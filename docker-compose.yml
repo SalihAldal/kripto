@@ -1,0 +1,100 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kinetic
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      APP_ENV: stage
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/kinetic
+      REDIS_URL: redis://redis:6379
+      BINANCE_ENV: testnet
+      BINANCE_DRY_RUN: "true"
+      APP_TOKEN: change-this-token
+      APP_TOKEN_NEXT: rotate-token
+      APP_ENCRYPTION_KEY: change-this-encryption-key
+      STARTUP_STRICT_ENV: "true"
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+      RUN_MIGRATIONS_ON_BOOT: "true"
+      RUN_SEED_ON_BOOT: "false"
+      APP_ROLE: web
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health/ready || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 6
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  worker:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      APP_ENV: stage
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/kinetic
+      REDIS_URL: redis://redis:6379
+      BINANCE_ENV: testnet
+      BINANCE_DRY_RUN: "true"
+      APP_TOKEN: change-this-token
+      APP_TOKEN_NEXT: rotate-token
+      APP_ENCRYPTION_KEY: change-this-encryption-key
+      STARTUP_STRICT_ENV: "true"
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+      RUN_MIGRATIONS_ON_BOOT: "false"
+      RUN_SEED_ON_BOOT: "false"
+      APP_ROLE: worker
+      SCANNER_WORKER_ENABLED: "true"
+      ENABLE_SEPARATE_WORKER: "true"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KINETIC | Institutional Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#31353b",
+              "inverse-on-surface": "#2d3136",
+              "on-primary": "#002e6a",
+              "on-primary-container": "#00285d",
+              "surface-container-high": "#262a30",
+              "secondary-fixed": "#60fcc6",
+              "outline-variant": "#424754",
+              "on-surface": "#e0e2ea",
+              "tertiary-container": "#ff5354",
+              "on-tertiary-container": "#5c000a",
+              "secondary": "#43e5b1",
+              "on-tertiary": "#68000c",
+              "on-secondary": "#003828",
+              "surface-container-lowest": "#0a0e13",
+              "primary-container": "#4d8eff",
+              "on-error": "#690005",
+              "on-tertiary-fixed-variant": "#930016",
+              "on-surface-variant": "#c2c6d6",
+              "on-background": "#e0e2ea",
+              "secondary-container": "#01c896",
+              "surface-container-low": "#181c21",
+              "on-secondary-fixed": "#002116",
+              "primary-fixed": "#d8e2ff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-dim": "#101419",
+              "surface": "#101419",
+              "surface-variant": "#31353b",
+              "error-container": "#93000a",
+              "tertiary-fixed-dim": "#ffb3ae",
+              "on-tertiary-fixed": "#410005",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#ffdad7",
+              "on-primary-fixed-variant": "#004395",
+              "tertiary": "#ffb3ae",
+              "surface-bright": "#36393f",
+              "on-primary-fixed": "#001a42",
+              "surface-container": "#1c2025",
+              "on-secondary-fixed-variant": "#00513b",
+              "background": "#101419",
+              "error": "#ffb4ab",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#3adfab",
+              "inverse-primary": "#005ac2",
+              "inverse-surface": "#e0e2ea",
+              "on-secondary-container": "#004d38",
+              "outline": "#8c909f",
+              "surface-tint": "#adc6ff"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .glass-card {
+        background: rgba(28, 32, 37, 0.8);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(173, 198, 255, 0.1);
+        border-left: 1px solid rgba(173, 198, 255, 0.1);
+      }
+      .obsidian-bg {
+        background-color: #0B0F14;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .kinetic-gradient {
+        background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%);
+      }
+      .ambient-glow {
+        box-shadow: 0 0 60px -5px rgba(224, 226, 234, 0.06);
+      }
+    </style>
+</head>
+<body class="obsidian-bg text-on-surface font-body min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+<!-- Decorative Background Elements (Observatory Feel) -->
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-secondary/5 blur-[100px]"></div>
+<!-- Login Container -->
+<main class="w-full max-w-[480px] z-10">
+<!-- Header / Logo -->
+<div class="text-center mb-10">
+<h1 class="text-3xl font-black tracking-tighter text-primary mb-2">KINETIC</h1>
+<p class="text-on-surface-variant font-medium tracking-wide text-sm uppercase">Institutional Grade Environment</p>
+</div>
+<!-- Glassmorphic Login Card -->
+<div class="glass-card ambient-glow rounded-xl p-8 md:p-12">
+<div class="mb-8">
+<h2 class="text-xl font-bold text-on-surface tracking-tight">System Access</h2>
+<p class="text-sm text-on-surface-variant mt-1">Authorized personnel only. Secure tunnel active.</p>
+</div>
+<form class="space-y-6">
+<!-- Institutional ID -->
+<div class="space-y-2">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Institutional ID / Email</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">alternate_email</span>
+</div>
+<input class="w-full bg-surface-container-low border-0 focus:ring-1 focus:ring-primary text-on-surface text-sm rounded-lg pl-11 py-3.5 transition-all placeholder:text-outline/40" placeholder="e.g. terminal-729@kinetic.sh" type="text"/>
+</div>
+</div>
+<!-- Password -->
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Password</label>
+<a class="text-[10px] font-bold text-primary hover:text-primary-fixed-dim transition-colors uppercase tracking-wider" href="#">Reset Credentials</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">lock</span>
+</div>
+<input class="w-full bg-surface-container-low border-0 focus:ring-1 focus:ring-primary text-on-surface text-sm rounded-lg pl-11 py-3.5 transition-all placeholder:text-outline/40" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="kinetic-gradient w-full py-4 rounded-lg text-on-primary-container font-black text-sm uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all hover:brightness-110" type="button">
+                    Initialize Session
+                </button>
+</form>
+<!-- Verification Options -->
+<div class="mt-10 pt-8 border-t border-outline-variant/10">
+<p class="text-center text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-6">Security Layer 2: Verification</p>
+<div class="grid grid-cols-2 gap-4">
+<!-- MFA Option -->
+<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-primary/20 transition-all group">
+<span class="material-symbols-outlined text-primary mb-2 opacity-60 group-hover:opacity-100 transition-opacity">phonelink_lock</span>
+<span class="text-[10px] font-bold text-on-surface-variant group-hover:text-on-surface uppercase tracking-wider">Mobile 2FA</span>
+</button>
+<!-- Hardware Key Option -->
+<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-primary/20 transition-all group">
+<span class="material-symbols-outlined text-primary mb-2 opacity-60 group-hover:opacity-100 transition-opacity">key_visualizer</span>
+<span class="text-[10px] font-bold text-on-surface-variant group-hover:text-on-surface uppercase tracking-wider">Hardware Key</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Meta -->
+<div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4 px-2">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#43e5b1]"></div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em]">Global Nodes Active: 104/104</span>
+</div>
+<div class="flex gap-6">
+<a class="text-[10px] font-bold text-outline hover:text-on-surface transition-colors uppercase tracking-widest" href="#">Privacy Protocol</a>
+<a class="text-[10px] font-bold text-outline hover:text-on-surface transition-colors uppercase tracking-widest" href="#">Contact Support</a>
+</div>
+</div>
+</main>
+<!-- Side Intelligence Visualizer (Subtle Asymmetric Element) -->
+<div class="fixed right-10 bottom-10 hidden xl:block w-72 pointer-events-none opacity-40">
+<div class="bg-surface-container-low p-6 rounded-xl space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-black uppercase tracking-tighter text-secondary">Real-time Feed</span>
+<span class="text-[10px] font-medium text-outline">v4.2.1-prod</span>
+</div>
+<div class="space-y-2">
+<div class="h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[65%] h-full bg-primary/40"></div>
+</div>
+<div class="h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[82%] h-full bg-secondary/40"></div>
+</div>
+<div class="h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[44%] h-full bg-primary/40"></div>
+</div>
+</div>
+<p class="text-[9px] text-on-surface-variant leading-relaxed font-medium">Monitoring latencies across NYC-1, LDN-2, and TYO-1 clusters for optimal execution speed.</p>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,20 @@
+{
+  "symbol": "BTCTRY",
+  "lastPrice": 110.5,
+  "change24h": 2.1,
+  "volume24h": 9800000,
+  "spreadPercent": 0.08,
+  "volatilityPercent": 1.35,
+  "momentumPercent": 0.42,
+  "orderBookImbalance": 0.18,
+  "buyPressure": 0.62,
+  "shortCandleSignal": 2,
+  "fakeSpikeScore": 0.22,
+  "tradable": true,
+  "rejectReasons": [],
+  "metadata": {
+    "shortMomentumPercent": 0.29,
+    "shortFlowImbalance": 0.14,
+    "tradeVelocity": 0.65
+  }
+}

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container": "#1c2025",
+            "error": "#ffb4ab",
+            "on-tertiary-container": "#5c000a",
+            "on-primary": "#002e6a",
+            "primary-fixed-dim": "#adc6ff",
+            "background": "#101419",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#410005",
+            "surface-bright": "#36393f",
+            "primary": "#adc6ff",
+            "on-error": "#690005",
+            "primary-fixed": "#d8e2ff",
+            "on-secondary": "#003828",
+            "tertiary-fixed": "#ffdad7",
+            "surface-tint": "#adc6ff",
+            "tertiary-container": "#ff5354",
+            "surface-dim": "#101419",
+            "inverse-primary": "#005ac2",
+            "surface": "#101419",
+            "on-surface": "#e0e2ea",
+            "on-secondary-container": "#004d38",
+            "tertiary": "#ffb3ae",
+            "outline-variant": "#424754",
+            "on-surface-variant": "#c2c6d6",
+            "surface-variant": "#31353b",
+            "surface-container-low": "#181c21",
+            "inverse-surface": "#e0e2ea",
+            "secondary": "#43e5b1",
+            "on-primary-fixed": "#001a42",
+            "tertiary-fixed-dim": "#ffb3ae",
+            "on-background": "#e0e2ea",
+            "surface-container-lowest": "#0a0e13",
+            "primary-container": "#4d8eff",
+            "surface-container-high": "#262a30",
+            "secondary-container": "#01c896",
+            "secondary-fixed-dim": "#3adfab",
+            "on-secondary-fixed": "#002116",
+            "on-primary-fixed-variant": "#004395",
+            "inverse-on-surface": "#2d3136",
+            "secondary-fixed": "#60fcc6",
+            "on-tertiary": "#68000c",
+            "surface-container-highest": "#31353b",
+            "on-error-container": "#ffdad6",
+            "outline": "#8c909f",
+            "on-secondary-fixed-variant": "#00513b",
+            "on-tertiary-fixed-variant": "#930016",
+            "on-primary-container": "#00285d"
+          },
+          fontFamily: {
+            "headline": ["Inter"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .glass-card {
+      background: rgba(49, 53, 59, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .inner-glow {
+      box-shadow: inset 1px 1px 0px 0px rgba(173, 198, 255, 0.1);
+    }
+    .panic-glow {
+      box-shadow: 0 0 30px -5px rgba(255, 83, 84, 0.4);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Implementation -->
+<nav class="bg-[#101419]/80 backdrop-blur-xl font-['Inter'] antialiased tracking-tight docked full-width top-0 z-50 bg-[#181c21] flat no shadows flex justify-between items-center w-full px-6 h-16 max-w-[1920px] mx-auto fixed">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-[#adc6ff] uppercase">KINETIC</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-[#e0e2ea]/60 hover:text-[#e0e2ea] transition-colors hover:bg-[#ffffff]/5 transition-all duration-200" href="#">Trade</a>
+<a class="text-[#e0e2ea]/60 hover:text-[#e0e2ea] transition-colors hover:bg-[#ffffff]/5 transition-all duration-200" href="#">Strategy</a>
+<a class="text-[#adc6ff] border-b-2 border-[#4d8eff] pb-1 font-semibold hover:bg-[#ffffff]/5 transition-all duration-200" href="#">Risk</a>
+<a class="text-[#e0e2ea]/60 hover:text-[#e0e2ea] transition-colors hover:bg-[#ffffff]/5 transition-all duration-200" href="#">Logs</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/10">
+<span class="material-symbols-outlined text-sm mr-2 text-primary">search</span>
+<input class="bg-transparent border-none text-xs focus:ring-0 p-0 text-on-surface-variant w-40" placeholder="Search instruments..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-[#e0e2ea]/60 hover:text-[#adc6ff] transition-all"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-[#e0e2ea]/60 hover:text-[#adc6ff] transition-all"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-2 text-[#e0e2ea]/60 hover:text-[#adc6ff] transition-all"><span class="material-symbols-outlined">account_balance_wallet</span></button>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-primary/20">
+<img class="object-cover h-full w-full" data-alt="Close-up portrait of a professional institutional trader in a high-tech office setting with soft blue ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPKKnF6oCo3xZJXnybitjenl8byOtssFGl7eKIIKmkqZrP6qum4_l92paAOY3TX2zEdcaM0hnYDqRMx6oN0cw1-4KXWlXwM1Lx_tlLGyEX9sH-pqYH0kqwPwS-mETFiycs9CXKpHiOyMYsP2cDRNUCUXd7ijbWmjW_C-rFhUMwnAMXXSFqGwK6KA_dnU-Y0sx-QIURRDgP1UpoFPf58V2i4I1njGZ5H9MVYlTnKYKK4WFH-2bPaKuOrlgqU0tfdddv6FWk85zRszDB"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar Implementation -->
+<aside class="bg-[#181c21] font-['Inter'] text-sm font-medium docked left-0 h-screen w-64 bg-[#101419] flat no shadows fixed mt-16 hidden lg:flex flex-col py-6">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl border border-outline-variant/5">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<p class="text-[#adc6ff] font-bold">Observatory</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">AI Scalping Active</p>
+</div>
+</div>
+</div>
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea]/50 hover:bg-[#1c2025]/50 transition-transform duration-200 hover:translate-x-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span>Market Pulse</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea]/50 hover:bg-[#1c2025]/50 transition-transform duration-200 hover:translate-x-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span>AI Insights</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea]/50 hover:bg-[#1c2025]/50 transition-transform duration-200 hover:translate-x-1 rounded-lg" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span>Portfolio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#1c2025] text-[#adc6ff] border-r-2 border-[#4d8eff] transition-transform duration-200 hover:translate-x-1 rounded-l-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span>Safety Hub</span>
+</a>
+</div>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 px-4 bg-tertiary-container text-on-tertiary-container font-bold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 active:opacity-80 transition-all">
+<span class="material-symbols-outlined text-lg">emergency_home</span>
+        Emergency Stop
+      </button>
+<div class="mt-6 pt-6 border-t border-outline-variant/10 space-y-3">
+<a class="flex items-center gap-3 text-[#e0e2ea]/50 hover:text-[#e0e2ea] transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">help_outline</span>
+<span class="text-xs uppercase tracking-tighter">Support</span>
+</a>
+<a class="flex items-center gap-3 text-[#e0e2ea]/50 hover:text-[#e0e2ea] transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">lan</span>
+<span class="text-xs uppercase tracking-tighter">API Status</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 px-6 pb-12 min-h-screen">
+<div class="max-w-[1600px] mx-auto">
+<!-- Header / Global Actions -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+<div class="space-y-1">
+<p class="text-label-sm text-primary uppercase tracking-[0.2em] font-bold">Security &amp; Compliance</p>
+<h1 class="text-[2.75rem] font-black tracking-tight leading-none">Risk Management</h1>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<div class="glass-card inner-glow p-4 rounded-xl flex items-center gap-6 border border-outline-variant/10">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Safety Mode</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-secondary font-bold">OPTIMIZED</span>
+<div class="w-10 h-5 bg-secondary/20 rounded-full relative p-0.5 border border-secondary/30">
+<div class="w-4 h-4 bg-secondary rounded-full absolute right-0.5"></div>
+</div>
+</div>
+</div>
+<div class="h-10 w-px bg-outline-variant/20"></div>
+<button class="panic-glow bg-gradient-to-br from-tertiary to-tertiary-container text-on-tertiary-container font-black px-6 py-2.5 rounded-lg text-sm uppercase tracking-wider flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">gavel</span>
+              Panic Sell All
+            </button>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<!-- Exposure Heatmap (Large) -->
+<section class="md:col-span-8 glass-card inner-glow rounded-xl p-6 border border-outline-variant/10 overflow-hidden relative">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+              Exposure Heatmap
+            </h3>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container rounded text-[10px] text-on-surface-variant font-bold uppercase">Asset Class</span>
+<span class="px-3 py-1 bg-surface-container-high text-primary rounded text-[10px] text-on-surface-variant font-bold uppercase">Sector</span>
+</div>
+</div>
+<div class="grid grid-cols-4 grid-rows-3 gap-3 h-[400px]">
+<div class="col-span-2 row-span-2 bg-secondary/10 border border-secondary/20 rounded-lg p-4 flex flex-col justify-between hover:bg-secondary/15 transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<span class="text-2xl font-black text-secondary">BTC</span>
+<span class="text-[10px] bg-secondary/20 px-2 py-0.5 rounded text-secondary font-bold">42% WEIGHT</span>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-tighter">Exposure</p>
+<p class="text-lg font-bold">$12.4M</p>
+</div>
+</div>
+<div class="col-span-1 row-span-2 bg-primary/10 border border-primary/20 rounded-lg p-4 flex flex-col justify-between hover:bg-primary/15 transition-colors cursor-pointer">
+<div class="flex justify-between items-start">
+<span class="text-xl font-bold text-primary">ETH</span>
+<span class="material-symbols-outlined text-sm text-primary">trending_up</span>
+</div>
+<p class="text-lg font-bold">$4.8M</p>
+</div>
+<div class="col-span-1 row-span-1 bg-surface-container border border-outline-variant/10 rounded-lg p-4 flex flex-col justify-center items-center opacity-60 hover:opacity-100 transition-all">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">SOL</span>
+<p class="text-sm font-bold mt-1">$1.2M</p>
+</div>
+<div class="col-span-1 row-span-1 bg-surface-container border border-outline-variant/10 rounded-lg p-4 flex flex-col justify-center items-center opacity-60 hover:opacity-100 transition-all">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">AVAX</span>
+<p class="text-sm font-bold mt-1">$840K</p>
+</div>
+<div class="col-span-2 row-span-1 bg-surface-container-low border border-outline-variant/10 rounded-lg p-4 flex items-center justify-between">
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant opacity-50">Stablecoin Reserve</p>
+<p class="text-lg font-bold text-secondary">$2.1M</p>
+</div>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-[#1c2025] border border-outline-variant/20 flex items-center justify-center text-[8px] font-bold">USDT</div>
+<div class="w-6 h-6 rounded-full bg-[#1c2025] border border-outline-variant/20 flex items-center justify-center text-[8px] font-bold">USDC</div>
+</div>
+</div>
+<div class="col-span-2 row-span-1 bg-tertiary/10 border border-tertiary/20 rounded-lg p-4 flex items-center justify-between hover:bg-tertiary/15 transition-colors cursor-pointer">
+<div>
+<p class="text-[10px] uppercase font-bold text-tertiary">High Volatility Risk</p>
+<p class="text-lg font-bold text-on-surface">L2 Ecosystem</p>
+</div>
+<span class="material-symbols-outlined text-tertiary">warning</span>
+</div>
+</div>
+</section>
+<!-- Dynamic Thresholds & Limits (Small/Stack) -->
+<section class="md:col-span-4 space-y-6">
+<div class="glass-card inner-glow rounded-xl p-6 border border-outline-variant/10">
+<h3 class="text-sm font-black uppercase tracking-widest text-primary mb-6">Trading Enforcements</h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter">
+<span class="text-on-surface-variant">Daily Drawdown</span>
+<span class="text-tertiary">Limit: 2.5%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-secondary to-tertiary" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between text-[10px] opacity-50">
+<span>Current: 1.62%</span>
+<span>Threshold Warning at 2.0%</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter">
+<span class="text-on-surface-variant">Max Trade Size</span>
+<span class="text-on-surface">$500,000</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 30%;"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter">
+<span class="text-on-surface-variant">Leverage Cap</span>
+<span class="text-on-surface">10.0x</span>
+</div>
+<div class="flex gap-1">
+<div class="h-1.5 flex-1 bg-primary rounded-full"></div>
+<div class="h-1.5 flex-1 bg-primary rounded-full"></div>
+<div class="h-1.5 flex-1 bg-primary rounded-full"></div>
+<div class="h-1.5 flex-1 bg-surface-container rounded-full"></div>
+<div class="h-1.5 flex-1 bg-surface-container rounded-full"></div>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 border border-primary/20 hover:bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest rounded-lg transition-colors">
+              Update Thresholds
+            </button>
+</div>
+<!-- Circuit Breakers Status -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/5">
+<h3 class="text-sm font-black uppercase tracking-widest mb-4">Circuit Breakers</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-lg border border-secondary/10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-xs font-medium">Volatility Pause</span>
+</div>
+<span class="text-[10px] uppercase font-bold text-secondary">Ready</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-lg border border-secondary/10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-xs font-medium">Latency Guard (API)</span>
+</div>
+<span class="text-[10px] uppercase font-bold text-secondary">Active</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-lg border border-tertiary/10">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="text-xs font-medium">Exchange Disconnect</span>
+</div>
+<span class="text-[10px] uppercase font-bold text-tertiary">Triggered</span>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Risk Assessment Card (Asymmetric Layout) -->
+<section class="md:col-span-12 lg:col-span-8 mt-6">
+<div class="glass-card inner-glow rounded-2xl p-8 border border-outline-variant/10 relative overflow-hidden">
+<!-- Background Accent Shape -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="flex flex-col md:flex-row gap-8 items-center">
+<div class="w-32 h-32 relative flex-shrink-0">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="60" stroke="currentColor" stroke-dasharray="377" stroke-dashoffset="94" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-black">75</span>
+<span class="text-[8px] uppercase font-bold tracking-widest text-on-surface-variant">Safety Score</span>
+</div>
+</div>
+<div class="flex-1 space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<h4 class="text-lg font-bold">Kinetic AI Assessment</h4>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed max-w-2xl">
+                  Market conditions are currently <span class="text-secondary font-bold">STABLE</span> but showing signs of increasing correlation between BTC and high-cap alts. AI suggests decreasing leverage on L2 positions by 15% to maintain Safety Score above 80.
+                </p>
+<div class="flex gap-4">
+<button class="bg-primary text-on-primary text-xs font-bold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">Apply Recommendations</button>
+<button class="bg-surface-container text-on-surface text-xs font-bold px-4 py-2 rounded-lg hover:bg-surface-container-high transition-colors">Review Logic</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Risk Logs / Recent Events -->
+<section class="md:col-span-12 lg:col-span-4 mt-6">
+<div class="glass-card inner-glow rounded-xl border border-outline-variant/10 flex flex-col h-full max-h-[400px]">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center">
+<h3 class="text-xs font-black uppercase tracking-widest">Risk Event Log</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm cursor-pointer">open_in_new</span>
+</div>
+<div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+<div class="flex gap-4 items-start border-l-2 border-tertiary pl-4 py-1">
+<div class="flex-1">
+<p class="text-[10px] text-on-surface-variant mb-1">14:22:01 • CRITICAL</p>
+<p class="text-sm font-bold">Binance API Latency Spike</p>
+<p class="text-xs text-on-surface-variant">Circuit breaker engaged: All pending orders paused.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start border-l-2 border-primary pl-4 py-1">
+<div class="flex-1">
+<p class="text-[10px] text-on-surface-variant mb-1">13:45:12 • INFO</p>
+<p class="text-sm font-bold">Leverage Rebalance</p>
+<p class="text-xs text-on-surface-variant">Manual leverage reduction on ETH/USDT pair.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start border-l-2 border-secondary pl-4 py-1">
+<div class="flex-1">
+<p class="text-[10px] text-on-surface-variant mb-1">12:10:55 • SUCCESS</p>
+<p class="text-sm font-bold">Safety Mode Activated</p>
+<p class="text-xs text-on-surface-variant">Optimized safety protocols deployed via UI.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start border-l-2 border-tertiary pl-4 py-1 opacity-60">
+<div class="flex-1">
+<p class="text-[10px] text-on-surface-variant mb-1">11:05:30 • WARNING</p>
+<p class="text-sm font-bold">Drawdown Threshold (1.5%)</p>
+<p class="text-xs text-on-surface-variant">User notified: Nearing 2.0% daily limit.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Bottom Nav for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-[#181c21]/95 backdrop-blur-xl border-t border-outline-variant/10 px-4 py-2 flex justify-around items-center z-50">
+<button class="flex flex-col items-center gap-1 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-bold">Pulse</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">psychology</span>
+<span class="text-[10px] font-bold">AI</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="text-[10px] font-bold">Risk</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-[10px] font-bold">Wallet</span>
+</button>
+</nav>
+</body></html>

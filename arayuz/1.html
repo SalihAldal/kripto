@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KINETIC | System Status &amp; AI Health</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#31353b",
+              "inverse-on-surface": "#2d3136",
+              "on-primary": "#002e6a",
+              "on-primary-container": "#00285d",
+              "surface-container-high": "#262a30",
+              "secondary-fixed": "#60fcc6",
+              "outline-variant": "#424754",
+              "on-surface": "#e0e2ea",
+              "tertiary-container": "#ff5354",
+              "on-tertiary-container": "#5c000a",
+              "secondary": "#43e5b1",
+              "on-tertiary": "#68000c",
+              "on-secondary": "#003828",
+              "surface-container-lowest": "#0a0e13",
+              "primary-container": "#4d8eff",
+              "on-error": "#690005",
+              "on-tertiary-fixed-variant": "#930016",
+              "on-surface-variant": "#c2c6d6",
+              "on-background": "#e0e2ea",
+              "secondary-container": "#01c896",
+              "surface-container-low": "#181c21",
+              "on-secondary-fixed": "#002116",
+              "primary-fixed": "#d8e2ff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-dim": "#101419",
+              "surface": "#101419",
+              "surface-variant": "#31353b",
+              "error-container": "#93000a",
+              "tertiary-fixed-dim": "#ffb3ae",
+              "on-tertiary-fixed": "#410005",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#ffdad7",
+              "on-primary-fixed-variant": "#004395",
+              "tertiary": "#ffb3ae",
+              "surface-bright": "#36393f",
+              "on-primary-fixed": "#001a42",
+              "surface-container": "#1c2025",
+              "on-secondary-fixed-variant": "#00513b",
+              "background": "#101419",
+              "error": "#ffb4ab",
+              "primary": "#adc6ff",
+              "secondary-fixed-dim": "#3adfab",
+              "inverse-primary": "#005ac2",
+              "inverse-surface": "#e0e2ea",
+              "on-secondary-container": "#004d38",
+              "outline": "#8c909f",
+              "surface-tint": "#adc6ff"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(28, 32, 37, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(173, 198, 255, 0.1);
+            border-left: 1px solid rgba(173, 198, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="bg-[#101419]/80 backdrop-blur-xl font-inter antialiased tracking-tight docked full-width top-0 z-50 flex justify-between items-center w-full px-6 py-3 sticky">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black tracking-tighter text-[#adc6ff]">KINETIC</span>
+<div class="hidden md:flex gap-6">
+<a class="text-[#e0e2ea] opacity-70 hover:bg-[#1c2025] hover:text-[#adc6ff] transition-colors duration-200" href="#">BTC/USD</a>
+<a class="text-[#e0e2ea] opacity-70 hover:bg-[#1c2025] hover:text-[#adc6ff] transition-colors duration-200" href="#">ETH/USD</a>
+<a class="text-[#e0e2ea] opacity-70 hover:bg-[#1c2025] hover:text-[#adc6ff] transition-colors duration-200" href="#">SOL/USD</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4">
+<span class="material-symbols-outlined text-[#adc6ff] text-sm">notifications</span>
+<span class="material-symbols-outlined text-[#adc6ff] text-sm">settings</span>
+<span class="material-symbols-outlined text-[#adc6ff] text-sm">account_balance_wallet</span>
+</div>
+<button class="px-4 py-1.5 rounded-lg text-sm font-bold bg-[#181c21] text-[#e0e2ea] hover:bg-[#1c2025] transition-all">Deposit</button>
+<button class="px-4 py-1.5 rounded-lg text-sm font-bold bg-gradient-to-br from-primary to-primary-container text-on-primary hover:opacity-90 transition-all Active:scale-95">Execute Trade</button>
+</div>
+</nav>
+<div class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-[#181c21] font-inter text-sm font-medium docked left-0 h-screen w-64 flex flex-col h-full py-6 hidden md:flex sticky top-0">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<div class="text-[#4d8eff] font-black text-lg leading-none">KINETIC</div>
+<div class="text-[10px] opacity-50 tracking-widest uppercase">Institutional Grade</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">query_stats</span> Live Trading
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">psychology</span> AI Analysis
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">history</span> Trade History
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">tune</span> Strategy Settings
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">security</span> Risk Management
+                </a>
+<a class="flex items-center gap-3 px-6 py-3 bg-[#1c2025] text-[#adc6ff] border-r-4 border-[#4d8eff]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span> Logs
+                </a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full py-3 rounded-xl bg-primary/10 text-primary border border-primary/20 font-bold mb-6 hover:bg-primary/20 transition-all">
+                    New Strategy
+                </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-2 py-2 text-[#e0e2ea] opacity-60 hover:opacity-100 text-xs" href="#">
+<span class="material-symbols-outlined text-sm">help</span> Support
+                    </a>
+<a class="flex items-center gap-3 px-2 py-2 text-[#e0e2ea] opacity-60 hover:opacity-100 text-xs" href="#">
+<span class="material-symbols-outlined text-sm">code</span> API Docs
+                    </a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8 overflow-y-auto">
+<header class="mb-12 flex justify-between items-end">
+<div>
+<h1 class="text-display-md font-black tracking-tighter text-on-surface mb-2">SYSTEM COMMAND</h1>
+<p class="text-on-surface-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                        All global nodes operational. AI latency within institutional threshold (1.2ms).
+                    </p>
+</div>
+<div class="flex gap-4">
+<div class="px-6 py-3 bg-surface-container-low rounded-xl">
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Total Requests</div>
+<div class="text-xl font-bold">1.42B <span class="text-xs text-secondary font-normal">+12%</span></div>
+</div>
+<div class="px-6 py-3 bg-surface-container-low rounded-xl">
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Global Confidence</div>
+<div class="text-xl font-bold">98.4%</div>
+</div>
+</div>
+</header>
+<!-- 3-Column Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Node Performance -->
+<div class="lg:col-span-3 space-y-6">
+<div class="glass-panel p-6 rounded-xl">
+<h3 class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-6">Exchange Nodes</h3>
+<div class="space-y-6">
+<div class="flex justify-between items-center">
+<div>
+<div class="font-bold">Binance HK-1</div>
+<div class="text-xs text-on-surface-variant">Primary Gateway</div>
+</div>
+<div class="text-right">
+<div class="text-secondary font-mono">0.8ms</div>
+<div class="text-[10px] text-on-surface-variant">Stable</div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<div class="font-bold">OKX SG-4</div>
+<div class="text-xs text-on-surface-variant">Regional Mesh</div>
+</div>
+<div class="text-right">
+<div class="text-secondary font-mono">1.1ms</div>
+<div class="text-[10px] text-on-surface-variant">Stable</div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<div class="font-bold">Coinbase US-E</div>
+<div class="text-xs text-on-surface-variant">Cross-Atlantic</div>
+</div>
+<div class="text-right">
+<div class="text-primary font-mono font-bold">4.2ms</div>
+<div class="text-[10px] text-on-surface-variant">Congested</div>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-xl overflow-hidden relative">
+<h3 class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Uptime Scan</h3>
+<div class="flex gap-1 h-12 items-end">
+<!-- Mock Uptime Bars -->
+<div class="flex-1 bg-secondary opacity-20 h-full rounded-t-sm"></div>
+<div class="flex-1 bg-secondary opacity-40 h-5/6 rounded-t-sm"></div>
+<div class="flex-1 bg-secondary opacity-60 h-full rounded-t-sm"></div>
+<div class="flex-1 bg-secondary h-full rounded-t-sm"></div>
+<div class="flex-1 bg-secondary opacity-80 h-4/6 rounded-t-sm"></div>
+<div class="flex-1 bg-secondary h-full rounded-t-sm"></div>
+<div class="flex-1 bg-secondary h-5/6 rounded-t-sm"></div>
+<div class="flex-1 bg-tertiary h-2/6 rounded-t-sm"></div>
+<div class="flex-1 bg-secondary h-full rounded-t-sm"></div>
+<div class="flex-1 bg-secondary opacity-90 h-full rounded-t-sm"></div>
+</div>
+<div class="mt-4 flex justify-between text-[10px] text-on-surface-variant font-mono">
+<span>24H AGO</span>
+<span>99.98% AVG</span>
+<span>NOW</span>
+</div>
+</div>
+</div>
+<!-- Center Column: Map & Global Stats -->
+<div class="lg:col-span-6 space-y-6">
+<div class="glass-panel rounded-xl overflow-hidden aspect-video relative group">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
+<img class="w-full h-full object-cover opacity-40 transition-transform duration-1000 group-hover:scale-105" data-alt="Digital stylized world map with glowing blue network nodes and connecting lines on a dark background representing global edge computing infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxbqLZAG_5YX9RTCOgXqNAJ2haYBFLErE1Y7we0puOjy1dmmO2w5B810VLMHwWXgkTLFBNsd1me6h42P0OfT5tBvFNhmfQ80zXUa9x5ncCTVnElQJCscGJCx1l73VrB0ETqpzV3hcJ2gO17C3QZ-3n_r7m1fQm0OhRVzxMOwEOAXlqEXOYocDU5ubRJPLeyXbgZC0xP35jXa7CcozvnBsisG7L5M4b4Mk0iZOACsbLmJOGQE8Vyp6vuATvZ0qlG5OjRtHN34Ptd087"/>
+<div class="absolute inset-0 z-20 p-8 flex flex-col justify-between pointer-events-none">
+<div class="flex justify-between">
+<div>
+<h3 class="text-2xl font-black text-primary">Global Edge Nodes</h3>
+<p class="text-sm text-on-surface-variant">32 Active | 2 Maintenance</p>
+</div>
+<div class="bg-surface-container-highest px-3 py-1 rounded-full text-[10px] font-bold border border-outline-variant/30 flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full"></span> LIVE TELEMETRY
+                                </div>
+</div>
+<!-- Map Callout -->
+<div class="self-end bg-surface-container-highest/90 backdrop-blur-md p-4 rounded-xl border border-primary/20 pointer-events-auto">
+<div class="text-[10px] uppercase text-primary font-bold mb-1">Current Focus: Frankfurt</div>
+<div class="text-lg font-bold">EU-CENTRAL-1</div>
+<div class="grid grid-cols-2 gap-4 mt-2">
+<div>
+<div class="text-[8px] text-on-surface-variant">CPU LOAD</div>
+<div class="text-sm font-mono text-secondary">42%</div>
+</div>
+<div>
+<div class="text-[8px] text-on-surface-variant">THROUGHPUT</div>
+<div class="text-sm font-mono text-secondary">8.4GB/s</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="glass-panel p-6 rounded-xl">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">speed</span>
+<span class="text-label-sm font-bold text-on-surface-variant tracking-widest">PROCESSING SPEED</span>
+</div>
+<div class="text-3xl font-black mb-1">0.0042<span class="text-sm font-normal text-on-surface-variant ml-1">ms/req</span></div>
+<div class="text-xs text-secondary font-medium">Faster than 99.4% of market competitors</div>
+</div>
+<div class="glass-panel p-6 rounded-xl">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="text-label-sm font-bold text-on-surface-variant tracking-widest">SECURITY STATUS</span>
+</div>
+<div class="text-3xl font-black mb-1">SECURE</div>
+<div class="text-xs text-on-surface-variant">Last threat mitigated 42m ago</div>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Health & Decision Stream -->
+<div class="lg:col-span-3 space-y-6">
+<div class="glass-panel p-6 rounded-xl border-l-4 border-secondary/50">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest">AI Intelligence</h3>
+<span class="px-2 py-0.5 bg-secondary-container/20 text-secondary text-[10px] rounded font-bold">OPTIMAL</span>
+</div>
+<div class="text-center py-4">
+<div class="relative inline-block">
+<svg class="w-32 h-32 transform -rotate-90">
+<circle class="text-surface-container-highest" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-secondary" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="36.4" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<div class="text-2xl font-black">94%</div>
+<div class="text-[8px] text-on-surface-variant">ACCURACY</div>
+</div>
+</div>
+</div>
+<div class="mt-4 space-y-3">
+<div class="text-xs flex justify-between">
+<span class="text-on-surface-variant">Sentiment Analysis</span>
+<span class="font-bold">Bullish</span>
+</div>
+<div class="text-xs flex justify-between">
+<span class="text-on-surface-variant">Pattern Matching</span>
+<span class="font-bold">Active</span>
+</div>
+<div class="text-xs flex justify-between">
+<span class="text-on-surface-variant">Execution Risk</span>
+<span class="text-secondary font-bold">Low</span>
+</div>
+</div>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col h-[400px]">
+<div class="p-6 border-b border-outline-variant/10">
+<h3 class="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest">Decision Logs</h3>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="p-3 bg-surface-container/50 rounded-lg border-l-2 border-secondary">
+<div class="text-[10px] font-mono text-on-surface-variant mb-1">14:02:11.450</div>
+<div class="text-xs font-bold mb-1">[EXEC] BTC Scalp Long</div>
+<div class="text-[10px] text-secondary opacity-80">AI Confidence: 92.1%</div>
+</div>
+<div class="p-3 bg-surface-container/50 rounded-lg border-l-2 border-primary">
+<div class="text-[10px] font-mono text-on-surface-variant mb-1">14:02:08.221</div>
+<div class="text-xs font-bold mb-1">[NEUTRAL] ETH Liquidity Scan</div>
+<div class="text-[10px] text-on-surface-variant opacity-80">Waiting for volume spike</div>
+</div>
+<div class="p-3 bg-surface-container/50 rounded-lg border-l-2 border-tertiary">
+<div class="text-[10px] font-mono text-on-surface-variant mb-1">14:01:55.902</div>
+<div class="text-xs font-bold mb-1">[ABORT] SOL Sell Signal</div>
+<div class="text-[10px] text-tertiary opacity-80">High slippage detected (2.4%)</div>
+</div>
+<div class="p-3 bg-surface-container/50 rounded-lg border-l-2 border-secondary">
+<div class="text-[10px] font-mono text-on-surface-variant mb-1">14:01:42.110</div>
+<div class="text-xs font-bold mb-1">[INFO] Node Switch to HK-1</div>
+<div class="text-[10px] text-on-surface-variant opacity-80">Latency optimized by -0.4ms</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high/50 text-center">
+<button class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline transition-all">View Full Audit Trail</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Background Decorative Elements -->
+<div class="fixed top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
+<div class="fixed bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2"></div>
+</body></html>

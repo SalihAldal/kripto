@@ -1,0 +1,692 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  TRADER
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+  LOCKED
+}
+
+enum ExchangeType {
+  BINANCE
+  BYBIT
+  OKX
+  KRAKEN
+  CUSTOM
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  DEGRADED
+  DISCONNECTED
+  ERROR
+}
+
+enum AiProviderType {
+  OPENAI
+  ANTHROPIC
+  GEMINI
+  LOCAL
+  CUSTOM
+}
+
+enum ProviderStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum ModelStatus {
+  ACTIVE
+  PAUSED
+  DISABLED
+}
+
+enum TradingPairStatus {
+  ACTIVE
+  PAUSED
+  DELISTED
+}
+
+enum SnapshotInterval {
+  S1
+  S5
+  M1
+  M5
+  M15
+  H1
+}
+
+enum ScannerResultStatus {
+  NEW
+  QUALIFIED
+  REJECTED
+}
+
+enum SignalSide {
+  BUY
+  SELL
+  HOLD
+}
+
+enum SignalSource {
+  AI_MODEL
+  SCANNER
+  RISK_ENGINE
+  MANUAL
+}
+
+enum SignalStatus {
+  NEW
+  APPROVED
+  REJECTED
+  EXPIRED
+  EXECUTED
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP
+  STOP_LIMIT
+  TAKE_PROFIT
+}
+
+enum OrderStatus {
+  NEW
+  PARTIALLY_FILLED
+  FILLED
+  CANCELED
+  REJECTED
+  EXPIRED
+}
+
+enum ExecutionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PositionSide {
+  LONG
+  SHORT
+}
+
+enum PositionStatus {
+  OPEN
+  CLOSED
+  LIQUIDATED
+}
+
+enum RiskProfile {
+  CONSERVATIVE
+  MODERATE
+  AGGRESSIVE
+}
+
+enum ConfigStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+enum StrategyMode {
+  AUTO
+  MANUAL
+  SEMI_AUTO
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  CRITICAL
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXECUTE
+}
+
+enum AppSettingScope {
+  GLOBAL
+  USER
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  username            String               @unique
+  passwordHash        String
+  fullName            String?
+  role                UserRole             @default(TRADER)
+  status              UserStatus           @default(ACTIVE)
+  timezone            String               @default("UTC")
+  lastLoginAt         DateTime?
+  lastErrorMessage    String?
+  metadata            Json?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  exchangeConnections ExchangeConnection[]
+  aiModelConfigs      AiModelConfig[]
+  scannerResults      ScannerResult[]
+  tradeSignals        TradeSignal[]
+  tradeOrders         TradeOrder[]
+  positions           Position[]
+  profitLossRecords   ProfitLossRecord[]
+  riskConfig          RiskConfig?
+  strategyConfigs     StrategyConfig[]
+  auditLogs           AuditLog[]
+  appSettings         AppSetting[]
+  autoRoundJobs       AutoRoundJob[]
+
+  @@index([status, role])
+  @@index([createdAt])
+}
+
+model ExchangeConnection {
+  id                   String           @id @default(cuid())
+  userId               String
+  user                 User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchange             ExchangeType
+  name                 String
+  status               ConnectionStatus @default(DISCONNECTED)
+  apiKeyMasked         String
+  apiSecretEncrypted   String
+  passphraseEncrypted  String?
+  isSandbox            Boolean          @default(true)
+  rateLimitPerMinute   Int              @default(1200)
+  lastSyncAt           DateTime?
+  lastErrorMessage     String?
+  lastErrorAt          DateTime?
+  errorCount           Int              @default(0)
+  providerMetadata     Json?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  tradeOrders          TradeOrder[]
+  positions            Position[]
+
+  @@unique([userId, exchange, name])
+  @@index([status])
+  @@index([exchange])
+}
+
+model AiProvider {
+  id               String          @id @default(cuid())
+  name             String          @unique
+  type             AiProviderType
+  status           ProviderStatus  @default(ACTIVE)
+  baseUrl          String?
+  modelCatalog     Json?
+  authMetadata     Json?
+  lastHealthAt     DateTime?
+  lastErrorMessage String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  modelConfigs     AiModelConfig[]
+  tradeSignals     TradeSignal[]
+
+  @@index([status, type])
+}
+
+model AiModelConfig {
+  id                    String      @id @default(cuid())
+  userId                String?
+  user                  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  aiProviderId          String
+  aiProvider            AiProvider  @relation(fields: [aiProviderId], references: [id], onDelete: Cascade)
+  key                   String
+  displayName           String
+  status                ModelStatus @default(ACTIVE)
+  version               String?
+  confidenceThreshold   Float       @default(0.8)
+  weight                Float       @default(1.0)
+  temperature           Float       @default(0.2)
+  maxTokens             Int?
+  retryCount            Int         @default(1)
+  timeoutMs             Int         @default(1500)
+  providerModelName     String?
+  errorMessage          String?
+  metadata              Json?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  tradeSignals          TradeSignal[]
+
+  @@unique([aiProviderId, key])
+  @@index([status])
+}
+
+model TradingPair {
+  id                String            @id @default(cuid())
+  symbol            String            @unique
+  baseAsset         String
+  quoteAsset        String
+  status            TradingPairStatus @default(ACTIVE)
+  pricePrecision    Int               @default(2)
+  quantityPrecision Int               @default(4)
+  tickSize          Float?
+  lotSize           Float?
+  minNotional       Float?
+  isFavorite        Boolean           @default(false)
+  metadata          Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  marketSnapshots   MarketSnapshot[]
+  scannerResults    ScannerResult[]
+  tradeSignals      TradeSignal[]
+  tradeOrders       TradeOrder[]
+  positions         Position[]
+  profitLossRecords ProfitLossRecord[]
+
+  @@index([status, baseAsset, quoteAsset])
+}
+
+model MarketSnapshot {
+  id                String           @id @default(cuid())
+  tradingPairId     String
+  tradingPair       TradingPair      @relation(fields: [tradingPairId], references: [id], onDelete: Cascade)
+  interval          SnapshotInterval
+  snapshotAt        DateTime
+  bidPrice          Float
+  askPrice          Float
+  lastPrice         Float
+  markPrice         Float?
+  indexPrice        Float?
+  volumeBase        Float?
+  volumeQuote       Float?
+  openInterest      Float?
+  fundingRate       Float?
+  source            ExchangeType     @default(BINANCE)
+  sourceLatencyMs   Int?
+  errorMessage      String?
+  metadata          Json?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  scannerResults    ScannerResult[]
+  tradeSignals      TradeSignal[]
+
+  @@index([tradingPairId, snapshotAt])
+  @@index([interval, source])
+}
+
+model ScannerResult {
+  id               String              @id @default(cuid())
+  userId           String?
+  user             User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tradingPairId    String
+  tradingPair      TradingPair         @relation(fields: [tradingPairId], references: [id], onDelete: Cascade)
+  marketSnapshotId String?
+  marketSnapshot   MarketSnapshot?     @relation(fields: [marketSnapshotId], references: [id], onDelete: SetNull)
+  scannerName      String
+  status           ScannerResultStatus @default(NEW)
+  score            Float
+  confidence       Float
+  rank             Int?
+  reason           String?
+  errorMessage     String?
+  metadata         Json?
+  scannedAt        DateTime            @default(now())
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  tradeSignals     TradeSignal[]
+
+  @@index([tradingPairId, scannedAt])
+  @@index([status, scannerName])
+}
+
+model TradeSignal {
+  id               String        @id @default(cuid())
+  userId           String?
+  user             User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tradingPairId    String
+  tradingPair      TradingPair   @relation(fields: [tradingPairId], references: [id], onDelete: Cascade)
+  aiProviderId     String?
+  aiProvider       AiProvider?   @relation(fields: [aiProviderId], references: [id], onDelete: SetNull)
+  aiModelConfigId  String?
+  aiModelConfig    AiModelConfig? @relation(fields: [aiModelConfigId], references: [id], onDelete: SetNull)
+  scannerResultId  String?
+  scannerResult    ScannerResult? @relation(fields: [scannerResultId], references: [id], onDelete: SetNull)
+  marketSnapshotId String?
+  marketSnapshot   MarketSnapshot? @relation(fields: [marketSnapshotId], references: [id], onDelete: SetNull)
+  side             SignalSide
+  source           SignalSource
+  status           SignalStatus  @default(NEW)
+  confidence       Float
+  triggerPrice     Float?
+  stopLossPrice    Float?
+  takeProfitPrice  Float?
+  reason           String?
+  errorMessage     String?
+  expiresAt        DateTime?
+  decidedAt        DateTime      @default(now())
+  metadata         Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  tradeOrders      TradeOrder[]
+
+  @@index([tradingPairId, decidedAt])
+  @@index([status, source])
+  @@index([aiModelConfigId])
+}
+
+model TradeOrder {
+  id                   String             @id @default(cuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchangeConnectionId String
+  exchangeConnection   ExchangeConnection @relation(fields: [exchangeConnectionId], references: [id], onDelete: Cascade)
+  tradingPairId        String
+  tradingPair          TradingPair        @relation(fields: [tradingPairId], references: [id], onDelete: Cascade)
+  tradeSignalId        String?
+  tradeSignal          TradeSignal?       @relation(fields: [tradeSignalId], references: [id], onDelete: SetNull)
+  positionId           String?
+  position             Position?          @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  side                 OrderSide
+  type                 OrderType
+  status               OrderStatus        @default(NEW)
+  clientOrderId        String?
+  exchangeOrderId      String?
+  quantity             Float
+  price                Float?
+  stopPrice            Float?
+  takeProfitPrice      Float?
+  timeInForce          String?
+  fee                  Float              @default(0)
+  feeCurrency          String?
+  slippage             Float              @default(0)
+  avgExecutionPrice    Float?
+  rejectReason         String?
+  errorMessage         String?
+  submittedAt          DateTime?
+  executedAt           DateTime?
+  canceledAt           DateTime?
+  metadata             Json?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  executions           TradeExecution[]
+  profitLossRecords    ProfitLossRecord[]
+
+  @@index([userId, createdAt])
+  @@index([status, side, type])
+  @@index([tradingPairId, exchangeOrderId])
+}
+
+model TradeExecution {
+  id             String          @id @default(cuid())
+  tradeOrderId   String
+  tradeOrder     TradeOrder      @relation(fields: [tradeOrderId], references: [id], onDelete: Cascade)
+  status         ExecutionStatus @default(PENDING)
+  executionPrice Float
+  executedQty    Float
+  quoteQty       Float?
+  fee            Float           @default(0)
+  slippage       Float           @default(0)
+  liquidityType  String?
+  executionRef   String?
+  errorMessage   String?
+  executedAt     DateTime        @default(now())
+  metadata       Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([tradeOrderId, executedAt])
+  @@index([status])
+}
+
+model Position {
+  id                   String             @id @default(cuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchangeConnectionId String
+  exchangeConnection   ExchangeConnection @relation(fields: [exchangeConnectionId], references: [id], onDelete: Cascade)
+  tradingPairId        String
+  tradingPair          TradingPair        @relation(fields: [tradingPairId], references: [id], onDelete: Cascade)
+  side                 PositionSide
+  status               PositionStatus     @default(OPEN)
+  entryPrice           Float
+  markPrice            Float?
+  closePrice           Float?
+  quantity             Float
+  leverage             Float              @default(1)
+  marginUsed           Float?
+  liquidationPrice     Float?
+  realizedPnl          Float              @default(0)
+  unrealizedPnl        Float              @default(0)
+  feeTotal             Float              @default(0)
+  openedAt             DateTime           @default(now())
+  closedAt             DateTime?
+  errorMessage         String?
+  metadata             Json?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  tradeOrders          TradeOrder[]
+  profitLossRecords    ProfitLossRecord[]
+
+  @@index([userId, status, openedAt])
+  @@index([tradingPairId, status])
+}
+
+model ProfitLossRecord {
+  id             String     @id @default(cuid())
+  userId         String
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradingPairId  String
+  tradingPair    TradingPair @relation(fields: [tradingPairId], references: [id], onDelete: Cascade)
+  positionId     String?
+  position       Position?  @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  tradeOrderId   String?
+  tradeOrder     TradeOrder? @relation(fields: [tradeOrderId], references: [id], onDelete: SetNull)
+  realizedPnl    Float      @default(0)
+  unrealizedPnl  Float      @default(0)
+  grossPnl       Float      @default(0)
+  netPnl         Float      @default(0)
+  feeTotal       Float      @default(0)
+  slippageCost   Float      @default(0)
+  roePercent     Float?
+  notes          String?
+  metadata       Json?
+  recordedAt     DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([userId, recordedAt])
+  @@index([tradingPairId])
+  @@index([positionId])
+}
+
+model RiskConfig {
+  id                    String       @id @default(cuid())
+  userId                String       @unique
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status                ConfigStatus @default(ACTIVE)
+  profile               RiskProfile  @default(MODERATE)
+  maxLeverage           Float        @default(10)
+  maxOpenPositions      Int          @default(5)
+  maxOrderNotional      Float        @default(50000)
+  maxDailyLossPercent   Float        @default(2.5)
+  maxDrawdownPercent    Float        @default(5)
+  stopLossRequired      Boolean      @default(true)
+  takeProfitRequired    Boolean      @default(false)
+  emergencyBrakeEnabled Boolean      @default(true)
+  cooldownMinutes       Int          @default(30)
+  metadata              Json?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+}
+
+model StrategyConfig {
+  id                   String        @id @default(cuid())
+  userId               String
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                 String
+  mode                 StrategyMode  @default(AUTO)
+  status               ConfigStatus  @default(ACTIVE)
+  isDefault            Boolean       @default(false)
+  confidenceThreshold  Float         @default(0.85)
+  riskWeight           Float         @default(1)
+  aiWeight             Float         @default(1)
+  executionCooldownSec Int           @default(5)
+  allowShort           Boolean       @default(true)
+  allowLong            Boolean       @default(true)
+  maxConcurrentTrades  Int           @default(3)
+  pairWhitelist        Json?
+  notes                String?
+  metadata             Json?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId, status])
+}
+
+model SystemLog {
+  id         String   @id @default(cuid())
+  level      LogLevel
+  source     String
+  message    String
+  errorCode  String?
+  stackTrace String?
+  context    Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([level, createdAt])
+  @@index([source, createdAt])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     AuditAction
+  entityType String
+  entityId   String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model TradeLifecycleEvent {
+  id          String   @id @default(cuid())
+  executionId String?
+  symbol      String?
+  stage       String
+  status      String
+  level       String?
+  message     String
+  orderId     String?
+  positionId  String?
+  context     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([executionId, createdAt])
+  @@index([symbol, createdAt])
+  @@index([orderId, createdAt])
+}
+
+model AutoRoundJob {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            String
+  totalRounds       Int
+  completedRounds   Int      @default(0)
+  failedRounds      Int      @default(0)
+  currentRound      Int      @default(0)
+  budgetPerTrade    Float
+  targetProfitPct   Float
+  stopLossPct       Float
+  maxWaitSec        Int
+  coinSelectionMode String   @default("scanner_best")
+  aiMode            String   @default("consensus")
+  allowRepeatCoin   Boolean  @default(true)
+  mode              String   @default("auto")
+  activeState       String   @default("bekliyor")
+  stopRequested     Boolean  @default(false)
+  lastError         String?
+  metadata          Json?
+  startedAt         DateTime?
+  finishedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  rounds            AutoRoundRun[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model AutoRoundRun {
+  id            String   @id @default(cuid())
+  jobId          String
+  job            AutoRoundJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  roundNo        Int
+  state          String
+  symbol         String?
+  executionId    String?
+  selectedReason String?
+  buyPrice       Float?
+  buyQty         Float?
+  sellPrice      Float?
+  sellQty        Float?
+  netPnl         Float?
+  feeTotal       Float?
+  result         String?
+  failReason     String?
+  startedAt      DateTime @default(now())
+  endedAt        DateTime?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([jobId, roundNo])
+  @@index([state, createdAt])
+}
+
+model AppSetting {
+  id          String          @id @default(cuid())
+  key         String          @unique
+  scope       AppSettingScope @default(GLOBAL)
+  userId      String?
+  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  value       Json
+  valueType   String          @default("json")
+  isSecret    Boolean         @default(false)
+  status      ConfigStatus    @default(ACTIVE)
+  description String?
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([scope, status])
+  @@index([userId])
+}

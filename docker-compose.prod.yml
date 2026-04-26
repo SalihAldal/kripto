@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  web:
+    image: kinetic-app:latest
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      APP_ROLE: web
+      RUN_MIGRATIONS_ON_BOOT: "true"
+      RUN_SEED_ON_BOOT: "false"
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health/ready || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 6
+
+  worker:
+    image: kinetic-app:latest
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      APP_ROLE: worker
+      RUN_MIGRATIONS_ON_BOOT: "false"
+      RUN_SEED_ON_BOOT: "false"
+      SCANNER_WORKER_ENABLED: "true"
+      ENABLE_SEPARATE_WORKER: "true"

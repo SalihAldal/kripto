@@ -1,0 +1,55 @@
+{
+  "finalDecision": "BUY",
+  "finalConfidence": 92,
+  "finalRiskScore": 28,
+  "score": 0.88,
+  "explanation": "Hybrid consensus strong buy",
+  "outputs": [],
+  "rejected": false,
+  "generatedAt": "2026-04-21T00:00:00.000Z",
+  "roleScores": [
+    {
+      "role": "AI-1_TECHNICAL",
+      "score": 78,
+      "decision": "BUY",
+      "confidence": 94,
+      "rationale": [
+        "EMA trend alignment",
+        "MACD positive",
+        "Volume confirmation"
+      ]
+    },
+    {
+      "role": "AI-2_SENTIMENT",
+      "score": 69,
+      "decision": "BUY",
+      "confidence": 87,
+      "rationale": [
+        "Positive momentum",
+        "Flow imbalance supports direction"
+      ]
+    },
+    {
+      "role": "AI-3_RISK",
+      "score": 73,
+      "decision": "BUY",
+      "confidence": 79,
+      "rationale": [
+        "Spread and volatility acceptable"
+      ],
+      "veto": false
+    }
+  ],
+  "decisionPayload": {
+    "coin": "BTCTRY",
+    "entryPrice": 110.5,
+    "targetPrice": 113.2,
+    "stopPrice": 109.4,
+    "riskRewardRatio": 2.45,
+    "technicalReason": "Multi-indicator trend confirmation",
+    "sentimentReason": "Positive sentiment and momentum",
+    "riskAssessment": "Risk level acceptable",
+    "confidenceScore": 92,
+    "openTrade": true
+  }
+}
