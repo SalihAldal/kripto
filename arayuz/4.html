@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#31353b",
+              "error-container": "#93000a",
+              "tertiary-container": "#ff5354",
+              "surface-container-lowest": "#0a0e13",
+              "tertiary-fixed": "#ffdad7",
+              "on-primary-fixed-variant": "#004395",
+              "surface-bright": "#36393f",
+              "on-background": "#e0e2ea",
+              "outline": "#8c909f",
+              "on-tertiary-container": "#5c000a",
+              "tertiary-fixed-dim": "#ffb3ae",
+              "secondary": "#43e5b1",
+              "surface-container-highest": "#31353b",
+              "on-secondary-fixed-variant": "#00513b",
+              "primary-fixed": "#d8e2ff",
+              "secondary-container": "#01c896",
+              "tertiary": "#ffb3ae",
+              "on-primary-fixed": "#001a42",
+              "on-tertiary-fixed": "#410005",
+              "on-secondary-container": "#004d38",
+              "inverse-on-surface": "#2d3136",
+              "primary-container": "#4d8eff",
+              "primary-fixed-dim": "#adc6ff",
+              "surface-dim": "#101419",
+              "on-primary-container": "#00285d",
+              "surface-container-high": "#262a30",
+              "surface": "#101419",
+              "on-error-container": "#ffdad6",
+              "surface-tint": "#adc6ff",
+              "on-surface-variant": "#c2c6d6",
+              "on-surface": "#e0e2ea",
+              "secondary-fixed": "#60fcc6",
+              "background": "#101419",
+              "on-tertiary-fixed-variant": "#930016",
+              "on-secondary": "#003828",
+              "on-secondary-fixed": "#002116",
+              "inverse-surface": "#e0e2ea",
+              "surface-container-low": "#181c21",
+              "surface-container": "#1c2025",
+              "primary": "#adc6ff",
+              "inverse-primary": "#005ac2",
+              "error": "#ffb4ab",
+              "outline-variant": "#424754",
+              "on-error": "#690005",
+              "on-primary": "#002e6a",
+              "on-tertiary": "#68000c",
+              "secondary-fixed-dim": "#3adfab"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0B0F14] text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Mobile Top Navigation Bar (Contextual) -->
+<header class="fixed top-0 left-0 right-0 h-14 bg-[#101419]/80 backdrop-blur-xl flex items-center justify-between px-4 z-50 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="monitoring">monitoring</span>
+<div>
+<h1 class="text-sm font-bold tracking-tight text-on-surface">BTC/USDT</h1>
+<p class="text-[10px] text-secondary font-medium tracking-wide">$64,231.50 <span class="ml-1 text-[8px]">+2.45%</span></p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="notifications">notifications</span>
+<div class="w-7 h-7 rounded-full bg-surface-container-high border border-outline-variant/20 flex items-center justify-center">
+<img alt="Trader Identity" class="w-full h-full rounded-full object-cover" data-alt="Close-up portrait of a professional trader in a dark suit with soft neon cyan rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHYywvqG1jVOuS_5MZEZqYhh3AeHttB2SB_jCP01mHEMT2ybxgH2j4sbB__njEoSO-VOquWU__Nu1HOt45CiuzHORKik-eVuFu-uZkLU8vzx2wRqeQydePxVbwCSKWCYgMCDwHCJ1IWdL_yvofvGGMYixLaNEXxzB4sbpch34XqYukRCYIbzkchgYJUA7lfXgjGB93QsClTPaG1tLloAXlP7CSacfpjZqV5szLvGZGgUrbYlhHDQKeGR9bdL4lim3djW6hz5UHgLo6"/>
+</div>
+</div>
+</header>
+<main class="pt-14 pb-32 flex flex-col h-screen overflow-hidden">
+<!-- 1s Real-time Chart Section -->
+<section class="h-[309px] w-full relative bg-surface-container-lowest overflow-hidden">
+<div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, #424754 1px, transparent 0); background-size: 24px 24px;"></div>
+<!-- Simulated Candlestick Visualization -->
+<div class="absolute inset-0 flex items-end justify-around px-4 pb-8 h-full">
+<div class="w-1.5 h-[60%] bg-secondary-container rounded-t-sm opacity-80"></div>
+<div class="w-1.5 h-[40%] bg-secondary rounded-t-sm"></div>
+<div class="w-1.5 h-[55%] border border-tertiary rounded-t-sm"></div>
+<div class="w-1.5 h-[70%] bg-secondary-container rounded-t-sm opacity-60"></div>
+<div class="w-1.5 h-[65%] bg-secondary rounded-t-sm"></div>
+<div class="w-1.5 h-[45%] border border-tertiary rounded-t-sm"></div>
+<div class="w-1.5 h-[50%] bg-secondary-container rounded-t-sm opacity-90"></div>
+<div class="w-1.5 h-[80%] bg-secondary rounded-t-sm"></div>
+<div class="w-1.5 h-[60%] border border-tertiary rounded-t-sm"></div>
+<div class="w-1.5 h-[75%] bg-secondary rounded-t-sm"></div>
+</div>
+<!-- Chart Overlays -->
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-bright/20 backdrop-blur-md text-[10px] font-bold text-primary uppercase tracking-widest">1s Live</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-[10px] font-medium text-on-surface-variant uppercase">Vol: 1.2K</span>
+</div>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container/60 backdrop-blur-lg flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface" data-icon="add">add</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container/60 backdrop-blur-lg flex items-center justify-center border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface" data-icon="remove">remove</span>
+</div>
+</div>
+</section>
+<!-- Dynamic Panels: AI Decision & Order Book -->
+<section class="flex-1 px-4 py-6 overflow-x-auto snap-x snap-mandatory flex gap-4 hide-scrollbar">
+<!-- AI Decision Card (Asymmetric Layout) -->
+<div class="min-w-[85vw] snap-center bg-surface-container-low rounded-xl p-5 border border-outline-variant/5 relative overflow-hidden flex flex-col gap-4">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+<div class="flex justify-between items-start z-10">
+<div>
+<span class="text-[10px] font-bold text-primary tracking-[0.2em] uppercase block mb-1">Kinetic AI Signal</span>
+<h2 class="text-xl font-black text-on-surface leading-tight">STRONG BUY</h2>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-on-surface-variant block mb-1 uppercase">Confidence</span>
+<span class="text-lg font-mono text-secondary">94.2%</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-3 z-10">
+<div class="p-3 bg-surface-container rounded-lg border-l-2 border-primary">
+<p class="text-xs text-on-surface leading-relaxed">Cluster analysis detects institutional accumulation at <span class="text-primary font-bold">$64,180</span>. Momentum shift imminent.</p>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="bg-surface-container-high/40 p-2 rounded-lg">
+<span class="text-[9px] text-on-surface-variant uppercase block">Target</span>
+<span class="text-xs font-bold">$64,800</span>
+</div>
+<div class="bg-surface-container-high/40 p-2 rounded-lg">
+<span class="text-[9px] text-on-surface-variant uppercase block">Stop Loss</span>
+<span class="text-xs font-bold">$63,950</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Book Card (High Density) -->
+<div class="min-w-[85vw] snap-center bg-surface-container-low rounded-xl p-5 border border-outline-variant/5 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xs font-bold text-on-surface tracking-tight uppercase">Order Flow</h3>
+<span class="text-[10px] text-on-surface-variant">Spread: 0.05</span>
+</div>
+<div class="flex-1 space-y-1 font-mono text-[10px]">
+<!-- Asks (Shorts) -->
+<div class="grid grid-cols-3 text-tertiary-fixed-dim/60">
+<span>64,235.1</span><span>0.421</span><span class="text-right">27.0k</span>
+</div>
+<div class="grid grid-cols-3 text-tertiary-fixed-dim/80">
+<span>64,234.5</span><span>1.102</span><span class="text-right">70.8k</span>
+</div>
+<div class="grid grid-cols-3 text-tertiary bg-tertiary/10 rounded-sm">
+<span>64,232.0</span><span>5.450</span><span class="text-right">350.1k</span>
+</div>
+<div class="h-4 flex items-center justify-center">
+<div class="h-[1px] w-full bg-outline-variant/20"></div>
+</div>
+<!-- Bids (Longs) -->
+<div class="grid grid-cols-3 text-secondary bg-secondary/10 rounded-sm">
+<span>64,231.5</span><span>8.201</span><span class="text-right">526.7k</span>
+</div>
+<div class="grid grid-cols-3 text-secondary-fixed-dim/80">
+<span>64,230.8</span><span>2.150</span><span class="text-right">138.1k</span>
+</div>
+<div class="grid grid-cols-3 text-secondary-fixed-dim/60">
+<span>64,229.0</span><span>0.880</span><span class="text-right">56.5k</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Scalping Interaction Zone -->
+<div class="fixed bottom-0 left-0 right-0 bg-[#101419] p-4 pb-8 z-50 rounded-t-3xl border-t border-outline-variant/10">
+<!-- Order Parameters (One-handed reach) -->
+<div class="flex justify-between items-center mb-6 px-2">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest mb-1">Leverage</span>
+<div class="flex items-center gap-3">
+<span class="text-lg font-bold text-primary">50x</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="edit">edit</span>
+</div>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/20"></div>
+<div class="flex flex-col text-right">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest mb-1">Position Size</span>
+<div class="flex items-center gap-3 justify-end">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="bolt">bolt</span>
+<span class="text-lg font-bold text-on-surface">1.25 BTC</span>
+</div>
+</div>
+</div>
+<!-- The Execution Button -->
+<button class="w-full h-16 rounded-xl bg-gradient-to-r from-primary to-primary-container flex items-center justify-between px-6 active:scale-[0.98] transition-all group overflow-hidden relative shadow-[0_8px_32px_rgba(77,142,255,0.3)]">
+<div class="absolute inset-0 bg-white/5 opacity-0 group-active:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-primary-container text-2xl" data-icon="styler" data-weight="fill">styler</span>
+<span class="text-lg font-black text-on-primary-container tracking-tight">EXECUTE LONG</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-on-primary-container/60 uppercase">Market</span>
+<span class="material-symbols-outlined text-on-primary-container" data-icon="chevron_right">chevron_right</span>
+</div>
+</button>
+<!-- Safety Toggles -->
+<div class="mt-4 flex justify-around">
+<div class="flex items-center gap-2 px-3 py-2 rounded-full bg-surface-container-high border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-[10px] font-bold text-on-surface uppercase">SL Protected</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-2 rounded-full bg-surface-container-high border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] font-bold text-on-surface uppercase">One-Tap On</span>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation (System Anchor) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-0 z-0">
+<!-- Suppressed for focused transactional screen as per protocol -->
+</nav>
+</body></html>

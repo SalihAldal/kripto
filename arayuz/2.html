@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KINETIC | User Profile &amp; Security Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#410005",
+              "surface-container-lowest": "#0a0e13",
+              "surface-container-high": "#262a30",
+              "error": "#ffb4ab",
+              "primary-container": "#4d8eff",
+              "error-container": "#93000a",
+              "tertiary-fixed": "#ffdad7",
+              "background": "#101419",
+              "primary-fixed": "#d8e2ff",
+              "surface-bright": "#36393f",
+              "primary": "#adc6ff",
+              "on-secondary-fixed": "#002116",
+              "on-error-container": "#ffdad6",
+              "on-background": "#e0e2ea",
+              "inverse-primary": "#005ac2",
+              "on-primary": "#002e6a",
+              "tertiary": "#ffb3ae",
+              "on-tertiary-container": "#5c000a",
+              "on-primary-container": "#00285d",
+              "surface-container": "#1c2025",
+              "inverse-on-surface": "#2d3136",
+              "surface-container-low": "#181c21",
+              "secondary": "#43e5b1",
+              "on-secondary-fixed-variant": "#00513b",
+              "surface": "#101419",
+              "on-secondary-container": "#004d38",
+              "tertiary-fixed-dim": "#ffb3ae",
+              "on-secondary": "#003828",
+              "secondary-fixed": "#60fcc6",
+              "outline": "#8c909f",
+              "on-primary-fixed": "#001a42",
+              "surface-dim": "#101419",
+              "on-tertiary": "#68000c",
+              "inverse-surface": "#e0e2ea",
+              "on-tertiary-fixed-variant": "#930016",
+              "on-primary-fixed-variant": "#004395",
+              "outline-variant": "#424754",
+              "secondary-fixed-dim": "#3adfab",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface-variant": "#c2c6d6",
+              "on-surface": "#e0e2ea",
+              "tertiary-container": "#ff5354",
+              "surface-variant": "#31353b",
+              "surface-container-highest": "#31353b",
+              "secondary-container": "#01c896",
+              "surface-tint": "#adc6ff",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #101419; color: #e0e2ea; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(28, 32, 37, 0.8); backdrop-filter: blur(20px); }
+        .inner-glow { box-shadow: inset 1px 1px 0px rgba(173, 198, 255, 0.1); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-screen w-64 bg-[#181c21] py-6 sticky top-0 z-40 shrink-0">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<h1 class="text-2xl font-black text-[#4d8eff] tracking-tighter">KINETIC</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline">Institutional Grade</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+                Live Trading
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">psychology</span>
+                AI Analysis
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">history</span>
+                Trade History
+            </a>
+<!-- Active Navigation for Settings Page -->
+<a class="flex items-center gap-3 px-4 py-3 bg-[#1c2025] text-[#adc6ff] border-r-4 border-[#4d8eff] rounded-xl font-medium" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tune</span>
+                Strategy Settings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">security</span>
+                Risk Management
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#e0e2ea] opacity-60 hover:bg-[#1c2025] hover:opacity-100 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">terminal</span>
+                Logs
+            </a>
+</nav>
+<div class="px-4 mt-auto pt-6 space-y-4">
+<button class="w-full py-3 px-4 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold text-sm flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                New Strategy
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-xs text-[#e0e2ea] opacity-60 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+                    Support
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 text-xs text-[#e0e2ea] opacity-60 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined text-sm">code</span>
+                    API Docs
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 bg-[#101419]/80 backdrop-blur-xl flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-6">
+<div class="md:hidden text-xl font-black tracking-tighter text-[#adc6ff]">KINETIC</div>
+<div class="hidden md:flex gap-6 items-center">
+<span class="text-[#4d8eff] font-bold border-b-2 border-[#4d8eff] pb-1 cursor-pointer">BTC/USD</span>
+<span class="text-[#e0e2ea] opacity-70 hover:text-[#adc6ff] transition-colors cursor-pointer">ETH/USD</span>
+<span class="text-[#e0e2ea] opacity-70 hover:text-[#adc6ff] transition-colors cursor-pointer">SOL/USD</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-[#181c21] rounded-lg px-3 py-1.5 gap-2 border border-outline-variant/10">
+<span class="material-symbols-outlined text-sm text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-on-surface" placeholder="Search markets..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-[#e0e2ea] opacity-70 hover:bg-[#1c2025] hover:text-[#adc6ff] rounded-lg transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#e0e2ea] opacity-70 hover:bg-[#1c2025] hover:text-[#adc6ff] rounded-lg transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 text-[#e0e2ea] opacity-70 hover:bg-[#1c2025] hover:text-[#adc6ff] rounded-lg transition-all">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</button>
+</div>
+<div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
+<div class="flex items-center gap-3 pl-2">
+<img alt="Trader Profile" class="w-9 h-9 rounded-full object-cover border border-primary/20" data-alt="portrait of a professional institutional trader in a dark office, soft blue rim lighting, sharp focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXvNSMkVjrNAnsSsLciH7fSJup82LNZNW2AvOu4lvtKx_ENM-EGVqu5og2cys1wQPAygcoZUHcy8R8lP0IOUVghvzMRZ-4mfW6sy22dmS_R6nLtDK3Ad5OtO1wvHv-0NOkmugb7tlbdQ4h4WhEVUAdMMaAFzYv2dQ5sRcadbPW3eZaAk1UB3Go2b0QJ_axu1nHqp8CUAc981oD3rYxOL3Qv5pe0Vw_4tU32WTNDj2G3BFH3sYsKFBWDUUHvamWvqN1H6YPdLw8mxQP"/>
+<div class="hidden sm:block">
+<p class="text-sm font-bold leading-none">James Vance</p>
+<p class="text-[10px] text-secondary font-medium tracking-wide uppercase">Institutional</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-6 md:p-10 max-w-7xl mx-auto w-full space-y-10">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-3xl font-black tracking-tight text-on-background">Profile &amp; Security</h2>
+<p class="text-on-surface-variant mt-1">Manage your institutional trading environment and security protocols.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 rounded-xl bg-surface-container-high text-on-surface font-semibold text-sm hover:bg-surface-bright transition-colors">Discard</button>
+<button class="px-5 py-2.5 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold text-sm shadow-lg shadow-primary/10">Save Changes</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Account & Security Hub -->
+<div class="lg:col-span-8 space-y-6">
+<!-- ACCOUNT OVERVIEW -->
+<section class="glass-panel inner-glow rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+<h3 class="font-bold tracking-tight text-lg">Account Overview</h3>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div>
+<label class="text-[10px] uppercase tracking-widest text-outline-variant font-bold">Full Name</label>
+<p class="text-on-background font-medium mt-1">James Alexander Vance</p>
+</div>
+<div>
+<label class="text-[10px] uppercase tracking-widest text-outline-variant font-bold">Entity Type</label>
+<p class="text-on-background font-medium mt-1">Institutional High-Frequency Desk</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] uppercase tracking-widest text-outline-variant font-bold">Tier Performance</span>
+<span class="text-xs text-secondary font-bold">Top 2%</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black text-on-background tracking-tight">$14.2M</span>
+<span class="text-xs text-secondary">+12.4% MoM</span>
+</div>
+<div class="w-full bg-surface-variant h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="bg-secondary h-full w-[85%] rounded-full shadow-[0_0_10px_rgba(67,229,177,0.4)]"></div>
+</div>
+<p class="text-[10px] text-outline mt-2 italic">Institutional status active until Jan 2026</p>
+</div>
+</div>
+</section>
+<!-- SECURITY HUB -->
+<section class="glass-panel inner-glow rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">shield</span>
+<h3 class="font-bold tracking-tight text-lg">Security Hub</h3>
+</div>
+<span class="px-2 py-1 bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-wider rounded border border-secondary/20">Secure</span>
+</div>
+<div class="space-y-6">
+<!-- 2FA -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">fingerprint</span>
+</div>
+<div>
+<p class="font-bold">Two-Factor Authentication</p>
+<p class="text-xs text-outline">Authenticator app and YubiKey active</p>
+</div>
+</div>
+<button class="text-primary text-xs font-bold hover:underline">Configure</button>
+</div>
+<!-- Session History (Asymmetric/Bento style sub-grid) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+<label class="text-[10px] uppercase tracking-widest text-outline-variant font-bold mb-3 block">Active Session</label>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-sm">location_on</span>
+<div>
+<p class="text-sm font-medium">Zurich, Switzerland</p>
+<p class="text-[10px] text-outline">IP: 192.168.1.104 • Chrome v121</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+<label class="text-[10px] uppercase tracking-widest text-outline-variant font-bold mb-3 block">IP Whitelisting</label>
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium">3 Trusted IPs</span>
+<button class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- API KEY MANAGEMENT -->
+<section class="glass-panel inner-glow rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">key</span>
+<h3 class="font-bold tracking-tight text-lg">API Key Management</h3>
+</div>
+<button class="flex items-center gap-2 text-xs font-bold bg-primary/10 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                                Add New Key
+                            </button>
+</div>
+<div class="space-y-3">
+<!-- Key Item 1 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container/50 hover:bg-surface-container transition-all rounded-xl border border-outline-variant/5">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-black/40 rounded flex items-center justify-center p-1.5">
+<img alt="Exchange Logo" class="w-full grayscale brightness-200" data-alt="abstract minimalist binance exchange logo vector style white on black" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZFozDrMjN_ld9r_u6P2HMYTds1AMh87eGqu6jn0FLEisXBXThZcPjq63_EqU19L96AsNDmWK0jUqeWxogWn3M3njKNrlPqFqkL8bvZ9Z6fCdXzVGiTVtHRzxlQoxzsFoJAAdmuUemyjbyZqgtd-E8DduJk_RjaSsqxgRU25ODuQ0RnCCZRMkYZYgiTapa49WnA5q1SFu5MW-oujgMeK5ITuqHMFhC96maaCGS8dNV0MN7kai3UaCem5d8cQn4vteB3v8Se12IN2LA"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<p class="text-sm font-bold">Binance_HFT_01</p>
+<span class="text-[8px] bg-secondary/10 text-secondary px-1.5 rounded border border-secondary/20 font-bold uppercase">Trading Enabled</span>
+</div>
+<p class="text-[10px] text-outline font-mono">ak_...8f2a • Read/Trade • No Withdrawal</p>
+</div>
+</div>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-outline hover:text-on-background"><span class="material-symbols-outlined text-sm">edit</span></button>
+<button class="p-2 text-tertiary hover:text-tertiary-container"><span class="material-symbols-outlined text-sm">delete</span></button>
+</div>
+</div>
+<!-- Key Item 2 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container/50 hover:bg-surface-container transition-all rounded-xl border border-outline-variant/5">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-black/40 rounded flex items-center justify-center p-1.5">
+<img alt="Exchange Logo" class="w-full grayscale brightness-200" data-alt="abstract minimalist okx exchange logo vector style white on black" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT7twub5IAZim35JDj3VkmYjela5S_zaCwJ2e7oN9qWtiEKWVDgB49nUGNr0MhVza1oxCKDqb8yhEjtAJ_vyqn3KETHB3rCzx3mD09h_8RCjjYIlmXjJN7GQ0t_DrujXUTgEZjuNOiG70J_BHcYlhOzX4FQJ2NMDEgIp1ian8Lw5rtBiAWdSHgPRJtZj7ff4yG3d34FdgIaxGyoPod9S_TXrOcy8rfFCCjhN6WHwq_1f_WG_D5C-KVHkmsWXir9YoUozwzVdKdQGXg"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<p class="text-sm font-bold">OKX_Liquidity_Main</p>
+<span class="text-[8px] bg-outline-variant/10 text-outline px-1.5 rounded border border-outline-variant/20 font-bold uppercase">Read Only</span>
+</div>
+<p class="text-[10px] text-outline font-mono">ak_...99c4 • Read Only • No Withdrawal</p>
+</div>
+</div>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-outline hover:text-on-background"><span class="material-symbols-outlined text-sm">edit</span></button>
+<button class="p-2 text-tertiary hover:text-tertiary-container"><span class="material-symbols-outlined text-sm">delete</span></button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Trading Limits & Notifications -->
+<div class="lg:col-span-4 space-y-6">
+<!-- TRADING LIMITS -->
+<section class="glass-panel inner-glow rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-bold tracking-tight text-lg">Trading Limits</h3>
+</div>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between mb-2">
+<label class="text-[10px] uppercase tracking-widest text-outline-variant font-bold">Daily Drawdown Limit</label>
+<span class="text-xs font-bold text-on-background">2.5%</span>
+</div>
+<input class="w-full h-1.5 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-tertiary" type="range"/>
+<p class="text-[10px] text-outline mt-2">Platform will cease all trading if hit.</p>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-sm font-bold">Max Leverage Lock</p>
+<p class="text-[10px] text-outline">Restrict account to 10x</p>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</div>
+</div>
+<div class="p-4 bg-tertiary/5 border border-tertiary/10 rounded-xl">
+<div class="flex items-center gap-3 text-tertiary mb-2">
+<span class="material-symbols-outlined text-sm">timer</span>
+<p class="text-xs font-bold uppercase tracking-wider">Cooling-off Period</p>
+</div>
+<p class="text-xs text-on-background mb-4">Mandatory 24h freeze on all manual execution if drawdown exceeds 5%.</p>
+<button class="w-full py-2 bg-tertiary text-on-tertiary font-bold text-xs rounded-lg active:scale-95 transition-transform">Enable Emergency Brake</button>
+</div>
+</div>
+</section>
+<!-- NOTIFICATION PREFERENCES -->
+<section class="glass-panel inner-glow rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+<h3 class="font-bold tracking-tight text-lg">Notifications</h3>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/10">
+<div>
+<p class="text-sm font-medium">AI Decision Alerts</p>
+<p class="text-[10px] text-outline">Notify when AI signal &gt; 85%</p>
+</div>
+<input checked="" class="rounded border-outline-variant bg-surface text-primary focus:ring-primary-container" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/10">
+<div>
+<p class="text-sm font-medium">Execution Confirmation</p>
+<p class="text-[10px] text-outline">Push &amp; Email on trade fills</p>
+</div>
+<input checked="" class="rounded border-outline-variant bg-surface text-primary focus:ring-primary-container" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/10">
+<div>
+<p class="text-sm font-medium">Security Warnings</p>
+<p class="text-[10px] text-outline">IP changes &amp; API access</p>
+</div>
+<input checked="" class="rounded border-outline-variant bg-surface text-primary opacity-50" disabled="" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-sm font-medium">Daily Performance Wrap</p>
+<p class="text-[10px] text-outline">Email summary at 00:00 UTC</p>
+</div>
+<input class="rounded border-outline-variant bg-surface text-primary focus:ring-primary-container" type="checkbox"/>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Footer Padding -->
+<div class="h-20 md:hidden"></div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant/10 px-6 py-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-[#e0e2ea] opacity-60" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#e0e2ea] opacity-60" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="text-[10px] font-bold">Trade</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tune</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#e0e2ea] opacity-60" href="#">
+<span class="material-symbols-outlined">security</span>
+<span class="text-[10px] font-bold">Risk</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#e0e2ea] opacity-60" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-bold">Profile</span>
+</a>
+</nav>
+</body></html>

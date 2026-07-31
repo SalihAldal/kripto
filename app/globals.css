@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans:
+    "Inter",
+    "Segoe UI",
+    "Roboto",
+    "Helvetica Neue",
+    Arial,
+    "Noto Sans",
+    "Liberation Sans",
+    sans-serif;
+  --color-background: #101419;
+  --color-surface: #101419;
+  --color-surface-container-lowest: #0a0e13;
+  --color-surface-container-low: #181c21;
+  --color-surface-container: #1c2025;
+  --color-surface-container-high: #262a30;
+  --color-surface-container-highest: #31353b;
+  --color-on-surface: #e0e2ea;
+  --color-on-surface-variant: #c2c6d6;
+  --color-outline: #8c909f;
+  --color-outline-variant: #424754;
+  --color-primary: #adc6ff;
+  --color-primary-container: #4d8eff;
+  --color-secondary: #43e5b1;
+  --color-secondary-container: #01c896;
+  --color-tertiary: #ffb3ae;
+  --color-tertiary-container: #ff5354;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: #101419;
+  color: #e0e2ea;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.glass-panel {
+  background: rgba(28, 32, 37, 0.8);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(173, 198, 255, 0.1);
+  border-left: 1px solid rgba(173, 198, 255, 0.1);
+}
+
+.scroll-slim::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: #424754;
+  border-radius: 999px;
+}
