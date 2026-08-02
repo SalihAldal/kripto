@@ -1,0 +1,62 @@
+{
+  "tradeNumber": 100,
+  "summary": {
+    "simulationId": "simulation-v1",
+    "workspace": "brainos-lab/simulation-v1",
+    "targetTrades": 100,
+    "completedTrades": 100,
+    "accepted": 15,
+    "rejected": 85,
+    "wins": 10,
+    "losses": 5,
+    "totalPnlUsdt": 125.6866,
+    "startedAt": "2026-08-01T23:32:15.914Z",
+    "updatedAt": "2026-08-01T23:32:16.231Z",
+    "status": "running"
+  },
+  "metrics": {
+    "winRate": 66.67,
+    "profitFactor": 13.907,
+    "expectancy": 8.3791,
+    "sharpeRatio": 0.998,
+    "averageConfidence": 72.52,
+    "averageHoldingTimeSec": 1753,
+    "averageRiskScore": 49.38,
+    "acceptanceRate": 15,
+    "topRejectionReasons": [
+      {
+        "reason": "AI consensus NO_TRADE",
+        "count": 24
+      },
+      {
+        "reason": "Risk per trade exceeds threshold",
+        "count": 11
+      },
+      {
+        "reason": "Abnormal volatility breaker",
+        "count": 3
+      },
+      {
+        "reason": "Exchange restriction: symbol temporarily blocked",
+        "count": 3
+      },
+      {
+        "reason": "Signal not actionable",
+        "count": 2
+      },
+      {
+        "reason": "Liquidity below threshold (256320 < 5000000)",
+        "count": 1
+      },
+      {
+        "reason": "Liquidity below threshold (374582 < 5000000)",
+        "count": 1
+      },
+      {
+        "reason": "Ranking below threshold (48.17 < 55)",
+        "count": 1
+      }
+    ],
+    "cumulativeMissedProfitUsdt": 231.3646
+  }
+}

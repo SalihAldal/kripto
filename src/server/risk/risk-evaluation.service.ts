@@ -11,7 +11,14 @@ import {
   setApiFailureState,
   setPausedState,
 } from "@/src/server/repositories/risk.repository";
-import { notifySystemEvent } from "@/src/server/notifications/notification.service";
+
+/** Stable Risk Gate policy contract for API/status consumers (Task 001-4). */
+export const RISK_GATE_POLICY = {
+  consecutiveLossBlocksEntry: false,
+  consecutiveLossTelemetryOnly: true,
+  apiBreakerUsesCooldownWindow: true,
+  preTradeEvaluationRequired: true,
+} as const;
 
 type EffectiveRiskConfig = {
   maxRiskPerTrade: number;
@@ -105,9 +112,6 @@ export function evaluateRiskRules(input: {
   ) {
     reasons.push("Max weekly loss breaker");
   }
-  if (state.consecutiveLosses >= config.consecutiveLossBreaker) {
-    reasons.push(`Consecutive loss breaker (${state.consecutiveLosses})`);
-  }
   // Consecutive loss is tracked as telemetry; do not hard-block new trades.
   // Hard pausing on every loss streak can keep the system stuck in reject loop.
   // Do not block forever by stale failure count; only enforce while cooldown is active.
@@ -122,19 +126,20 @@ function readNumber(meta: Record<string, unknown> | undefined, key: string, fall
   return typeof raw === "number" && Number.isFinite(raw) ? raw : fallback;
 }
 
+/** Caps stale DB min-confidence so live flow is not stuck in perpetual rejects (Task 001-3). */
+export function boundMinConfidenceThreshold(configuredMinConfidence: number): number {
+  if (env.AI_ULTRA_PRECISION_MODE) {
+    return Math.max(env.AI_SPOT_MIN_CONFIDENCE_ULTRA, configuredMinConfidence);
+  }
+  const liveConfidenceCap = Math.min(env.EXECUTION_FAST_MIN_CONFIDENCE, 45);
+  return Math.max(40, Math.min(configuredMinConfidence, liveConfidenceCap));
+}
+
 export async function getEffectiveRiskConfig(userId: string): Promise<EffectiveRiskConfig> {
   const config = await getRiskConfigByUser(userId);
   const metadata = (config?.metadata as Record<string, unknown> | undefined) ?? {};
   const configuredMinConfidence = readNumber(metadata, "minConfidenceThreshold", env.AI_MIN_CONFIDENCE);
-  // Keep runtime risk gate aligned with live exchange realities.
-  // Historical DB values can remain very strict (70+), which causes perpetual rejects.
-  // Use a practical cap for live flow so risk gate does not block every candidate.
-  const boundedMinConfidence = env.AI_ULTRA_PRECISION_MODE
-    ? Math.max(env.AI_SPOT_MIN_CONFIDENCE_ULTRA, configuredMinConfidence)
-    : Math.max(
-        40,
-        Math.min(configuredMinConfidence, env.EXECUTION_FAST_MIN_CONFIDENCE, 45),
-      );
+  const boundedMinConfidence = boundMinConfidenceThreshold(configuredMinConfidence);
   return {
     maxRiskPerTrade: readNumber(metadata, "maxRiskPerTrade", 1),
     maxDailyLossPercent: config?.maxDailyLossPercent ?? env.RISK_MAX_DAILY_LOSS_PERCENT,
@@ -198,44 +203,6 @@ export async function evaluatePreTradeRisk(input: PreTradeRiskInput): Promise<Ri
       apiBlockedUntil: apiFailures.blockedUntil,
     },
   });
-
-  if (
-    !paused.paused &&
-    effectiveConfig.dailyLossReferenceTry > 0 &&
-    daily.lossAmountAbs >= 10 &&
-    (daily.lossAmountAbs / effectiveConfig.dailyLossReferenceTry) * 100 >= effectiveConfig.maxDailyLossPercent
-  ) {
-    const until = new Date(Date.now() + effectiveConfig.cooldownMinutes * 60 * 1000).toISOString();
-    await setPausedState({
-      userId: input.userId,
-      paused: true,
-      reason: "Max daily loss breaker",
-      until,
-    }).catch(() => null);
-  }
-  if (
-    effectiveConfig.dailyLossReferenceTry > 0 &&
-    daily.lossAmountAbs >= 5 &&
-    (daily.lossAmountAbs / effectiveConfig.dailyLossReferenceTry) * 100 >= effectiveConfig.maxDailyLossPercent * 0.8
-  ) {
-    await notifySystemEvent({
-      userId: input.userId,
-      eventType: "DAILY_LOSS_WARNING",
-      title: "Gunluk zarar limiti yaklasti",
-      message: `Gunluk zarar ${(daily.lossAmountAbs / effectiveConfig.dailyLossReferenceTry * 100).toFixed(2)}%`,
-      level: "WARN",
-      cooldownMinutes: 60,
-    });
-  }
-  if (!paused.paused && consecutiveLosses >= effectiveConfig.consecutiveLossBreaker) {
-    const until = new Date(Date.now() + effectiveConfig.cooldownMinutes * 60 * 1000).toISOString();
-    await setPausedState({
-      userId: input.userId,
-      paused: true,
-      reason: `Consecutive loss breaker (${consecutiveLosses})`,
-      until,
-    }).catch(() => null);
-  }
 
   return {
     ok: reasons.length === 0,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateRiskRules } from "../src/server/risk/risk-evaluation.service";
+import { evaluateRiskRules, RISK_GATE_POLICY } from "../src/server/risk/risk-evaluation.service";
 
 describe("risk-engine", () => {
   const config = {
@@ -78,5 +78,37 @@ describe("risk-engine", () => {
     expect(reasons.length).toBeGreaterThan(6);
     expect(reasons.join(" | ")).toContain("Confidence below minimum threshold");
     expect(reasons.join(" | ")).toContain("API breaker cooldown active");
+  });
+
+  it("does not hard-block on consecutive loss streak alone (001-10 regression guard)", () => {
+    expect(RISK_GATE_POLICY.consecutiveLossBlocksEntry).toBe(false);
+    expect(RISK_GATE_POLICY.consecutiveLossTelemetryOnly).toBe(true);
+
+    const streakAboveBreaker = config.consecutiveLossBreaker + 2;
+    const reasons = evaluateRiskRules({
+      config,
+      metrics: {
+        confidencePercent: 80,
+        spreadPercent: 0.1,
+        liquidity24h: 20_000_000,
+        expectedProfitPercent: 0.7,
+        slippagePercent: 0.2,
+        volatilityPercent: 1.4,
+        riskPerTradePercent: 0.7,
+        stopLossConfigured: true,
+      },
+      state: {
+        paused: false,
+        openPositionCount: 1,
+        dailyLossAbs: 0.6,
+        dailyLossPercent: 0.012,
+        weeklyLossAbs: 1.3,
+        weeklyLossPercent: 0.026,
+        consecutiveLosses: streakAboveBreaker,
+        apiFailureCount: 0,
+      },
+    });
+    expect(reasons).toHaveLength(0);
+    expect(reasons.join(" | ")).not.toContain("Consecutive loss");
   });
 });

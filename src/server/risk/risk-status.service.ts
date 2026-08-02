@@ -8,7 +8,7 @@ import {
   getRiskConfigByUser,
   listOpenPositionsCount,
 } from "@/src/server/repositories/risk.repository";
-import { getEffectiveRiskConfig } from "@/src/server/risk/risk-evaluation.service";
+import { getEffectiveRiskConfig, RISK_GATE_POLICY } from "@/src/server/risk/risk-evaluation.service";
 
 export async function getRiskStatus(userId?: string) {
   const { user } = await getRuntimeExecutionContext(userId);
@@ -33,6 +33,7 @@ export async function getRiskStatus(userId?: string) {
     apiFailures,
     config,
     effective,
+    gatePolicy: RISK_GATE_POLICY,
     updatedAt: new Date().toISOString(),
   };
 }

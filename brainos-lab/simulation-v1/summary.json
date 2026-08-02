@@ -1,0 +1,14 @@
+{
+  "simulationId": "simulation-v1",
+  "workspace": "brainos-lab/simulation-v1",
+  "targetTrades": 100,
+  "completedTrades": 100,
+  "accepted": 15,
+  "rejected": 85,
+  "wins": 10,
+  "losses": 5,
+  "totalPnlUsdt": 125.6866,
+  "startedAt": "2026-08-01T23:32:15.914Z",
+  "updatedAt": "2026-08-01T23:32:16.234Z",
+  "status": "completed"
+}
