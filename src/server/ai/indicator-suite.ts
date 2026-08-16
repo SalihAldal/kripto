@@ -212,7 +212,17 @@ function detectDivergence(closes: number[], rsiValues: number[]) {
   return { bullish, bearish };
 }
 
-export function buildIndicatorSnapshot(input: AIAnalysisInput) {
+export type IndicatorSnapshot = ReturnType<typeof buildIndicatorSnapshot>;
+
+/** Reuse orchestrator memoized snapshot; build only when absent (non-consensus callers). */
+export function resolveIndicatorSnapshot(input: AIAnalysisInput): Readonly<IndicatorSnapshot> {
+  if (input.indicatorSnapshot) {
+    return input.indicatorSnapshot;
+  }
+  return buildIndicatorSnapshot(input);
+}
+
+export function buildIndicatorSnapshot(input: AIAnalysisInput): IndicatorSnapshot {
   const closes = input.klines.map((x) => x.close);
   const highs = input.klines.map((x) => x.high);
   const lows = input.klines.map((x) => x.low);

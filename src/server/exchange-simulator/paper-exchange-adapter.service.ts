@@ -4,6 +4,7 @@ import type { PlaceOrderResult } from "@/src/types/exchange";
 import { getPaperAccount } from "@/src/server/simulation/paper-trading.service";
 import { simulateMarketExecution } from "@/src/server/exchange-simulator/exchange-simulator.service";
 import { emitExchangeSimulatorEvent } from "@/src/server/exchange-simulator/exchange-simulator.events";
+import { bridgePaperFill } from "@/src/server/forensics/forensic-bridge.service";
 
 type PaperSimulatorOrderInput = {
   userId: string;
@@ -124,6 +125,18 @@ export async function executePaperOrderViaExchangeSimulator(
     avgFillPrice: avgPrice,
     fee,
     fillCount: simulation.fillCount,
+  });
+
+  bridgePaperFill({
+    symbol: input.symbol,
+    side: input.side,
+    entryPrice: avgPrice,
+    quantity: executedQty,
+    fees: fee,
+    orderId: simulation.orderId,
+    fillId: simulation.simulationId,
+    sessionId: input.executionId,
+    reconciled: true,
   });
 
   return {

@@ -2,6 +2,11 @@ import type { MarketTicker } from "@/lib/types";
 import { env } from "@/lib/config";
 import { getExchangeAdapter, getExchangeProvider } from "@/src/server/exchange";
 import { ExternalServiceError } from "@/src/server/errors";
+import {
+  mapOrchestratorTickerToMarketTicker,
+  marketDataOrchestrator,
+} from "@/src/server/market-data";
+import type { MarketDataPriority } from "@/src/server/market-data/market-data.types";
 import { markHeartbeat } from "@/src/server/observability/heartbeat";
 import { withCircuitBreaker } from "@/src/server/resilience/circuit-breaker";
 import type { ExchangeBalance, FeeEstimate, KlineItem, OrderBookSnapshot, PlaceOrderResult, RecentTrade } from "@/src/types/exchange";
@@ -66,10 +71,10 @@ function candidateSymbolVariants(symbol: string) {
 
 async function getTradableSymbolSet() {
   const now = Date.now();
-  if (tradableSymbolSetCache && now - tradableSymbolSetCacheAt < 60_000) {
+  if (tradableSymbolSetCache && now - tradableSymbolSetCacheAt < 300_000) {
     return tradableSymbolSetCache;
   }
-  const info = await getExchangeInfo();
+  const info = await marketDataOrchestrator.getExchangeInfo({ priority: "low" });
   tradableSymbolSetCache = new Set(info.symbols.map((row) => row.symbol.toUpperCase()));
   tradableSymbolSetCacheAt = now;
   return tradableSymbolSetCache;
@@ -99,23 +104,12 @@ export async function resolveExchangeSymbol(symbol: string) {
   return resolveSymbolForExchange(symbol);
 }
 
-export async function getTicker(symbol: string): Promise<MarketTicker> {
-  const provider = getExchangeProvider();
+export async function getTicker(symbol: string, priority: MarketDataPriority = "normal"): Promise<MarketTicker> {
   const normalized = await resolveSymbolForExchange(symbol);
   try {
-    const row = await withCircuitBreaker(
-      "exchange:getTicker",
-      () => provider.getTicker(normalized),
-      { threshold: 5, cooldownMs: 15_000 },
-    );
+    const row = await marketDataOrchestrator.getTicker(normalized, { priority });
     markHeartbeat({ service: "exchange", status: "UP", message: "Ticker fetched", details: { symbol: normalized } });
-    return {
-      symbol: row.symbol,
-      price: row.price,
-      change24h: row.change24h,
-      volume24h: row.volume24h,
-      updatedAt: new Date().toISOString(),
-    };
+    return mapOrchestratorTickerToMarketTicker(row);
   } catch (error) {
     pushLog("ERROR", `Ticker fetch failed: ${(error as Error).message}`);
     markHeartbeat({ service: "exchange", status: "DEGRADED", message: "Ticker fetch failed" });
@@ -124,43 +118,29 @@ export async function getTicker(symbol: string): Promise<MarketTicker> {
 }
 
 export async function scanWatchlist(symbols: string[]) {
-  const result = await Promise.all(symbols.map((symbol) => getTicker(symbol)));
-  pushLog("INFO", `Coin tarama tamamlandi (${symbols.length} adet).`);
+  const unique = Array.from(new Set(symbols.map((symbol) => symbol.toUpperCase())));
+  const result = await Promise.all(unique.map((symbol) => getTicker(symbol, "normal")));
+  pushLog("INFO", `Coin tarama tamamlandi (${unique.length} adet).`);
   return result.sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h));
 }
 
-export async function getKlines(symbol: string, interval = "1m", limit = 100): Promise<KlineItem[]> {
-  const provider = getExchangeProvider();
+export async function getKlines(symbol: string, interval = "1m", limit = 100, priority: MarketDataPriority = "normal"): Promise<KlineItem[]> {
   const normalized = await resolveSymbolForExchange(symbol);
-  const rows = await withCircuitBreaker(
-    "exchange:getKlines",
-    () => provider.getKlines(normalized, interval, limit),
-    { threshold: 5, cooldownMs: 15_000 },
-  );
+  const rows = await marketDataOrchestrator.getKlines(normalized, interval, limit, { priority });
   pushLog("INFO", `${normalized} klines cekildi (${interval}, ${limit})`);
   return rows;
 }
 
-export async function getOrderBook(symbol: string, limit = 50): Promise<OrderBookSnapshot> {
-  const provider = getExchangeProvider();
+export async function getOrderBook(symbol: string, limit = 50, priority: MarketDataPriority = "normal"): Promise<OrderBookSnapshot> {
   const normalized = await resolveSymbolForExchange(symbol);
-  const orderBook = await withCircuitBreaker(
-    "exchange:getOrderBook",
-    () => provider.getOrderBook(normalized, limit),
-    { threshold: 5, cooldownMs: 15_000 },
-  );
+  const orderBook = await marketDataOrchestrator.getOrderBook(normalized, limit, { priority });
   pushLog("INFO", `${normalized} orderbook cekildi`);
   return orderBook;
 }
 
-export async function getRecentTrades(symbol: string, limit = 50): Promise<RecentTrade[]> {
-  const provider = getExchangeProvider();
+export async function getRecentTrades(symbol: string, limit = 50, priority: MarketDataPriority = "normal"): Promise<RecentTrade[]> {
   const normalized = await resolveSymbolForExchange(symbol);
-  const rows = await withCircuitBreaker(
-    "exchange:getRecentTrades",
-    () => provider.getRecentTrades(normalized, limit),
-    { threshold: 5, cooldownMs: 15_000 },
-  );
+  const rows = await marketDataOrchestrator.getRecentTrades(normalized, limit, { priority });
   pushLog("INFO", `${normalized} recent trades cekildi`);
   return rows;
 }
@@ -408,13 +388,8 @@ export async function getOrderStatus(symbol: string, orderId: string) {
 }
 
 export async function getExchangeInfo() {
-  const provider = getExchangeProvider();
   try {
-    const info = await withCircuitBreaker(
-      "exchange:getExchangeInfo",
-      () => provider.getExchangeInfo(),
-      { threshold: 4, cooldownMs: 15_000 },
-    );
+    const info = await marketDataOrchestrator.getExchangeInfo({ priority: "low" });
     markHeartbeat({ service: "exchange", status: "UP", message: "Exchange info fetched" });
     return info;
   } catch (error) {
@@ -535,4 +510,8 @@ export async function getAccountBalancesVerbose(): Promise<{
 export function subscribeTicker(symbol: string, onData: (data: { symbol: string; price: number; eventTime: number }) => void) {
   const provider = getExchangeProvider();
   return provider.subscribeTicker(symbol.toUpperCase(), onData);
+}
+
+export function getMarketDataTelemetry() {
+  return marketDataOrchestrator.getTelemetry();
 }

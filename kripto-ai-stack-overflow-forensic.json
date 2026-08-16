@@ -1,0 +1,231 @@
+{
+  "forensicId": "ai-stack-overflow-2026-08-14",
+  "sessionId": "cmstdt3ww0007uncgmjwgvf6p",
+  "roundNo": 1,
+  "runId": "cmstdt48d000luncg3wf3wki8",
+  "analyzedAt": "2026-08-14T20:45:00.000Z",
+  "methodology": "Artifact correlation + live log replay + static call-chain analysis + deterministic stack probe (no code changes, no paper run)",
+  "executiveSummary": {
+    "rootCause": "Synchronous V8 call-stack exhaustion in the post-provider AI consensus hot path — primarily buildHybridDecision and repeated buildIndicatorSnapshot invocations — amplified by nested async abort wrappers and SCANNER_AI_CONCURRENCY=2",
+    "classification": ["AI_ORCHESTRATOR", "RECURSION"],
+    "confidence": "HIGH",
+    "forensicLayerContributed": false,
+    "providerBlame": false
+  },
+  "observedMetrics": {
+    "aiScope": 83,
+    "aiProcessed": 34,
+    "aiSuccess": 17,
+    "aiFailed": 17,
+    "aiTimeout": 0,
+    "remoteCallsVerified": 79,
+    "stackOverflowErrors": 38,
+    "stackOverflowUniqueSymbols": 38,
+    "totalFailureRecords": 62,
+    "aiDegradedRecords": 23,
+    "providerTimeoutDegraded": 10,
+    "scannerAiConcurrency": 2,
+    "scannerContextConcurrency": 6
+  },
+  "firstStackOverflow": {
+    "timestamp": "2026-08-14T20:12:51.158Z",
+    "symbol": "FILTRY",
+    "candidateId": "ai:FILTRY:a963b84d",
+    "stage": "ai",
+    "reasonCode": "AI_FAILED",
+    "reasonDetail": "Maximum call stack size exceeded",
+    "runtimeCheckpoint": "Scanner consensus 0/47",
+    "lastSuccessfulProviderCalls": [
+      { "provider": "provider-3", "latencyMs": 2320, "timestamp": "2026-08-14T20:12:35.035Z" },
+      { "provider": "provider-1", "latencyMs": 2689, "timestamp": "2026-08-14T20:12:35.395Z" },
+      { "provider": "provider-1", "latencyMs": 3110, "timestamp": "2026-08-14T20:12:35.812Z" }
+    ],
+    "logSite": {
+      "file": "src/server/scanner/scanner.service.ts",
+      "function": "mapWithConcurrency worker catch",
+      "line": 754,
+      "message": "AI evaluation skipped for candidate"
+    }
+  },
+  "callChainReconstruction": {
+    "primaryPath": [
+      "round-selection.service.ts: onCheckpoint → Scanner consensus N/M",
+      "scanner.service.ts: mapWithConcurrency (concurrency=2)",
+      "scanner.service.ts: runWithDecisionTrace → worker try",
+      "cancellable-work.service.ts: withCancellableBoundedAwait ×3 (market-context, ai-format, ai-consensus)",
+      "cooperative-async.service.ts: runCooperativePool worker wrapper",
+      "analysis-orchestrator.ts: runAIConsensusFromInputImpl",
+      "analysis-orchestrator.ts: analyzeLaneWithSingleProvider ×3 (providers succeed — ai-trace)",
+      "analysis-orchestrator.ts: buildHybridDecision",
+      "hybrid-decision-engine.ts: buildIndicatorSnapshot ×3 (lines 327, 514, 649)",
+      "indicator-suite.ts: buildIndicatorSnapshot (nested ema/rsi/clusterLevels helpers)",
+      "RangeError: Maximum call stack size exceeded"
+    ],
+    "terminalSink": [
+      "scanner.service.ts:717 catch",
+      "ai-runtime.service.ts: failAiCandidate",
+      "candidate-lifecycle.service.ts: traceCandidateFailed",
+      "forensic-collector.service.ts: recordTerminalOutcome"
+    ],
+    "cyclesRuledOut": [
+      "failAiCandidate → re-evaluate",
+      "error handler → logging → error handler loop",
+      "artifact write → event → artifact write",
+      "withAiRetry infinite retry on stack overflow"
+    ]
+  },
+  "stackOverflowSites": {
+    "capturePoint": {
+      "file": "src/server/scanner/scanner.service.ts",
+      "line": 717,
+      "handler": "catch (error) → failAiCandidate → logger.warn AI evaluation skipped"
+    },
+    "probableThrowSite": {
+      "file": "src/server/ai/hybrid-decision-engine.ts",
+      "function": "buildHybridDecision",
+      "line": 649,
+      "note": "First heavy synchronous work after all three provider lanes return OK for FILTRY"
+    },
+    "contributingDepth": [
+      { "file": "src/server/ai/indicator-suite.ts", "function": "buildIndicatorSnapshot", "invocationsPerConsensus": "8-10" },
+      { "file": "src/server/ai/providers/provider-1.adapter.ts", "function": "buildTechnicalSpecialistOutput", "invocations": 2 },
+      { "file": "src/server/ai/providers/provider-3.adapter.ts", "function": "lane adapter", "invocations": 1 },
+      { "file": "src/server/ai/analysis-scorecard.service.ts", "function": "buildAnalysisScorecard", "note": "Reached only on success path" },
+      { "file": "src/server/ai/short-term-report.service.ts", "function": "buildShortTermReport", "note": "Reached only on success path" },
+      { "file": "src/server/execution/cancellable-work.service.ts", "function": "withCancellableBoundedAwait + linkAbortSignal", "note": "Adds frames before consensus body runs" }
+    ]
+  },
+  "candidateCorrelation": {
+    "stackOverflowSymbols": [
+      "FILTRY", "FORMTRY", "DYMTRY", "EDUTRY", "EULTRY", "ESPTRY", "ERATRY", "DODOTRY",
+      "RESOLVTRY", "QTUMTRY", "SANDTRY", "MAVTRY", "NOMTRY", "SHELLTRY", "PIXELTRY", "MMTTRY",
+      "NILTRY", "MUBARAKTRY", "SHIBTRY", "ROBOTRY", "SLPTRY", "ACETRY", "XPLTRY", "TURBOTRY",
+      "BABYTRY", "AVNTTRY", "USUALTRY", "1000SATSTRY", "AVAXTRY", "XLMTRY", "AITRY", "ATTRY",
+      "XAUTTRY", "API3TRY", "ZILTRY", "AMPTRY", "1000CATTRY", "ZKTRY"
+    ],
+    "concentration": {
+      "singleProvider": false,
+      "singleStrategy": false,
+      "singleLane": false,
+      "singleSymbolOnly": false,
+      "pattern": "Broad — any symbol entering full consensus after provider lanes can overflow"
+    },
+    "dualOutcomeSymbols": {
+      "note": "17 symbols appear COMPLETED in ai-progress AND have stack overflow in errors.json (different candidateId — multiple scanner passes in same round)",
+      "examples": ["ACETRY", "XPLTRY", "BABYTRY", "AVNTTRY"]
+    },
+    "simultaneousOverflowEvents": [
+      { "timestamp": "2026-08-14T20:17:05.407Z", "symbols": ["RESOLVTRY", "QTUMTRY"] }
+    ]
+  },
+  "providerCorrelation": {
+    "stackOverflowBeforeProviderComplete": false,
+    "evidence": "FILTRY/FORMTRY: 3 successful remote provider calls in ai-trace before stack overflow 16s later",
+    "aiTraceBreakdown": { "provider-1": 60, "provider-3": 34, "provider-2": 8 },
+    "degradedSeparatePath": {
+      "count": 23,
+      "providerTimeoutRiskLane": 10,
+      "reasonCode": "AI_DEGRADED",
+      "note": "provider-3:risk timeouts are independent from stack overflow"
+    },
+    "laneConcentration": "None for stack overflow — failure occurs after all lanes invoked"
+  },
+  "concurrencyCorrelation": {
+    "configured": { "SCANNER_AI_CONCURRENCY": 2, "SCANNER_CONTEXT_CONCURRENCY": 6 },
+    "deterministicProbe": {
+      "buildIndicatorSnapshot_concurrency1": "PASS",
+      "buildIndicatorSnapshot_parallel2": "PASS",
+      "buildHybridDecision_isolated": "Not stack overflow (mock input TypeError — incomplete mock)",
+      "interpretation": "Isolated snapshot survives concurrency 2; overflow requires full orchestrator + wrapper stack"
+    },
+    "liveEvidence": {
+      "existsAtConcurrency1": "Unknown — live run used concurrency 2 only",
+      "appearsUnderConcurrency2": true,
+      "scalesWithConcurrency": "Frequency amplified (2 workers × deep stacks); per-worker overflow is synchronous",
+      "priorSessions": "Same error in cmst8nza40007unvsi2211emo round 3 (100+ occurrences) — recurring under load"
+    }
+  },
+  "retryTimeoutCancellation": {
+    "AI_TIMEOUT_count": 0,
+    "AI_FAILED_count_in_aiProgress": 17,
+    "stackOverflow_classifiedAs": "AI_FAILED",
+    "classificationLogic": {
+      "file": "src/server/scanner/scanner.service.ts",
+      "lines": "719-735",
+      "rule": "RangeError message does not match timed out / CooperativeAsyncTimeoutError → STALL_ERROR_CODES.AI_FAILED"
+    },
+    "whyNotAiTimeout": "Stack overflow is synchronous RangeError, not worker timeout or abort",
+    "withAiRetry": "Lane retries not triggered on stack overflow; error propagates to scanner catch",
+    "withCancellableBoundedAwait": "Adds stack frames; abort cascade under budget adds more but not infinite loop"
+  },
+  "forensicTelemetry": {
+    "contributedToOverflow": false,
+    "evidence": [
+      "failAiCandidate runs AFTER catch — terminal sink only",
+      "traceCandidateFailed → recordTerminalOutcome is append-only",
+      "errors.json records are export artifacts, not throw sites",
+      "bridgeAiProviderResult succeeds before overflow on FILTRY"
+    ],
+    "secondaryStress": "Prisma transaction timeout on decisionTimelineEvent.createMany after FORMTRY overflow (14099ms > 5000ms tx limit) — persistence backlog, not overflow cause"
+  },
+  "stackSettings": {
+    "NODE_OPTIONS": null,
+    "defaultV8Stack": "~984KB (64-bit Node default)",
+    "recommendedFix": "Do NOT increase stack size — eliminate redundant deep synchronous work"
+  },
+  "why38vs17": {
+    "stackOverflowRecords": 38,
+    "aiProgressFailedCount": 17,
+    "explanation": [
+      "errors.json aggregates ALL lifecycle failures across the full round (multiple scanner passes, duplicate candidateIds per symbol)",
+      "ai-progress ring buffer tracks main batch only (processed=34, success=17, failed=17)",
+      "Same symbol can stack-fail in one pass and COMPLETE in a later pass (different candidateId)",
+      "23 additional AI_DEGRADED records are separate from stack overflow"
+    ]
+  },
+  "classification": {
+    "primary": "AI_ORCHESTRATOR",
+    "secondary": ["RECURSION", "CONCURRENCY"],
+    "ruledOut": ["AI_PROVIDER", "RETRY", "CANCELLATION", "FORENSIC_TELEMETRY", "PERSISTENCE", "SERIALIZATION"],
+    "confidence": "HIGH"
+  },
+  "safeFixProposal": {
+    "priority": [
+      {
+        "id": "P0-1",
+        "action": "Memoize buildIndicatorSnapshot(input) once per runAIConsensusFromInputImpl and pass through buildHybridDecision, scorecard, short-term report, and provider adapters",
+        "files": ["analysis-orchestrator.ts", "hybrid-decision-engine.ts", "provider-1.adapter.ts", "provider-3.adapter.ts", "short-term-report.service.ts", "short-term-score.service.ts"]
+      },
+      {
+        "id": "P0-2",
+        "action": "Split buildHybridDecision into smaller functions; remove redundant scoreTechnical/scoreRisk snapshot rebuilds",
+        "files": ["hybrid-decision-engine.ts"]
+      },
+      {
+        "id": "P1-1",
+        "action": "Flatten nested withCancellableBoundedAwait in scanner AI worker (single linked abort context)",
+        "files": ["scanner.service.ts", "cancellable-work.service.ts"]
+      },
+      {
+        "id": "P1-2",
+        "action": "Strip hybridPayload/roleScores from logger.info payload in analysis-orchestrator.ts:977",
+        "files": ["analysis-orchestrator.ts"]
+      }
+    ],
+    "doNotDo": ["Increase NODE_OPTIONS --stack-size without structural fix", "Blame provider-3 timeouts", "Modify strategy thresholds"]
+  },
+  "regressionTestsRequired": [
+    "Full mock consensus path under SCANNER_AI_CONCURRENCY=2 must not throw RangeError",
+    "buildIndicatorSnapshot called at most once per consensus (spy/mock counter)",
+    "Stack overflow from session cmstdt3ww0007uncgmjwgvf6p FILTRY timeline replay fixture",
+    "Concurrent dual-worker cooperative pool with heavy consensus mock",
+    "failAiCandidate still terminalizes on synthetic RangeError without re-entry"
+  ],
+  "artifactPaths": {
+    "errors": "artifacts/forensics/cmstdt3ww0007uncgmjwgvf6p/rounds/1/errors.json",
+    "aiProgress": "artifacts/forensics/cmstdt3ww0007uncgmjwgvf6p/rounds/1/ai-progress.json",
+    "aiTrace": "artifacts/forensics/cmstdt3ww0007uncgmjwgvf6p/rounds/1/ai-trace.json",
+    "candidateLifecycle": "artifacts/forensics/cmstdt3ww0007uncgmjwgvf6p/rounds/1/candidate-lifecycle.json",
+    "liveLog": "artifacts/5round-stress-validation-live.log"
+  }
+}

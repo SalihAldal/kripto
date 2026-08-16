@@ -14,19 +14,50 @@ const EMPTY_SCAN_RESULT: ScannerPipelineResult = {
 
 const SNAPSHOT_STALE_MS = 45_000;
 const MANUAL_SCAN_MIN_INTERVAL_MS = 20_000;
+const UI_SCAN_MAX_WAIT_MS = 25_000;
 let inFlightScan: Promise<ScannerPipelineResult> | null = null;
 let lastManualScanAt = 0;
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function awaitWithTimeout<T>(promise: Promise<T>, timeoutMs: number) {
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<null>((resolve) => {
+        timer = setTimeout(() => resolve(null), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 async function loadFreshScan(withAi: boolean) {
-  if (inFlightScan) return inFlightScan;
+  if (inFlightScan) {
+    const attached = await awaitWithTimeout(inFlightScan, UI_SCAN_MAX_WAIT_MS);
+    if (attached) return attached;
+    const snapshot = getScannerWorkerSnapshot();
+    if (snapshot.detailed && snapshot.detailed.candidates.length > 0) return snapshot.detailed;
+    return EMPTY_SCAN_RESULT;
+  }
   inFlightScan = runScannerPipeline(undefined, {
     includeAi: withAi,
     persist: false,
     persistRejected: false,
+    runtime: {
+      attachIfRunning: true,
+      attachMaxWaitMs: UI_SCAN_MAX_WAIT_MS,
+      preferLastResultOnAttachTimeout: true,
+      maxCycleSec: Math.min(90, env.AUTO_ROUND_SCANNER_MAX_CYCLE_SEC ?? 90),
+    },
   });
   try {
-    const result = await inFlightScan;
-    lastManualScanAt = Date.now();
+    const result = (await awaitWithTimeout(inFlightScan, UI_SCAN_MAX_WAIT_MS)) ?? EMPTY_SCAN_RESULT;
+    if (result.totalSymbols > 0) lastManualScanAt = Date.now();
     return result;
   } finally {
     inFlightScan = null;

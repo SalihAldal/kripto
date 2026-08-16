@@ -1,0 +1,1723 @@
+{
+  "validationId": "1round-ai-cancel-2026-08-14T19-30-42-079Z",
+  "referenceFix": "kripto-p0-ai-cancellation-validation.json",
+  "startedAt": "2026-08-14T19:30:49.730Z",
+  "completedAt": "2026-08-14T19:36:44.716Z",
+  "verdict": "PASS",
+  "codeFingerprint": {
+    "gitHead": "31e27712566af791a8ecb1c24bbc7f376d608a5e",
+    "cancellableWorkSha": "553a99c216c9e281",
+    "cooperativeAsyncSha": "7bd4bb853b1e8745",
+    "validationProcessPid": 38580,
+    "note": "Validation runner loads current workspace source via tsx — this IS the redeployed cancellation code path"
+  },
+  "config": {
+    "mode": "PAPER",
+    "exchange": "tr",
+    "scanner": "REAL_SCANNER",
+    "ai": "REAL_AI",
+    "aiGatePolicy": "VETO",
+    "totalRounds": 1,
+    "selectionBudgetMs": 1200000
+  },
+  "preflight": {
+    "path": "C:\\Users\\salih\\Desktop\\kripto-main\\preflight.json",
+    "canStart": true,
+    "overallVerdict": "DEGRADED",
+    "reconciledJobs": 1,
+    "reconciledRounds": 1
+  },
+  "sessionId": "cmstce95w0007unronp6bkn7p",
+  "job": {
+    "id": "cmstce95w0007unronp6bkn7p",
+    "status": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "lastError": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)"
+  },
+  "round": {
+    "roundNo": 1,
+    "runId": "cmstce9gb000junroyg7ptq1v",
+    "state": "tur_basarisiz",
+    "symbol": "BELTRY",
+    "failReason": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)",
+    "startedAt": "2026-08-14T19:30:55.451Z",
+    "endedAt": "2026-08-14T19:36:31.702Z",
+    "durationMs": 336251
+  },
+  "aiCandidates": {
+    "processed": 4,
+    "total": 87,
+    "finalAssessment": {
+      "total": 2,
+      "startedOrphans": [],
+      "missingForensicStart": [],
+      "timeoutRows": [],
+      "timeoutForensicIncomplete": []
+    },
+    "snapshots": [
+      {
+        "at": "2026-08-14T19:33:15.700Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 0,
+        "total": 0,
+        "assessment": {
+          "total": 0,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": []
+      },
+      {
+        "at": "2026-08-14T19:33:25.707Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 0,
+        "total": 0,
+        "assessment": {
+          "total": 0,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": []
+      },
+      {
+        "at": "2026-08-14T19:33:35.717Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 0,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "STARTED"
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "STARTED"
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:34:03.040Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 3,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:34:13.089Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:34:23.106Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:34:33.116Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:34:43.123Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:34:53.131Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:35:03.142Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:35:13.166Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:35:23.423Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:35:33.493Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:35:43.514Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:35:53.595Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:36:03.642Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:36:13.660Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:36:23.667Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:36:34.012Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      },
+      {
+        "at": "2026-08-14T19:36:44.028Z",
+        "roundId": "1",
+        "runId": "cmstce9gb000junroyg7ptq1v",
+        "processed": 4,
+        "total": 87,
+        "assessment": {
+          "total": 2,
+          "startedOrphans": [],
+          "missingForensicStart": [],
+          "timeoutRows": [],
+          "timeoutForensicIncomplete": []
+        },
+        "candidates": [
+          {
+            "candidateId": "ai:ACETRY:ec02d8d5",
+            "symbol": "ACETRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.244Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.789Z",
+            "durationMs": 11545
+          },
+          {
+            "candidateId": "ai:BELTRY:d6963378",
+            "symbol": "BELTRY",
+            "provider": "provider-1",
+            "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+            "executionMode": "paper",
+            "startedAt": "2026-08-14T19:33:26.257Z",
+            "status": "COMPLETED",
+            "completedAt": "2026-08-14T19:33:37.791Z",
+            "durationMs": 11534
+          }
+        ]
+      }
+    ]
+  },
+  "selectionBudget": {
+    "configuredMs": 1200000,
+    "elapsedMs": 335814,
+    "budgetRespected": true,
+    "lastProgressAt": "2026-08-14T19:34:03.579Z",
+    "heartbeatAt": "2026-08-14T19:36:31.417Z"
+  },
+  "recovery": {
+    "prematureRestartDetected": false,
+    "recoverySnapshots": [],
+    "recoveryTimeline": [
+      {
+        "id": "38182cf8-be2c-4acd-a10e-98726a9e7856",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:36:36.012Z",
+        "durationMs": 38
+      },
+      {
+        "id": "06a64566-76c7-4c8d-b927-699773c8ed97",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:36:20.975Z",
+        "durationMs": 15
+      },
+      {
+        "id": "22072c17-2110-4af5-985f-83faa267d3ad",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:36:05.962Z",
+        "durationMs": 14
+      },
+      {
+        "id": "d43148f8-f14c-4710-8c4c-0336c0c53249",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:35:51.114Z",
+        "durationMs": 160
+      },
+      {
+        "id": "9b74006f-74a6-4fc3-baf3-f548f21bd761",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:35:35.993Z",
+        "durationMs": 51
+      },
+      {
+        "id": "3aeb960c-18ff-4cdb-a887-8424e857bcaa",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:35:21.244Z",
+        "durationMs": 200
+      },
+      {
+        "id": "e8c8bd8d-9745-489b-82ca-f733eab04e8a",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:35:05.951Z",
+        "durationMs": 29
+      },
+      {
+        "id": "9dc42abb-36d6-48e2-94b6-20508396f619",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:34:50.831Z",
+        "durationMs": 15
+      },
+      {
+        "id": "647105e7-9671-4e87-9d01-b9e7bfce2be2",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:34:35.812Z",
+        "durationMs": 11
+      },
+      {
+        "id": "4ad0695f-a394-4569-91a4-608062ab6af0",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:34:20.803Z",
+        "durationMs": 12
+      },
+      {
+        "id": "3438e6b3-cf14-490f-8d60-b9ff79cdaf19",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:34:05.798Z",
+        "durationMs": 17
+      },
+      {
+        "id": "c90aa04c-32a3-439f-ae30-f60aa585cc66",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:34:03.117Z",
+        "durationMs": 12336
+      },
+      {
+        "id": "b05dcc4d-3f9a-45c1-acd2-262a664d6379",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:33:10.417Z",
+        "durationMs": 11
+      },
+      {
+        "id": "80edaf8d-4c4b-4d50-9503-4783f68377cf",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:32:55.412Z",
+        "durationMs": 12
+      },
+      {
+        "id": "ad4ecc8b-6a87-4897-ba95-f8498c1872c8",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:32:40.409Z",
+        "durationMs": 11
+      },
+      {
+        "id": "3efa2d80-22f7-48ed-b21b-7e5dc7e0778d",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:32:25.397Z",
+        "durationMs": 10
+      },
+      {
+        "id": "ce747ac5-84b4-43c9-b210-9a1da5b59bd7",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:32:10.462Z",
+        "durationMs": 50
+      },
+      {
+        "id": "fdb6642e-d3b8-4595-bdf2-a33f68085b04",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:31:55.408Z",
+        "durationMs": 26
+      },
+      {
+        "id": "e6880543-e68a-4cd8-a725-cbb49a0d3ff7",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:31:40.382Z",
+        "durationMs": 15
+      },
+      {
+        "id": "ed8c204f-6833-4057-b02c-b8ea38fd2e75",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:31:25.376Z",
+        "durationMs": 10
+      },
+      {
+        "id": "48ba3214-cbaf-42d5-93af-2bc1b067bb24",
+        "jobId": "cmstce95w0007unronp6bkn7p",
+        "action": "NO_ACTION",
+        "result": "skipped",
+        "failure": "SCHEDULER_CRASH",
+        "message": "No recoverable issue detected",
+        "trigger": "watchdog",
+        "decision": {
+          "action": "NO_ACTION",
+          "reason": "No recoverable issue detected",
+          "failure": "SCHEDULER_CRASH",
+          "component": "recovery_manager",
+          "safeResume": true,
+          "escalationLevel": 0
+        },
+        "operator": "automatic",
+        "component": "recovery_manager",
+        "timestamp": "2026-08-14T19:31:10.375Z",
+        "durationMs": 10
+      }
+    ]
+  },
+  "artifacts": {
+    "root": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmstce95w0007unronp6bkn7p\\rounds\\1",
+    "status": {
+      "round-summary.json": true,
+      "ai-progress.json": true,
+      "ai-trace.json": true,
+      "round-watchdog.json": true,
+      "recovery-decisions.json": true,
+      "recovery-telemetry.json": true
+    },
+    "exportKind": "failed-round-partial"
+  },
+  "zombieLock": {
+    "zombieRuns": 0,
+    "jobTerminal": true,
+    "roundTerminal": true
+  },
+  "timeline": [
+    {
+      "at": "2026-08-14T19:30:55.364Z",
+      "event": "JOB_STARTED",
+      "sessionId": "cmstce95w0007unronp6bkn7p"
+    }
+  ],
+  "progressSamples": [
+    {
+      "at": "2026-08-14T19:31:05.432Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:31:15.446Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:31:25.450Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:31:35.513Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:31:45.523Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:31:55.537Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:32:05.615Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:32:15.625Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:32:25.638Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "PUMP_SCAN",
+      "elapsedMs": 379,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:30:55.982Z",
+      "lastProgressAt": "2026-08-14T19:30:55.982Z",
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:32:35.654Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "SCANNING",
+      "elapsedMs": 98829,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:32:34.432Z",
+      "lastProgressAt": "2026-08-14T19:32:32.430Z",
+      "aiTotal": 100,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:32:45.660Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "SCANNING",
+      "elapsedMs": 110002,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:32:45.605Z",
+      "lastProgressAt": "2026-08-14T19:32:45.605Z",
+      "aiTotal": 100,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:32:55.680Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "SCANNING",
+      "elapsedMs": 119007,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:32:54.610Z",
+      "lastProgressAt": "2026-08-14T19:32:54.610Z",
+      "aiTotal": 100,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:33:05.690Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "SCANNING",
+      "elapsedMs": 129798,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:33:05.401Z",
+      "lastProgressAt": "2026-08-14T19:33:05.401Z",
+      "aiTotal": 100,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:33:15.700Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "SCANNING",
+      "elapsedMs": 138973,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:33:14.576Z",
+      "lastProgressAt": "2026-08-14T19:33:14.576Z",
+      "aiTotal": 100,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:33:25.707Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "SCANNING",
+      "elapsedMs": 150026,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:33:25.629Z",
+      "lastProgressAt": "2026-08-14T19:33:25.629Z",
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:33:35.716Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 158614,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:33:34.217Z",
+      "lastProgressAt": "2026-08-14T19:33:29.594Z",
+      "aiProcessed": 0,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:34:03.040Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 160622,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:33:36.225Z",
+      "lastProgressAt": "2026-08-14T19:33:29.594Z",
+      "aiProcessed": 0,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:34:13.089Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:34:23.106Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:34:33.116Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:34:43.123Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:34:53.131Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:35:03.142Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:35:13.166Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:35:23.423Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:35:33.493Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:35:43.514Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:35:53.595Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:36:03.642Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:36:13.660Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:36:23.667Z",
+      "roundNo": 1,
+      "runState": "tariyor",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 187877,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:34:03.480Z",
+      "lastProgressAt": "2026-08-14T19:34:03.480Z",
+      "aiProcessed": 1,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:36:34.012Z",
+      "roundNo": 1,
+      "runState": "tur_basarisiz",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 335814,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:36:31.417Z",
+      "lastProgressAt": "2026-08-14T19:34:03.579Z",
+      "aiProcessed": 2,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    },
+    {
+      "at": "2026-08-14T19:36:44.028Z",
+      "roundNo": 1,
+      "runState": "tur_basarisiz",
+      "step": "AI_ANALYSIS",
+      "elapsedMs": 335814,
+      "selectionBudgetMs": 1200000,
+      "heartbeatAt": "2026-08-14T19:36:31.417Z",
+      "lastProgressAt": "2026-08-14T19:34:03.579Z",
+      "aiProcessed": 2,
+      "aiTotal": 87,
+      "progressState": "ACTIVE_PROGRESS",
+      "reasonCode": "PROGRESS_ADVANCING",
+      "startedOrphans": 0
+    }
+  ],
+  "failReasons": []
+}

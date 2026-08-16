@@ -1,4 +1,5 @@
 import type { ExpertOpinionType, ExpertType, MasterDecisionType } from "@prisma/client";
+import type { AIDecision } from "@/src/types/ai";
 import type {
   ConflictPair,
   DecisionAttributionSnapshot,
@@ -7,6 +8,16 @@ import type {
 } from "@/src/server/decision-engine/decision-engine.types";
 import { OPINION_POLARITY } from "@/src/server/decision-engine/decision-engine.types";
 import { avg } from "@/src/server/decision-engine/experts/expert.utils";
+
+/** Stable Trading Decision policy — hybrid BUY preservation when master defers without hard conflict. */
+export const TRADING_DECISION_POLICY = {
+  preserveHybridBuyOnMasterDefer: true,
+  minHybridConfidenceToPreserve: 65,
+  minMasterConsensusToPreserve: 45,
+  minMasterConfidenceToPreserve: 40,
+  maxBearishExpertsToPreserve: 1,
+  minExpertCoverageToTrustMasterReject: 5,
+} as const;
 
 function isBullish(opinion: ExpertOpinionType) {
   return opinion === "BUY" || opinion === "WEAK_BUY";
@@ -72,8 +83,9 @@ export function buildAttribution(opinions: ExpertOpinionResult[]): DecisionAttri
 }
 
 export function computeConsensusMetrics(opinions: ExpertOpinionResult[], conflicts: ConflictPair[]) {
-  const polarities = opinions.filter((row) => row.opinion !== "NO_OPINION").map((row) => OPINION_POLARITY[row.opinion]);
-  const consensusScore = avg(opinions.map((row) => row.score));
+  const actionableOpinions = opinions.filter((row) => row.opinion !== "NO_OPINION");
+  const polarities = actionableOpinions.map((row) => OPINION_POLARITY[row.opinion]);
+  const consensusScore = avg((actionableOpinions.length > 0 ? actionableOpinions : opinions).map((row) => row.score));
   const agreementScore =
     polarities.length === 0
       ? 0
@@ -118,6 +130,74 @@ export function mapMasterToLegacy(decision: MasterDecisionType): "BUY" | "SELL" 
   if (decision === "SELL" || decision === "REDUCE") return "SELL";
   if (decision === "WATCHLIST") return "HOLD";
   return "NO_TRADE";
+}
+
+function countBearishExperts(opinions: ExpertOpinionResult[]) {
+  return opinions.filter((row) => isBearish(row.opinion)).length;
+}
+
+function countActionableExperts(opinions: ExpertOpinionResult[]) {
+  return opinions.filter((row) => row.opinion !== "NO_OPINION").length;
+}
+
+/**
+ * Master engine WAIT/WATCHLIST previously mapped to NO_TRADE/HOLD and erased hybrid BUY approvals.
+ * Preserve hybrid BUY when master only defers and no material bearish conflict exists.
+ */
+export function resolveEffectiveTradingDecision(input: {
+  masterDecision: MasterDecisionType;
+  hybridDecision: AIDecision;
+  hybridRejected: boolean;
+  hybridConfidence: number;
+  metrics: ReturnType<typeof computeConsensusMetrics>;
+  opinions: ExpertOpinionResult[];
+}): {
+  legacyDecision: "BUY" | "SELL" | "HOLD" | "NO_TRADE";
+  preservedHybridBuy: boolean;
+  preservationReason?: string;
+} {
+  const mapped = mapMasterToLegacy(input.masterDecision);
+  if (!TRADING_DECISION_POLICY.preserveHybridBuyOnMasterDefer) {
+    return { legacyDecision: mapped, preservedHybridBuy: false };
+  }
+  if (input.hybridDecision !== "BUY" || input.hybridRejected) {
+    return { legacyDecision: mapped, preservedHybridBuy: false };
+  }
+  if (input.masterDecision === "STRONG_BUY" || input.masterDecision === "BUY") {
+    return { legacyDecision: "BUY", preservedHybridBuy: false };
+  }
+  if (input.masterDecision === "SELL" || input.masterDecision === "REDUCE") {
+    return { legacyDecision: "SELL", preservedHybridBuy: false };
+  }
+
+  const bearishExperts = countBearishExperts(input.opinions);
+  const expertCoverage = countActionableExperts(input.opinions);
+  const masterHardReject =
+    input.masterDecision === "NO_TRADE" &&
+    expertCoverage >= TRADING_DECISION_POLICY.minExpertCoverageToTrustMasterReject &&
+    input.metrics.consensusScore < TRADING_DECISION_POLICY.minMasterConsensusToPreserve;
+  if (masterHardReject || bearishExperts > TRADING_DECISION_POLICY.maxBearishExpertsToPreserve) {
+    return { legacyDecision: mapped, preservedHybridBuy: false };
+  }
+
+  const hybridConfidenceOk = input.hybridConfidence >= TRADING_DECISION_POLICY.minHybridConfidenceToPreserve;
+  const masterDefer =
+    input.masterDecision === "WAIT" ||
+    input.masterDecision === "WATCHLIST" ||
+    (input.masterDecision === "NO_TRADE" && expertCoverage < TRADING_DECISION_POLICY.minExpertCoverageToTrustMasterReject);
+  const masterMetricsOk =
+    input.metrics.consensusScore >= TRADING_DECISION_POLICY.minMasterConsensusToPreserve ||
+    input.metrics.confidence >= TRADING_DECISION_POLICY.minMasterConfidenceToPreserve;
+
+  if (masterDefer && hybridConfidenceOk && masterMetricsOk) {
+    return {
+      legacyDecision: "BUY",
+      preservedHybridBuy: true,
+      preservationReason: `Hybrid BUY preserved — master ${input.masterDecision} deferred (consensus=${input.metrics.consensusScore.toFixed(0)}, confidence=${input.metrics.confidence.toFixed(0)})`,
+    };
+  }
+
+  return { legacyDecision: mapped, preservedHybridBuy: false };
 }
 
 export function buildHumanReadableDecision(input: {

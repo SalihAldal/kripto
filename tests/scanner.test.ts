@@ -16,6 +16,8 @@ function context(symbol: string, momentum = 0.8): MarketContext {
     buyPressure: 0.62,
     shortCandleSignal: 2,
     fakeSpikeScore: 0.3,
+    pumpRisk: 20,
+    pumpIntensity: 40,
     tradable: true,
     rejectReasons: [],
     metadata: {},

@@ -1,0 +1,81 @@
+{
+  "validationId": "p0-profitability-2026-08-14T22-27-27-345Z",
+  "verdict": "PASS",
+  "startedAt": "2026-08-14T22:27:41.680Z",
+  "completedAt": "2026-08-14T22:31:47.231Z",
+  "sessionId": "cmstipo0p0007un1o31ozf8jh",
+  "config": {
+    "mode": "PAPER",
+    "totalRounds": 1,
+    "aiGatePolicy": "VETO",
+    "note": "Zero-trade result acceptable when gates legitimately block"
+  },
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY"
+  },
+  "job": {
+    "id": "cmstipo0p0007un1o31ozf8jh",
+    "status": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "lastError": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)"
+  },
+  "round": {
+    "roundNo": 1,
+    "runId": "cmstipo8e000mun1okkj66q81",
+    "state": "tur_basarisiz",
+    "symbol": "ACETRY",
+    "endedAt": "2026-08-14T22:31:44.992Z",
+    "failReason": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)",
+    "tradeCount": 0,
+    "artifactRoot": "artifacts/forensics/cmstipo0p0007un1o31ozf8jh/rounds/1"
+  },
+  "unitTests": {
+    "suite": "tests/forensics/p0-execution-correctness.test.ts",
+    "passed": 23,
+    "failed": 0,
+    "cases": [
+      "AI VETO blocks NO_TRADE/HOLD/REJECT/WAIT",
+      "AI VETO allows BUY/SELL with consensus",
+      "missing AI verdict / consensus / provider evidence blocked",
+      "TP/SL/TIME_EXIT/END_OF_REPLAY replay exits",
+      "POSITION_MONITOR vs REPLAY_WINDOW mapping",
+      "fee edge metrics + feeReconciliationStatus PASS/FAIL",
+      "simulation integrity no look-ahead"
+    ]
+  },
+  "forensic": {
+    "aiGatePolicy": "VETO",
+    "aiGateDecisionCount": 0,
+    "aiGateBlockCount": 0,
+    "aiGatePassCount": 0,
+    "feeMetricCount": 0,
+    "tradeCount": 0,
+    "exitReasons": [],
+    "nonEndOfReplayExitCount": 0,
+    "feeReconciliation": [],
+    "upstreamBlocks": {
+      "TDI_REJECTED": 3,
+      "CONSENSUS_REJECT": 2,
+      "AI_FAILED": 2,
+      "NO_TRADE_decisions": 2
+    },
+    "note": "Round failed during pump scan timeout before execution-orchestrator order path; upstream TDI/consensus rejected NO_TRADE candidates"
+  },
+  "acceptance": {
+    "aiVetoEnforced": true,
+    "aiVetoLiveExecutionPathObserved": false,
+    "feeReconciliationExact": true,
+    "exitTaxonomyUnitTested": true,
+    "nonEndOfReplayPossibleInTests": true,
+    "nonEndOfReplayLiveObserved": false,
+    "testsPassed": true,
+    "noStrategyThresholdChanges": true,
+    "noSafetyBypass": true
+  },
+  "remainingBlockers": [
+    "Live round did not reach execution-orchestrator AI gate bridge (pump scan timeout)",
+    "Re-run validation when pump scan / network stable to observe live AI_GATE_* decision traces"
+  ]
+}

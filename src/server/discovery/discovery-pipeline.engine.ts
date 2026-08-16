@@ -11,6 +11,12 @@ import { filterHealthyOnly } from "@/src/server/discovery/stages/market-health-f
 import { detectDiscoveryRegime, regimeConfidence } from "@/src/server/discovery/stages/regime-detection.service";
 import { persistDiscoveryBatch } from "@/src/server/discovery/discovery.repository";
 import { emitDiscoveryEvent } from "@/src/server/discovery/discovery.events";
+import {
+  createAsyncTelemetry,
+  resolveDiscoveryItemTimeoutMs,
+  runCooperativePool,
+  type AsyncRuntimeTelemetry,
+} from "@/src/server/execution/cooperative-async.service";
 
 export async function runDiscoveryForSymbol(input: DiscoveryBatchInput): Promise<DiscoveryProfileOutput | null> {
   if (!input.context) return null;
@@ -58,27 +64,55 @@ export async function runDiscoveryForSymbol(input: DiscoveryBatchInput): Promise
 
 export async function runDiscoveryBatch(
   inputs: DiscoveryBatchInput[],
-  options?: { persist?: boolean },
+  options?: {
+    persist?: boolean;
+    shouldAbort?: () => void;
+    onHeartbeat?: () => void | Promise<void>;
+    onCheckpoint?: (processed: number, total: number, symbol?: string) => void | Promise<void>;
+    telemetry?: AsyncRuntimeTelemetry;
+    itemTimeoutMs?: number;
+    concurrency?: number;
+  },
 ): Promise<DiscoveryBatchResult> {
   const scannedAt = new Date().toISOString();
+  const telemetry = options?.telemetry ?? createAsyncTelemetry();
   const profiles: DiscoveryProfileOutput[] = [];
 
-  for (const input of inputs) {
-    const profile = await runDiscoveryForSymbol(input);
-    if (profile) profiles.push(profile);
+  const rows = await runCooperativePool(
+    inputs,
+    async (input, _index, _signal) => runDiscoveryForSymbol(input),
+    {
+      label: "discovery-batch",
+      concurrency: Math.max(1, Math.min(options?.concurrency ?? 8, inputs.length || 1)),
+      workerTimeoutMs: options?.itemTimeoutMs ?? resolveDiscoveryItemTimeoutMs(),
+      shouldAbort: options?.shouldAbort,
+      onHeartbeat: options?.onHeartbeat,
+      telemetry,
+      onItemComplete: async (processed, total, item) => {
+        await options?.onCheckpoint?.(processed, total, item.symbol);
+      },
+    },
+  );
+
+  for (const row of rows) {
+    if (row) profiles.push(row);
   }
 
-  const rankings = rankDiscoveryProfiles(profiles);
-  if (options?.persist !== false && profiles.length > 0) {
-    await persistDiscoveryBatch({ scannedAt, profiles, rankings }).catch(() => null);
-    emitDiscoveryEvent("discovery.batch.completed", { scannedAt, count: profiles.length });
+  const uniqueProfiles = Array.from(
+    new Map(profiles.map((profile) => [profile.symbol.toUpperCase(), profile])).values(),
+  );
+
+  const rankings = rankDiscoveryProfiles(uniqueProfiles);
+  if (options?.persist !== false && uniqueProfiles.length > 0) {
+    await persistDiscoveryBatch({ scannedAt, profiles: uniqueProfiles, rankings }).catch(() => null);
+    emitDiscoveryEvent("discovery.batch.completed", { scannedAt, count: uniqueProfiles.length });
   }
 
   return {
     scannedAt,
     totalSymbols: inputs.length,
-    healthySymbols: profiles.length,
-    profiles,
+    healthySymbols: uniqueProfiles.length,
+    profiles: uniqueProfiles,
     rankings,
   };
 }

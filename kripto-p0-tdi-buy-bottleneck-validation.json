@@ -1,0 +1,92 @@
+{
+  "sessionId": "cmsuf7zij0007une4u1q4cqu4",
+  "smokeRunId": "smoke-2026-08-15T13-37-38-183Z",
+  "capturedAt": "2026-08-15T14:26:00.000Z",
+  "jobStatus": {
+    "status": "COMPLETED",
+    "activeState": "tur_tamamlandi",
+    "completedRounds": 0,
+    "failedRounds": 2,
+    "finishedAt": "2026-08-15T14:10:41.786Z"
+  },
+  "validationOutcome": "ZERO_TDI_APPROVED_WITH_EVIDENCE",
+  "interpretation": "Correctness fixes verified by unit tests. Live 2-round run produced 7 TDI WAIT (HOLD) records and sharply reduced techStrongButOthersWeak duplicate signals (6 vs 6518 baseline rate). No hybrid BUY because candidates lacked simultaneous strong momentum, quality, and non-complex sentiment; round winner CHIPTRY reached EXECUTING but was AI-gated NO_TRADE.",
+  "tdi": {
+    "total": 123,
+    "approved": 0,
+    "wait": 7,
+    "rejected": 116,
+    "hybridBuy": 0,
+    "masterBuy": 0,
+    "momentumWeak": 59,
+    "techStrongButOthersWeak": 6,
+    "confidenceLt40": 120
+  },
+  "comparisonToBaseline46Round": {
+    "baselineSessionId": "cmstltuqn0007un9ksbk3xn9c",
+    "baselineTechStrongButOthersWeakRate": 0.37,
+    "validationTechStrongButOthersWeakRate": 0.049,
+    "baselineTdiWaitRate": 0.346,
+    "validationTdiWaitRate": 0.057,
+    "note": "Small sample (123 vs 17626); duplicate-gate reduction directionally confirmed"
+  },
+  "rounds": [
+    {
+      "roundNo": 1,
+      "symbol": "ALICETRY",
+      "result": "failed",
+      "failReason": "SIM_TIGHT_FILTER_15m: pump RANGE zayif (24h=5.43%, short=0.000%, flow=0.000) | Tape yetersiz",
+      "candidateCount": 15,
+      "scannerCount": null,
+      "tdiApproved": 0,
+      "tdiWait": 0,
+      "tdiRejected": 26,
+      "executionReady": 0,
+      "aiInvoked": 15,
+      "aiDecisions": { "NO_TRADE": "dominant", "note": "weak pump profile, zero short momentum telemetry" },
+      "riskSizingRows": 0,
+      "orders": 0,
+      "durationMs": 636773
+    },
+    {
+      "roundNo": 2,
+      "symbol": "CHIPTRY",
+      "result": "failed",
+      "failReason": "AI_GATE_BLOCK: NO_TRADE",
+      "candidateCount": 49,
+      "scannerCount": null,
+      "tdiApproved": 0,
+      "tdiWait": 7,
+      "tdiRejected": 90,
+      "executionReady": 0,
+      "aiInvoked": 49,
+      "aiDecisions": { "NO_TRADE": "dominant", "HOLD": 7, "note": "winner reached EXECUTING stage before AI gate veto" },
+      "riskSizingRows": 0,
+      "orders": 0,
+      "durationMs": 1336920,
+      "holdExamples": [
+        { "symbol": "RENDERTRY", "hybridCompositeScore": 49.66, "reason": "momentumWeak + newsComplex + techStrongButOthersWeak" },
+        { "symbol": "SLPTRY", "hybridCompositeScore": null, "reason": "see tdi-decisions.json" }
+      ]
+    }
+  ],
+  "remainingBlockersObserved": [
+    "Weak/zero shortMomentum and shortFlow telemetry on selected symbols",
+    "newsComplex blocks paper momentum waiver",
+    "Futures trap risk (LATE_LONG_TRAP / LATE_SHORT_TRAP)",
+    "Master NO_TRADE when LEARNING/MOMENTUM experts bearish with expert disagreement",
+    "AI execution gate veto on round winner (CHIPTRY NO_TRADE)",
+    "Quality/composite below BUY thresholds on most candidates"
+  ],
+  "testsPassed": {
+    "suites": [
+      "tests/p0-tdi-buy-bottleneck.test.ts",
+      "tests/ai-hybrid-engine.test.ts",
+      "tests/master-decision-engine.test.ts",
+      "tests/forensics/tdi-sensitivity-reconciliation.test.ts"
+    ],
+    "total": 32,
+    "status": "ALL_PASSED"
+  },
+  "artifactRoot": "artifacts/forensics/cmsuf7zij0007une4u1q4cqu4/rounds/"
+}

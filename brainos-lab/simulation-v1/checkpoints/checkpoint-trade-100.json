@@ -5,47 +5,52 @@
     "workspace": "brainos-lab/simulation-v1",
     "targetTrades": 100,
     "completedTrades": 100,
-    "accepted": 15,
-    "rejected": 85,
-    "wins": 10,
-    "losses": 5,
-    "totalPnlUsdt": 125.6866,
-    "startedAt": "2026-08-01T23:32:15.914Z",
-    "updatedAt": "2026-08-01T23:32:16.231Z",
+    "accepted": 6,
+    "rejected": 94,
+    "wins": 5,
+    "losses": 1,
+    "totalPnlUsdt": 36.0356,
+    "startedAt": "2026-08-04T22:33:27.279Z",
+    "updatedAt": "2026-08-04T22:33:27.577Z",
     "status": "running"
   },
   "metrics": {
-    "winRate": 66.67,
-    "profitFactor": 13.907,
-    "expectancy": 8.3791,
-    "sharpeRatio": 0.998,
-    "averageConfidence": 72.52,
-    "averageHoldingTimeSec": 1753,
-    "averageRiskScore": 49.38,
-    "acceptanceRate": 15,
+    "winRate": 83.33,
+    "profitFactor": 5.517,
+    "expectancy": 6.0059,
+    "sharpeRatio": 0.688,
+    "sortinoRatio": 0.753,
+    "maxDrawdownUsdt": 7.9774,
+    "averageDrawdownUsdt": 4.8974,
+    "recoveryFactor": 4.5172,
+    "capitalEfficiency": 0.0036,
+    "averageConfidence": 72.41,
+    "averageHoldingTimeSec": 2006,
+    "averageRiskScore": 48.26,
+    "acceptanceRate": 6,
     "topRejectionReasons": [
       {
+        "reason": "Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set",
+        "count": 9
+      },
+      {
+        "reason": "Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set",
+        "count": 8
+      },
+      {
         "reason": "AI consensus NO_TRADE",
-        "count": 24
+        "count": 7
       },
       {
-        "reason": "Risk per trade exceeds threshold",
-        "count": 11
+        "reason": "Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set",
+        "count": 6
       },
       {
-        "reason": "Abnormal volatility breaker",
-        "count": 3
-      },
-      {
-        "reason": "Exchange restriction: symbol temporarily blocked",
-        "count": 3
-      },
-      {
-        "reason": "Signal not actionable",
+        "reason": "Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set",
         "count": 2
       },
       {
-        "reason": "Liquidity below threshold (256320 < 5000000)",
+        "reason": "Ranking below threshold (59.87 < 88)",
         "count": 1
       },
       {
@@ -53,10 +58,74 @@
         "count": 1
       },
       {
-        "reason": "Ranking below threshold (48.17 < 55)",
+        "reason": "Ranking below threshold (48.17 < 88)",
         "count": 1
       }
     ],
-    "cumulativeMissedProfitUsdt": 231.3646
+    "cumulativeMissedProfitUsdt": 259.2234,
+    "regimePerformanceByGroup": [
+      {
+        "regime": "RANGE_SIDEWAYS",
+        "tradeCount": 4,
+        "winRate": 100,
+        "profitFactor": 999,
+        "sharpeRatio": 1.3149,
+        "sortinoRatio": 1.3149,
+        "maxDrawdown": 0,
+        "expectancy": 6.2263,
+        "totalPnl": 24.905
+      },
+      {
+        "regime": "WEAK_BULLISH_TREND",
+        "tradeCount": 2,
+        "winRate": 50,
+        "profitFactor": 2.3953,
+        "sharpeRatio": 0.4109,
+        "sortinoRatio": 0.6976,
+        "maxDrawdown": 7.9774,
+        "expectancy": 5.5653,
+        "totalPnl": 11.1306
+      }
+    ],
+    "executionQuality": {
+      "executionCount": 6,
+      "successRate": 100,
+      "rejectionRate": 0,
+      "partialFillRate": 0,
+      "averageSlippagePct": 0.1782,
+      "averageFillTimeMs": 203.5,
+      "averageLatencyMs": 203.5,
+      "averageQualityScore": 67.9333,
+      "profitFactor": 5.5172,
+      "maxDrawdown": 7.9774
+    },
+    "portfolioAllocation": {
+      "tradeCount": 6,
+      "averageCapitalUtilization": 17.1855,
+      "averagePortfolioExposure": 17.1855,
+      "averageConcentration": 8.334,
+      "averageAllocationMultiplier": 0.9435,
+      "portfolioBlockedRate": 0,
+      "capitalEfficiency": 0.0036,
+      "profitFactor": 5.5172,
+      "sharpeRatio": 0.6881,
+      "sortinoRatio": 0.7529,
+      "maxDrawdown": 7.9774,
+      "portfolioStability": 88.33
+    },
+    "confidenceCalibration": {
+      "sampleCount": 100,
+      "averageCalibrationError": 12.22,
+      "averageConfidenceAccuracy": 87.78,
+      "overestimationRate": 100,
+      "underestimationRate": 0,
+      "decisionAccuracy": 0,
+      "expectedValueAccuracy": 0,
+      "profitFactor": 5.5172,
+      "sharpeRatio": 0.6881,
+      "sortinoRatio": 0.7529,
+      "falsePositiveRate": 1,
+      "falseNegativeRate": 0
+    }
   }
 }

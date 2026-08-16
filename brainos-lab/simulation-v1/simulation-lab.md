@@ -4,7 +4,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:03:45.949Z |
+| Timestamp | 2026-08-04T20:04:57.283Z |
 | Market | SPOT_TRY |
 | Symbol | XRPTRY |
 | Strategy | trend_pullback |
@@ -16,7 +16,7 @@
 | Risk Score | 21.23 |
 | Position Size | 336.61 |
 | Entry Price | 4001.06 |
-| Stop Loss | 3960.83 |
+| Stop Loss | 3959.7 |
 | Take Profit | 4107.08 |
 | Exit Price | 4001.06 |
 | Exit Reason | N/A |
@@ -24,7 +24,7 @@
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
 | Risk Rule | Risk per trade exceeds threshold |
@@ -32,13 +32,13 @@
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
 **Would acceptance have been profitable?** No
 
-**Root Cause:** Risk per trade exceeds threshold
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
@@ -48,7 +48,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:05:15.971Z |
+| Timestamp | 2026-08-04T20:06:27.290Z |
 | Market | SPOT_TRY |
 | Symbol | LINKTRY |
 | Strategy | mean_reversion |
@@ -60,7 +60,7 @@
 | Risk Score | 21.32 |
 | Position Size | 955.02 |
 | Entry Price | 3409.42 |
-| Stop Loss | 3359.15 |
+| Stop Loss | 3359.17 |
 | Take Profit | 3440.62 |
 | Exit Price | 3409.42 |
 | Exit Reason | N/A |
@@ -92,7 +92,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:06:45.974Z |
+| Timestamp | 2026-08-04T20:07:57.292Z |
 | Market | SPOT_USDT |
 | Symbol | ADATRY |
 | Strategy | mean_reversion |
@@ -104,7 +104,7 @@
 | Risk Score | 35.53 |
 | Position Size | 726.68 |
 | Entry Price | 2356.25 |
-| Stop Loss | 2333.03 |
+| Stop Loss | 2333.04 |
 | Take Profit | 2379.77 |
 | Exit Price | 2356.25 |
 | Exit Reason | N/A |
@@ -112,21 +112,21 @@
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (256320 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
+| Rejection Reason | Ranking below threshold (59.87 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
 | Risk Rule | Spread above threshold |
 | Liquidity Result | FAIL |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (256320 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (59.87 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 4.7816 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -136,7 +136,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:08:15.976Z |
+| Timestamp | 2026-08-04T20:09:27.294Z |
 | Market | SPOT_TRY |
 | Symbol | AVAXTRY |
 | Strategy | trend_pullback |
@@ -157,7 +157,7 @@
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
 | Rejection Reason | Liquidity below threshold (374582 < 5000000) |
-| Confidence Threshold | 45 |
+| Confidence Threshold | 51 |
 | Ranking Result | PASS |
 | Risk Rule | Spread above threshold |
 | Liquidity Result | FAIL |
@@ -180,7 +180,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:09:45.978Z |
+| Timestamp | 2026-08-04T20:10:57.297Z |
 | Market | SPOT_USDT |
 | Symbol | XRPTRY |
 | Strategy | trend_pullback |
@@ -192,7 +192,7 @@
 | Risk Score | 36.83 |
 | Position Size | 965.25 |
 | Entry Price | 1032.18 |
-| Stop Loss | 1019.83 |
+| Stop Loss | 1011.54 |
 | Take Profit | 1040.58 |
 | Exit Price | 1032.18 |
 | Exit Reason | N/A |
@@ -200,21 +200,21 @@
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
 | Ranking Result | PASS |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 2.7027 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -224,7 +224,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:11:15.980Z |
+| Timestamp | 2026-08-04T20:12:27.299Z |
 | Market | SPOT_TRY |
 | Symbol | XRPTRY |
 | Strategy | momentum_scalp |
@@ -236,7 +236,7 @@
 | Risk Score | 59.45 |
 | Position Size | 937.49 |
 | Entry Price | 3155.96 |
-| Stop Loss | 3117.74 |
+| Stop Loss | 3100.97 |
 | Take Profit | 3181.83 |
 | Exit Price | 3155.96 |
 | Exit Reason | N/A |
@@ -244,21 +244,21 @@
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
+| Rejection Reason | Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
 | Ranking Result | PASS |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 6.8437 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -268,7 +268,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:12:45.982Z |
+| Timestamp | 2026-08-04T20:13:57.301Z |
 | Market | SPOT_TRY |
 | Symbol | ADATRY |
 | Strategy | momentum_scalp |
@@ -288,15 +288,15 @@
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (48.17 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (48.17 < 88) |
+| Confidence Threshold | 51 |
 | Ranking Result | FAIL |
 | Risk Rule | Spread above threshold |
 | Liquidity Result | FAIL |
-| AI Consensus Result | BUY |
+| AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (48.17 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (48.17 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -312,7 +312,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:14:15.984Z |
+| Timestamp | 2026-08-04T20:15:27.304Z |
 | Market | SPOT_USDT |
 | Symbol | DOGETRY |
 | Strategy | momentum_scalp |
@@ -324,7 +324,7 @@
 | Risk Score | 33.32 |
 | Position Size | 908.87 |
 | Entry Price | 1296.37 |
-| Stop Loss | 1278.83 |
+| Stop Loss | 1272.42 |
 | Take Profit | 1319.5 |
 | Exit Price | 1296.37 |
 | Exit Reason | N/A |
@@ -332,15 +332,15 @@
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (46.4 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (46.4 < 82) |
+| Confidence Threshold | 49 |
 | Ranking Result | FAIL |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (46.4 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (46.4 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 2.8539 USDT
 
@@ -356,7 +356,7 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:15:45.987Z |
+| Timestamp | 2026-08-04T20:16:57.306Z |
 | Market | SPOT_USDT |
 | Symbol | SOLTRY |
 | Strategy | momentum_scalp |
@@ -368,24 +368,31 @@
 | Risk Score | 35.89 |
 | Position Size | 657.22 |
 | Entry Price | 1939.4 |
-| Stop Loss | 1922.44 |
+| Stop Loss | 1910.57 |
 | Take Profit | 1977.94 |
-| Exit Price | 1975.76 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 1.875 |
-| PnL USDT | 12.3229 |
-| Trade Duration | 1080s |
-| Accepted / Rejected | Accepted |
+| Exit Price | 1939.4 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed momentum_scalp in volatile regime with confidence 72.23% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
 **Would acceptance have been profitable?** No
 
-**Root Cause:** Signal quality aligned with regime
+**Root Cause:** Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
 
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -393,37 +400,100 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:17:15.991Z |
-| Market | SPOT_USDT |
+| Timestamp | 2026-08-04T20:18:27.308Z |
+| Market | SPOT_TRY |
 | Symbol | LINKTRY |
-| Strategy | mean_reversion |
+| Strategy | momentum_scalp |
 | Market Regime | low_liquidity |
-| Signal | SELL |
-| Signal Score | 84.07 |
-| Confidence | 85.29 |
-| Ranking Score | 94.09 |
-| Risk Score | 38.64 |
-| Position Size | 446.55 |
-| Entry Price | 3954.99 |
-| Stop Loss | 3910.28 |
-| Take Profit | 3989.95 |
-| Exit Price | 3954.99 |
+| Signal | BUY |
+| Signal Score | 92.41 |
+| Confidence | 56.98 |
+| Ranking Score | 82.98 |
+| Risk Score | 67.14 |
+| Position Size | 525.75 |
+| Entry Price | 741.77 |
+| Stop Loss | 737.22 |
+| Take Profit | 765.67 |
+| Exit Price | 741.77 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (330123 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Liquidity below threshold |
+| Rejection Reason | Ranking below threshold (82.98 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
 | Liquidity Result | FAIL |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (330123 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (82.98 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 4.7468 USDT
+**Estimated Missed Profit:** 1.1987 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+### Batch Summary — Trades 1–10
+
+- Completed Trades: 10
+- Accepted: 0
+- Rejected: 10
+- Batch Win Rate: 0%
+- Profit Factor: 0
+- Expectancy: 0
+- Sharpe Ratio: 0
+- Average Confidence: 65.08
+- Average Holding Time: 0s
+- Average Risk Score: 39.14
+- Top Rejection Reason: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: N/A in N/A
+- Most Common Failure Pattern: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
+
+---
+
+## Trade 11
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T20:19:57.311Z |
+| Market | SPOT_USDT |
+| Symbol | DOGETRY |
+| Strategy | mean_reversion |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 52.58 |
+| Confidence | 82.06 |
+| Ranking Score | 84.55 |
+| Risk Score | 23.44 |
+| Position Size | 556.43 |
+| Entry Price | 2013.68 |
+| Stop Loss | 1989.69 |
+| Take Profit | 2078.62 |
+| Exit Price | 2013.68 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Liquidity below threshold (827921 < 5000000) |
+| Confidence Threshold | 51 |
+| Ranking Result | PASS |
+| Risk Rule | Liquidity below threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Liquidity below threshold (827921 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.9157 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -433,88 +503,113 @@
 
 ---
 
-### Batch Summary — Trades 1–10
-
-- Completed Trades: 10
-- Accepted: 1
-- Rejected: 9
-- Batch Win Rate: 100%
-- Profit Factor: 999
-- Expectancy: 12.3229
-- Sharpe Ratio: 0
-- Average Confidence: 67.91
-- Average Holding Time: 1080s
-- Average Risk Score: 36.29
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: momentum_scalp in volatile
-- Most Common Failure Pattern: Risk per trade exceeds threshold
-- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
-
----
-
-## Trade 11
+## Trade 12
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:18:45.997Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | breakout_follow |
-| Market Regime | low_liquidity |
+| Timestamp | 2026-08-04T20:21:27.313Z |
+| Market | SPOT_USDT |
+| Symbol | XRPTRY |
+| Strategy | momentum_scalp |
+| Market Regime | volatile |
 | Signal | BUY |
-| Signal Score | 85.5 |
-| Confidence | 55.69 |
-| Ranking Score | 47 |
-| Risk Score | 37.47 |
-| Position Size | 558.46 |
-| Entry Price | 3960 |
-| Stop Loss | 3913.52 |
-| Take Profit | 4023.29 |
-| Exit Price | 3960 |
+| Signal Score | 83.71 |
+| Confidence | 93.69 |
+| Ranking Score | 86.96 |
+| Risk Score | 76.71 |
+| Position Size | 344.43 |
+| Entry Price | 3435 |
+| Stop Loss | 3372.23 |
+| Take Profit | 3465.03 |
+| Exit Price | 3435 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (47 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
+| Rejection Reason | Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (47 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 3.7612 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Ranking score gate
+**Root Cause:** Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
-## Trade 12
+## Trade 13
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:20:15.999Z |
+| Timestamp | 2026-08-04T20:22:57.314Z |
 | Market | SPOT_USDT |
-| Symbol | XRPTRY |
+| Symbol | LINKTRY |
 | Strategy | trend_pullback |
 | Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 87.69 |
-| Confidence | 91.77 |
-| Ranking Score | 79.3 |
-| Risk Score | 70.45 |
-| Position Size | 699.65 |
-| Entry Price | 198.69 |
-| Stop Loss | 196.95 |
-| Take Profit | 200.62 |
-| Exit Price | 198.69 |
+| Signal Score | 91.64 |
+| Confidence | 80.16 |
+| Ranking Score | 51.95 |
+| Risk Score | 40.75 |
+| Position Size | 482.07 |
+| Entry Price | 2751.6 |
+| Stop Loss | 2710.15 |
+| Take Profit | 2825.56 |
+| Exit Price | 2751.6 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Expected profit below minimum |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0.8967 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 14
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T20:24:27.316Z |
+| Market | SPOT_TRY |
+| Symbol | BTCTRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 78.36 |
+| Confidence | 89.09 |
+| Ranking Score | 73.56 |
+| Risk Score | 53.85 |
+| Position Size | 995.68 |
+| Entry Price | 2868617.31 |
+| Stop Loss | 2839386.1 |
+| Take Profit | 2905080.55 |
+| Exit Price | 2868617.31 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
@@ -530,7 +625,7 @@
 
 **Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 2.5537 USDT
+**Estimated Missed Profit:** 7.7862 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -540,133 +635,45 @@
 
 ---
 
-## Trade 13
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T21:21:46.002Z |
-| Market | SPOT_USDT |
-| Symbol | SOLTRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 55.86 |
-| Confidence | 67.41 |
-| Ranking Score | 65.78 |
-| Risk Score | 34.43 |
-| Position Size | 471.21 |
-| Entry Price | 3100.48 |
-| Stop Loss | 3067.34 |
-| Take Profit | 3162.85 |
-| Exit Price | 3100.48 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Abnormal volatility breaker |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Abnormal volatility breaker. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 1.4655 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Abnormal volatility breaker
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 14
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T21:23:16.004Z |
-| Market | SPOT_USDT |
-| Symbol | AVAXTRY |
-| Strategy | momentum_scalp |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 75.51 |
-| Confidence | 76.29 |
-| Ranking Score | 42.69 |
-| Risk Score | 46.93 |
-| Position Size | 232.86 |
-| Entry Price | 833.77 |
-| Stop Loss | 818.81 |
-| Take Profit | 840.61 |
-| Exit Price | 833.77 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (42.69 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (42.69 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
 ## Trade 15
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:24:46.007Z |
-| Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | mean_reversion |
-| Market Regime | trending |
-| Signal | SELL |
-| Signal Score | 90.09 |
-| Confidence | 66.4 |
-| Ranking Score | 49.25 |
-| Risk Score | 19.1 |
-| Position Size | 462.32 |
-| Entry Price | 2199.78 |
-| Stop Loss | 2175.62 |
-| Take Profit | 2241.9 |
-| Exit Price | 2199.78 |
+| Timestamp | 2026-08-04T20:25:57.318Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | momentum_scalp |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 83.95 |
+| Confidence | 54.11 |
+| Ranking Score | 89.6 |
+| Risk Score | 39.25 |
+| Position Size | 502.99 |
+| Entry Price | 1591.59 |
+| Stop Loss | 1566.68 |
+| Take Profit | 1625.41 |
+| Exit Price | 1591.59 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (49.25 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | PASS |
+| Rejection Reason | Exchange restriction: symbol temporarily blocked |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
+| Exchange Restriction | BLOCKED |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (49.25 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Exchange restriction: symbol temporarily blocked. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 4.2718 USDT
+**Estimated Missed Profit:** 3.1185 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Ranking score gate
+**Root Cause:** Exchange restriction: symbol temporarily blocked
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -676,72 +683,35 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:26:16.009Z |
-| Market | SPOT_TRY |
-| Symbol | BTCTRY |
-| Strategy | breakout_follow |
+| Timestamp | 2026-08-04T20:27:27.320Z |
+| Market | SPOT_USDT |
+| Symbol | ADATRY |
+| Strategy | mean_reversion |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 51.92 |
-| Confidence | 73.15 |
-| Ranking Score | 66.56 |
-| Risk Score | 38.61 |
-| Position Size | 663.01 |
-| Entry Price | 2963115.21 |
-| Stop Loss | 2909828.35 |
-| Take Profit | 3013296.86 |
-| Exit Price | 2953745.7 |
-| Exit Reason | TIMEOUT |
-| PnL % | -0.316 |
-| PnL USDT | -2.0951 |
-| Trade Duration | 2090s |
-| Accepted / Rejected | Accepted |
-
-**Engineering Analysis:** Executed breakout_follow in trending regime with confidence 73.15% vs threshold 45%.
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Adverse move after valid entry
-
-**Lessons Learned:** Review stop placement for this strategy/regime combination.
-
----
-
-## Trade 17
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T21:27:46.012Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | mean_reversion |
-| Market Regime | volatile |
-| Signal | SELL |
-| Signal Score | 45.31 |
-| Confidence | 65.87 |
-| Ranking Score | 47.94 |
-| Risk Score | 48.29 |
-| Position Size | 678.99 |
-| Entry Price | 464.76 |
-| Stop Loss | 458 |
-| Take Profit | 470 |
-| Exit Price | 464.76 |
+| Signal Score | 63.49 |
+| Confidence | 90.03 |
+| Ranking Score | 47.61 |
+| Risk Score | 49.22 |
+| Position Size | 998.82 |
+| Entry Price | 3244.7 |
+| Stop Loss | 3208.93 |
+| Take Profit | 3336.82 |
+| Exit Price | 3244.7 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (47.94 < 55) |
+| Rejection Reason | Ranking below threshold (47.61 < 48) |
 | Confidence Threshold | 45 |
 | Ranking Result | FAIL |
-| Risk Rule | Abnormal volatility breaker |
+| Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (47.94 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (47.61 < 48). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -753,41 +723,78 @@
 
 ---
 
+## Trade 17
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T20:28:57.322Z |
+| Market | SPOT_TRY |
+| Symbol | DOGETRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 63.11 |
+| Confidence | 74.96 |
+| Ranking Score | 50.27 |
+| Risk Score | 24.12 |
+| Position Size | 118.352691 |
+| Entry Price | 3109.61 |
+| Stop Loss | 3076.52 |
+| Take Profit | 3153.32 |
+| Exit Price | 3149.93 |
+| Exit Reason | TAKE_PROFIT |
+| PnL % | 1.297 |
+| PnL USDT | 1.3687 |
+| Trade Duration | 1280s |
+| Accepted / Rejected | Accepted |
+
+**Engineering Analysis:** Executed mean_reversion in ranging regime with confidence 74.96% vs threshold 45%.
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Signal quality aligned with regime
+
+**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+
+---
+
 ## Trade 18
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:29:16.014Z |
+| Timestamp | 2026-08-04T20:30:27.328Z |
 | Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | trend_pullback |
+| Symbol | AVAXTRY |
+| Strategy | momentum_scalp |
 | Market Regime | volatile |
 | Signal | BUY |
-| Signal Score | 53.31 |
-| Confidence | 74.5 |
-| Ranking Score | 44.35 |
-| Risk Score | 40.34 |
-| Position Size | 354.1 |
-| Entry Price | 1459.65 |
-| Stop Loss | 1440.73 |
-| Take Profit | 1495.13 |
-| Exit Price | 1459.65 |
+| Signal Score | 80.78 |
+| Confidence | 67.87 |
+| Ranking Score | 49.14 |
+| Risk Score | 51.22 |
+| Position Size | 643.3 |
+| Entry Price | 3679.5 |
+| Stop Loss | 3591.19 |
+| Take Profit | 3740.66 |
+| Exit Price | 3679.5 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (44.35 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (49.14 < 82) |
+| Confidence Threshold | 49 |
 | Ranking Result | FAIL |
 | Risk Rule | Abnormal volatility breaker |
 | Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (44.35 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (49.14 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 2.5601 USDT
+**Estimated Missed Profit:** 8.0027 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -801,41 +808,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:30:46.016Z |
+| Timestamp | 2026-08-04T20:31:57.331Z |
 | Market | SPOT_USDT |
-| Symbol | ETHTRY |
-| Strategy | breakout_follow |
+| Symbol | LINKTRY |
+| Strategy | mean_reversion |
 | Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 52.94 |
-| Confidence | 63.73 |
-| Ranking Score | 51.25 |
-| Risk Score | 47.18 |
-| Position Size | 814.08 |
-| Entry Price | 939.81 |
-| Stop Loss | 926.89 |
-| Take Profit | 957.34 |
-| Exit Price | 939.81 |
+| Signal | SELL |
+| Signal Score | 79.16 |
+| Confidence | 92.66 |
+| Ranking Score | 48.73 |
+| Risk Score | 35.32 |
+| Position Size | 698.46 |
+| Entry Price | 2702.67 |
+| Stop Loss | 2663.65 |
+| Take Profit | 2738.81 |
+| Exit Price | 2702.67 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (51.25 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
+| Rejection Reason | Signal not actionable |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
 | Risk Rule | PASS |
 | Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (51.25 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Signal not actionable. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
 **Would acceptance have been profitable?** No
 
-**Root Cause:** Ranking score gate
+**Root Cause:** Signal not actionable
 
 **Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
@@ -845,54 +852,61 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:32:16.019Z |
-| Market | SPOT_USDT |
+| Timestamp | 2026-08-04T20:33:27.333Z |
+| Market | SPOT_TRY |
 | Symbol | LINKTRY |
 | Strategy | momentum_scalp |
-| Market Regime | ranging |
+| Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 89.04 |
-| Confidence | 77.35 |
-| Ranking Score | 67.63 |
-| Risk Score | 41.51 |
-| Position Size | 309.99 |
-| Entry Price | 1976.47 |
-| Stop Loss | 1944.02 |
-| Take Profit | 2030.36 |
-| Exit Price | 1974.83 |
-| Exit Reason | TIMEOUT |
-| PnL % | -0.083 |
-| PnL USDT | -0.2573 |
-| Trade Duration | 3217s |
-| Accepted / Rejected | Accepted |
+| Signal Score | 73.07 |
+| Confidence | 58.39 |
+| Ranking Score | 88.44 |
+| Risk Score | 55.42 |
+| Position Size | 888.01 |
+| Entry Price | 110.26 |
+| Stop Loss | 108.64 |
+| Take Profit | 112.45 |
+| Exit Price | 110.26 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Liquidity below threshold (958344 < 5000000) |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed momentum_scalp in ranging regime with confidence 77.35% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Liquidity below threshold (958344 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 9.3063 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Adverse move after valid entry
+**Root Cause:** Liquidity gate
 
-**Lessons Learned:** Review stop placement for this strategy/regime combination.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
 ### Batch Summary — Trades 11–20
 
 - Completed Trades: 20
-- Accepted: 3
-- Rejected: 17
-- Batch Win Rate: 0%
-- Profit Factor: 5.238
-- Expectancy: 3.3235
-- Sharpe Ratio: 0.519
-- Average Confidence: 69.56
-- Average Holding Time: 2129s
-- Average Risk Score: 39.36
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: momentum_scalp in ranging
-- Most Common Failure Pattern: Ranking score gate
+- Accepted: 1
+- Rejected: 19
+- Batch Win Rate: 100%
+- Profit Factor: 999
+- Expectancy: 1.3687
+- Sharpe Ratio: 0
+- Average Confidence: 71.69
+- Average Holding Time: 1280s
+- Average Risk Score: 42.04
+- Top Rejection Reason: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: mean_reversion in ranging
+- Most Common Failure Pattern: Liquidity gate
 - Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
 
 ---
@@ -901,43 +915,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:33:46.022Z |
-| Market | SPOT_USDT |
-| Symbol | BTCTRY |
-| Strategy | momentum_scalp |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 67.34 |
-| Confidence | 82.19 |
-| Ranking Score | 48.18 |
-| Risk Score | 77.86 |
-| Position Size | 605.32 |
-| Entry Price | 2858358.34 |
-| Stop Loss | 2811929.81 |
-| Take Profit | 2929901.8 |
-| Exit Price | 2858358.34 |
+| Timestamp | 2026-08-04T20:34:57.336Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
+| Signal | SELL |
+| Signal Score | 54.88 |
+| Confidence | 75.39 |
+| Ranking Score | 87.86 |
+| Risk Score | 47.25 |
+| Position Size | 794.1 |
+| Entry Price | 2807.85 |
+| Stop Loss | 2758.35 |
+| Take Profit | 2843.73 |
+| Exit Price | 2807.85 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (48.18 < 55) |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
-| Ranking Result | FAIL |
+| Ranking Result | PASS |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (48.18 < 55). Consecutive-loss telemetry (2) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 7.9479 USDT
+**Estimated Missed Profit:** 0 USDT
 
-**Would acceptance have been profitable?** Yes
+**Would acceptance have been profitable?** No
 
-**Root Cause:** Ranking score gate
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
 
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -945,41 +959,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:35:16.024Z |
+| Timestamp | 2026-08-04T20:36:27.338Z |
 | Market | SPOT_USDT |
-| Symbol | AVAXTRY |
+| Symbol | XRPTRY |
 | Strategy | momentum_scalp |
-| Market Regime | volatile |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 50.28 |
-| Confidence | 71.69 |
-| Ranking Score | 57.93 |
-| Risk Score | 68.22 |
-| Position Size | 223.48 |
-| Entry Price | 3931.41 |
-| Stop Loss | 3887.97 |
-| Take Profit | 3998.59 |
-| Exit Price | 3931.41 |
+| Signal Score | 55.37 |
+| Confidence | 78.59 |
+| Ranking Score | 86.7 |
+| Risk Score | 51.78 |
+| Position Size | 525.99 |
+| Entry Price | 2352.09 |
+| Stop Loss | 2326.48 |
+| Take Profit | 2411.84 |
+| Exit Price | 2352.09 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
+| Rejection Reason | Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
+| Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (2) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 1.428 USDT
+**Estimated Missed Profit:** 5.9016 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -989,37 +1003,37 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:36:46.026Z |
-| Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | momentum_scalp |
+| Timestamp | 2026-08-04T20:37:57.341Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | trend_pullback |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 74.88 |
-| Confidence | 75.59 |
-| Ranking Score | 47.78 |
-| Risk Score | 70.09 |
-| Position Size | 355.53 |
-| Entry Price | 2903.58 |
-| Stop Loss | 2864.71 |
-| Take Profit | 2943.72 |
-| Exit Price | 2903.58 |
+| Signal Score | 47.45 |
+| Confidence | 61.56 |
+| Ranking Score | 43.16 |
+| Risk Score | 45.52 |
+| Position Size | 340.03 |
+| Entry Price | 1802.31 |
+| Stop Loss | 1787.71 |
+| Take Profit | 1841.92 |
+| Exit Price | 1802.31 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (47.78 < 55) |
+| Rejection Reason | Ranking below threshold (43.16 < 66) |
 | Confidence Threshold | 45 |
 | Ranking Result | FAIL |
 | Risk Rule | PASS |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (47.78 < 55). Consecutive-loss telemetry (2) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (43.16 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 1.2799 USDT
+**Estimated Missed Profit:** 3.9375 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -1033,43 +1047,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:38:16.028Z |
+| Timestamp | 2026-08-04T20:39:27.343Z |
 | Market | SPOT_USDT |
-| Symbol | AVAXTRY |
-| Strategy | breakout_follow |
+| Symbol | XRPTRY |
+| Strategy | momentum_scalp |
 | Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 72.75 |
-| Confidence | 91.13 |
-| Ranking Score | 58.41 |
-| Risk Score | 30.87 |
-| Position Size | 791.84 |
-| Entry Price | 2676.08 |
-| Stop Loss | 2646.01 |
-| Take Profit | 2734.22 |
-| Exit Price | 2676.08 |
+| Signal Score | 79.87 |
+| Confidence | 91.09 |
+| Ranking Score | 84.93 |
+| Risk Score | 62.46 |
+| Position Size | 479.47 |
+| Entry Price | 1015.36 |
+| Stop Loss | 1002.86 |
+| Take Profit | 1047.2 |
+| Exit Price | 1015.36 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (2142072 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
+| Rejection Reason | Ranking below threshold (84.93 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
 | Risk Rule | Spread above threshold |
 | Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (2142072 < 5000000). Consecutive-loss telemetry (2) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (84.93 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 6.1843 USDT
+**Estimated Missed Profit:** 0 USDT
 
-**Would acceptance have been profitable?** Yes
+**Would acceptance have been profitable?** No
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -1077,64 +1091,27 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:39:46.030Z |
+| Timestamp | 2026-08-04T20:40:57.345Z |
 | Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | mean_reversion |
-| Market Regime | ranging |
+| Symbol | SOLTRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 91.49 |
-| Confidence | 91.09 |
-| Ranking Score | 69.2 |
-| Risk Score | 45.84 |
-| Position Size | 849.01 |
-| Entry Price | 1799.99 |
-| Stop Loss | 1770.71 |
-| Take Profit | 1843.69 |
-| Exit Price | 1839.08 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 2.172 |
-| PnL USDT | 18.4405 |
-| Trade Duration | 223s |
-| Accepted / Rejected | Accepted |
-
-**Engineering Analysis:** Executed mean_reversion in ranging regime with confidence 91.09% vs threshold 45%.
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Signal quality aligned with regime
-
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
-
----
-
-## Trade 26
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T21:41:16.033Z |
-| Market | SPOT_USDT |
-| Symbol | BTCTRY |
-| Strategy | mean_reversion |
-| Market Regime | ranging |
-| Signal | SELL |
-| Signal Score | 66.37 |
-| Confidence | 78.36 |
-| Ranking Score | 65.41 |
-| Risk Score | 40.17 |
-| Position Size | 219.06 |
-| Entry Price | 2906446.11 |
-| Stop Loss | 2877706.63 |
-| Take Profit | 2933711.98 |
-| Exit Price | 2906446.11 |
+| Signal Score | 58.42 |
+| Confidence | 68.97 |
+| Ranking Score | 92.14 |
+| Risk Score | 36.18 |
+| Position Size | 224.82 |
+| Entry Price | 1785.16 |
+| Stop Loss | 1766.71 |
+| Take Profit | 1828.8 |
+| Exit Price | 1785.16 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Signal not actionable |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
 | Risk Rule | PASS |
@@ -1142,13 +1119,57 @@
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Signal not actionable. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0.9398 USDT
+**Estimated Missed Profit:** 1.549 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Signal not actionable
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 26
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T20:42:27.348Z |
+| Market | SPOT_TRY |
+| Symbol | SOLTRY |
+| Strategy | breakout_follow |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 60.07 |
+| Confidence | 53.68 |
+| Ranking Score | 54.38 |
+| Risk Score | 48.93 |
+| Position Size | 347.45 |
+| Entry Price | 1569.57 |
+| Stop Loss | 1538.41 |
+| Take Profit | 1582.57 |
+| Exit Price | 1569.57 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (54.38 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (54.38 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 3.1375 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1158,35 +1179,35 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:42:46.035Z |
-| Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | momentum_scalp |
-| Market Regime | volatile |
+| Timestamp | 2026-08-04T20:43:57.351Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 71.77 |
-| Confidence | 66.82 |
-| Ranking Score | 43.26 |
-| Risk Score | 31.93 |
-| Position Size | 170.48 |
-| Entry Price | 2559.53 |
-| Stop Loss | 2539.64 |
-| Take Profit | 2599.35 |
-| Exit Price | 2559.53 |
+| Signal Score | 87.27 |
+| Confidence | 73.25 |
+| Ranking Score | 51.74 |
+| Risk Score | 59.92 |
+| Position Size | 779.56 |
+| Entry Price | 407.44 |
+| Stop Loss | 400.84 |
+| Take Profit | 419.15 |
+| Exit Price | 407.44 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (43.26 < 55) |
+| Rejection Reason | Ranking below threshold (51.74 < 68) |
 | Confidence Threshold | 45 |
 | Ranking Result | FAIL |
-| Risk Rule | Risk per trade exceeds threshold |
+| Risk Rule | PASS |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (43.26 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (51.74 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -1202,21 +1223,21 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:44:16.037Z |
+| Timestamp | 2026-08-04T20:45:27.354Z |
 | Market | SPOT_USDT |
-| Symbol | BTCTRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
+| Symbol | ADATRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 73.77 |
-| Confidence | 87.22 |
-| Ranking Score | 55.74 |
-| Risk Score | 38.11 |
-| Position Size | 659.09 |
-| Entry Price | 2984521.63 |
-| Stop Loss | 2945272.52 |
-| Take Profit | 3074257.04 |
-| Exit Price | 2984521.63 |
+| Signal Score | 53.09 |
+| Confidence | 52.43 |
+| Ranking Score | 85.65 |
+| Risk Score | 53.54 |
+| Position Size | 567.37 |
+| Entry Price | 709.44 |
+| Stop Loss | 698.39 |
+| Take Profit | 724.21 |
+| Exit Price | 709.44 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
@@ -1225,14 +1246,14 @@
 | Rejection Reason | AI consensus NO_TRADE |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
+| Risk Rule | PASS |
 | Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
 **Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 4.8707 USDT
+**Estimated Missed Profit:** 6.5588 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -1246,41 +1267,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:45:46.039Z |
+| Timestamp | 2026-08-04T20:46:57.356Z |
 | Market | SPOT_USDT |
-| Symbol | DOGETRY |
+| Symbol | XRPTRY |
 | Strategy | mean_reversion |
-| Market Regime | volatile |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 71.43 |
-| Confidence | 83.67 |
-| Ranking Score | 83.85 |
-| Risk Score | 61.33 |
-| Position Size | 354.12 |
-| Entry Price | 856.22 |
-| Stop Loss | 850.24 |
-| Take Profit | 864.63 |
-| Exit Price | 856.22 |
+| Signal Score | 70.28 |
+| Confidence | 93.94 |
+| Ranking Score | 59.07 |
+| Risk Score | 59.61 |
+| Position Size | 785.8 |
+| Entry Price | 1442.47 |
+| Stop Loss | 1423.37 |
+| Take Profit | 1479.36 |
+| Exit Price | 1442.47 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
+| Rejection Reason | Ranking below threshold (59.07 < 66) |
 | Confidence Threshold | 45 |
-| Ranking Result | PASS |
+| Ranking Result | FAIL |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (59.07 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 3.7112 USDT
+**Estimated Missed Profit:** 8.2902 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Risk per trade exceeds threshold
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1290,54 +1311,61 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:47:16.040Z |
+| Timestamp | 2026-08-04T20:48:27.359Z |
 | Market | SPOT_USDT |
-| Symbol | ETHTRY |
-| Strategy | momentum_scalp |
+| Symbol | DOGETRY |
+| Strategy | breakout_follow |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 67.97 |
-| Confidence | 62.92 |
-| Ranking Score | 67.04 |
-| Risk Score | 48.65 |
-| Position Size | 719.98 |
-| Entry Price | 1167.26 |
-| Stop Loss | 1155.89 |
-| Take Profit | 1187.94 |
-| Exit Price | 1181.77 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 1.243 |
-| PnL USDT | 8.9494 |
-| Trade Duration | 2936s |
-| Accepted / Rejected | Accepted |
+| Signal Score | 77.53 |
+| Confidence | 59.97 |
+| Ranking Score | 41.74 |
+| Risk Score | 22.56 |
+| Position Size | 340.12 |
+| Entry Price | 295.03 |
+| Stop Loss | 292.23 |
+| Take Profit | 297.94 |
+| Exit Price | 295.03 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (41.74 < 66) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed momentum_scalp in trending regime with confidence 62.92% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Ranking below threshold (41.74 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 1.5714 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Signal quality aligned with regime
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
 ### Batch Summary — Trades 21–30
 
 - Completed Trades: 30
-- Accepted: 5
-- Rejected: 25
-- Batch Win Rate: 100%
-- Profit Factor: 16.882
-- Expectancy: 7.4721
-- Sharpe Ratio: 0.969
-- Average Confidence: 72.73
-- Average Holding Time: 1909s
-- Average Risk Score: 43.34
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: mean_reversion in ranging
-- Most Common Failure Pattern: Ranking score gate
+- Accepted: 1
+- Rejected: 29
+- Batch Win Rate: 0%
+- Profit Factor: 999
+- Expectancy: 1.3687
+- Sharpe Ratio: 0
+- Average Confidence: 71.42
+- Average Holding Time: 1280s
+- Average Risk Score: 44.28
+- Top Rejection Reason: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: N/A in N/A
+- Most Common Failure Pattern: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
 - Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
 
 ---
@@ -1346,43 +1374,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:48:46.044Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | breakout_follow |
-| Market Regime | volatile |
+| Timestamp | 2026-08-04T20:49:57.362Z |
+| Market | SPOT_USDT |
+| Symbol | LINKTRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 68.38 |
-| Confidence | 53.19 |
-| Ranking Score | 94.51 |
-| Risk Score | 78.21 |
-| Position Size | 275 |
-| Entry Price | 198.5 |
-| Stop Loss | 196.23 |
-| Take Profit | 201.58 |
-| Exit Price | 198.5 |
+| Signal Score | 71.08 |
+| Confidence | 83.96 |
+| Ranking Score | 86.85 |
+| Risk Score | 79.14 |
+| Position Size | 292.85 |
+| Entry Price | 4044.09 |
+| Stop Loss | 3972.71 |
+| Take Profit | 4103.72 |
+| Exit Price | 4044.09 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
+| Rejection Reason | Entry quality: elevated AI risk (79) without elite confidence (82% < 82%) |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
+| Risk Rule | PASS |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Entry quality: elevated AI risk (79) without elite confidence (82% < 82%). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 3.1013 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Entry quality: elevated AI risk (79) without elite confidence (82% < 82%)
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -1390,43 +1418,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:50:16.046Z |
+| Timestamp | 2026-08-04T20:51:27.364Z |
 | Market | SPOT_USDT |
-| Symbol | DOGETRY |
-| Strategy | momentum_scalp |
+| Symbol | ADATRY |
+| Strategy | mean_reversion |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 47.63 |
-| Confidence | 92.87 |
-| Ranking Score | 42.3 |
-| Risk Score | 60.9 |
-| Position Size | 239.32 |
-| Entry Price | 1423.63 |
-| Stop Loss | 1403.73 |
-| Take Profit | 1446.68 |
-| Exit Price | 1423.63 |
+| Signal Score | 93.43 |
+| Confidence | 70.84 |
+| Ranking Score | 45.79 |
+| Risk Score | 78.82 |
+| Position Size | 258.4 |
+| Entry Price | 247.21 |
+| Stop Loss | 243.5 |
+| Take Profit | 254.33 |
+| Exit Price | 247.21 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (42.3 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (45.79 < 82) |
+| Confidence Threshold | 49 |
 | Ranking Result | FAIL |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (42.3 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (45.79 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 1.5013 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
 **Root Cause:** Ranking score gate
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -1434,41 +1462,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:51:46.048Z |
+| Timestamp | 2026-08-04T20:52:57.367Z |
 | Market | SPOT_USDT |
-| Symbol | SOLTRY |
-| Strategy | mean_reversion |
-| Market Regime | trending |
+| Symbol | ADATRY |
+| Strategy | breakout_follow |
+| Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 73.57 |
-| Confidence | 87.2 |
-| Ranking Score | 70.94 |
-| Risk Score | 37.68 |
-| Position Size | 930.04 |
-| Entry Price | 2172.21 |
-| Stop Loss | 2155.23 |
-| Take Profit | 2203.28 |
-| Exit Price | 2172.21 |
+| Signal Score | 61.46 |
+| Confidence | 53.75 |
+| Ranking Score | 49.59 |
+| Risk Score | 41.06 |
+| Position Size | 697.8 |
+| Entry Price | 2330.29 |
+| Stop Loss | 2300.7 |
+| Take Profit | 2367.94 |
+| Exit Price | 2330.29 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
+| Rejection Reason | Ranking below threshold (49.59 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (49.59 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 4.5107 USDT
+**Estimated Missed Profit:** 8.869 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1478,41 +1506,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:53:16.051Z |
+| Timestamp | 2026-08-04T20:54:27.370Z |
 | Market | SPOT_USDT |
-| Symbol | XRPTRY |
-| Strategy | momentum_scalp |
-| Market Regime | low_liquidity |
+| Symbol | BTCTRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 92.39 |
-| Confidence | 63.2 |
-| Ranking Score | 68.37 |
-| Risk Score | 22.66 |
-| Position Size | 725.45 |
-| Entry Price | 3002.76 |
-| Stop Loss | 2949.96 |
-| Take Profit | 3093.93 |
-| Exit Price | 3002.76 |
+| Signal Score | 45.79 |
+| Confidence | 57.98 |
+| Ranking Score | 76.49 |
+| Risk Score | 53.14 |
+| Position Size | 330.79 |
+| Entry Price | 2903157.1 |
+| Stop Loss | 2860335.53 |
+| Take Profit | 2971198.48 |
+| Exit Price | 2903157.1 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (625400 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
+| Rejection Reason | Ranking below threshold (76.49 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (625400 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (76.49 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 8.6111 USDT
+**Estimated Missed Profit:** 1.7333 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1522,37 +1550,37 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:54:46.053Z |
+| Timestamp | 2026-08-04T20:55:57.372Z |
 | Market | SPOT_TRY |
 | Symbol | ETHTRY |
-| Strategy | momentum_scalp |
+| Strategy | trend_pullback |
 | Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 65.82 |
-| Confidence | 57.33 |
-| Ranking Score | 67.63 |
-| Risk Score | 27.28 |
-| Position Size | 575.05 |
-| Entry Price | 1875.11 |
-| Stop Loss | 1843.26 |
-| Take Profit | 1910.93 |
-| Exit Price | 1875.11 |
+| Signal Score | 61.21 |
+| Confidence | 72.93 |
+| Ranking Score | 85.4 |
+| Risk Score | 31.73 |
+| Position Size | 825.7 |
+| Entry Price | 2089.3 |
+| Stop Loss | 2073 |
+| Take Profit | 2122.71 |
+| Exit Price | 2089.3 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1789888 < 5000000) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Liquidity below threshold (1893735 < 5000000) |
+| Confidence Threshold | 51 |
 | Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
+| Risk Rule | Liquidity below threshold |
 | Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1789888 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Liquidity below threshold (1893735 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 6.1818 USDT
+**Estimated Missed Profit:** 9.8589 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -1566,43 +1594,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:56:16.056Z |
+| Timestamp | 2026-08-04T20:57:27.378Z |
 | Market | SPOT_USDT |
-| Symbol | AVAXTRY |
+| Symbol | DOGETRY |
 | Strategy | mean_reversion |
-| Market Regime | ranging |
+| Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 50.64 |
-| Confidence | 71.61 |
-| Ranking Score | 80.51 |
-| Risk Score | 25.75 |
-| Position Size | 221.03 |
-| Entry Price | 1584.49 |
-| Stop Loss | 1574.06 |
-| Take Profit | 1620.11 |
-| Exit Price | 1584.49 |
+| Signal Score | 74.09 |
+| Confidence | 70.74 |
+| Ranking Score | 67.8 |
+| Risk Score | 42.17 |
+| Position Size | 171.94 |
+| Entry Price | 3025.99 |
+| Stop Loss | 2992.33 |
+| Take Profit | 3107.04 |
+| Exit Price | 3025.99 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
+| Rejection Reason | Liquidity below threshold (770968 < 5000000) |
+| Confidence Threshold | 51 |
 | Ranking Result | PASS |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Liquidity below threshold (770968 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 2.7364 USDT
+**Estimated Missed Profit:** 0 USDT
 
-**Would acceptance have been profitable?** Yes
+**Would acceptance have been profitable?** No
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Liquidity gate
 
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -1610,41 +1638,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:57:46.059Z |
+| Timestamp | 2026-08-04T20:58:57.381Z |
 | Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | momentum_scalp |
+| Symbol | LINKTRY |
+| Strategy | mean_reversion |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 62.49 |
-| Confidence | 53.81 |
-| Ranking Score | 71.18 |
-| Risk Score | 46.22 |
-| Position Size | 224.05 |
-| Entry Price | 1302.38 |
-| Stop Loss | 1290.45 |
-| Take Profit | 1334.3 |
-| Exit Price | 1302.38 |
+| Signal Score | 79.15 |
+| Confidence | 74.58 |
+| Ranking Score | 86.43 |
+| Risk Score | 79.09 |
+| Position Size | 979.1 |
+| Entry Price | 2347.27 |
+| Stop Loss | 2320.37 |
+| Take Profit | 2392.58 |
+| Exit Price | 2347.27 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
+| Rejection Reason | Entry quality: elevated AI risk (79) without elite confidence (73% < 82%) |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
 | Risk Rule | PASS |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Entry quality: elevated AI risk (79) without elite confidence (73% < 82%). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 2.292 USDT
+**Estimated Missed Profit:** 11.4751 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Entry quality: elevated AI risk (79) without elite confidence (73% < 82%)
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1654,36 +1682,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T21:59:16.061Z |
+| Timestamp | 2026-08-04T21:00:27.383Z |
 | Market | SPOT_TRY |
 | Symbol | DOGETRY |
 | Strategy | momentum_scalp |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 86.48 |
-| Confidence | 72.82 |
-| Ranking Score | 85.22 |
-| Risk Score | 47.9 |
-| Position Size | 200.16 |
-| Entry Price | 876.5 |
-| Stop Loss | 867.07 |
-| Take Profit | 902.23 |
-| Exit Price | 895.41 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 2.157 |
-| PnL USDT | 4.3175 |
-| Trade Duration | 1261s |
-| Accepted / Rejected | Accepted |
+| Signal Score | 84.72 |
+| Confidence | 78.56 |
+| Ranking Score | 77.9 |
+| Risk Score | 77.59 |
+| Position Size | 785.11 |
+| Entry Price | 3368.65 |
+| Stop Loss | 3328.93 |
+| Take Profit | 3418.32 |
+| Exit Price | 3368.65 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Entry quality: elevated AI risk (78) without elite confidence (77% < 82%) |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed momentum_scalp in trending regime with confidence 72.82% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Entry quality: elevated AI risk (78) without elite confidence (77% < 82%). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 4.0355 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Signal quality aligned with regime
+**Root Cause:** Entry quality: elevated AI risk (78) without elite confidence (77% < 82%)
 
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -1691,41 +1726,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:00:46.063Z |
-| Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | momentum_scalp |
-| Market Regime | low_liquidity |
+| Timestamp | 2026-08-04T21:01:57.386Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 75.36 |
-| Confidence | 72.54 |
-| Ranking Score | 93.33 |
-| Risk Score | 32.45 |
-| Position Size | 930.82 |
-| Entry Price | 1147.88 |
-| Stop Loss | 1133.91 |
-| Take Profit | 1171.62 |
-| Exit Price | 1147.88 |
+| Signal Score | 69.07 |
+| Confidence | 58.5 |
+| Ranking Score | 51.62 |
+| Risk Score | 51.49 |
+| Position Size | 348.17 |
+| Entry Price | 2508.59 |
+| Stop Loss | 2478.81 |
+| Take Profit | 2589.47 |
+| Exit Price | 2508.59 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1854771 < 5000000) |
+| Rejection Reason | Ranking below threshold (51.62 < 66) |
 | Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | BUY |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1854771 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (51.62 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 2.6249 USDT
+**Estimated Missed Profit:** 3.8682 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1735,61 +1770,61 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:02:16.065Z |
+| Timestamp | 2026-08-04T21:03:27.388Z |
 | Market | SPOT_TRY |
-| Symbol | LINKTRY |
-| Strategy | momentum_scalp |
-| Market Regime | volatile |
-| Signal | SELL |
-| Signal Score | 87.3 |
-| Confidence | 71.05 |
-| Ranking Score | 92.14 |
-| Risk Score | 71.02 |
-| Position Size | 892.42 |
-| Entry Price | 780.18 |
-| Stop Loss | 769.08 |
-| Take Profit | 792.82 |
-| Exit Price | 780.18 |
+| Symbol | DOGETRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 59.94 |
+| Confidence | 69.98 |
+| Ranking Score | 88.28 |
+| Risk Score | 63.88 |
+| Position Size | 876.86 |
+| Entry Price | 3463.69 |
+| Stop Loss | 3424.07 |
+| Take Profit | 3573.49 |
+| Exit Price | 3463.69 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
+| Risk Rule | PASS |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 8.1197 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
 ### Batch Summary — Trades 31–40
 
 - Completed Trades: 40
-- Accepted: 6
-- Rejected: 34
-- Batch Win Rate: 100%
-- Profit Factor: 18.717
-- Expectancy: 6.9463
-- Sharpe Ratio: 0.973
-- Average Confidence: 71.94
-- Average Holding Time: 1801s
-- Average Risk Score: 43.76
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: momentum_scalp in trending
-- Most Common Failure Pattern: AI consensus disagreement
+- Accepted: 1
+- Rejected: 39
+- Batch Win Rate: 0%
+- Profit Factor: 999
+- Expectancy: 1.3687
+- Sharpe Ratio: 0
+- Average Confidence: 70.86
+- Average Holding Time: 1280s
+- Average Risk Score: 48.16
+- Top Rejection Reason: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: N/A in N/A
+- Most Common Failure Pattern: Entry quality: elevated AI risk (79) without elite confidence (82% < 82%)
 - Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
 
 ---
@@ -1798,43 +1833,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:03:46.069Z |
-| Market | SPOT_USDT |
-| Symbol | BTCTRY |
+| Timestamp | 2026-08-04T21:04:57.391Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
 | Strategy | mean_reversion |
-| Market Regime | low_liquidity |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 56.93 |
-| Confidence | 55.54 |
-| Ranking Score | 70.07 |
-| Risk Score | 47.13 |
-| Position Size | 849.68 |
-| Entry Price | 2807767.38 |
-| Stop Loss | 2781944.09 |
-| Take Profit | 2842315.37 |
-| Exit Price | 2807767.38 |
+| Signal Score | 60.45 |
+| Confidence | 55.26 |
+| Ranking Score | 45.95 |
+| Risk Score | 68.59 |
+| Position Size | 549.39 |
+| Entry Price | 1034.44 |
+| Stop Loss | 1025.26 |
+| Take Profit | 1056.85 |
+| Exit Price | 1034.44 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (421582 < 5000000) |
+| Rejection Reason | Ranking below threshold (45.95 < 66) |
 | Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Liquidity below threshold |
-| Liquidity Result | FAIL |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (421582 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (45.95 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 6.3015 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -1842,41 +1877,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:05:16.072Z |
+| Timestamp | 2026-08-04T21:06:27.393Z |
 | Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | mean_reversion |
-| Market Regime | low_liquidity |
+| Symbol | SOLTRY |
+| Strategy | trend_pullback |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 68.99 |
-| Confidence | 73.34 |
-| Ranking Score | 87.87 |
-| Risk Score | 48.33 |
-| Position Size | 912.34 |
-| Entry Price | 1661.11 |
-| Stop Loss | 1641.03 |
-| Take Profit | 1684.57 |
-| Exit Price | 1661.11 |
+| Signal Score | 53.48 |
+| Confidence | 88.23 |
+| Ranking Score | 92.18 |
+| Risk Score | 28.83 |
+| Position Size | 565.78 |
+| Entry Price | 1999.47 |
+| Stop Loss | 1975.28 |
+| Take Profit | 2058.97 |
+| Exit Price | 1999.47 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1939002 < 5000000) |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1939002 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 1.7882 USDT
+**Estimated Missed Profit:** 7.3551 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -1886,443 +1921,35 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:06:46.075Z |
+| Timestamp | 2026-08-04T21:07:57.396Z |
 | Market | SPOT_TRY |
-| Symbol | BTCTRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 86.62 |
-| Confidence | 67.11 |
-| Ranking Score | 73.01 |
-| Risk Score | 38.66 |
-| Position Size | 173.83 |
-| Entry Price | 2930455.27 |
-| Stop Loss | 2894541.78 |
-| Take Profit | 2958057.02 |
-| Exit Price | 2930455.27 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 44
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:08:16.078Z |
-| Market | SPOT_TRY |
-| Symbol | BTCTRY |
-| Strategy | mean_reversion |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 49.97 |
-| Confidence | 78.21 |
-| Ranking Score | 58.37 |
-| Risk Score | 62.36 |
-| Position Size | 771.41 |
-| Entry Price | 2844598.81 |
-| Stop Loss | 2813447.44 |
-| Take Profit | 2926237.04 |
-| Exit Price | 2844598.81 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 2.5688 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 45
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:09:46.081Z |
-| Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | trend_pullback |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 90.46 |
-| Confidence | 74.93 |
-| Ranking Score | 83.87 |
-| Risk Score | 46.08 |
-| Position Size | 633.64 |
-| Entry Price | 2261.35 |
-| Stop Loss | 2232.24 |
-| Take Profit | 2334.71 |
-| Exit Price | 2316.02 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 2.418 |
-| PnL USDT | 15.3214 |
-| Trade Duration | 814s |
-| Accepted / Rejected | Accepted |
-
-**Engineering Analysis:** Executed trend_pullback in trending regime with confidence 74.93% vs threshold 45%.
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Signal quality aligned with regime
-
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
-
----
-
-## Trade 46
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:11:16.084Z |
-| Market | SPOT_TRY |
-| Symbol | ETHTRY |
-| Strategy | trend_pullback |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 89.89 |
-| Confidence | 79.9 |
-| Ranking Score | 58.75 |
-| Risk Score | 60.43 |
-| Position Size | 767.42 |
-| Entry Price | 1180.27 |
-| Stop Loss | 1167.18 |
-| Take Profit | 1196.39 |
-| Exit Price | 1180.27 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 47
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:12:46.087Z |
-| Market | SPOT_USDT |
-| Symbol | DOGETRY |
-| Strategy | breakout_follow |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 46.04 |
-| Confidence | 58.39 |
-| Ranking Score | 56.89 |
-| Risk Score | 53.13 |
-| Position Size | 887.37 |
-| Entry Price | 1684.66 |
-| Stop Loss | 1673.07 |
-| Take Profit | 1731.93 |
-| Exit Price | 1684.66 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 6.5665 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 48
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:14:16.090Z |
-| Market | SPOT_TRY |
-| Symbol | ADATRY |
-| Strategy | mean_reversion |
-| Market Regime | low_liquidity |
-| Signal | BUY |
-| Signal Score | 54.71 |
-| Confidence | 74.45 |
-| Ranking Score | 81.03 |
-| Risk Score | 27.26 |
-| Position Size | 155.45 |
-| Entry Price | 1962.49 |
-| Stop Loss | 1944.77 |
-| Take Profit | 1986.21 |
-| Exit Price | 1962.49 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1635819 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Liquidity below threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1635819 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Liquidity gate
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 49
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:15:46.093Z |
-| Market | SPOT_USDT |
 | Symbol | AVAXTRY |
 | Strategy | trend_pullback |
-| Market Regime | volatile |
+| Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 54.37 |
-| Confidence | 52.06 |
-| Ranking Score | 53.58 |
-| Risk Score | 52.7 |
-| Position Size | 928.74 |
-| Entry Price | 2085.7 |
-| Stop Loss | 2054.91 |
-| Take Profit | 2119.83 |
-| Exit Price | 2085.7 |
+| Signal Score | 49.3 |
+| Confidence | 53.54 |
+| Ranking Score | 71.88 |
+| Risk Score | 26.12 |
+| Position Size | 433.19 |
+| Entry Price | 3409.98 |
+| Stop Loss | 3356.61 |
+| Take Profit | 3488.43 |
+| Exit Price | 3409.98 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Exchange restriction: symbol temporarily blocked |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (71.88 < 88) |
+| Confidence Threshold | 49 |
 | Ranking Result | FAIL |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | BLOCKED |
-
-**Engineering Analysis:** Rejected due to: Exchange restriction: symbol temporarily blocked. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 2.8977 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Exchange restriction: symbol temporarily blocked
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 50
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:17:16.095Z |
-| Market | SPOT_TRY |
-| Symbol | SOLTRY |
-| Strategy | breakout_follow |
-| Market Regime | trending |
-| Signal | SELL |
-| Signal Score | 46.94 |
-| Confidence | 85.67 |
-| Ranking Score | 55.23 |
-| Risk Score | 74.61 |
-| Position Size | 973.53 |
-| Entry Price | 2754.95 |
-| Stop Loss | 2708.75 |
-| Take Profit | 2811.54 |
-| Exit Price | 2754.95 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-### Batch Summary — Trades 41–50
-
-- Completed Trades: 50
-- Accepted: 7
-- Rejected: 43
-- Batch Win Rate: 100%
-- Profit Factor: 25.23
-- Expectancy: 8.1428
-- Sharpe Ratio: 1.127
-- Average Confidence: 71.54
-- Average Holding Time: 1660s
-- Average Risk Score: 45.22
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: trend_pullback in trending
-- Most Common Failure Pattern: Liquidity gate
-- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
-
----
-
-## Trade 51
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:18:46.098Z |
-| Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | trend_pullback |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 77.85 |
-| Confidence | 67.27 |
-| Ranking Score | 72.33 |
-| Risk Score | 27.12 |
-| Position Size | 381.31 |
-| Entry Price | 256.08 |
-| Stop Loss | 254.3 |
-| Take Profit | 260.23 |
-| Exit Price | 256.08 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 52
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:20:16.100Z |
-| Market | SPOT_USDT |
-| Symbol | XRPTRY |
-| Strategy | mean_reversion |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 54.44 |
-| Confidence | 60.43 |
-| Ranking Score | 49.54 |
-| Risk Score | 43.67 |
-| Position Size | 611.75 |
-| Entry Price | 151.98 |
-| Stop Loss | 149.59 |
-| Take Profit | 154.03 |
-| Exit Price | 151.98 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (49.54 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (49.54 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (71.88 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -2334,47 +1961,462 @@
 
 ---
 
-## Trade 53
+## Trade 44
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:21:46.103Z |
-| Market | SPOT_USDT |
-| Symbol | LINKTRY |
-| Strategy | trend_pullback |
-| Market Regime | low_liquidity |
+| Timestamp | 2026-08-04T21:09:27.398Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | momentum_scalp |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 46.7 |
-| Confidence | 81.66 |
-| Ranking Score | 68.79 |
-| Risk Score | 74.77 |
-| Position Size | 572.99 |
-| Entry Price | 3502.85 |
-| Stop Loss | 3474.2 |
-| Take Profit | 3533.36 |
-| Exit Price | 3502.85 |
+| Signal Score | 87.91 |
+| Confidence | 74.53 |
+| Ranking Score | 48.63 |
+| Risk Score | 26.29 |
+| Position Size | 758.1 |
+| Entry Price | 477.56 |
+| Stop Loss | 471.12 |
+| Take Profit | 485.37 |
+| Exit Price | 477.56 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1029253 < 5000000) |
+| Rejection Reason | Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set |
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1029253 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 3.203 USDT
+**Estimated Missed Profit:** 7.9449 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 45
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:10:57.401Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 65.67 |
+| Confidence | 81.92 |
+| Ranking Score | 54.81 |
+| Risk Score | 56.65 |
+| Position Size | 534.94 |
+| Entry Price | 3717 |
+| Stop Loss | 3667.24 |
+| Take Profit | 3820.86 |
+| Exit Price | 3717 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (54.81 < 66) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (54.81 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.4925 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 46
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:12:27.403Z |
+| Market | SPOT_USDT |
+| Symbol | AVAXTRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 89.94 |
+| Confidence | 55.65 |
+| Ranking Score | 75.42 |
+| Risk Score | 69.35 |
+| Position Size | 714.69 |
+| Entry Price | 676.72 |
+| Stop Loss | 665.8 |
+| Take Profit | 697.32 |
+| Exit Price | 676.72 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | AI consensus NO_TRADE |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.337 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** AI consensus disagreement
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 47
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:13:57.406Z |
+| Market | SPOT_USDT |
+| Symbol | ETHTRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
+| Signal | SELL |
+| Signal Score | 76.35 |
+| Confidence | 60.28 |
+| Ranking Score | 40.82 |
+| Risk Score | 30.18 |
+| Position Size | 279.24 |
+| Entry Price | 3726.79 |
+| Stop Loss | 3667.05 |
+| Take Profit | 3758.53 |
+| Exit Price | 3726.79 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (40.82 < 66) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (40.82 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 48
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:15:27.408Z |
+| Market | SPOT_TRY |
+| Symbol | LINKTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 65.58 |
+| Confidence | 66.96 |
+| Ranking Score | 41.43 |
+| Risk Score | 35.38 |
+| Position Size | 604.31 |
+| Entry Price | 826.24 |
+| Stop Loss | 810.11 |
+| Take Profit | 836.86 |
+| Exit Price | 826.24 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (41.43 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (41.43 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 49
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:16:57.411Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | momentum_scalp |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 60.11 |
+| Confidence | 91.29 |
+| Ranking Score | 55.35 |
+| Risk Score | 39.87 |
+| Position Size | 151.12 |
+| Entry Price | 2306.36 |
+| Stop Loss | 2277.85 |
+| Take Profit | 2335.62 |
+| Exit Price | 2306.36 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.0896 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 50
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:18:27.414Z |
+| Market | SPOT_TRY |
+| Symbol | SOLTRY |
+| Strategy | trend_pullback |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 45.19 |
+| Confidence | 70.36 |
+| Ranking Score | 42.74 |
+| Risk Score | 24.67 |
+| Position Size | 831.51 |
+| Entry Price | 764.41 |
+| Stop Loss | 752.9 |
+| Take Profit | 771.27 |
+| Exit Price | 764.41 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (42.74 < 48) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (42.74 < 48). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 4.4319 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+### Batch Summary — Trades 41–50
+
+- Completed Trades: 50
+- Accepted: 1
+- Rejected: 49
+- Batch Win Rate: 0%
+- Profit Factor: 999
+- Expectancy: 1.3687
+- Sharpe Ratio: 0
+- Average Confidence: 70.65
+- Average Holding Time: 1280s
+- Average Risk Score: 46.65
+- Top Rejection Reason: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: N/A in N/A
+- Most Common Failure Pattern: Ranking score gate
+- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
+
+---
+
+## Trade 51
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:19:57.417Z |
+| Market | SPOT_USDT |
+| Symbol | XRPTRY |
+| Strategy | trend_pullback |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 63.67 |
+| Confidence | 89.8 |
+| Ranking Score | 51.79 |
+| Risk Score | 46.78 |
+| Position Size | 459.06 |
+| Entry Price | 341.98 |
+| Stop Loss | 337.6 |
+| Take Profit | 350.33 |
+| Exit Price | 341.98 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Liquidity below threshold (204699 < 5000000) |
+| Confidence Threshold | 51 |
+| Ranking Result | PASS |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Liquidity below threshold (204699 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Liquidity gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 52
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:21:27.421Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
+| Signal | SELL |
+| Signal Score | 57.48 |
+| Confidence | 92.13 |
+| Ranking Score | 48.47 |
+| Risk Score | 75.04 |
+| Position Size | 320.59 |
+| Entry Price | 2377.58 |
+| Stop Loss | 2342.91 |
+| Take Profit | 2407.82 |
+| Exit Price | 2377.58 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (48.47 < 66) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (48.47 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.7731 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 53
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:22:57.423Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 85.71 |
+| Confidence | 74.47 |
+| Ranking Score | 76.93 |
+| Risk Score | 33.04 |
+| Position Size | 750.3 |
+| Entry Price | 2574.77 |
+| Stop Loss | 2538.16 |
+| Take Profit | 2597.56 |
+| Exit Price | 2574.77 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -2382,36 +2424,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:23:16.105Z |
-| Market | SPOT_USDT |
-| Symbol | AVAXTRY |
-| Strategy | trend_pullback |
+| Timestamp | 2026-08-04T21:24:27.426Z |
+| Market | SPOT_TRY |
+| Symbol | BTCTRY |
+| Strategy | mean_reversion |
 | Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 53.08 |
-| Confidence | 61.09 |
-| Ranking Score | 67.28 |
-| Risk Score | 23.07 |
-| Position Size | 353.43 |
-| Entry Price | 3316.4 |
-| Stop Loss | 3291.04 |
-| Take Profit | 3416.64 |
-| Exit Price | 3415.45 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 2.987 |
-| PnL USDT | 10.557 |
-| Trade Duration | 922s |
-| Accepted / Rejected | Accepted |
+| Signal | SELL |
+| Signal Score | 89.07 |
+| Confidence | 81.23 |
+| Ranking Score | 41.63 |
+| Risk Score | 52.02 |
+| Position Size | 334.04 |
+| Entry Price | 2910551.22 |
+| Stop Loss | 2872248.37 |
+| Take Profit | 2945588.74 |
+| Exit Price | 2910551.22 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (41.63 < 68) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed trend_pullback in ranging regime with confidence 61.09% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Ranking below threshold (41.63 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
 **Would acceptance have been profitable?** No
 
-**Root Cause:** Signal quality aligned with regime
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -2419,28 +2468,160 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:24:46.107Z |
+| Timestamp | 2026-08-04T21:25:57.429Z |
 | Market | SPOT_TRY |
-| Symbol | ADATRY |
+| Symbol | DOGETRY |
+| Strategy | momentum_scalp |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 48.2 |
+| Confidence | 75.22 |
+| Ranking Score | 53.5 |
+| Risk Score | 64 |
+| Position Size | 788.83 |
+| Entry Price | 3966.24 |
+| Stop Loss | 3904.81 |
+| Take Profit | 4007.12 |
+| Exit Price | 3966.24 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (53.5 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (53.5 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 56
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:27:27.431Z |
+| Market | SPOT_TRY |
+| Symbol | DOGETRY |
+| Strategy | momentum_scalp |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 91.24 |
+| Confidence | 75.78 |
+| Ranking Score | 55.03 |
+| Risk Score | 59.99 |
+| Position Size | 582.7 |
+| Entry Price | 364.73 |
+| Stop Loss | 361.44 |
+| Take Profit | 373.22 |
+| Exit Price | 364.73 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (55.03 < 68) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (55.03 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.8763 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 57
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:28:57.434Z |
+| Market | SPOT_USDT |
+| Symbol | ETHTRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 76.53 |
+| Confidence | 66.06 |
+| Ranking Score | 69.49 |
+| Risk Score | 77.27 |
+| Position Size | 836.02 |
+| Entry Price | 715.17 |
+| Stop Loss | 703.08 |
+| Take Profit | 735.76 |
+| Exit Price | 715.17 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | AI consensus NO_TRADE |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | Expected profit below minimum |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** AI consensus disagreement
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 58
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:30:27.437Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
 | Strategy | trend_pullback |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 85.72 |
-| Confidence | 69.78 |
-| Ranking Score | 82.93 |
-| Risk Score | 34.32 |
-| Position Size | 287.19 |
-| Entry Price | 3624.17 |
-| Stop Loss | 3596.33 |
-| Take Profit | 3689.37 |
-| Exit Price | 3597.12 |
+| Signal Score | 74.87 |
+| Confidence | 92.67 |
+| Ranking Score | 80.83 |
+| Risk Score | 69.04 |
+| Position Size | 843.275454 |
+| Entry Price | 1285.75 |
+| Stop Loss | 1270.08 |
+| Take Profit | 1302.64 |
+| Exit Price | 1275.4 |
 | Exit Reason | STOP_LOSS |
-| PnL % | -0.746 |
-| PnL USDT | -2.1424 |
-| Trade Duration | 786s |
+| PnL % | -0.805 |
+| PnL USDT | -7.9774 |
+| Trade Duration | 1302s |
 | Accepted / Rejected | Accepted |
 
-**Engineering Analysis:** Executed trend_pullback in trending regime with confidence 69.78% vs threshold 45%.
+**Engineering Analysis:** Executed trend_pullback in trending regime with confidence 92.67% vs threshold 45%.
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -2452,171 +2633,39 @@
 
 ---
 
-## Trade 56
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:26:16.110Z |
-| Market | SPOT_TRY |
-| Symbol | BTCTRY |
-| Strategy | breakout_follow |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 63.37 |
-| Confidence | 59.73 |
-| Ranking Score | 61.92 |
-| Risk Score | 48.25 |
-| Position Size | 685.95 |
-| Entry Price | 2812607.27 |
-| Stop Loss | 2768351.28 |
-| Take Profit | 2856826.15 |
-| Exit Price | 2812607.27 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Abnormal volatility breaker |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Abnormal volatility breaker. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Abnormal volatility breaker
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 57
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:27:46.112Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | trend_pullback |
-| Market Regime | low_liquidity |
-| Signal | BUY |
-| Signal Score | 90.02 |
-| Confidence | 81.3 |
-| Ranking Score | 83.23 |
-| Risk Score | 24.88 |
-| Position Size | 657.75 |
-| Entry Price | 1000.84 |
-| Stop Loss | 993.17 |
-| Take Profit | 1033.5 |
-| Exit Price | 1000.84 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Exchange restriction: symbol temporarily blocked |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | BUY |
-| Exchange Restriction | BLOCKED |
-
-**Engineering Analysis:** Rejected due to: Exchange restriction: symbol temporarily blocked. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Exchange restriction: symbol temporarily blocked
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 58
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:29:16.115Z |
-| Market | SPOT_USDT |
-| Symbol | XRPTRY |
-| Strategy | momentum_scalp |
-| Market Regime | low_liquidity |
-| Signal | BUY |
-| Signal Score | 76.17 |
-| Confidence | 58.58 |
-| Ranking Score | 83.58 |
-| Risk Score | 69.72 |
-| Position Size | 665.13 |
-| Entry Price | 1287.66 |
-| Stop Loss | 1275.48 |
-| Take Profit | 1323.27 |
-| Exit Price | 1287.66 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1608611 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1608611 < 5000000). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 2.747 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Liquidity gate
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
 ## Trade 59
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:30:46.119Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
+| Timestamp | 2026-08-04T21:31:57.441Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
 | Strategy | mean_reversion |
-| Market Regime | volatile |
-| Signal | SELL |
-| Signal Score | 91.53 |
-| Confidence | 92.23 |
-| Ranking Score | 42.38 |
-| Risk Score | 48.58 |
-| Position Size | 710.5 |
-| Entry Price | 2704.79 |
-| Stop Loss | 2676.8 |
-| Take Profit | 2772 |
-| Exit Price | 2704.79 |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 84.38 |
+| Confidence | 63.87 |
+| Ranking Score | 71.03 |
+| Risk Score | 37.91 |
+| Position Size | 159.84 |
+| Entry Price | 1730.46 |
+| Stop Loss | 1706.03 |
+| Take Profit | 1749.53 |
+| Exit Price | 1730.46 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (42.38 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (71.03 < 88) |
+| Confidence Threshold | 51 |
 | Ranking Result | FAIL |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (42.38 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (71.03 < 88). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -2632,61 +2681,61 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:32:16.122Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | breakout_follow |
-| Market Regime | trending |
-| Signal | SELL |
-| Signal Score | 53.46 |
-| Confidence | 62.78 |
-| Ranking Score | 40.96 |
-| Risk Score | 55.04 |
-| Position Size | 820.37 |
-| Entry Price | 2161.16 |
-| Stop Loss | 2135.17 |
-| Take Profit | 2219.5 |
-| Exit Price | 2161.16 |
+| Timestamp | 2026-08-04T21:33:27.444Z |
+| Market | SPOT_USDT |
+| Symbol | ADATRY |
+| Strategy | mean_reversion |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 75.69 |
+| Confidence | 54.04 |
+| Ranking Score | 62.66 |
+| Risk Score | 42.96 |
+| Position Size | 214.99 |
+| Entry Price | 2254.63 |
+| Stop Loss | 2211.54 |
+| Take Profit | 2284.86 |
+| Exit Price | 2254.63 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (40.96 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (62.66 < 82) |
+| Confidence Threshold | 49 |
 | Ranking Result | FAIL |
-| Risk Rule | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
-| AI Consensus Result | BUY |
+| AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (40.96 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (62.66 < 82). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 1.664 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
 **Root Cause:** Ranking score gate
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
 ### Batch Summary — Trades 51–60
 
 - Completed Trades: 60
-- Accepted: 9
-- Rejected: 51
-- Batch Win Rate: 50%
-- Profit Factor: 15.553
-- Expectancy: 7.2682
-- Sharpe Ratio: 1.005
-- Average Confidence: 71.2
-- Average Holding Time: 1481s
-- Average Risk Score: 45.17
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: trend_pullback in ranging
-- Most Common Failure Pattern: AI consensus disagreement
+- Accepted: 2
+- Rejected: 58
+- Batch Win Rate: 0%
+- Profit Factor: 0.172
+- Expectancy: -3.3044
+- Sharpe Ratio: -0.707
+- Average Confidence: 71.63
+- Average Holding Time: 1291s
+- Average Risk Score: 48.18
+- Top Rejection Reason: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: trend_pullback in trending
+- Most Common Failure Pattern: Liquidity gate
 - Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
 
 ---
@@ -2695,43 +2744,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:33:46.125Z |
+| Timestamp | 2026-08-04T21:34:57.447Z |
 | Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | mean_reversion |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 47.19 |
-| Confidence | 80.55 |
-| Ranking Score | 81.64 |
-| Risk Score | 63.99 |
-| Position Size | 474.41 |
-| Entry Price | 690.45 |
-| Stop Loss | 681.54 |
-| Take Profit | 698.31 |
-| Exit Price | 690.45 |
+| Symbol | XRPTRY |
+| Strategy | breakout_follow |
+| Market Regime | low_liquidity |
+| Signal | SELL |
+| Signal Score | 94.34 |
+| Confidence | 78.11 |
+| Ranking Score | 54.65 |
+| Risk Score | 58.43 |
+| Position Size | 970.58 |
+| Entry Price | 1937.91 |
+| Stop Loss | 1909.67 |
+| Take Profit | 1981.9 |
+| Exit Price | 1937.91 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
+| Rejection Reason | Ranking below threshold (54.65 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (54.65 < 88). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 12.9087 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Risk per trade exceeds threshold
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -2739,41 +2788,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:35:16.128Z |
-| Market | SPOT_USDT |
-| Symbol | AVAXTRY |
-| Strategy | trend_pullback |
+| Timestamp | 2026-08-04T21:36:27.450Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | breakout_follow |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 92.88 |
-| Confidence | 56.88 |
-| Ranking Score | 55.87 |
-| Risk Score | 60.94 |
-| Position Size | 775.22 |
-| Entry Price | 1396.85 |
-| Stop Loss | 1380.54 |
-| Take Profit | 1410.8 |
-| Exit Price | 1396.85 |
+| Signal Score | 54.11 |
+| Confidence | 87.86 |
+| Ranking Score | 46.47 |
+| Risk Score | 66.82 |
+| Position Size | 362.33 |
+| Entry Price | 3113.67 |
+| Stop Loss | 3092.26 |
+| Take Profit | 3179.92 |
+| Exit Price | 3113.67 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
+| Rejection Reason | Ranking below threshold (46.47 < 66) |
 | Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
+| Ranking Result | FAIL |
+| Risk Rule | Expected profit below minimum |
 | Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (46.47 < 66). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 4.0777 USDT
+**Estimated Missed Profit:** 0.6848 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -2783,43 +2832,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:36:46.131Z |
-| Market | SPOT_TRY |
-| Symbol | LINKTRY |
-| Strategy | momentum_scalp |
-| Market Regime | volatile |
+| Timestamp | 2026-08-04T21:37:57.453Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 83.87 |
-| Confidence | 75.46 |
-| Ranking Score | 57.75 |
-| Risk Score | 41.29 |
-| Position Size | 303.64 |
-| Entry Price | 1309.89 |
-| Stop Loss | 1301.39 |
-| Take Profit | 1337.18 |
-| Exit Price | 1309.89 |
+| Signal Score | 91.88 |
+| Confidence | 92.93 |
+| Ranking Score | 59.62 |
+| Risk Score | 69.57 |
+| Position Size | 321.89 |
+| Entry Price | 327.8 |
+| Stop Loss | 323.24 |
+| Take Profit | 332.64 |
+| Exit Price | 327.8 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Exchange restriction: symbol temporarily blocked |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
+| Rejection Reason | Ranking below threshold (59.62 < 66) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
 | Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | BUY |
-| Exchange Restriction | BLOCKED |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Exchange restriction: symbol temporarily blocked. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (59.62 < 66). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 0.75 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Exchange restriction: symbol temporarily blocked
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -2827,36 +2876,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:38:16.134Z |
-| Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | trend_pullback |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 72.48 |
-| Confidence | 72.47 |
-| Ranking Score | 68.32 |
-| Risk Score | 78.28 |
-| Position Size | 980.84 |
-| Entry Price | 2937.68 |
-| Stop Loss | 2918.01 |
-| Take Profit | 3024.51 |
-| Exit Price | 2928.26 |
-| Exit Reason | TIMEOUT |
-| PnL % | -0.321 |
-| PnL USDT | -3.1485 |
-| Trade Duration | 4523s |
-| Accepted / Rejected | Accepted |
+| Timestamp | 2026-08-04T21:39:27.456Z |
+| Market | SPOT_TRY |
+| Symbol | SOLTRY |
+| Strategy | momentum_scalp |
+| Market Regime | volatile |
+| Signal | SELL |
+| Signal Score | 67.95 |
+| Confidence | 72.02 |
+| Ranking Score | 40.59 |
+| Risk Score | 23.24 |
+| Position Size | 265.08 |
+| Entry Price | 3249.29 |
+| Stop Loss | 3174.07 |
+| Take Profit | 3334.56 |
+| Exit Price | 3249.29 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (40.59 < 48) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed trend_pullback in trending regime with confidence 72.47% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Ranking below threshold (40.59 < 48). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 1.7813 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** Adverse move after valid entry
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Review stop placement for this strategy/regime combination.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -2864,43 +2920,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:39:46.137Z |
+| Timestamp | 2026-08-04T21:40:57.458Z |
 | Market | SPOT_USDT |
-| Symbol | ETHTRY |
-| Strategy | breakout_follow |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 71.79 |
-| Confidence | 85.43 |
-| Ranking Score | 89.22 |
-| Risk Score | 31.92 |
-| Position Size | 526.43 |
-| Entry Price | 1884.36 |
-| Stop Loss | 1859.75 |
-| Take Profit | 1936.73 |
-| Exit Price | 1884.36 |
+| Symbol | ADATRY |
+| Strategy | momentum_scalp |
+| Market Regime | low_liquidity |
+| Signal | SELL |
+| Signal Score | 86.16 |
+| Confidence | 90.87 |
+| Ranking Score | 71.01 |
+| Risk Score | 60.19 |
+| Position Size | 655.88 |
+| Entry Price | 597.5 |
+| Stop Loss | 590.79 |
+| Take Profit | 611.25 |
+| Exit Price | 597.5 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| Rejection Reason | Ranking below threshold (71.01 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (2) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (71.01 < 88). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 0 USDT
+**Estimated Missed Profit:** 1.397 USDT
 
-**Would acceptance have been profitable?** No
+**Would acceptance have been profitable?** Yes
 
-**Root Cause:** AI consensus disagreement
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
@@ -2908,28 +2964,28 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:41:16.139Z |
+| Timestamp | 2026-08-04T21:42:27.461Z |
 | Market | SPOT_USDT |
 | Symbol | XRPTRY |
-| Strategy | trend_pullback |
-| Market Regime | trending |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 68.97 |
-| Confidence | 90.82 |
-| Ranking Score | 57.33 |
-| Risk Score | 52.86 |
-| Position Size | 920.57 |
-| Entry Price | 1099.34 |
-| Stop Loss | 1081.62 |
-| Take Profit | 1127.28 |
-| Exit Price | 1123.66 |
+| Signal Score | 67.14 |
+| Confidence | 87.13 |
+| Ranking Score | 52.92 |
+| Risk Score | 40.18 |
+| Position Size | 215.042268 |
+| Entry Price | 1405.28 |
+| Stop Loss | 1387.18 |
+| Take Profit | 1450.03 |
+| Exit Price | 1448.61 |
 | Exit Reason | TAKE_PROFIT |
-| PnL % | 2.212 |
-| PnL USDT | 20.363 |
-| Trade Duration | 977s |
+| PnL % | 3.083 |
+| PnL USDT | 6.1599 |
+| Trade Duration | 1246s |
 | Accepted / Rejected | Accepted |
 
-**Engineering Analysis:** Executed trend_pullback in trending regime with confidence 90.82% vs threshold 45%.
+**Engineering Analysis:** Executed mean_reversion in ranging regime with confidence 87.13% vs threshold 45%.
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -2945,41 +3001,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:42:46.142Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | breakout_follow |
-| Market Regime | low_liquidity |
+| Timestamp | 2026-08-04T21:43:57.465Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
 | Signal | BUY |
-| Signal Score | 80.12 |
-| Confidence | 68.78 |
-| Ranking Score | 77.38 |
-| Risk Score | 36.43 |
-| Position Size | 579.81 |
-| Entry Price | 2443.48 |
-| Stop Loss | 2404.18 |
-| Take Profit | 2506.78 |
-| Exit Price | 2443.48 |
+| Signal Score | 88.16 |
+| Confidence | 60.95 |
+| Ranking Score | 83.34 |
+| Risk Score | 20.98 |
+| Position Size | 861.71 |
+| Entry Price | 1562.24 |
+| Stop Loss | 1528.61 |
+| Take Profit | 1601.15 |
+| Exit Price | 1562.24 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1898600 < 5000000) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
 | Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1898600 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 4.9516 USDT
+**Estimated Missed Profit:** 8.9963 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -2989,41 +3045,41 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:44:16.144Z |
+| Timestamp | 2026-08-04T21:45:27.468Z |
 | Market | SPOT_USDT |
-| Symbol | SOLTRY |
-| Strategy | momentum_scalp |
-| Market Regime | trending |
-| Signal | SELL |
-| Signal Score | 76.3 |
-| Confidence | 87.56 |
-| Ranking Score | 58.47 |
-| Risk Score | 36.98 |
-| Position Size | 974.47 |
-| Entry Price | 3822 |
-| Stop Loss | 3783.24 |
-| Take Profit | 3914.46 |
-| Exit Price | 3822 |
+| Symbol | ADATRY |
+| Strategy | mean_reversion |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 70.28 |
+| Confidence | 56.8 |
+| Ranking Score | 89.04 |
+| Risk Score | 32.48 |
+| Position Size | 257.44 |
+| Entry Price | 1907.37 |
+| Stop Loss | 1861.59 |
+| Take Profit | 1932.7 |
+| Exit Price | 1907.37 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Signal not actionable |
-| Confidence Threshold | 45 |
+| Rejection Reason | Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
 | Ranking Result | PASS |
-| Risk Rule | PASS |
+| Risk Rule | Abnormal volatility breaker |
 | Liquidity Result | PASS |
-| AI Consensus Result | BUY |
+| AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Signal not actionable. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 10.4268 USDT
+**Estimated Missed Profit:** 1.4442 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Signal not actionable
+**Root Cause:** Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -3033,81 +3089,37 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:45:46.147Z |
-| Market | SPOT_USDT |
-| Symbol | SOLTRY |
-| Strategy | breakout_follow |
-| Market Regime | volatile |
+| Timestamp | 2026-08-04T21:46:57.471Z |
+| Market | SPOT_TRY |
+| Symbol | AVAXTRY |
+| Strategy | mean_reversion |
+| Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 59.75 |
-| Confidence | 53.49 |
-| Ranking Score | 94.29 |
-| Risk Score | 65.43 |
-| Position Size | 213.27 |
-| Entry Price | 2563.61 |
-| Stop Loss | 2522.22 |
-| Take Profit | 2648.07 |
-| Exit Price | 2563.61 |
+| Signal Score | 93.5 |
+| Confidence | 82.49 |
+| Ranking Score | 44.71 |
+| Risk Score | 63.22 |
+| Position Size | 785.06 |
+| Entry Price | 3895.6 |
+| Stop Loss | 3851 |
+| Take Profit | 3994.09 |
+| Exit Price | 3895.6 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 70
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:47:16.149Z |
-| Market | SPOT_USDT |
-| Symbol | BTCTRY |
-| Strategy | breakout_follow |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 88.53 |
-| Confidence | 62.67 |
-| Ranking Score | 43.54 |
-| Risk Score | 40.44 |
-| Position Size | 535.11 |
-| Entry Price | 2844059.17 |
-| Stop Loss | 2820616.96 |
-| Take Profit | 2925844.26 |
-| Exit Price | 2844059.17 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (43.54 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (44.71 < 88) |
+| Confidence Threshold | 51 |
 | Ranking Result | FAIL |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (43.54 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (44.71 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 6.2661 USDT
+**Estimated Missed Profit:** 1.1776 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -3117,21 +3129,65 @@
 
 ---
 
+## Trade 70
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:48:27.474Z |
+| Market | SPOT_USDT |
+| Symbol | DOGETRY |
+| Strategy | breakout_follow |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 48.72 |
+| Confidence | 58.78 |
+| Ranking Score | 83.69 |
+| Risk Score | 19.13 |
+| Position Size | 243.75 |
+| Entry Price | 1036.12 |
+| Stop Loss | 1011.25 |
+| Take Profit | 1062.82 |
+| Exit Price | 1036.12 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.9256 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
 ### Batch Summary — Trades 61–70
 
 - Completed Trades: 70
-- Accepted: 11
-- Rejected: 59
-- Batch Win Rate: 50%
-- Profit Factor: 11.811
-- Expectancy: 7.5117
-- Sharpe Ratio: 0.91
-- Average Confidence: 71.52
-- Average Holding Time: 1712s
-- Average Risk Score: 45.99
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: trend_pullback in trending
-- Most Common Failure Pattern: Risk per trade exceeds threshold
+- Accepted: 3
+- Rejected: 67
+- Batch Win Rate: 100%
+- Profit Factor: 0.944
+- Expectancy: -0.1496
+- Sharpe Ratio: -0.025
+- Average Confidence: 72.37
+- Average Holding Time: 1276s
+- Average Risk Score: 47.78
+- Top Rejection Reason: Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: mean_reversion in ranging
+- Most Common Failure Pattern: Ranking score gate
 - Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
 
 ---
@@ -3140,36 +3196,43 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:48:46.152Z |
+| Timestamp | 2026-08-04T21:49:57.479Z |
 | Market | SPOT_TRY |
-| Symbol | SOLTRY |
-| Strategy | momentum_scalp |
+| Symbol | AVAXTRY |
+| Strategy | mean_reversion |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 66.56 |
-| Confidence | 86.4 |
-| Ranking Score | 72.42 |
-| Risk Score | 43.41 |
-| Position Size | 910.12 |
-| Entry Price | 870.55 |
-| Stop Loss | 858.71 |
-| Take Profit | 897.97 |
-| Exit Price | 889.62 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 2.191 |
-| PnL USDT | 19.9407 |
-| Trade Duration | 3744s |
-| Accepted / Rejected | Accepted |
+| Signal Score | 67.65 |
+| Confidence | 53.35 |
+| Ranking Score | 47.56 |
+| Risk Score | 28.65 |
+| Position Size | 244.63 |
+| Entry Price | 3955.02 |
+| Stop Loss | 3915.27 |
+| Take Profit | 4009.68 |
+| Exit Price | 3955.02 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (47.56 < 66) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
 
-**Engineering Analysis:** Executed momentum_scalp in trending regime with confidence 86.4% vs threshold 45%.
+**Engineering Analysis:** Rejected due to: Ranking below threshold (47.56 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
 **Estimated Missed Profit:** 0 USDT
 
 **Would acceptance have been profitable?** No
 
-**Root Cause:** Signal quality aligned with regime
+**Root Cause:** Ranking score gate
 
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
 
 ---
 
@@ -3177,152 +3240,27 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:50:16.155Z |
-| Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 46.65 |
-| Confidence | 75.17 |
-| Ranking Score | 62.85 |
-| Risk Score | 20.66 |
-| Position Size | 201.56 |
-| Entry Price | 1197.34 |
-| Stop Loss | 1181.74 |
-| Take Profit | 1220.35 |
-| Exit Price | 1184.9 |
-| Exit Reason | STOP_LOSS |
-| PnL % | -1.039 |
-| PnL USDT | -2.0942 |
-| Trade Duration | 2493s |
-| Accepted / Rejected | Accepted |
-
-**Engineering Analysis:** Executed trend_pullback in volatile regime with confidence 75.17% vs threshold 45%.
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Adverse move after valid entry
-
-**Lessons Learned:** Review stop placement for this strategy/regime combination.
-
----
-
-## Trade 73
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:51:46.157Z |
+| Timestamp | 2026-08-04T21:51:27.482Z |
 | Market | SPOT_USDT |
-| Symbol | ETHTRY |
-| Strategy | mean_reversion |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 57.5 |
-| Confidence | 53.14 |
-| Ranking Score | 46.72 |
-| Risk Score | 41.01 |
-| Position Size | 776.23 |
-| Entry Price | 1679.28 |
-| Stop Loss | 1662.54 |
-| Take Profit | 1726.3 |
-| Exit Price | 1679.28 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (46.72 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (46.72 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 74
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:53:16.160Z |
-| Market | SPOT_USDT |
-| Symbol | DOGETRY |
-| Strategy | mean_reversion |
-| Market Regime | low_liquidity |
-| Signal | BUY |
-| Signal Score | 57.81 |
-| Confidence | 52.83 |
-| Ranking Score | 52.76 |
-| Risk Score | 77.37 |
-| Position Size | 725.76 |
-| Entry Price | 3565.26 |
-| Stop Loss | 3522.74 |
-| Take Profit | 3654.75 |
-| Exit Price | 3565.26 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (52.76 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (52.76 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 75
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:54:46.162Z |
-| Market | SPOT_TRY |
 | Symbol | BTCTRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
+| Strategy | mean_reversion |
+| Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 90.21 |
-| Confidence | 77.44 |
-| Ranking Score | 44.1 |
-| Risk Score | 77.31 |
-| Position Size | 603 |
-| Entry Price | 2816565.4 |
-| Stop Loss | 2770514.73 |
-| Take Profit | 2879245.32 |
-| Exit Price | 2816565.4 |
+| Signal Score | 89.71 |
+| Confidence | 73.21 |
+| Ranking Score | 43.06 |
+| Risk Score | 57.7 |
+| Position Size | 665.56 |
+| Entry Price | 2934253.51 |
+| Stop Loss | 2885926.35 |
+| Take Profit | 3021546.61 |
+| Exit Price | 2934253.51 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (44.1 < 55) |
+| Rejection Reason | Ranking below threshold (43.06 < 66) |
 | Confidence Threshold | 45 |
 | Ranking Result | FAIL |
 | Risk Rule | Risk per trade exceeds threshold |
@@ -3330,9 +3268,141 @@
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (44.1 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (43.06 < 66). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 5.0773 USDT
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 73
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:52:57.485Z |
+| Market | SPOT_USDT |
+| Symbol | ETHTRY |
+| Strategy | breakout_follow |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 74.3 |
+| Confidence | 70.84 |
+| Ranking Score | 43.34 |
+| Risk Score | 59.83 |
+| Position Size | 264.87 |
+| Entry Price | 3872.83 |
+| Stop Loss | 3830.76 |
+| Take Profit | 3946.36 |
+| Exit Price | 3872.83 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (43.34 < 68) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (43.34 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.1283 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 74
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:54:27.488Z |
+| Market | SPOT_TRY |
+| Symbol | BTCTRY |
+| Strategy | breakout_follow |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 89.19 |
+| Confidence | 68.79 |
+| Ranking Score | 58.2 |
+| Risk Score | 67.6 |
+| Position Size | 311.97 |
+| Entry Price | 2805878.56 |
+| Stop Loss | 2779671.65 |
+| Take Profit | 2886034.66 |
+| Exit Price | 2805878.56 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (58.2 < 68) |
+| Confidence Threshold | 45 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (58.2 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0.8049 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 75
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T21:55:57.492Z |
+| Market | SPOT_TRY |
+| Symbol | LINKTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 47.84 |
+| Confidence | 88.6 |
+| Ranking Score | 67.16 |
+| Risk Score | 60.41 |
+| Position Size | 286.04 |
+| Entry Price | 612.07 |
+| Stop Loss | 597.38 |
+| Take Profit | 622.13 |
+| Exit Price | 612.07 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (67.16 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (67.16 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.1499 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -3346,304 +3416,21 @@
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T22:56:16.165Z |
+| Timestamp | 2026-08-04T21:57:27.495Z |
 | Market | SPOT_USDT |
-| Symbol | BTCTRY |
-| Strategy | breakout_follow |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 52 |
-| Confidence | 86.84 |
-| Ranking Score | 83.04 |
-| Risk Score | 28.27 |
-| Position Size | 970.74 |
-| Entry Price | 2864898.76 |
-| Stop Loss | 2838331.02 |
-| Take Profit | 2950887.49 |
-| Exit Price | 2864898.76 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 12.3866 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 77
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:57:46.167Z |
-| Market | SPOT_TRY |
 | Symbol | ADATRY |
-| Strategy | breakout_follow |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 82.53 |
-| Confidence | 80.09 |
-| Ranking Score | 69.66 |
-| Risk Score | 78.93 |
-| Position Size | 416.32 |
-| Entry Price | 2376.95 |
-| Stop Loss | 2362.22 |
-| Take Profit | 2422.24 |
-| Exit Price | 2376.95 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 4.0674 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 78
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T22:59:16.169Z |
-| Market | SPOT_TRY |
-| Symbol | XRPTRY |
-| Strategy | mean_reversion |
-| Market Regime | trending |
-| Signal | SELL |
-| Signal Score | 87.27 |
-| Confidence | 64.82 |
-| Ranking Score | 71.59 |
-| Risk Score | 60.3 |
-| Position Size | 344.51 |
-| Entry Price | 2536.5 |
-| Stop Loss | 2506.03 |
-| Take Profit | 2562.72 |
-| Exit Price | 2536.5 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 1.4332 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 79
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:00:46.171Z |
-| Market | SPOT_USDT |
-| Symbol | DOGETRY |
-| Strategy | mean_reversion |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 73.74 |
-| Confidence | 53.09 |
-| Ranking Score | 72.06 |
-| Risk Score | 68.44 |
-| Position Size | 200.57 |
-| Entry Price | 3294.64 |
-| Stop Loss | 3259.88 |
-| Take Profit | 3321.35 |
-| Exit Price | 3294.64 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 2.6295 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 80
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:02:16.176Z |
-| Market | SPOT_TRY |
-| Symbol | BTCTRY |
 | Strategy | momentum_scalp |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 46.84 |
-| Confidence | 54.62 |
-| Ranking Score | 52.18 |
-| Risk Score | 53.61 |
-| Position Size | 949.4 |
-| Entry Price | 2883580.07 |
-| Stop Loss | 2839006.05 |
-| Take Profit | 2963981.49 |
-| Exit Price | 2883580.07 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (52.18 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (52.18 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 5.1363 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-### Batch Summary — Trades 71–80
-
-- Completed Trades: 80
-- Accepted: 13
-- Rejected: 67
-- Batch Win Rate: 50%
-- Profit Factor: 11.318
-- Expectancy: 7.7288
-- Sharpe Ratio: 0.883
-- Average Confidence: 71.13
-- Average Holding Time: 1928s
-- Average Risk Score: 47.1
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: momentum_scalp in trending
-- Most Common Failure Pattern: Ranking score gate
-- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
-
----
-
-## Trade 81
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:03:46.178Z |
-| Market | SPOT_USDT |
-| Symbol | DOGETRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
-| Signal | SELL |
-| Signal Score | 46.88 |
-| Confidence | 62.79 |
-| Ranking Score | 73.98 |
-| Risk Score | 48.24 |
-| Position Size | 625.6 |
-| Entry Price | 1102.32 |
-| Stop Loss | 1087.4 |
-| Take Profit | 1138.48 |
-| Exit Price | 1102.32 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 82
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:05:16.181Z |
-| Market | SPOT_TRY |
-| Symbol | AVAXTRY |
-| Strategy | breakout_follow |
 | Market Regime | trending |
 | Signal | BUY |
-| Signal Score | 68.18 |
-| Confidence | 72.23 |
-| Ranking Score | 70.49 |
-| Risk Score | 64.23 |
-| Position Size | 294.66 |
-| Entry Price | 649.55 |
-| Stop Loss | 638.71 |
-| Take Profit | 661.93 |
-| Exit Price | 649.55 |
+| Signal Score | 92.58 |
+| Confidence | 55.48 |
+| Ranking Score | 87.44 |
+| Risk Score | 53.35 |
+| Position Size | 867.37 |
+| Entry Price | 1709.68 |
+| Stop Loss | 1688.05 |
+| Take Profit | 1729.99 |
+| Exit Price | 1709.68 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
@@ -3653,634 +3440,6 @@
 | Confidence Threshold | 45 |
 | Ranking Result | PASS |
 | Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 3.1234 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 83
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:06:46.183Z |
-| Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | momentum_scalp |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 73.71 |
-| Confidence | 92.43 |
-| Ranking Score | 51.78 |
-| Risk Score | 72.25 |
-| Position Size | 399.55 |
-| Entry Price | 3679.5 |
-| Stop Loss | 3643.41 |
-| Take Profit | 3800.6 |
-| Exit Price | 3679.5 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (51.78 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (51.78 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 84
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:08:16.186Z |
-| Market | SPOT_TRY |
-| Symbol | ADATRY |
-| Strategy | momentum_scalp |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 84.77 |
-| Confidence | 88.02 |
-| Ranking Score | 45.68 |
-| Risk Score | 71.32 |
-| Position Size | 527.9 |
-| Entry Price | 1987.3 |
-| Stop Loss | 1968.68 |
-| Take Profit | 2007.47 |
-| Exit Price | 1987.3 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (45.68 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (45.68 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 3.6636 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 85
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:09:46.190Z |
-| Market | SPOT_USDT |
-| Symbol | AVAXTRY |
-| Strategy | momentum_scalp |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 78.46 |
-| Confidence | 76.71 |
-| Ranking Score | 72.43 |
-| Risk Score | 65.9 |
-| Position Size | 278.49 |
-| Entry Price | 1838.92 |
-| Stop Loss | 1812.6 |
-| Take Profit | 1861.49 |
-| Exit Price | 1838.92 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0.8828 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 86
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:11:16.192Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | breakout_follow |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 86.09 |
-| Confidence | 81.09 |
-| Ranking Score | 52.98 |
-| Risk Score | 70.25 |
-| Position Size | 698.8 |
-| Entry Price | 2422.15 |
-| Stop Loss | 2383.96 |
-| Take Profit | 2492.28 |
-| Exit Price | 2422.15 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (52.98 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | PASS |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (52.98 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
-
----
-
-## Trade 87
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:12:46.195Z |
-| Market | SPOT_USDT |
-| Symbol | XRPTRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 76.2 |
-| Confidence | 53.86 |
-| Ranking Score | 75.11 |
-| Risk Score | 41.53 |
-| Position Size | 362.22 |
-| Entry Price | 1814.8 |
-| Stop Loss | 1783.24 |
-| Take Profit | 1870.46 |
-| Exit Price | 1814.8 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 2.5863 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** AI consensus disagreement
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 88
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:14:16.198Z |
-| Market | SPOT_TRY |
-| Symbol | SOLTRY |
-| Strategy | breakout_follow |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 55.31 |
-| Confidence | 71.62 |
-| Ranking Score | 65.17 |
-| Risk Score | 78.1 |
-| Position Size | 591.83 |
-| Entry Price | 2561.11 |
-| Stop Loss | 2520.93 |
-| Take Profit | 2625.88 |
-| Exit Price | 2561.11 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 6.2616 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 89
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:15:46.202Z |
-| Market | SPOT_USDT |
-| Symbol | XRPTRY |
-| Strategy | mean_reversion |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 52.26 |
-| Confidence | 77.3 |
-| Ranking Score | 50.01 |
-| Risk Score | 58.89 |
-| Position Size | 565.65 |
-| Entry Price | 2853.76 |
-| Stop Loss | 2807.44 |
-| Take Profit | 2891.08 |
-| Exit Price | 2853.76 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (50.01 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (50.01 < 55). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 7.0084 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 90
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:17:16.204Z |
-| Market | SPOT_TRY |
-| Symbol | BTCTRY |
-| Strategy | breakout_follow |
-| Market Regime | ranging |
-| Signal | BUY |
-| Signal Score | 77.54 |
-| Confidence | 73.7 |
-| Ranking Score | 81.22 |
-| Risk Score | 73.12 |
-| Position Size | 438.61 |
-| Entry Price | 2902404.19 |
-| Stop Loss | 2852844.97 |
-| Take Profit | 2943816.76 |
-| Exit Price | 2902404.19 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 2.6492 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-### Batch Summary — Trades 81–90
-
-- Completed Trades: 90
-- Accepted: 13
-- Rejected: 77
-- Batch Win Rate: 0%
-- Profit Factor: 11.318
-- Expectancy: 7.7288
-- Sharpe Ratio: 0.883
-- Average Confidence: 71.56
-- Average Holding Time: 1928s
-- Average Risk Score: 49.02
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: N/A in N/A
-- Most Common Failure Pattern: AI consensus disagreement
-- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
-
----
-
-## Trade 91
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:18:46.208Z |
-| Market | SPOT_USDT |
-| Symbol | SOLTRY |
-| Strategy | breakout_follow |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 50.97 |
-| Confidence | 71.72 |
-| Ranking Score | 71.16 |
-| Risk Score | 43.3 |
-| Position Size | 472.8 |
-| Entry Price | 424.41 |
-| Stop Loss | 418.91 |
-| Take Profit | 432.16 |
-| Exit Price | 424.41 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Risk per trade exceeds threshold |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 6.0518 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Risk per trade exceeds threshold
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 92
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:20:16.210Z |
-| Market | SPOT_USDT |
-| Symbol | ADATRY |
-| Strategy | trend_pullback |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 47.58 |
-| Confidence | 71.01 |
-| Ranking Score | 83.81 |
-| Risk Score | 23.24 |
-| Position Size | 245.51 |
-| Entry Price | 607.11 |
-| Stop Loss | 600.05 |
-| Take Profit | 625.09 |
-| Exit Price | 607.11 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Abnormal volatility breaker |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Abnormal volatility breaker |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Abnormal volatility breaker. Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 0.5573 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Abnormal volatility breaker
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 93
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:21:46.212Z |
-| Market | SPOT_TRY |
-| Symbol | BTCTRY |
-| Strategy | trend_pullback |
-| Market Regime | low_liquidity |
-| Signal | SELL |
-| Signal Score | 62.45 |
-| Confidence | 66 |
-| Ranking Score | 87.88 |
-| Risk Score | 29.1 |
-| Position Size | 522.01 |
-| Entry Price | 2908659.55 |
-| Stop Loss | 2860130.84 |
-| Take Profit | 2985855.88 |
-| Exit Price | 2908659.55 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1162066 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1162066 < 5000000). Consecutive-loss telemetry (1) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 4.0299 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Liquidity gate
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 94
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:23:16.215Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
-| Strategy | trend_pullback |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 59.35 |
-| Confidence | 91.3 |
-| Ranking Score | 59 |
-| Risk Score | 68.34 |
-| Position Size | 599.95 |
-| Entry Price | 2895.08 |
-| Stop Loss | 2859.13 |
-| Take Profit | 2978.65 |
-| Exit Price | 2971.33 |
-| Exit Reason | TAKE_PROFIT |
-| PnL % | 2.634 |
-| PnL USDT | 15.8027 |
-| Trade Duration | 372s |
-| Accepted / Rejected | Accepted |
-
-**Engineering Analysis:** Executed trend_pullback in trending regime with confidence 91.3% vs threshold 45%.
-
-**Estimated Missed Profit:** 0 USDT
-
-**Would acceptance have been profitable?** No
-
-**Root Cause:** Signal quality aligned with regime
-
-**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
-
----
-
-## Trade 95
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:24:46.218Z |
-| Market | SPOT_USDT |
-| Symbol | ETHTRY |
-| Strategy | momentum_scalp |
-| Market Regime | trending |
-| Signal | BUY |
-| Signal Score | 64.58 |
-| Confidence | 90.44 |
-| Ranking Score | 49.67 |
-| Risk Score | 53.29 |
-| Position Size | 507.85 |
-| Entry Price | 2002.19 |
-| Stop Loss | 1969.62 |
-| Take Profit | 2044.63 |
-| Exit Price | 2002.19 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (49.67 < 55) |
-| Confidence Threshold | 45 |
-| Ranking Result | FAIL |
-| Risk Rule | Risk per trade exceeds threshold |
-| Liquidity Result | PASS |
-| AI Consensus Result | BUY |
-| Exchange Restriction | NONE |
-
-**Engineering Analysis:** Rejected due to: Ranking below threshold (49.67 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
-
-**Estimated Missed Profit:** 6.3227 USDT
-
-**Would acceptance have been profitable?** Yes
-
-**Root Cause:** Ranking score gate
-
-**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
-
----
-
-## Trade 96
-
-| Field | Value |
-| --- | --- |
-| Timestamp | 2026-08-01T23:26:16.220Z |
-| Market | SPOT_USDT |
-| Symbol | LINKTRY |
-| Strategy | mean_reversion |
-| Market Regime | volatile |
-| Signal | BUY |
-| Signal Score | 47.17 |
-| Confidence | 75.03 |
-| Ranking Score | 78.62 |
-| Risk Score | 60.44 |
-| Position Size | 187.61 |
-| Entry Price | 2450.79 |
-| Stop Loss | 2431.62 |
-| Take Profit | 2482.64 |
-| Exit Price | 2450.79 |
-| Exit Reason | N/A |
-| PnL % | 0 |
-| PnL USDT | 0 |
-| Trade Duration | 0s |
-| Accepted / Rejected | Rejected |
-| Rejection Reason | AI consensus NO_TRADE |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Risk per trade exceeds threshold |
 | Liquidity Result | PASS |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
@@ -4297,41 +3456,41 @@
 
 ---
 
-## Trade 97
+## Trade 77
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T23:27:46.223Z |
-| Market | SPOT_TRY |
-| Symbol | DOGETRY |
+| Timestamp | 2026-08-04T21:58:57.498Z |
+| Market | SPOT_USDT |
+| Symbol | AVAXTRY |
 | Strategy | breakout_follow |
-| Market Regime | low_liquidity |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 84.95 |
-| Confidence | 93.58 |
-| Ranking Score | 45.14 |
-| Risk Score | 46.45 |
-| Position Size | 675.95 |
-| Entry Price | 2940.49 |
-| Stop Loss | 2903.04 |
-| Take Profit | 2995.19 |
-| Exit Price | 2940.49 |
+| Signal Score | 91.96 |
+| Confidence | 65.63 |
+| Ranking Score | 55 |
+| Risk Score | 72.6 |
+| Position Size | 742.8 |
+| Entry Price | 3776.67 |
+| Stop Loss | 3726.3 |
+| Take Profit | 3839.77 |
+| Exit Price | 3776.67 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Ranking below threshold (45.14 < 55) |
-| Confidence Threshold | 45 |
+| Rejection Reason | Ranking below threshold (55 < 68) |
+| Confidence Threshold | 49 |
 | Ranking Result | FAIL |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
 | AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Ranking below threshold (45.14 < 55). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (55 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 3.1364 USDT
+**Estimated Missed Profit:** 4.7985 USDT
 
 **Would acceptance have been profitable?** Yes
 
@@ -4341,76 +3500,76 @@
 
 ---
 
-## Trade 98
+## Trade 78
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T23:29:16.225Z |
+| Timestamp | 2026-08-04T22:00:27.502Z |
 | Market | SPOT_USDT |
-| Symbol | SOLTRY |
-| Strategy | mean_reversion |
-| Market Regime | low_liquidity |
+| Symbol | AVAXTRY |
+| Strategy | momentum_scalp |
+| Market Regime | volatile |
 | Signal | BUY |
-| Signal Score | 83.28 |
-| Confidence | 92.76 |
-| Ranking Score | 69.5 |
-| Risk Score | 53.99 |
-| Position Size | 608.12 |
-| Entry Price | 1268.77 |
-| Stop Loss | 1257.96 |
-| Take Profit | 1302.57 |
-| Exit Price | 1268.77 |
+| Signal Score | 91.47 |
+| Confidence | 76.12 |
+| Ranking Score | 40.9 |
+| Risk Score | 45.41 |
+| Position Size | 521.14 |
+| Entry Price | 366.01 |
+| Stop Loss | 357.23 |
+| Take Profit | 369.05 |
+| Exit Price | 366.01 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (624245 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
-| Liquidity Result | FAIL |
-| AI Consensus Result | NO_TRADE |
+| Rejection Reason | Ranking below threshold (40.9 < 48) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Expected profit below minimum |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (624245 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (40.9 < 48). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 2.5723 USDT
+**Estimated Missed Profit:** 1.0266 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
 ---
 
-## Trade 99
+## Trade 79
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T23:30:46.227Z |
-| Market | SPOT_USDT |
-| Symbol | XRPTRY |
+| Timestamp | 2026-08-04T22:01:57.505Z |
+| Market | SPOT_TRY |
+| Symbol | LINKTRY |
 | Strategy | mean_reversion |
-| Market Regime | trending |
+| Market Regime | ranging |
 | Signal | BUY |
-| Signal Score | 91.82 |
-| Confidence | 81.2 |
-| Ranking Score | 86.16 |
-| Risk Score | 68.68 |
-| Position Size | 362.58 |
-| Entry Price | 3318.86 |
-| Stop Loss | 3261.1 |
-| Take Profit | 3409.77 |
-| Exit Price | 3405 |
+| Signal Score | 91.03 |
+| Confidence | 77.79 |
+| Ranking Score | 67.57 |
+| Risk Score | 23.79 |
+| Position Size | 494.2053 |
+| Entry Price | 1356.68 |
+| Stop Loss | 1337.54 |
+| Take Profit | 1368.82 |
+| Exit Price | 1368.48 |
 | Exit Reason | TAKE_PROFIT |
-| PnL % | 2.595 |
-| PnL USDT | 9.409 |
-| Trade Duration | 852s |
+| PnL % | 0.87 |
+| PnL USDT | 3.494 |
+| Trade Duration | 4513s |
 | Accepted / Rejected | Accepted |
 
-**Engineering Analysis:** Executed mean_reversion in trending regime with confidence 81.2% vs threshold 45%.
+**Engineering Analysis:** Executed mean_reversion in ranging regime with confidence 77.79% vs threshold 45%.
 
 **Estimated Missed Profit:** 0 USDT
 
@@ -4422,45 +3581,949 @@
 
 ---
 
-## Trade 100
+## Trade 80
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-01T23:32:16.231Z |
+| Timestamp | 2026-08-04T22:03:27.509Z |
 | Market | SPOT_USDT |
-| Symbol | XRPTRY |
-| Strategy | momentum_scalp |
+| Symbol | DOGETRY |
+| Strategy | trend_pullback |
 | Market Regime | low_liquidity |
 | Signal | BUY |
-| Signal Score | 77.23 |
-| Confidence | 78.68 |
-| Ranking Score | 59.99 |
-| Risk Score | 79.44 |
-| Position Size | 958.28 |
-| Entry Price | 3585.36 |
-| Stop Loss | 3540.7 |
-| Take Profit | 3614.78 |
-| Exit Price | 3585.36 |
+| Signal Score | 63.96 |
+| Confidence | 52.18 |
+| Ranking Score | 43.27 |
+| Risk Score | 43.99 |
+| Position Size | 212.74 |
+| Entry Price | 1326.05 |
+| Stop Loss | 1310.77 |
+| Take Profit | 1366.23 |
+| Exit Price | 1326.05 |
 | Exit Reason | N/A |
 | PnL % | 0 |
 | PnL USDT | 0 |
 | Trade Duration | 0s |
 | Accepted / Rejected | Rejected |
-| Rejection Reason | Liquidity below threshold (1482934 < 5000000) |
-| Confidence Threshold | 45 |
-| Ranking Result | PASS |
-| Risk Rule | Spread above threshold |
+| Rejection Reason | Ranking below threshold (43.27 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
+| Risk Rule | Confidence below minimum threshold |
 | Liquidity Result | FAIL |
 | AI Consensus Result | NO_TRADE |
 | Exchange Restriction | NONE |
 
-**Engineering Analysis:** Rejected due to: Liquidity below threshold (1482934 < 5000000). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+**Engineering Analysis:** Rejected due to: Ranking below threshold (43.27 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
 
-**Estimated Missed Profit:** 10.9627 USDT
+**Estimated Missed Profit:** 1.5275 USDT
 
 **Would acceptance have been profitable?** Yes
 
-**Root Cause:** Liquidity gate
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+### Batch Summary — Trades 71–80
+
+- Completed Trades: 80
+- Accepted: 4
+- Rejected: 76
+- Batch Win Rate: 100%
+- Profit Factor: 1.382
+- Expectancy: 0.7613
+- Sharpe Ratio: 0.143
+- Average Confidence: 71.85
+- Average Holding Time: 2085s
+- Average Risk Score: 48.23
+- Top Rejection Reason: AI consensus NO_TRADE
+- Most Successful Pattern: mean_reversion in ranging
+- Most Common Failure Pattern: Ranking score gate
+- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
+
+---
+
+## Trade 81
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:04:57.512Z |
+| Market | SPOT_TRY |
+| Symbol | DOGETRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 84.41 |
+| Confidence | 85.4 |
+| Ranking Score | 91.73 |
+| Risk Score | 23.47 |
+| Position Size | 866.023776 |
+| Entry Price | 2379.02 |
+| Stop Loss | 2363.79 |
+| Take Profit | 2436.05 |
+| Exit Price | 2421.62 |
+| Exit Reason | TAKE_PROFIT |
+| PnL % | 1.791 |
+| PnL USDT | 13.8824 |
+| Trade Duration | 775s |
+| Accepted / Rejected | Accepted |
+
+**Engineering Analysis:** Executed mean_reversion in ranging regime with confidence 85.4% vs threshold 45%.
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Signal quality aligned with regime
+
+**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+
+---
+
+## Trade 82
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:06:27.517Z |
+| Market | SPOT_USDT |
+| Symbol | LINKTRY |
+| Strategy | trend_pullback |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 72.98 |
+| Confidence | 88.81 |
+| Ranking Score | 56.73 |
+| Risk Score | 31.61 |
+| Position Size | 237.27 |
+| Entry Price | 471.98 |
+| Stop Loss | 466.7 |
+| Take Profit | 483.79 |
+| Exit Price | 471.98 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.9137 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 83
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:07:57.520Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | mean_reversion |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 53.51 |
+| Confidence | 81.69 |
+| Ranking Score | 48.51 |
+| Risk Score | 28.56 |
+| Position Size | 332.06 |
+| Entry Price | 3192.99 |
+| Stop Loss | 3148.86 |
+| Take Profit | 3232.78 |
+| Exit Price | 3192.99 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Risk per trade exceeds threshold |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Risk per trade exceeds threshold. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Risk per trade exceeds threshold
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 84
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:09:27.523Z |
+| Market | SPOT_TRY |
+| Symbol | ETHTRY |
+| Strategy | breakout_follow |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 59.68 |
+| Confidence | 66.99 |
+| Ranking Score | 73.54 |
+| Risk Score | 56.37 |
+| Position Size | 318.47 |
+| Entry Price | 927.05 |
+| Stop Loss | 914.14 |
+| Take Profit | 937.9 |
+| Exit Price | 927.05 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (73.54 < 88) |
+| Confidence Threshold | 51 |
+| Ranking Result | FAIL |
+| Risk Rule | Liquidity below threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (73.54 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 4.1751 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 85
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:10:57.526Z |
+| Market | SPOT_TRY |
+| Symbol | LINKTRY |
+| Strategy | trend_pullback |
+| Market Regime | ranging |
+| Signal | SELL |
+| Signal Score | 67.23 |
+| Confidence | 56.82 |
+| Ranking Score | 94.3 |
+| Risk Score | 41.64 |
+| Position Size | 577.05 |
+| Entry Price | 3557.5 |
+| Stop Loss | 3517.62 |
+| Take Profit | 3598.39 |
+| Exit Price | 3557.5 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 86
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:12:27.529Z |
+| Market | SPOT_USDT |
+| Symbol | LINKTRY |
+| Strategy | breakout_follow |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 52.56 |
+| Confidence | 93.17 |
+| Ranking Score | 94.79 |
+| Risk Score | 62.86 |
+| Position Size | 759.48 |
+| Entry Price | 2729.25 |
+| Stop Loss | 2683.86 |
+| Take Profit | 2786.46 |
+| Exit Price | 2729.25 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 4.2455 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 87
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:13:57.532Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | momentum_scalp |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 77.28 |
+| Confidence | 57.09 |
+| Ranking Score | 72.66 |
+| Risk Score | 65.23 |
+| Position Size | 705.67 |
+| Entry Price | 990.8 |
+| Stop Loss | 974.51 |
+| Take Profit | 1020.87 |
+| Exit Price | 990.8 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (72.66 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (72.66 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.6724 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 88
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:15:27.535Z |
+| Market | SPOT_USDT |
+| Symbol | DOGETRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 57.48 |
+| Confidence | 58.19 |
+| Ranking Score | 76.12 |
+| Risk Score | 53.17 |
+| Position Size | 384.16 |
+| Entry Price | 2889.39 |
+| Stop Loss | 2858.58 |
+| Take Profit | 2956.33 |
+| Exit Price | 2889.39 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | AI consensus NO_TRADE |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: AI consensus NO_TRADE. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.7326 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** AI consensus disagreement
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 89
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:16:57.539Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | breakout_follow |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 70.99 |
+| Confidence | 63.6 |
+| Ranking Score | 85.7 |
+| Risk Score | 56.4 |
+| Position Size | 257.76 |
+| Entry Price | 2789.24 |
+| Stop Loss | 2722.3 |
+| Take Profit | 2838.53 |
+| Exit Price | 2789.24 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.5596 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 90
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:18:27.542Z |
+| Market | SPOT_USDT |
+| Symbol | AVAXTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 69.45 |
+| Confidence | 53.67 |
+| Ranking Score | 74.59 |
+| Risk Score | 74.11 |
+| Position Size | 485.38 |
+| Entry Price | 2042.26 |
+| Stop Loss | 2003.02 |
+| Take Profit | 2088.65 |
+| Exit Price | 2042.26 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (74.59 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (74.59 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 5.0188 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+### Batch Summary — Trades 81–90
+
+- Completed Trades: 90
+- Accepted: 5
+- Rejected: 85
+- Batch Win Rate: 100%
+- Profit Factor: 3.122
+- Expectancy: 3.3855
+- Sharpe Ratio: 0.478
+- Average Confidence: 71.7
+- Average Holding Time: 1823s
+- Average Risk Score: 48.35
+- Top Rejection Reason: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: mean_reversion in ranging
+- Most Common Failure Pattern: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+- Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
+
+---
+
+## Trade 91
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:19:57.546Z |
+| Market | SPOT_USDT |
+| Symbol | LINKTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 61.98 |
+| Confidence | 64.42 |
+| Ranking Score | 68.28 |
+| Risk Score | 51.83 |
+| Position Size | 254.94 |
+| Entry Price | 1977.46 |
+| Stop Loss | 1948.81 |
+| Take Profit | 2021.56 |
+| Exit Price | 1977.46 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (68.28 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | NO_TRADE |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (68.28 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 1.3563 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 92
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:21:27.549Z |
+| Market | SPOT_USDT |
+| Symbol | BTCTRY |
+| Strategy | breakout_follow |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 63.99 |
+| Confidence | 87.78 |
+| Ranking Score | 63.12 |
+| Risk Score | 44.05 |
+| Position Size | 629.62 |
+| Entry Price | 2882591.67 |
+| Stop Loss | 2840505.83 |
+| Take Profit | 2969579.31 |
+| Exit Price | 2882591.67 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set |
+| Confidence Threshold | 45 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 93
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:22:57.553Z |
+| Market | SPOT_TRY |
+| Symbol | XRPTRY |
+| Strategy | momentum_scalp |
+| Market Regime | trending |
+| Signal | BUY |
+| Signal Score | 50.62 |
+| Confidence | 75.56 |
+| Ranking Score | 73.63 |
+| Risk Score | 45.16 |
+| Position Size | 849.9994 |
+| Entry Price | 3136.69 |
+| Stop Loss | 3114.45 |
+| Take Profit | 3222.99 |
+| Exit Price | 3214.04 |
+| Exit Reason | TAKE_PROFIT |
+| PnL % | 2.466 |
+| PnL USDT | 19.108 |
+| Trade Duration | 2918s |
+| Accepted / Rejected | Accepted |
+
+**Engineering Analysis:** Executed momentum_scalp in trending regime with confidence 75.56% vs threshold 45%.
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Signal quality aligned with regime
+
+**Lessons Learned:** Maintain current gate ordering; pattern validated under simulated regime.
+
+---
+
+## Trade 94
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:24:27.557Z |
+| Market | SPOT_TRY |
+| Symbol | XRPTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
+| Signal | SELL |
+| Signal Score | 63.86 |
+| Confidence | 88.54 |
+| Ranking Score | 86.07 |
+| Risk Score | 26.11 |
+| Position Size | 354.34 |
+| Entry Price | 3912.99 |
+| Stop Loss | 3842.31 |
+| Take Profit | 3957.89 |
+| Exit Price | 3912.99 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 95
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:25:57.560Z |
+| Market | SPOT_USDT |
+| Symbol | ADATRY |
+| Strategy | breakout_follow |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 60.61 |
+| Confidence | 74.42 |
+| Ranking Score | 63.41 |
+| Risk Score | 51.17 |
+| Position Size | 169.13 |
+| Entry Price | 1080.55 |
+| Stop Loss | 1064.27 |
+| Take Profit | 1092.12 |
+| Exit Price | 1080.55 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (63.41 < 88) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (63.41 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0.46 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 96
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:27:27.564Z |
+| Market | SPOT_USDT |
+| Symbol | SOLTRY |
+| Strategy | breakout_follow |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 66.05 |
+| Confidence | 83.79 |
+| Ranking Score | 55.51 |
+| Risk Score | 72.28 |
+| Position Size | 684.06 |
+| Entry Price | 3389.53 |
+| Stop Loss | 3335.47 |
+| Take Profit | 3446.7 |
+| Exit Price | 3389.53 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (55.51 < 68) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (55.51 < 68). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 4.6037 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 97
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:28:57.567Z |
+| Market | SPOT_TRY |
+| Symbol | BTCTRY |
+| Strategy | trend_pullback |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 47.21 |
+| Confidence | 93.88 |
+| Ranking Score | 56.58 |
+| Risk Score | 38.43 |
+| Position Size | 986.7 |
+| Entry Price | 2854678.27 |
+| Stop Loss | 2786165.99 |
+| Take Profit | 2924027.46 |
+| Exit Price | 2854678.27 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | Abnormal volatility breaker |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 98
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:30:27.570Z |
+| Market | SPOT_USDT |
+| Symbol | LINKTRY |
+| Strategy | breakout_follow |
+| Market Regime | volatile |
+| Signal | BUY |
+| Signal Score | 75.94 |
+| Confidence | 74.38 |
+| Ranking Score | 53.2 |
+| Risk Score | 64.2 |
+| Position Size | 916.28 |
+| Entry Price | 2002.42 |
+| Stop Loss | 1955.21 |
+| Take Profit | 2042.25 |
+| Exit Price | 2002.42 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (53.2 < 82) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Risk per trade exceeds threshold |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (53.2 < 82). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 0 USDT
+
+**Would acceptance have been profitable?** No
+
+**Root Cause:** Ranking score gate
+
+**Lessons Learned:** Rejection prevented low-quality entry; gate behavior consistent with policy.
+
+---
+
+## Trade 99
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:31:57.574Z |
+| Market | SPOT_TRY |
+| Symbol | AVAXTRY |
+| Strategy | mean_reversion |
+| Market Regime | ranging |
+| Signal | BUY |
+| Signal Score | 71.95 |
+| Confidence | 78.06 |
+| Ranking Score | 52.72 |
+| Risk Score | 27.96 |
+| Position Size | 188.21 |
+| Entry Price | 2948.15 |
+| Stop Loss | 2904.81 |
+| Take Profit | 3003.47 |
+| Exit Price | 2948.15 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set |
+| Confidence Threshold | 49 |
+| Ranking Result | PASS |
+| Risk Rule | PASS |
+| Liquidity Result | PASS |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set. Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.2152 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Strategy mean_reversion (RANGE_MEAN_REVERSION) misaligned with regime allowed set
+
+**Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
+
+---
+
+## Trade 100
+
+| Field | Value |
+| --- | --- |
+| Timestamp | 2026-08-04T22:33:27.577Z |
+| Market | SPOT_USDT |
+| Symbol | LINKTRY |
+| Strategy | mean_reversion |
+| Market Regime | low_liquidity |
+| Signal | BUY |
+| Signal Score | 57.5 |
+| Confidence | 67.07 |
+| Ranking Score | 78.11 |
+| Risk Score | 53.22 |
+| Position Size | 632.48 |
+| Entry Price | 622.79 |
+| Stop Loss | 613.17 |
+| Take Profit | 630.11 |
+| Exit Price | 622.79 |
+| Exit Reason | N/A |
+| PnL % | 0 |
+| PnL USDT | 0 |
+| Trade Duration | 0s |
+| Accepted / Rejected | Rejected |
+| Rejection Reason | Ranking below threshold (78.11 < 88) |
+| Confidence Threshold | 49 |
+| Ranking Result | FAIL |
+| Risk Rule | Spread above threshold |
+| Liquidity Result | FAIL |
+| AI Consensus Result | BUY |
+| Exchange Restriction | NONE |
+
+**Engineering Analysis:** Rejected due to: Ranking below threshold (78.11 < 88). Consecutive-loss telemetry (0) did not block (policy: consecutiveLossBlocksEntry=false).
+
+**Estimated Missed Profit:** 2.5932 USDT
+
+**Would acceptance have been profitable?** Yes
+
+**Root Cause:** Ranking score gate
 
 **Lessons Learned:** Potential false negative — validate gate threshold against missed profit estimate.
 
@@ -4469,18 +4532,18 @@
 ### Batch Summary — Trades 91–100
 
 - Completed Trades: 100
-- Accepted: 15
-- Rejected: 85
+- Accepted: 6
+- Rejected: 94
 - Batch Win Rate: 100%
-- Profit Factor: 13.907
-- Expectancy: 8.3791
-- Sharpe Ratio: 0.998
-- Average Confidence: 72.52
-- Average Holding Time: 1753s
-- Average Risk Score: 49.38
-- Top Rejection Reason: AI consensus NO_TRADE
-- Most Successful Pattern: trend_pullback in trending
-- Most Common Failure Pattern: Risk per trade exceeds threshold
+- Profit Factor: 5.517
+- Expectancy: 6.0059
+- Sharpe Ratio: 0.688
+- Average Confidence: 72.41
+- Average Holding Time: 2006s
+- Average Risk Score: 48.26
+- Top Rejection Reason: Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set
+- Most Successful Pattern: momentum_scalp in trending
+- Most Common Failure Pattern: Ranking score gate
 - Recommended Engineering Adjustments: Review confidence cap and ranking threshold for false negatives.
 
 ---
@@ -4489,50 +4552,50 @@
 
 ### Overall Statistics
 - Completed Trades: 100
-- Accepted: 15 | Rejected: 85
-- Win Rate: 66.67%
-- Profit Factor: 13.907
-- Expectancy: 8.3791 USDT
-- Sharpe Ratio: 0.998
-- Total PnL: 125.6866 USDT
-- Acceptance Rate: 15%
-- Cumulative Missed Profit (rejected): 231.3646 USDT
+- Accepted: 6 | Rejected: 94
+- Win Rate: 83.33%
+- Profit Factor: 5.517
+- Expectancy: 6.0059 USDT
+- Sharpe Ratio: 0.688
+- Total PnL: 36.0356 USDT
+- Acceptance Rate: 6%
+- Cumulative Missed Profit (rejected): 259.2234 USDT
 
 ### Best Strategies
-1. trend_pullback — 7 trades, 54.659 USDT
-2. momentum_scalp — 5 trades, 45.2732 USDT
-3. mean_reversion — 2 trades, 27.8495 USDT
+1. mean_reversion — 4 trades, 24.905 USDT
+2. momentum_scalp — 1 trades, 19.108 USDT
+3. trend_pullback — 1 trades, -7.9774 USDT
 
 ### Worst Strategies
-1. breakout_follow — 1 trades, -2.0951 USDT
-2. mean_reversion — 2 trades, 27.8495 USDT
-3. momentum_scalp — 5 trades, 45.2732 USDT
+1. trend_pullback — 1 trades, -7.9774 USDT
+2. momentum_scalp — 1 trades, 19.108 USDT
+3. mean_reversion — 4 trades, 24.905 USDT
 
 ### False Positives
-- Count: 5
-- Primary pattern: accepted trades with negative PnL (TIMEOUT)
+- Count: 1
+- Primary pattern: accepted trades with negative PnL (STOP_LOSS)
 
 ### False Negatives
-- Count: 54
-- Estimated missed profit: 231.3646 USDT
+- Count: 66
+- Estimated missed profit: 259.2234 USDT
 
 ### Risk Engine Analysis
 - Policy: consecutiveLossBlocksEntry=false
-- Top risk rejections: Liquidity below threshold (256320 < 5000000); Liquidity below threshold (374582 < 5000000)
+- Top risk rejections: Liquidity below threshold (374582 < 5000000)
 
 ### Confidence Threshold Analysis
 - Effective bounded threshold: 45
-- Average candidate confidence: 72.52
+- Average candidate confidence: 72.41
 
 ### Ranking Analysis
 - Ranking threshold used: 55
-- Rejections citing ranking: 26
+- Rejections citing ranking: 50
 
 ### Liquidity Analysis
 - Liquidity rejections: 21
 
 ### AI Consensus Analysis
-- NO_TRADE rejections: 48
+- NO_TRADE rejections: 33
 
 ### Engineering Recommendations
 1. Keep consecutive-loss telemetry-only policy; simulation shows no streak hard-blocks.

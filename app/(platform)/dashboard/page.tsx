@@ -13,6 +13,7 @@ import { QuickTradeActionPanel } from "@/src/features/dashboard/components/quick
 import type { SellTargetMetric } from "@/src/features/dashboard/components/quick-trade-action-panel";
 import { OrderBookPanel } from "@/src/features/dashboard/components/order-book-panel";
 import { SystemStatusPanel } from "@/src/features/dashboard/components/system-status-panel";
+import { SchedulerHealthPanel } from "@/src/features/dashboard/components/scheduler-health-panel";
 import { NotificationsPanel } from "@/src/features/dashboard/components/notifications-panel";
 import { DebugObservabilityPanel } from "@/src/features/dashboard/components/debug-observability-panel";
 import { TradeFlowPanel } from "@/src/features/dashboard/components/trade-flow-panel";
@@ -288,7 +289,10 @@ export default function DashboardPage() {
   const { items: toasts, push: pushToast } = useToast();
 
   const scannerState = useAsyncState(async () => {
-    const remote = await apiGet<ScannerRow[]>("/api/market/scan?withAi=0").catch(() => null);
+    const remote = await Promise.race([
+      apiGet<ScannerRow[]>("/api/market/scan?withAi=0"),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 30_000)),
+    ]).catch(() => null);
     return remote ?? [];
   }, [] as ScannerRow[]);
   const { reload: reloadScanner, data: scannerData, loading: scannerLoading, error: scannerError } = scannerState;
@@ -1416,6 +1420,7 @@ export default function DashboardPage() {
           </Panel>
           <OrderBookPanel rows={orderBook} />
           <SystemStatusPanel livePollingEnabled={liveMonitoringEnabled} />
+          <SchedulerHealthPanel livePollingEnabled={liveMonitoringEnabled} />
           <details className="group rounded-xl border border-outline-variant/20 bg-surface/60 p-3">
             <summary className="cursor-pointer list-none text-sm font-bold text-on-surface">
               Debug / Gozlemlenebilirlik

@@ -1,5 +1,6 @@
 import { env } from "@/lib/config";
 import { buildMarketContext } from "@/src/server/scanner/market-context-builder";
+import { resolveRegimePipelinePolicy } from "@/src/server/scanner/regime-intelligence.service";
 import {
   getApiFailureState,
   getConsecutiveLossCount,
@@ -11,6 +12,8 @@ import {
   setApiFailureState,
   setPausedState,
 } from "@/src/server/repositories/risk.repository";
+import { bridgeRiskSizing } from "@/src/server/forensics/forensic-bridge.service";
+import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
 
 /** Stable Risk Gate policy contract for API/status consumers (Task 001-4). */
 export const RISK_GATE_POLICY = {
@@ -18,6 +21,10 @@ export const RISK_GATE_POLICY = {
   consecutiveLossTelemetryOnly: true,
   apiBreakerUsesCooldownWindow: true,
   preTradeEvaluationRequired: true,
+  /** Small risk-per-trade relief for high-confidence, low-risk-score setups only. */
+  maxRiskPerTradeBumpPercent: 0.15,
+  minConfidenceForRiskPerTradeRelief: 72,
+  maxAiRiskScoreForRiskPerTradeRelief: 45,
 } as const;
 
 type EffectiveRiskConfig = {
@@ -71,6 +78,10 @@ export function evaluateRiskRules(input: {
     volatilityPercent: number;
     riskPerTradePercent: number;
     stopLossConfigured?: boolean;
+    aiRiskScore?: number;
+    marketRegime?: string;
+    volatilityPercent?: number;
+    liquidity24h?: number;
   };
   state: {
     paused: boolean;
@@ -87,16 +98,32 @@ export function evaluateRiskRules(input: {
 }) {
   const reasons: string[] = [];
   const { config, metrics, state } = input;
+  const regimePolicy = resolveRegimePipelinePolicy({
+    marketRegime: metrics.marketRegime ?? "RANGE_SIDEWAYS",
+    volatilityPercent: metrics.volatilityPercent,
+    liquidity24h: metrics.liquidity24h,
+    minLiquidityThreshold: config.minLiquidityThreshold,
+  });
+  const effectiveMinConfidence = config.minConfidenceThreshold + regimePolicy.confidenceFloorAdjust;
+  const effectiveMinExpectedProfit = config.minExpectedProfitThreshold * regimePolicy.expectedValueFloorMultiplier;
+  const effectiveVolatilityBreaker =
+    config.abnormalVolatilityThreshold * regimePolicy.volatilityBreakerMultiplier;
 
   if (state.paused) reasons.push(`System paused: ${state.pauseReason ?? "Risk pause active"}`);
-  if (metrics.confidencePercent < config.minConfidenceThreshold) reasons.push("Confidence below minimum threshold");
+  if (metrics.confidencePercent < effectiveMinConfidence) reasons.push("Confidence below minimum threshold");
   if (metrics.spreadPercent > config.maxSpreadThreshold) reasons.push("Spread above threshold");
   if (metrics.liquidity24h < config.minLiquidityThreshold) reasons.push("Liquidity below threshold");
-  if (metrics.expectedProfitPercent < config.minExpectedProfitThreshold) reasons.push("Expected profit below minimum");
+  if (metrics.expectedProfitPercent < effectiveMinExpectedProfit) reasons.push("Expected profit below minimum");
   if (metrics.slippagePercent > config.maxSlippageThreshold) reasons.push("Estimated slippage above threshold");
-  if (metrics.riskPerTradePercent > config.maxRiskPerTrade) reasons.push("Risk per trade exceeds threshold");
+  const effectiveMaxRiskPerTrade = boundMaxRiskPerTrade(config.maxRiskPerTrade, {
+    confidencePercent: metrics.confidencePercent,
+    riskPerTradePercent: metrics.riskPerTradePercent,
+    aiRiskScore: metrics.aiRiskScore,
+  });
+  if (metrics.riskPerTradePercent > effectiveMaxRiskPerTrade) reasons.push("Risk per trade exceeds threshold");
   if (config.stopLossRequired && !metrics.stopLossConfigured) reasons.push("Stop-loss is required");
-  if (metrics.volatilityPercent > config.abnormalVolatilityThreshold) reasons.push("Abnormal volatility breaker");
+  if (metrics.volatilityPercent > effectiveVolatilityBreaker) reasons.push("Abnormal volatility breaker");
+  if (!regimePolicy.openTradeAllowed) reasons.push(`Market regime blocks entry (${regimePolicy.canonicalRegime})`);
   if (state.openPositionCount >= config.maxOpenPositions) reasons.push(`Max open positions reached (${config.maxOpenPositions})`);
   if (
     state.dailyLossPercent > 0 &&
@@ -133,6 +160,22 @@ export function boundMinConfidenceThreshold(configuredMinConfidence: number): nu
   }
   const liveConfidenceCap = Math.min(env.EXECUTION_FAST_MIN_CONFIDENCE, 45);
   return Math.max(40, Math.min(configuredMinConfidence, liveConfidenceCap));
+}
+
+/** Confidence-calibrated risk-per-trade ceiling — elite setups only, not a global relax. */
+export function boundMaxRiskPerTrade(
+  configuredMax: number,
+  metrics: { confidencePercent: number; riskPerTradePercent: number; aiRiskScore?: number },
+): number {
+  const aiRisk = metrics.aiRiskScore ?? 100;
+  if (
+    metrics.confidencePercent >= RISK_GATE_POLICY.minConfidenceForRiskPerTradeRelief &&
+    aiRisk <= RISK_GATE_POLICY.maxAiRiskScoreForRiskPerTradeRelief &&
+    metrics.riskPerTradePercent <= configuredMax + RISK_GATE_POLICY.maxRiskPerTradeBumpPercent
+  ) {
+    return configuredMax + RISK_GATE_POLICY.maxRiskPerTradeBumpPercent;
+  }
+  return configuredMax;
 }
 
 export async function getEffectiveRiskConfig(userId: string): Promise<EffectiveRiskConfig> {
@@ -204,12 +247,26 @@ export async function evaluatePreTradeRisk(input: PreTradeRiskInput): Promise<Ri
     },
   });
 
-  return {
+  const result = {
     ok: reasons.length === 0,
     reasons,
     paused: Boolean(paused.paused),
     effectiveConfig,
   };
+  bridgeRiskSizing({
+    candidateId: createCandidateId(input.symbol, "risk"),
+    symbol: input.symbol,
+    approved: result.ok && !result.paused,
+    rejectionReason: result.paused ? paused.reason ?? "Risk paused" : reasons[0],
+    riskParameters: {
+      openPositionCount,
+      consecutiveLosses,
+      dailyLossAbs: daily.lossAmountAbs,
+      weeklyLossAbs: weekly.lossAmountAbs,
+    },
+    maxSimultaneousPositions: effectiveConfig.maxOpenPositions,
+  });
+  return result;
 }
 
 export async function evaluateRuntimeRisk(input: { userId: string; symbol: string }) {

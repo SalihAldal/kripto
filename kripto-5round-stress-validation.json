@@ -1,0 +1,620 @@
+{
+  "validationId": "5round-stress-2026-08-14T17-46-20-544Z",
+  "startedAt": "2026-08-14T17:46:29.957Z",
+  "completedAt": "2026-08-14T19:31:31.973Z",
+  "sessionId": "cmst8nza40007unvsi2211emo",
+  "config": {
+    "mode": "PAPER",
+    "exchange": "tr",
+    "aiGatePolicy": "VETO",
+    "maxWaitSec": 600,
+    "totalRounds": 5,
+    "roundCeilingMin": 20,
+    "selectionBudgetMs": 1200000
+  },
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY",
+    "clockSync": {
+      "status": "PASS",
+      "reasonCode": "CLOCK_SYNC_OK",
+      "reasonDetail": "Clock skew 58ms within threshold",
+      "timestamp": "2026-08-14T17:46:29.606Z",
+      "metadata": {
+        "localTime": "2026-08-14T17:46:29.604Z",
+        "serverTime": "2026-08-14T17:46:29.546Z",
+        "clockOffsetMs": -58,
+        "clockSkewMs": 58,
+        "apiLatencyMs": 193,
+        "skewThresholdMs": 5000,
+        "endpoint": "https://www.binance.tr/api/v3/time",
+        "timestampSource": "binance.api.v3.time"
+      }
+    },
+    "database": {
+      "status": "PASS",
+      "reasonCode": "DB_HEALTHY",
+      "reasonDetail": "PostgreSQL reachable and AutoRound schema accessible",
+      "timestamp": "2026-08-14T17:46:28.160Z"
+    },
+    "binance": {
+      "status": "PASS",
+      "reasonCode": "BINANCE_TR_HEALTHY",
+      "reasonDetail": "BTCTRY ticker ok (3014043)",
+      "timestamp": "2026-08-14T17:46:29.409Z",
+      "metadata": {
+        "symbol": "BTCTRY",
+        "price": 3014043
+      }
+    },
+    "ai": {
+      "status": "PASS",
+      "reasonCode": "AI_CONFIGURED",
+      "reasonDetail": "3 enabled AI provider(s)",
+      "timestamp": "2026-08-14T17:46:29.607Z",
+      "metadata": {
+        "providers": [
+          {
+            "id": "provider-1",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-2",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-3",
+            "name": "Gemini",
+            "model": "gemini-1.5-flash-latest"
+          }
+        ],
+        "remoteRequired": false
+      }
+    },
+    "emergencyStop": {
+      "status": "PASS",
+      "reasonCode": "EMERGENCY_STOP_INACTIVE",
+      "reasonDetail": "Emergency stop inactive",
+      "timestamp": "2026-08-14T17:46:29.627Z"
+    },
+    "artifactPath": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmst8nza40007unvsi2211emo\\preflight.json"
+  },
+  "job": {
+    "id": "cmst8nza40007unvsi2211emo",
+    "status": "STOPPED",
+    "completedRounds": 0,
+    "failedRounds": 4,
+    "lastError": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE)",
+    "finishedAt": "2026-08-14T19:30:54.792Z",
+    "createdAt": "2026-08-14T17:46:30.364Z"
+  },
+  "schedulerStress": {
+    "progressSampleCount": 2,
+    "progressStateDistribution": {
+      "UNKNOWN": 2
+    },
+    "recoverySnapshotCount": 0,
+    "restartCurrentStageTotal": 0,
+    "prematureRestartDetected": false,
+    "recoverySnapshots": []
+  },
+  "progressSamples": [
+    {
+      "roundNo": 1,
+      "source": "round-summary",
+      "heartbeatAt": "2026-08-14T17:56:25.804Z",
+      "lastProgressAt": null,
+      "elapsedMs": 0,
+      "selectionBudgetMs": 0
+    },
+    {
+      "roundNo": 3,
+      "source": "round-summary",
+      "heartbeatAt": "2026-08-14T18:40:34.499Z",
+      "lastProgressAt": null,
+      "elapsedMs": 0,
+      "selectionBudgetMs": 0
+    }
+  ],
+  "rounds": [
+    {
+      "roundNo": 1,
+      "roundId": "1",
+      "dbRunId": "cmst8o0rw000lunvscf8sygmd",
+      "state": "tur_basarisiz",
+      "symbol": "SHELLTRY",
+      "result": "failed",
+      "failReason": "AI_GATE_BLOCK: NO_TRADE",
+      "netPnl": null,
+      "terminal": true,
+      "outcomeClass": "LEGITIMATE_ZERO_TRADE",
+      "durationMs": 637000,
+      "durationMin": 10.62,
+      "selectionBudgetMs": 0,
+      "elapsedMs": 0,
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmst8nza40007unvsi2211emo\\rounds\\1",
+      "artifactsExist": true,
+      "missingArtifacts": [],
+      "missingMinimumArtifacts": [],
+      "exportStatus": "COMPLETED",
+      "exportErrorExists": false,
+      "exportKind": "failed-round-partial",
+      "candidateCount": 6,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 6,
+        "tdiRejects": 0,
+        "waitReasonDistribution": {
+          "NEUTRAL": 5,
+          "BELOW_THRESHOLD": 1
+        },
+        "tdiWarnings": []
+      },
+      "sizing": {
+        "sizingPassedCount": 0,
+        "sizingRejectedCount": 0
+      },
+      "risk": {
+        "riskPassedCount": 0,
+        "riskRejectedCount": 0
+      },
+      "ai": {
+        "aiInvokedCount": 2,
+        "aiSuccessCount": 2,
+        "aiFailedCount": 0,
+        "remoteCount": 18,
+        "degradedCount": 0,
+        "consensusCount": 6
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0,
+        "openPositionsAtEnd": 0
+      },
+      "exit": {
+        "exitReasons": {},
+        "exitModels": {},
+        "exitEdgeNotProven": false
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "tradeCount": 0
+      },
+      "runtime": {
+        "watchdogDecision": "NONE",
+        "txCount": 100,
+        "txTimeouts": 1,
+        "recoveryCount": 0,
+        "restartCurrentStageCount": 0,
+        "lastProgressAt": null,
+        "heartbeatAt": "2026-08-14T17:56:25.804Z",
+        "clockForensicsExists": false,
+        "clockSkewMs": null
+      },
+      "p0": {
+        "aiGatePolicy": "VETO",
+        "aiGateFailures": [],
+        "feeFailures": [],
+        "criticalFailures": []
+      },
+      "p1": {
+        "meanReversionEntries": 0,
+        "mrComplete": true,
+        "scannerQualificationRejections": 0,
+        "entryTimingRecords": 0
+      },
+      "p2": {
+        "slotReportRows": 3,
+        "feePolicyEvaluations": 0
+      },
+      "resolvedConfig": {
+        "maxPositions": 3,
+        "exchange": "binance"
+      }
+    },
+    {
+      "roundNo": 2,
+      "roundId": "2",
+      "dbRunId": "cmst91o9r02rjunvsrbrqfgxx",
+      "state": "tur_basarisiz",
+      "symbol": "JASMYUSDT",
+      "result": "failed",
+      "failReason": "Tur secim suresi doldu (1200s)",
+      "netPnl": null,
+      "terminal": true,
+      "outcomeClass": "LEGITIMATE_ZERO_TRADE",
+      "durationMs": 1303000,
+      "durationMin": 21.72,
+      "selectionBudgetMs": 1200000,
+      "elapsedMs": 1303000,
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmst8nza40007unvsi2211emo\\rounds\\2",
+      "artifactsExist": true,
+      "missingArtifacts": [],
+      "missingMinimumArtifacts": [],
+      "exportStatus": "COMPLETED",
+      "exportErrorExists": false,
+      "exportKind": "failed-round-partial",
+      "candidateCount": 46,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 27,
+        "tdiRejects": 0,
+        "waitReasonDistribution": {
+          "NEUTRAL": 26,
+          "BELOW_THRESHOLD": 1
+        },
+        "tdiWarnings": []
+      },
+      "sizing": {
+        "sizingPassedCount": 0,
+        "sizingRejectedCount": 0
+      },
+      "risk": {
+        "riskPassedCount": 0,
+        "riskRejectedCount": 0
+      },
+      "ai": {
+        "aiInvokedCount": 44,
+        "aiSuccessCount": 37,
+        "aiFailedCount": 7,
+        "remoteCount": 91,
+        "degradedCount": 20,
+        "consensusCount": 37
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0,
+        "openPositionsAtEnd": 0
+      },
+      "exit": {
+        "exitReasons": {},
+        "exitModels": {},
+        "exitEdgeNotProven": false
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "tradeCount": 0
+      },
+      "runtime": {
+        "watchdogDecision": "FAIL_ROUND",
+        "txCount": 100,
+        "txTimeouts": 3,
+        "recoveryCount": 0,
+        "restartCurrentStageCount": 0,
+        "lastProgressAt": null,
+        "heartbeatAt": null,
+        "clockForensicsExists": false,
+        "clockSkewMs": null
+      },
+      "p0": {
+        "aiGatePolicy": "VETO",
+        "aiGateFailures": [],
+        "feeFailures": [],
+        "criticalFailures": []
+      },
+      "p1": {
+        "meanReversionEntries": 0,
+        "mrComplete": true,
+        "scannerQualificationRejections": 0,
+        "entryTimingRecords": 0
+      },
+      "p2": {
+        "slotReportRows": 3,
+        "feePolicyEvaluations": 0
+      },
+      "resolvedConfig": {
+        "maxPositions": 3,
+        "exchange": "binance"
+      }
+    },
+    {
+      "roundNo": 3,
+      "roundId": "3",
+      "dbRunId": "cmst9tlxx064zunvst352o1s5",
+      "state": "tur_basarisiz",
+      "symbol": "CRVTRY",
+      "result": "failed",
+      "failReason": "AI_GATE_BLOCK: NO_TRADE",
+      "netPnl": null,
+      "terminal": true,
+      "outcomeClass": "LEGITIMATE_ZERO_TRADE",
+      "durationMs": 1303000,
+      "durationMin": 21.72,
+      "selectionBudgetMs": 0,
+      "elapsedMs": 0,
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmst8nza40007unvsi2211emo\\rounds\\3",
+      "artifactsExist": true,
+      "missingArtifacts": [],
+      "missingMinimumArtifacts": [],
+      "exportStatus": "COMPLETED",
+      "exportErrorExists": false,
+      "exportKind": "failed-round-partial",
+      "candidateCount": 38,
+      "tdi": {
+        "tdiApprovals": 1,
+        "tdiWait": 40,
+        "tdiRejects": 0,
+        "waitReasonDistribution": {
+          "NEUTRAL": 38,
+          "BELOW_THRESHOLD": 2
+        },
+        "tdiWarnings": []
+      },
+      "sizing": {
+        "sizingPassedCount": 0,
+        "sizingRejectedCount": 0
+      },
+      "risk": {
+        "riskPassedCount": 0,
+        "riskRejectedCount": 0
+      },
+      "ai": {
+        "aiInvokedCount": 2,
+        "aiSuccessCount": 2,
+        "aiFailedCount": 0,
+        "remoteCount": 156,
+        "degradedCount": 36,
+        "consensusCount": 64
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0,
+        "openPositionsAtEnd": 0
+      },
+      "exit": {
+        "exitReasons": {},
+        "exitModels": {},
+        "exitEdgeNotProven": false
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "tradeCount": 0
+      },
+      "runtime": {
+        "watchdogDecision": "NONE",
+        "txCount": 100,
+        "txTimeouts": 1,
+        "recoveryCount": 0,
+        "restartCurrentStageCount": 0,
+        "lastProgressAt": null,
+        "heartbeatAt": "2026-08-14T18:40:34.499Z",
+        "clockForensicsExists": false,
+        "clockSkewMs": null
+      },
+      "p0": {
+        "aiGatePolicy": "VETO",
+        "aiGateFailures": [],
+        "feeFailures": [],
+        "criticalFailures": []
+      },
+      "p1": {
+        "meanReversionEntries": 0,
+        "mrComplete": true,
+        "scannerQualificationRejections": 0,
+        "entryTimingRecords": 0
+      },
+      "p2": {
+        "slotReportRows": 3,
+        "feePolicyEvaluations": 0
+      },
+      "resolvedConfig": {
+        "maxPositions": 3,
+        "exchange": "binance"
+      }
+    },
+    {
+      "roundNo": 4,
+      "roundId": "4",
+      "dbRunId": "cmstaljbi09zsunvsk1hn8ik0",
+      "state": "tur_basarisiz",
+      "symbol": "PIXELTRY",
+      "result": "failed",
+      "failReason": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE); prior=tariyor; evidence={\"heartbeatAt\":\"2026-08-14T18:43:03.819Z\",\"state\":\"tariyor\",\"jobSchedulerActive\":false}",
+      "netPnl": null,
+      "terminal": true,
+      "outcomeClass": "LEGITIMATE_ZERO_TRADE",
+      "durationMs": 3019000,
+      "durationMin": 50.32,
+      "selectionBudgetMs": 1200000,
+      "elapsedMs": 3019000,
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmst8nza40007unvsi2211emo\\rounds\\4",
+      "artifactsExist": true,
+      "missingArtifacts": [
+        "round-summary.json",
+        "recovery-decisions.json",
+        "recovery-telemetry.json",
+        "candidate-lifecycle.json",
+        "ai-trace.json",
+        "decision-trace.json",
+        "risk-sizing-trace.json",
+        "execution-trace.json",
+        "position-trace.json",
+        "exit-trace.json",
+        "pnl-ledger.json",
+        "fee-aware-entry-policy.json",
+        "strategy-performance.json",
+        "scanner-qualification.json",
+        "tdi-decisions.json",
+        "slot-opportunity-report.json",
+        "mean-reversion-audit.json",
+        "entry-timing.json",
+        "ev-calibration.json"
+      ],
+      "missingMinimumArtifacts": [
+        "round-summary.json",
+        "recovery-decisions.json",
+        "recovery-telemetry.json"
+      ],
+      "exportStatus": "UNKNOWN",
+      "exportErrorExists": false,
+      "exportKind": null,
+      "candidateCount": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0,
+        "waitReasonDistribution": {},
+        "tdiWarnings": []
+      },
+      "sizing": {
+        "sizingPassedCount": 0,
+        "sizingRejectedCount": 0
+      },
+      "risk": {
+        "riskPassedCount": 0,
+        "riskRejectedCount": 0
+      },
+      "ai": {
+        "aiInvokedCount": 4,
+        "aiSuccessCount": 3,
+        "aiFailedCount": 0,
+        "remoteCount": 0,
+        "degradedCount": 0,
+        "consensusCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0,
+        "openPositionsAtEnd": 0
+      },
+      "exit": {
+        "exitReasons": {},
+        "exitModels": {},
+        "exitEdgeNotProven": false
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "tradeCount": 0
+      },
+      "runtime": {
+        "txCount": 0,
+        "txTimeouts": 0,
+        "recoveryCount": 0,
+        "restartCurrentStageCount": 0,
+        "lastProgressAt": null,
+        "heartbeatAt": null,
+        "clockForensicsExists": false,
+        "clockSkewMs": null
+      },
+      "p0": {
+        "aiGatePolicy": "VETO",
+        "aiGateFailures": [],
+        "feeFailures": [],
+        "criticalFailures": []
+      },
+      "p1": {
+        "meanReversionEntries": 0,
+        "mrComplete": true,
+        "scannerQualificationRejections": 0,
+        "entryTimingRecords": 0
+      },
+      "p2": {
+        "slotReportRows": 0,
+        "feePolicyEvaluations": 0
+      },
+      "resolvedConfig": null
+    }
+  ],
+  "aiGateSummary": {
+    "blockingVerdictOrderCount": 0,
+    "vetoBypassCount": 0,
+    "contradictionCount": 0,
+    "remoteCount": 265,
+    "degradedCount": 56
+  },
+  "p1p2Summary": {
+    "meanReversionEntries": 0,
+    "mrCompleteCount": 4,
+    "scannerQualificationRejections": 0,
+    "entryTimingRecords": 0,
+    "evCalibrationRounds": 0,
+    "tdiWaitDistribution": {
+      "NEUTRAL": 69,
+      "BELOW_THRESHOLD": 4
+    },
+    "slotReportRows": 9,
+    "feePolicyEvaluations": 0
+  },
+  "runtimeHealth": {
+    "recoveryAuditCount": 10,
+    "noActionRecoveryCount": 10,
+    "runnerDbDisconnect": true
+  },
+  "profitability": {
+    "classification": "NOT_PROVEN",
+    "trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "note": "5-round stress validation — not a profitability proof"
+  },
+  "dbConsistency": {
+    "status": "NO_TRADES",
+    "message": "Zero trades across rounds — pipeline blocking stage analysis required"
+  },
+  "failedRoundConsistency": {
+    "status": "AGREE",
+    "roundNo": 1,
+    "db": {
+      "failReason": "AI_GATE_BLOCK: NO_TRADE",
+      "state": "tur_basarisiz",
+      "endedAt": "2026-08-14T17:57:09.032Z",
+      "recoveryCount": null
+    },
+    "artifact": {
+      "failReason": "AI_GATE_BLOCK: NO_TRADE",
+      "terminalState": "tur_basarisiz",
+      "endedAt": "2026-08-14T17:57:09.125Z",
+      "recoveryCount": 0
+    },
+    "delta": {
+      "failReason": true,
+      "state": true,
+      "endedAt": true
+    }
+  },
+  "criticalFailures": [
+    {
+      "code": "ARTIFACTS_MISSING",
+      "message": "Round 4 missing minimum artifacts: round-summary.json, recovery-decisions.json, recovery-telemetry.json",
+      "roundId": "4"
+    }
+  ],
+  "stopEarly": false,
+  "zombieCount": 0,
+  "terminalRounds": 4,
+  "productionReadiness": "NOT_READY",
+  "lastStatus": null
+}

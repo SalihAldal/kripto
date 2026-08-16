@@ -35,6 +35,24 @@ function netProfitPercent(row: AutoRoundStatusResponse["jobs"][number]["rounds"]
   return (netPnl / notional) * 100;
 }
 
+function RuntimeProgressBar({ label, value, tone = "secondary" }: { label: string; value: number; tone?: "secondary" | "primary" }) {
+  const pct = Math.max(0, Math.min(100, value));
+  return (
+    <div className="space-y-0.5">
+      <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
+        <span>{label}</span>
+        <span>{pct.toFixed(0)}%</span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-outline-variant/20">
+        <div
+          className={`h-full rounded-full ${tone === "primary" ? "bg-primary" : "bg-secondary"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function AutoRoundControlPanel({ onNotify, livePollingEnabled = true }: Props) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<AutoRoundStatusResponse | null>(null);
@@ -229,6 +247,45 @@ export function AutoRoundControlPanel({ onNotify, livePollingEnabled = true }: P
         <p>Tamamlanan Tur: {active?.completedRounds ?? 0}</p>
         <p>Kalan Tur: {remaining}</p>
         <p>Aktif Durum: {active?.activeState ?? "bekliyor"}</p>
+        {active?.runtime ? (
+          <div className="mt-2 rounded-md border border-outline-variant/10 bg-surface-container px-2 py-1">
+            <p className="font-semibold">Runtime: {active.runtime.step}</p>
+            <p>{active.runtime.message}</p>
+            <p>
+              Genel Ilerleme: {active.runtime.roundProgressPct.toFixed(2)}%
+              {typeof active.runtime.intraRoundPct === "number"
+                ? ` | Tur Ici: ${active.runtime.intraRoundPct.toFixed(1)}%`
+                : ""}
+            </p>
+            <RuntimeProgressBar label="Genel" value={active.runtime.roundProgressPct} tone="primary" />
+            {typeof active.runtime.intraRoundPct === "number" ? (
+              <RuntimeProgressBar label="Tur Ici" value={active.runtime.intraRoundPct} />
+            ) : null}
+            {active.runtime.progressBreakdown ? (
+              <div className="mt-2 space-y-1">
+                <RuntimeProgressBar label="Selection" value={active.runtime.progressBreakdown.selection} />
+                <RuntimeProgressBar label="Pump" value={active.runtime.progressBreakdown.pump} />
+                <RuntimeProgressBar label="Scanner" value={active.runtime.progressBreakdown.scanner} />
+                <RuntimeProgressBar label="AI Analysis" value={active.runtime.progressBreakdown.aiAnalysis} />
+                <RuntimeProgressBar label="Candidate Eval" value={active.runtime.progressBreakdown.candidateEvaluation} />
+                <RuntimeProgressBar label="Execution" value={active.runtime.progressBreakdown.execution} />
+                <RuntimeProgressBar label="Position Monitor" value={active.runtime.progressBreakdown.positionMonitoring} />
+              </div>
+            ) : null}
+            <p>
+              Aday: {active.runtime.currentSymbol ?? active.runtime.currentCandidate ?? "-"} | Pipeline:{" "}
+              {active.runtime.currentPipeline ?? "-"}
+            </p>
+            <p>
+              Scanner: {active.runtime.candidatesProcessed}/
+              {(active.runtime.scannerTotal ??
+                (active.runtime.candidatesProcessed + (active.runtime.candidatesRemaining ?? 0))) ||
+                "?"}{" "}
+              | Deneme: {active.runtime.selectionAttempt}
+            </p>
+            <p>Sure: {Math.floor(active.runtime.elapsedMs / 1000)}s</p>
+          </div>
+        ) : null}
         <p className={totalNetPnl >= 0 ? "text-secondary" : "text-tertiary"}>
           Toplam Oto PnL: {totalNetPnl.toFixed(6)} ({totalNetPnlPercent >= 0 ? "+" : ""}{totalNetPnlPercent.toFixed(4)}%)
         </p>

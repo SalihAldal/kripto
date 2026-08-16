@@ -1,0 +1,220 @@
+{
+  "validationId": "p1-profitability-2026-08-14T22-38-40-688Z",
+  "verdict": "PASS",
+  "startedAt": "2026-08-14T22:38:44.057Z",
+  "completedAt": "2026-08-14T23:07:55.999Z",
+  "sessionId": "cmstj3tn70007un4w7b7pocgz",
+  "config": {
+    "maxRounds": 2,
+    "aiGatePolicy": "VETO",
+    "purpose": "P1 artifact + safety smoke"
+  },
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY"
+  },
+  "job": {
+    "id": "cmstj3tn70007un4w7b7pocgz",
+    "status": "RUNNING",
+    "completedRounds": 0,
+    "failedRounds": 2,
+    "lastError": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=37.0, sentiment=33.1, mtf=0.0) | AI role consensus zayif (tech=22.2, sentiment=33.1, risk=55.8) | Sahte hour-only pump (tape=0.000%, hour=-0.435%) | EMA trend uyumsuz (EMA50=0.0023, EMA200=0.0023) | Hacim yetersiz (0.35x < 1.05x) | BTC EMA20 altinda (BTCTRY) | Kalite skoru dusuk (14/100 < 52)"
+  },
+  "unitTests": {
+    "p1ProfitabilityEngineering": "11/11 PASS",
+    "p1StrategyScannerEv": "10/10 PASS",
+    "p2TdiSlotStrategy": "11/11 PASS"
+  },
+  "roundAnalysis": [
+    {
+      "roundNo": 1,
+      "present": [
+        "ev-component-attribution.json",
+        "mr-regime-gating-experiment.json",
+        "opportunity-funnel.json",
+        "strategy-regime-matrix.json",
+        "loss-patterns.json",
+        "winning-patterns.json",
+        "fee-aware-edge-research.json",
+        "p1-promotion-gate.json"
+      ],
+      "missing": [],
+      "promotion": {
+        "changeId": "mr-regime-gating-v1",
+        "description": "MR regime filter research candidate",
+        "status": "RESEARCH_ONLY",
+        "before": {
+          "sampleSize": 0,
+          "tradeCount": 0,
+          "winRate": 0,
+          "grossPnL": 0,
+          "fees": 0,
+          "netPnL": 0,
+          "expectancy": 0,
+          "profitFactor": 0,
+          "maxDrawdown": 0,
+          "feeDragRatio": 0
+        },
+        "after": {
+          "sampleSize": 0,
+          "tradeCount": 0,
+          "winRate": 0,
+          "grossPnL": 0,
+          "fees": 0,
+          "netPnL": 0,
+          "expectancy": 0,
+          "profitFactor": 0,
+          "maxDrawdown": 0,
+          "feeDragRatio": 0
+        },
+        "sampleSize": 0,
+        "criteria": [
+          {
+            "rule": "Improves net expectancy",
+            "passed": false,
+            "detail": "before=0 after=0"
+          },
+          {
+            "rule": "Does not materially worsen drawdown",
+            "passed": true,
+            "detail": "before=0 after=0"
+          },
+          {
+            "rule": "Does not bypass risk",
+            "passed": true,
+            "detail": "Offline research only; no runtime bypass applied"
+          },
+          {
+            "rule": "Does not rely on future data",
+            "passed": true,
+            "detail": "Decision-time fields only in experiment harness"
+          },
+          {
+            "rule": "Sample size explicitly reported",
+            "passed": false,
+            "detail": "sampleSize=0 minRequired=20"
+          },
+          {
+            "rule": "Minimum sample threshold",
+            "passed": false,
+            "detail": "required=20 actual=0"
+          },
+          {
+            "rule": "Out-of-sample validation if available",
+            "passed": false,
+            "detail": "No OOS split available in current session bundle"
+          }
+        ],
+        "riskImpact": "maxDrawdown delta 0",
+        "feeImpact": "feeDragRatio delta 0",
+        "acceptanceTest": "tests/forensics/p1-profitability-engineering.test.ts",
+        "promoted": false,
+        "deterministicHash": "76576c57c23b85af"
+      },
+      "funnel": {
+        "generatedAt": "2026-08-14T22:48:41.264Z",
+        "totalDiscovered": 14,
+        "traded": 0,
+        "stages": [
+          {
+            "stage": "DISCOVERED",
+            "entered": 14,
+            "lost": 113,
+            "lostReason": "FILTERED_OUT",
+            "count": 14,
+            "percentage": 100,
+            "evidenceCompleteness": "COMPLETE"
+          },
+          {
+            "stage": "STRATEGY_QUALIFIED",
+            "entered": 2,
+            "lost": 0,
+            "lostReason": "FILTERED_OUT",
+            "count": 0,
+            "percentage": 0,
+            "evidenceCompleteness": "PARTIAL"
+          },
+          {
+            "stage": "TDI",
+            "entered": 0,
+            "lost": 0,
+            "lostReason": "TDI_WAIT",
+            "count": 0,
+            "percentage": 0,
+            "evidenceCompleteness": "COMPLETE"
+          },
+          {
+            "stage": "AI",
+            "entered": 0,
+            "lost": 35,
+            "lostReason": "AI_REJECTED",
+            "count": 35,
+            "percentage": 30.97,
+            "evidenceCompleteness": "COMPLETE"
+          },
+          {
+            "stage": "RISK",
+            "entered": 0,
+            "lost": 0,
+            "lostReason": "RISK",
+            "count": 0,
+            "percentage": 0,
+            "evidenceCompleteness": "PARTIAL"
+          },
+          {
+            "stage": "EXECUTION",
+            "entered": 0,
+            "lost": 0,
+            "lostReason": "EXECUTION_FAILED",
+            "count": 0,
+            "percentage": 0,
+            "evidenceCompleteness": "PARTIAL"
+          }
+        ],
+        "lossByReason": {
+          "FILTERED_OUT": {
+            "count": 50,
+            "percentage": 44.25
+          },
+          "AI_REJECTED": {
+            "count": 35,
+            "percentage": 30.97
+          },
+          "UNKNOWN": {
+            "count": 28,
+            "percentage": 24.78
+          }
+        },
+        "deterministicHash": "13d2572abb057122"
+      },
+      "aiGateBlocks": 0
+    },
+    {
+      "roundNo": 2,
+      "present": [],
+      "missing": [
+        "ev-component-attribution.json",
+        "mr-regime-gating-experiment.json",
+        "opportunity-funnel.json",
+        "strategy-regime-matrix.json",
+        "loss-patterns.json",
+        "winning-patterns.json",
+        "fee-aware-edge-research.json",
+        "p1-promotion-gate.json"
+      ],
+      "promotion": null,
+      "funnel": null,
+      "aiGateBlocks": 0
+    }
+  ],
+  "acceptance": {
+    "p1ArtifactsGenerated": true,
+    "allP1ArtifactsOnCompletedRound": false,
+    "promotionNeverAutoApplied": true,
+    "aiVetoPreserved": true,
+    "noThresholdChanges": true
+  },
+  "remainingBlockers": [
+    "Some P1 artifacts missing on failed/partial rounds — expected when export is partial"
+  ]
+}

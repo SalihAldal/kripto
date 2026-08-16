@@ -2,7 +2,8 @@ import type { AIProviderAdapter } from "@/src/server/ai/provider.interface";
 import { analyzeWithRemoteModel } from "@/src/server/ai/providers/remote-llm";
 import type { AIAnalysisInput, AIModelOutput, AIProviderConfig } from "@/src/types/ai";
 import { clampScore } from "@/src/server/ai/utils";
-import { buildIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { resolveIndicatorSnapshot, type IndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { runOnFreshStack, yieldAsyncStackUnwind } from "@/src/server/execution/cancellable-work.service";
 import { buildStandardizedOutput } from "@/src/server/ai/providers/standardized-output";
 
 function buildOutput(input: AIAnalysisInput, signalBias: number, riskPenalty: number, label: string): AIModelOutput {
@@ -62,7 +63,7 @@ function buildOutput(input: AIAnalysisInput, signalBias: number, riskPenalty: nu
   };
 }
 
-function resolveTrendDirection(input: AIAnalysisInput, indicators: ReturnType<typeof buildIndicatorSnapshot>) {
+function resolveTrendDirection(input: AIAnalysisInput, indicators: Readonly<IndicatorSnapshot>) {
   const mtf = input.multiTimeframe;
   if (mtf?.dominantTrend === "BULLISH") return "BULLISH";
   if (mtf?.dominantTrend === "BEARISH") return "BEARISH";
@@ -76,7 +77,7 @@ function resolveTrendDirection(input: AIAnalysisInput, indicators: ReturnType<ty
 }
 
 function buildTechnicalSpecialistOutput(input: AIAnalysisInput, label: string): AIModelOutput {
-  const ind = buildIndicatorSnapshot(input);
+  const ind = resolveIndicatorSnapshot(input);
   const trendDirection = resolveTrendDirection(input, ind);
   const tf = input.multiTimeframe;
   const redFlags: string[] = [];
@@ -314,7 +315,8 @@ export class Provider1Adapter implements AIProviderAdapter {
   }
 
   async analyzeTechnicalSignal(input: AIAnalysisInput): Promise<AIModelOutput> {
-    const expertOutput = buildTechnicalSpecialistOutput(input, this.config.name);
+    await yieldAsyncStackUnwind();
+    const expertOutput = await runOnFreshStack(() => buildTechnicalSpecialistOutput(input, this.config.name));
     const remote = await analyzeWithRemoteModel(this.config, input, "technical");
     if (!remote) return expertOutput;
     const blendedConfidence = clampScore(expertOutput.confidence * 0.7 + remote.confidence * 0.3);

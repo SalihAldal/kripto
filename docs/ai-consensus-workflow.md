@@ -2,7 +2,7 @@
 
 Spot trading AI consensus layer. Aggregates multi-provider outputs into a single `finalDecision` before execution.
 
-## Problem Context (pr-task-002)
+## Problem Context (pr-task-003)
 
 Over-strict consensus rules (hard 2-vote directional block after soft acceptance) caused valid single-provider directional setups to become `NO_TRADE`. Policy now allows **soft directional acceptance** without a post-hoc vote veto.
 

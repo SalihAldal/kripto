@@ -1,4 +1,6 @@
 import { prisma } from "@/src/server/db/prisma";
+import type { SchedulerLease } from "@/src/server/execution/scheduler-ownership.types";
+import type { RoundOwnershipRecord } from "@/src/server/execution/round-registry.types";
 
 export type AutoRoundState =
   | "bekliyor"
@@ -100,6 +102,7 @@ export async function updateAutoRoundJob(input: {
   stopRequested?: boolean;
   lastError?: string | null;
   finishedAt?: Date | null;
+  activeRunId?: string | null;
   metadata?: Record<string, unknown>;
 }) {
   return prisma.autoRoundJob.update({
@@ -113,6 +116,7 @@ export async function updateAutoRoundJob(input: {
       stopRequested: input.stopRequested,
       lastError: input.lastError,
       finishedAt: input.finishedAt,
+      activeRunId: input.activeRunId,
       metadata: input.metadata as never,
     },
   });
@@ -315,4 +319,119 @@ export async function listAutoRoundRunsPaginated(input: {
   ]);
   const totalPages = total > 0 ? Math.ceil(total / pageSize) : 1;
   return { total, page, pageSize, totalPages, runs };
+}
+
+const SCHEDULER_LEASE_KEY = "schedulerLease";
+
+export function readSchedulerLeaseFromMetadata(metadata: unknown): SchedulerLease | null {
+  if (!metadata || typeof metadata !== "object") return null;
+  const lease = (metadata as Record<string, unknown>)[SCHEDULER_LEASE_KEY];
+  if (!lease || typeof lease !== "object") return null;
+  const row = lease as Record<string, unknown>;
+  if (typeof row.jobId !== "string" || typeof row.ownerId !== "string") return null;
+  return {
+    jobId: row.jobId,
+    ownerId: row.ownerId,
+    createdAt: String(row.createdAt ?? ""),
+    lastHeartbeatAt: String(row.lastHeartbeatAt ?? ""),
+    version: Number(row.version ?? 0),
+    generation: Number(row.generation ?? 0),
+    state: row.state as SchedulerLease["state"],
+  };
+}
+
+export async function loadSchedulerLease(jobId: string) {
+  const job = await prisma.autoRoundJob.findUnique({
+    where: { id: jobId },
+    select: { metadata: true },
+  });
+  if (!job) return null;
+  return readSchedulerLeaseFromMetadata(job.metadata);
+}
+
+export async function compareAndSetSchedulerLease(input: {
+  jobId: string;
+  lease: SchedulerLease;
+  expectedVersion: number | null;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const job = await tx.autoRoundJob.findUnique({
+      where: { id: input.jobId },
+      select: { metadata: true },
+    });
+    if (!job) return { ok: false as const, lease: null };
+    const meta = ((job.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>;
+    const current = readSchedulerLeaseFromMetadata(meta);
+    const currentVersion = current?.version ?? 0;
+    if (input.expectedVersion !== null && currentVersion !== input.expectedVersion) {
+      return { ok: false as const, lease: current };
+    }
+    const nextLease: SchedulerLease = {
+      ...input.lease,
+      version: currentVersion + 1,
+    };
+    await tx.autoRoundJob.update({
+      where: { id: input.jobId },
+      data: {
+        metadata: {
+          ...meta,
+          [SCHEDULER_LEASE_KEY]: nextLease,
+        } as never,
+      },
+    });
+    return { ok: true as const, lease: nextLease };
+  });
+}
+
+const ROUND_REGISTRY_KEY = "roundRegistry";
+const IN_PROGRESS_RUN_STATES: AutoRoundState[] = [
+  "tariyor",
+  "coin_secildi",
+  "alim_yapildi",
+  "satis_bekleniyor",
+];
+
+export function readRoundRegistryFromMetadata(metadata: unknown): Record<string, RoundOwnershipRecord> {
+  if (!metadata || typeof metadata !== "object") return {};
+  const raw = (metadata as Record<string, unknown>)[ROUND_REGISTRY_KEY];
+  if (!raw || typeof raw !== "object") return {};
+  const out: Record<string, RoundOwnershipRecord> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!value || typeof value !== "object") continue;
+    const row = value as Record<string, unknown>;
+    if (typeof row.runId !== "string") continue;
+    out[key] = {
+      jobId: String(row.jobId ?? ""),
+      roundNo: Number(row.roundNo ?? key),
+      roundOwner: String(row.roundOwner ?? ""),
+      runId: row.runId,
+      status: row.status as RoundOwnershipRecord["status"],
+      version: Number(row.version ?? 0),
+      createdAt: String(row.createdAt ?? ""),
+      updatedAt: String(row.updatedAt ?? ""),
+    };
+  }
+  return out;
+}
+
+export async function acquireOrCreateRoundRun(input: {
+  jobId: string;
+  roundNo: number;
+  ownerId: string;
+  ownership: RoundOwnershipRecord;
+  state: AutoRoundState;
+  metadata?: Record<string, unknown>;
+}) {
+  const { transactionallyBeginRound } = await import("@/src/server/repositories/auto-round-integrity.repository");
+  return transactionallyBeginRound(input);
+}
+
+export async function persistRoundOwnershipRecord(input: {
+  jobId: string;
+  record: RoundOwnershipRecord;
+}) {
+  const { persistRoundOwnershipRecordTransactional } = await import(
+    "@/src/server/repositories/auto-round-integrity.repository"
+  );
+  return persistRoundOwnershipRecordTransactional(input);
 }

@@ -116,19 +116,22 @@ export function evaluateSmartExitEngine(input: {
     ? Math.max(minProtectedProfitPercent, 0.85)
     : minProtectedProfitPercent;
   const hasProtectedProfit = currentProfitPercent >= profitLockThreshold;
+  const peakWasProtected = peakProfitPercent >= profitLockThreshold;
+  const canProtectExit =
+    hasProtectedProfit || (peakWasProtected && currentProfitPercent > minProtectedProfitPercent * 0.35);
 
   let earlyExitTrigger: SmartExitEvaluationResult["earlyExitTrigger"] = "NONE";
-  if (hasProtectedProfit && input.reverseSignal) earlyExitTrigger = "REVERSE_SIGNAL";
-  else if (hasProtectedProfit && regimeRisky && peakProfitPercent > profitLockThreshold) earlyExitTrigger = "REGIME_SHIFT";
+  if (canProtectExit && input.reverseSignal) earlyExitTrigger = "REVERSE_SIGNAL";
+  else if (canProtectExit && regimeRisky && peakProfitPercent > profitLockThreshold) earlyExitTrigger = "REGIME_SHIFT";
   else if (
-    hasProtectedProfit &&
+    canProtectExit &&
     momentumDead &&
-    (input.isPumpTrade ? peakProfitPercent >= 0.55 : peakProfitPercent >= profitLockThreshold * 0.92)
+    (input.isPumpTrade ? peakProfitPercent >= 0.55 : peakProfitPercent >= profitLockThreshold * 0.85)
   ) {
     earlyExitTrigger = "MOMENTUM_FADE";
   }
-  else if (hasProtectedProfit && reversalCandle) earlyExitTrigger = "REVERSAL_CANDLE";
-  else if (volumeDrop && peakProfitPercent > 0.6 && currentProfitPercent < peakProfitPercent - 0.25) earlyExitTrigger = "VOLUME_DROPOFF";
+  else if (canProtectExit && reversalCandle) earlyExitTrigger = "REVERSAL_CANDLE";
+  else if (canProtectExit && volumeDrop && peakProfitPercent > 0.6 && currentProfitPercent < peakProfitPercent - 0.25) earlyExitTrigger = "VOLUME_DROPOFF";
 
   const exitConfidence = Number(
     clamp(

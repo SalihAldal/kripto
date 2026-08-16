@@ -1,5 +1,6 @@
 import { env } from "@/lib/config";
-import { getKlines, getOrderBook, getRecentTrades, getTicker } from "@/services/binance.service";
+import { marketDataOrchestrator, resolveAdaptiveTtlMs } from "@/src/server/market-data";
+import type { MarketDataPriority } from "@/src/server/market-data/market-data.types";
 import { putMarketSnapshot } from "@/src/server/scanner/market-snapshot-cache";
 import { detectMarketRegime } from "@/src/server/scanner/market-regime.service";
 import { recordRegimeStability } from "@/src/server/scanner/regime-stability.service";
@@ -140,54 +141,60 @@ function rememberContext(context: MarketContext) {
 
 export async function buildMarketContext(
   symbol: string,
-  options?: { lite?: boolean; forceLive?: boolean },
+  options?: { lite?: boolean; forceLive?: boolean; priority?: MarketDataPriority },
 ): Promise<MarketContext> {
   const normalized = symbol.toUpperCase();
   const lite = Boolean(options?.lite);
-  const forceLive = Boolean(options?.forceLive);
-  const recentCached = forceLive ? null : getCachedHealthyContext(normalized, 60_000);
-  if (!forceLive && recentCached && recentCached.metadata?.dataQualityOk) {
-    return {
-      ...recentCached,
-      metadata: {
-        ...recentCached.metadata,
-        fallbackFromCache: true,
-        fallbackReason: "recent_cache",
-      },
-    };
+  const priority = options?.priority ?? (options?.forceLive ? "high" : "normal");
+  const maxAgeMs = resolveAdaptiveTtlMs({
+    kind: "contextBundle",
+    priority,
+    volume24h: undefined,
+  });
+  const recentCached = getCachedHealthyContext(normalized, Math.max(60_000, maxAgeMs));
+  if (recentCached && recentCached.metadata?.dataQualityOk) {
+    const cacheAgeMs = Date.now() - (contextCache.get(normalized)?.at ?? 0);
+    const freshEnough = !options?.forceLive || cacheAgeMs <= maxAgeMs;
+    if (freshEnough) {
+      return {
+        ...recentCached,
+        metadata: {
+          ...recentCached.metadata,
+          fallbackFromCache: true,
+          fallbackReason: "recent_cache",
+        },
+      };
+    }
   }
-  const ticker = await getTicker(normalized);
+  const bundle = await marketDataOrchestrator.fetchContextBundle({
+    symbol: normalized,
+    lite,
+    priority,
+    maxAgeMs: options?.forceLive ? maxAgeMs : undefined,
+  });
+  const ticker = bundle.ticker;
   const resolvedSymbol = ticker.symbol.toUpperCase();
   const safeTickerPrice = Number.isFinite(ticker.price) && ticker.price > 0 ? ticker.price : 1;
   const safeTickerVolume = Number.isFinite(ticker.volume24h) && ticker.volume24h > 0 ? ticker.volume24h : 0;
-  const needs24hKlines =
-    !Number.isFinite(ticker.change24h) || Math.abs(Number(ticker.change24h)) < 0.2;
-  const [klinesRes, orderBookRes, recentTradesRes, klines24hRes] = await Promise.allSettled([
-    getKlines(resolvedSymbol, "1m", 80),
-    lite ? Promise.resolve(null) : getOrderBook(resolvedSymbol, 30),
-    lite ? Promise.resolve(null) : getRecentTrades(resolvedSymbol, 150),
-    needs24hKlines ? getKlines(resolvedSymbol, "1h", 26) : Promise.resolve([]),
-  ]);
-  const klines = klinesRes.status === "fulfilled" && klinesRes.value.length > 0 ? klinesRes.value : fallbackKlines(safeTickerPrice, 80);
-  const klines24h =
-    klines24hRes.status === "fulfilled" && klines24hRes.value.length > 0 ? klines24hRes.value : [];
+  const klines = bundle.klines1m.length > 0 ? bundle.klines1m : fallbackKlines(safeTickerPrice, 80);
+  const klines24h = bundle.klines1h.length > 0 ? bundle.klines1h : [];
   const orderBook =
-    orderBookRes.status === "fulfilled" &&
-    orderBookRes.value &&
-    orderBookRes.value.bids.length > 0 &&
-    orderBookRes.value.asks.length > 0
-      ? orderBookRes.value
+    !lite &&
+    bundle.orderBook &&
+    bundle.orderBook.bids.length > 0 &&
+    bundle.orderBook.asks.length > 0
+      ? bundle.orderBook
       : {
           lastUpdateId: Date.now(),
           bids: [{ price: safeTickerPrice, quantity: 0 }],
           asks: [{ price: safeTickerPrice, quantity: 0 }],
         };
   const recentTrades =
-    recentTradesRes.status === "fulfilled" && recentTradesRes.value && recentTradesRes.value.length > 0
-      ? recentTradesRes.value
+    !lite && bundle.recentTrades && bundle.recentTrades.length > 0
+      ? bundle.recentTrades
       : fallbackRecentTrades(safeTickerPrice, 150);
 
-  if (!lite) {
+  if (!lite && bundle.orderBook && bundle.recentTrades) {
     putMarketSnapshot(resolvedSymbol, { klines, orderBook, recentTrades });
   }
 
@@ -340,7 +347,7 @@ export async function buildMarketContext(
   const stalePrice =
     (lastTradeAgeSec !== null && lastTradeAgeSec > staleThresholdSec) ||
     (lastKlineAgeSec !== null && lastKlineAgeSec > staleThresholdSec);
-  const missingKlines = klinesRes.status !== "fulfilled" || klines.length < 20;
+  const missingKlines = klines.length < 20;
   const dataQualityIssues = [
     stalePrice ? "PRICE_STALE" : "",
     missingKlines ? "KLINE_MISSING" : "",
@@ -512,7 +519,7 @@ export async function buildMarketContext(
   );
 
   const rejectReasons: string[] = [];
-  if (forceLive && !liveDataHealthy) rejectReasons.push("Live data unavailable");
+  if (options?.forceLive && !liveDataHealthy) rejectReasons.push("Live data unavailable");
   if (!liveDataHealthy) rejectReasons.push("Market data degraded");
   if (tickerOutlier) rejectReasons.push("Ticker outlier filtered");
   if (effectiveLiquidity24h < env.SCANNER_MIN_VOLUME_24H) rejectReasons.push("Low liquidity");

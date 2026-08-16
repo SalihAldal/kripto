@@ -1,0 +1,255 @@
+{
+  "validationId": "5round-2026-08-14T22-50-18-796Z",
+  "reportType": "5ROUND_SHORT_PAPER_SMOKE",
+  "startedAt": "2026-08-14T22:50:21.352Z",
+  "completedAt": "2026-08-14T23:10:49.658Z",
+  "durationMinutes": 20.5,
+  "sessionId": "cmstjiruf0007unr8e78nizga",
+  "config": {
+    "mode": "PAPER",
+    "exchange": "BINANCE_TR",
+    "scanner": "REAL_SCANNER",
+    "ai": "REAL_AI",
+    "aiGatePolicy": "VETO",
+    "maxWaitSec": 600,
+    "totalRoundsPlanned": 5,
+    "totalRoundsCompleted": 3,
+    "maxOpenPositions": 3
+  },
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "DEGRADED",
+    "artifactPath": "artifacts/forensics/cmstjiruf0007unr8e78nizga/preflight.json",
+    "rootCopy": "preflight.json",
+    "checks": {
+      "postgresql": "PASS",
+      "prisma": "PASS",
+      "binanceTR": "PASS",
+      "clockSync": "PASS",
+      "apiLatencyMs": 111,
+      "clockSkewMs": 28,
+      "aiProviders": "PASS (3 providers)",
+      "emergencyStop": "PASS (inactive; paper allowed)",
+      "activeJobs": "PASS",
+      "zombieReconciled": "WARN (1 stale round)",
+      "staleJobReconciled": "WARN (prior SCHEDULER_LEASE_STALE job)",
+      "workerLocks": "PASS",
+      "resolvedConfig": "PASS (paper, binance, maxPositions=3)"
+    }
+  },
+  "jobSummary": {
+    "id": "cmstjiruf0007unr8e78nizga",
+    "status": "STOPPED",
+    "stopRequested": true,
+    "completedRounds": 0,
+    "failedRounds": 3,
+    "roundsNotStarted": [4, 5],
+    "lastError": null,
+    "finishedAt": "2026-08-14T23:10:39.940Z"
+  },
+  "roundsSummary": [
+    {
+      "roundNo": 1,
+      "symbol": "NILTRY",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "durationMin": 8.67,
+      "candidateCount": 12,
+      "tdiApprovals": 0,
+      "tdiWait": 7,
+      "tdiWaitReasons": { "NEUTRAL": 6, "BELOW_THRESHOLD": 1 },
+      "sizingPass": 0,
+      "sizingReject": 0,
+      "executionReady": 0,
+      "aiCalls": 8,
+      "aiSuccess": 8,
+      "remoteAiCalls": 31,
+      "degradedAiCalls": 11,
+      "riskPass": 0,
+      "riskReject": 0,
+      "orders": 0,
+      "fills": 0,
+      "positionsOpened": 0,
+      "positionsClosed": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "failReason": "AI_GATE_BLOCK: NO_TRADE",
+      "watchdogDecision": "NONE",
+      "recoveryCount": 0,
+      "artifactsExported": true,
+      "missingArtifacts": []
+    },
+    {
+      "roundNo": 2,
+      "symbol": "LUNCTRY",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "durationMin": 8.72,
+      "candidateCount": 19,
+      "tdiApprovals": 0,
+      "tdiWait": 19,
+      "tdiWaitReasons": { "NEUTRAL": 18, "BELOW_THRESHOLD": 1 },
+      "sizingPass": 0,
+      "sizingReject": 0,
+      "executionReady": 0,
+      "aiCalls": 2,
+      "aiSuccess": 2,
+      "remoteAiCalls": 0,
+      "degradedAiCalls": 21,
+      "riskPass": 0,
+      "riskReject": 0,
+      "orders": 0,
+      "fills": 0,
+      "positionsOpened": 0,
+      "positionsClosed": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "failReason": "SIM_TIGHT_FILTER_15m + quality stack",
+      "watchdogDecision": "FAIL_ROUND",
+      "recoveryCount": 0,
+      "artifactsExported": true,
+      "missingArtifacts": []
+    },
+    {
+      "roundNo": 3,
+      "symbol": "NILTRY",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "durationMin": 2.87,
+      "candidateCount": 4,
+      "tdiApprovals": 0,
+      "tdiWait": 22,
+      "tdiWaitReasons": { "NEUTRAL": 21, "BELOW_THRESHOLD": 1 },
+      "sizingPass": 0,
+      "sizingReject": 0,
+      "executionReady": 0,
+      "aiCalls": 4,
+      "aiSuccess": 4,
+      "remoteAiCalls": 0,
+      "degradedAiCalls": 22,
+      "riskPass": 0,
+      "riskReject": 0,
+      "orders": 0,
+      "fills": 0,
+      "positionsOpened": 0,
+      "positionsClosed": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "failReason": "Tur motoru durduruldu",
+      "watchdogDecision": "NONE",
+      "recoveryCount": 0,
+      "artifactsExported": true,
+      "missingArtifacts": []
+    }
+  ],
+  "aiGateValidation": {
+    "policy": "VETO",
+    "criticalBypass": false,
+    "criticalBypassCode": null,
+    "ordersUnderBlockingVerdict": 0,
+    "runtimeVetoProof": {
+      "roundNo": 1,
+      "executionVerdict": "AI_GATE_BLOCK",
+      "aiVerdict": "NO_TRADE",
+      "artifact": "artifacts/forensics/cmstjiruf0007unr8e78nizga/rounds/1/decision-trace.json"
+    },
+    "verdict": "PASS"
+  },
+  "exitValidation": {
+    "closedPositions": 0,
+    "exitReasons": {},
+    "exitEdgeNotProven": true,
+    "verdict": "NOT_TESTED"
+  },
+  "feeReconciliation": {
+    "tradesChecked": 0,
+    "mismatches": 0,
+    "verdict": "NOT_TESTED"
+  },
+  "p1ArtifactValidation": {
+    "meanReversionAudit": "EXPORTED",
+    "scannerNotDiscovered": "EXPORTED",
+    "evCalibration": "EXPORTED",
+    "entryTiming": "EXPORTED",
+    "strategyPerformance": "EXPORTED",
+    "verdict": "PASS"
+  },
+  "p2ArtifactValidation": {
+    "tdiWaitTaxonomy": "PASS",
+    "slotOpportunityReport": "EXPORTED",
+    "tdiSensitivity": "EXPORTED",
+    "feeAwareEntryPolicy": "EXPORTED",
+    "verdict": "PASS"
+  },
+  "runtimeHealth": {
+    "terminalRounds": 3,
+    "zombieCount": 0,
+    "aiStartedOrphans": 0,
+    "staleLocks": 0,
+    "prematureRestartCurrentStage": false,
+    "cancellationWorks": true,
+    "selectionBudgetBounded": true,
+    "hostRamWarning": "~95% at preflight"
+  },
+  "consistency": {
+    "runtimeArtifactDb": "AGREE",
+    "dbConsistencyStatus": "NO_TRADES",
+    "note": "Zero trades — no PnL cross-layer contradiction"
+  },
+  "failuresAndWarnings": [
+    {
+      "code": "INCOMPLETE_RUN",
+      "severity": "HIGH",
+      "message": "Job STOPPED after 3/5 rounds (stopRequested=true)"
+    },
+    {
+      "code": "ZOMBIE_ROUNDS_RECONCILED",
+      "severity": "WARN",
+      "message": "1 stale round reconciled at preflight"
+    },
+    {
+      "code": "STALE_JOB_RECONCILED",
+      "severity": "WARN",
+      "message": "Prior RUNNING job reconciled at preflight"
+    },
+    {
+      "code": "EXIT_EDGE_NOT_PROVEN",
+      "severity": "INFO",
+      "message": "No closed positions"
+    },
+    {
+      "code": "EXECUTION_PATH_NOT_EXERCISED",
+      "severity": "INFO",
+      "message": "No orders/fills in any round"
+    }
+  ],
+  "profitability": {
+    "classification": "NOT_PROVEN",
+    "trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "winRate": null,
+    "note": "Short smoke sample — not a profitability proof"
+  },
+  "criticalFailures": [],
+  "stopEarly": false,
+  "finalVerdict": "PARTIAL",
+  "passCriteriaMet": {
+    "fiveRoundsTerminal": false,
+    "noCriticalSafetyFailure": true,
+    "aiVetoRespected": true,
+    "noPnlMismatch": true,
+    "noZombieOrphan": true,
+    "artifactsAvailable": true,
+    "runtimeStable": true
+  },
+  "artifactsRoot": "artifacts/forensics/cmstjiruf0007unr8e78nizga",
+  "fullRunnerOutput": "kripto-5round-paper-validation.json",
+  "markdownReport": "KRIPTO_5ROUND_SHORT_PAPER_SMOKE.md"
+}

@@ -1,8 +1,55 @@
 import type { PositionCloseReason } from "@/src/server/execution/types";
 import { resolveRoundTripTakerFeePercent } from "@/src/server/execution/fee-profile";
+import { resolveRegimeAwareEntryQualityThreshold } from "@/src/server/scanner/regime-intelligence.service";
 
 export const MINIMUM_NET_EXIT_PROFIT_PERCENT = 0.45;
 const PROFIT_BUFFER_AFTER_FEES_PERCENT = 0.05;
+
+/** Trade quality policy — entry/exit calibration for profit factor (not global risk relax). */
+export const TRADE_QUALITY_POLICY = {
+  maxAiRiskScoreWithoutEliteConfidence: 75,
+  minConfidenceForHighRiskEntry: 82,
+  trendingTpConfidenceBoost: 0.12,
+  minConfidenceForTrendingTpBoost: 75,
+  minRewardRiskForQualityTimeoutExit: 1.3,
+  minConfidenceForQualityTimeoutExit: 70,
+} as const;
+
+export function shouldRejectHighRiskLowConfidenceEntry(input: {
+  confidencePercent: number;
+  aiRiskScore: number;
+  marketRegime?: string;
+}): { reject: boolean; reason?: string } {
+  const thresholds = resolveRegimeAwareEntryQualityThreshold({
+    marketRegime: input.marketRegime ?? "RANGE_SIDEWAYS",
+    baseMaxAiRiskScore: TRADE_QUALITY_POLICY.maxAiRiskScoreWithoutEliteConfidence,
+    baseMinConfidence: TRADE_QUALITY_POLICY.minConfidenceForHighRiskEntry,
+  });
+  if (input.aiRiskScore > thresholds.maxAiRiskScore && input.confidencePercent < thresholds.minConfidence) {
+    return {
+      reject: true,
+      reason: `Entry quality: elevated AI risk (${input.aiRiskScore.toFixed(0)}) without elite confidence (${input.confidencePercent.toFixed(0)}% < ${thresholds.minConfidence.toFixed(0)}%)`,
+    };
+  }
+  return { reject: false };
+}
+
+export function resolveRegimeTakeProfitBoost(input: {
+  marketRegime: string;
+  confidencePercent: number;
+}): number {
+  const regime = input.marketRegime.toUpperCase();
+  if (
+    (regime.includes("BULL") || regime.includes("ROCKET") || regime.includes("TREND")) &&
+    input.confidencePercent >= TRADE_QUALITY_POLICY.minConfidenceForTrendingTpBoost
+  ) {
+    return TRADE_QUALITY_POLICY.trendingTpConfidenceBoost;
+  }
+  if (regime.includes("RANGE") || regime.includes("SIDEWAYS") || regime.includes("LOW_VOL")) {
+    return input.confidencePercent >= 75 ? 0.06 : 0;
+  }
+  return 0;
+}
 
 export function resolveMinimumProtectedProfitPercent() {
   const roundTripFeePercent = resolveRoundTripTakerFeePercent();

@@ -265,8 +265,62 @@ export type AutoRoundRunItem = {
   failReason?: string | null;
   selectedReason?: string | null;
   metadata?: Record<string, unknown> | null;
+  runtime?: RoundRuntimeSnapshot | null;
   startedAt: string;
   endedAt?: string | null;
+};
+
+export type RoundProgressBreakdown = {
+  selection: number;
+  pump: number;
+  scanner: number;
+  aiAnalysis: number;
+  candidateEvaluation: number;
+  execution: number;
+  positionMonitoring: number;
+  intraRound: number;
+  overall: number;
+};
+
+export type RoundRuntimeSnapshot = {
+  step: string;
+  message: string;
+  coarseState: string;
+  currentCandidate?: string;
+  currentSymbol?: string;
+  candidatesProcessed: number;
+  candidatesRemaining?: number;
+  scannerTotal?: number;
+  pumpProcessed?: number;
+  pumpTotal?: number;
+  aiProcessed?: number;
+  aiTotal?: number;
+  executionPhasePct?: number;
+  positionHoldSec?: number;
+  positionMaxWaitSec?: number;
+  currentPipeline?: string;
+  currentAiPhase?: string;
+  currentScannerPhase?: string;
+  retryCount: number;
+  selectionAttempt: number;
+  roundProgressPct: number;
+  intraRoundPct?: number;
+  progressBreakdown?: RoundProgressBreakdown;
+  elapsedMs: number;
+  estimatedRemainingMs?: number;
+  selectionBudgetMs: number;
+  heartbeatAt: string;
+  cancelled?: boolean;
+  cancelReason?: string;
+  timeline?: Array<{
+    at: string;
+    kind: string;
+    step: string;
+    message: string;
+    symbol?: string;
+    pipeline?: string;
+    attempt?: number;
+  }>;
 };
 
 export type AutoRoundJobItem = {
@@ -290,6 +344,7 @@ export type AutoRoundJobItem = {
   startedAt?: string | null;
   finishedAt?: string | null;
   rounds: AutoRoundRunItem[];
+  runtime?: RoundRuntimeSnapshot | null;
 };
 
 export type AutoRoundSimulationSummary = {
@@ -357,6 +412,53 @@ export type AutoRoundStatusResponse = {
   active: AutoRoundJobItem | null;
   jobs: AutoRoundJobItem[];
   summary?: AutoRoundSimulationSummary;
+  scheduler?: {
+    registry: Record<string, unknown>;
+    activeLease: Record<string, unknown> | null;
+    roundRegistry: Record<string, unknown>;
+    readOnly?: boolean;
+  };
+  health?: SchedulerProductionHealthSnapshot | null;
+};
+
+export type SchedulerProductionHealthSnapshot = {
+  generatedAt: string;
+  overallScore: number;
+  schedulerHealth: number;
+  runtimeHealth: number;
+  recoveryHealth: number;
+  watchdogHealth: number;
+  scannerHealth: number;
+  aiHealth: number;
+  databaseHealth: number;
+  ownershipHealth: number;
+  heartbeatHealth: number;
+  leaseHealth: number;
+  registryHealth: number;
+  jobs: Array<{
+    jobId: string;
+    jobStatus: string;
+    score: number;
+    canRecover: boolean;
+    issues: Array<{
+      component: string;
+      failure: string;
+      severity: string;
+      message: string;
+    }>;
+    recoveryState: {
+      escalationLevel: number;
+      recoveryCount: number;
+    };
+  }>;
+  watchdog: {
+    activeCount: number;
+    entries: Array<{ jobId: string; ownerId: string; startedAt: string; tickCount: number }>;
+  };
+  recoveryManager: {
+    processOwnerId: string;
+    pendingRecoveries: number;
+  };
 };
 
 export type AutoRoundHistoryItem = AutoRoundRunItem & {

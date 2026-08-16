@@ -2,7 +2,8 @@ import type { AIProviderAdapter } from "@/src/server/ai/provider.interface";
 import { analyzeWithRemoteModel } from "@/src/server/ai/providers/remote-llm";
 import type { AIAnalysisInput, AIModelOutput, AIProviderConfig } from "@/src/types/ai";
 import { clampScore } from "@/src/server/ai/utils";
-import { buildIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { resolveIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { runOnFreshStack, yieldAsyncStackUnwind } from "@/src/server/execution/cancellable-work.service";
 import { buildStandardizedOutput } from "@/src/server/ai/providers/standardized-output";
 
 function readParamNumber(input: AIAnalysisInput, key: string): number | null {
@@ -22,7 +23,7 @@ function readParamBoolean(input: AIAnalysisInput, key: string): boolean | null {
 }
 
 function buildRiskManagerOutput(input: AIAnalysisInput, provider: string): AIModelOutput {
-  const ind = buildIndicatorSnapshot(input);
+  const ind = resolveIndicatorSnapshot(input);
   const vetoReasonList: string[] = [];
   const cautionList: string[] = [];
   let riskExposure = 24;
@@ -286,7 +287,8 @@ export class Provider3Adapter implements AIProviderAdapter {
   }
 
   async analyzeRiskAssessment(input: AIAnalysisInput): Promise<AIModelOutput> {
-    const specialist = buildRiskManagerOutput(input, this.config.name);
+    await yieldAsyncStackUnwind();
+    const specialist = await runOnFreshStack(() => buildRiskManagerOutput(input, this.config.name));
     const remote = await analyzeWithRemoteModel(this.config, input, "risk");
     if (!remote) return specialist;
     return {

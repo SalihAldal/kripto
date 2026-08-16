@@ -41,6 +41,7 @@ type Run = {
   failReason?: string | null;
   selectedReason?: string | null;
   metadata?: Record<string, unknown> | null;
+  startedAt?: Date;
   endedAt?: Date | null;
 };
 
@@ -65,13 +66,44 @@ vi.mock("@/src/server/repositories/execution.repository", () => ({
   }),
 }));
 
+const mockCandidate = {
+  context: {
+    symbol: "BTCTRY",
+    metadata: {},
+    spreadPercent: 0.1,
+    fakeSpikeScore: 0,
+    pumpRisk: 10,
+    change24h: 1,
+    momentumPercent: 0.5,
+    volatilityPercent: 0.2,
+    volume24h: 1_000_000,
+    tradable: true,
+    rejectReasons: [],
+    lastPrice: 100,
+  },
+  ai: {
+    explanation: "consensus strong buy",
+    finalConfidence: 80,
+    finalDecision: "BUY",
+    rejected: false,
+    analysisScorecard: { confidenceScore: 80 },
+  },
+  score: { score: 80, confidence: 80, status: "OK" },
+  rank: 1,
+};
+
 vi.mock("@/src/server/scanner", () => ({
   getBestFastEntry: vi.fn().mockResolvedValue({
-    selected: {
-      context: { symbol: "BTCTRY" },
-      ai: { explanation: "consensus strong buy" },
-    },
+    selected: mockCandidate,
     reason: undefined,
+    scannedAt: new Date().toISOString(),
+    evaluated: 1,
+  }),
+  getPumpFastEntry: vi.fn().mockResolvedValue({
+    selected: mockCandidate,
+    reason: "Pump lane",
+    scannedAt: new Date().toISOString(),
+    evaluated: 1,
   }),
 }));
 
@@ -168,12 +200,13 @@ vi.mock("@/src/server/repositories/auto-round.repository", () => ({
     return next;
   }),
   createAutoRoundRun: vi.fn(async (payload: Record<string, unknown>) => {
-    const row: Run = {
+    const row: Run & { startedAt: Date } = {
       id: `run-${Math.random().toString(36).slice(2, 8)}`,
       jobId: String(payload.jobId),
       roundNo: Number(payload.roundNo),
       state: String(payload.state),
       metadata: (payload.metadata as Record<string, unknown>) ?? null,
+      startedAt: new Date(),
     };
     runs.set(row.id, row);
     return row;
@@ -186,11 +219,187 @@ vi.mock("@/src/server/repositories/auto-round.repository", () => ({
     runs.set(runId, next);
     return next;
   }),
+  getAutoRoundRunById: vi.fn(async (runId: string) => runs.get(runId) ?? null),
+  getAutoRoundJobStats: vi.fn(async () => ({
+    openedRounds: 0,
+    successCount: 0,
+    failedCount: 0,
+    rejectedCount: 0,
+    netPnl: 0,
+    feeTotal: 0,
+    entryNotional: 0,
+    netPnlPercent: 0,
+    winRate: 0,
+  })),
+  listAutoRoundRunsPaginated: vi.fn(async () => ({ runs: [], total: 0, page: 1, pageSize: 5, totalPages: 0 })),
+  getAutoRoundRunFilterCounts: vi.fn(async () => ({ all: 0, opened: 0, rejected: 0 })),
+  loadSchedulerLease: vi.fn(async () => null),
+  compareAndSetSchedulerLease: vi.fn(async (input: { lease: Record<string, unknown> }) => ({
+    ok: true,
+    lease: { ...input.lease, version: Number(input.lease.version ?? 0) + 1 },
+  })),
+  acquireOrCreateRoundRun: vi.fn(async (payload: Record<string, unknown>) => {
+    const row: Run & { startedAt: Date } = {
+      id: `run-${Math.random().toString(36).slice(2, 8)}`,
+      jobId: String(payload.jobId),
+      roundNo: Number(payload.roundNo),
+      state: String(payload.state),
+      metadata: (payload.metadata as Record<string, unknown>) ?? null,
+      startedAt: new Date(),
+    };
+    const existing = Array.from(runs.values()).find(
+      (x) =>
+        x.jobId === row.jobId &&
+        x.roundNo === row.roundNo &&
+        !x.endedAt &&
+        ["tariyor", "coin_secildi", "alim_yapildi", "satis_bekleniyor"].includes(x.state),
+    );
+    if (existing) return { action: "attached", run: existing };
+    runs.set(row.id, row);
+    return { action: "created", run: row };
+  }),
+  persistRoundOwnershipRecord: vi.fn(async (input: { record: Record<string, unknown> }) => input.record),
+}));
+
+vi.mock("@/src/server/execution/scheduler-watchdog.service", () => ({
+  atomicStartSchedulerWatchdog: vi.fn(async (jobId: string) => ({ action: "started", jobId })),
+  stopSchedulerWatchdog: vi.fn(() => true),
+  getWatchdogRegistrySnapshot: vi.fn(() => ({ activeCount: 0, entries: [] })),
+  resetSchedulerWatchdogForTests: vi.fn(),
+}));
+
+vi.mock("@/src/server/execution/scheduler-recovery.service", () => ({
+  configureSchedulerRecovery: vi.fn(),
+  executeSchedulerRecoveryForRunningJobs: vi.fn(async () => []),
+  executeSchedulerRecovery: vi.fn(async () => ({
+    jobId: "job-1",
+    action: "NO_ACTION",
+    result: "skipped",
+    decision: { action: "NO_ACTION", reason: "mock", failure: "SCHEDULER_CRASH", component: "scheduler", escalationLevel: 0, safeResume: true },
+    auditEvent: { id: "mock", timestamp: new Date().toISOString(), jobId: "job-1", component: "scheduler", failure: "SCHEDULER_CRASH", decision: {}, action: "NO_ACTION", result: "skipped", durationMs: 0, operator: "automatic", trigger: "startup" },
+  })),
+  getProductionHealthSnapshot: vi.fn(async () => ({
+    generatedAt: new Date().toISOString(),
+    overallScore: 100,
+    schedulerHealth: 100,
+    runtimeHealth: 100,
+    recoveryHealth: 100,
+    watchdogHealth: 100,
+    scannerHealth: 100,
+    aiHealth: 100,
+    databaseHealth: 100,
+    ownershipHealth: 100,
+    heartbeatHealth: 100,
+    leaseHealth: 100,
+    registryHealth: 100,
+    jobs: [],
+    watchdog: { activeCount: 0, entries: [] },
+    recoveryManager: { processOwnerId: "test", pendingRecoveries: 0 },
+  })),
+  getRecoveryTimeline: vi.fn(async () => []),
+}));
+
+vi.mock("@/src/server/repositories/auto-round-integrity.repository", () => ({
+  OptimisticConcurrencyError: class OptimisticConcurrencyError extends Error {},
+  transactionallyFailRound: vi.fn(async (input: Record<string, unknown>) => {
+    const jobId = String(input.jobId);
+    const runId = String(input.runId);
+    const job = jobs.get(jobId);
+    const run = runs.get(runId);
+    if (!run) return { ok: false, action: "missing" };
+    if (run.endedAt) return { ok: true, action: "already_terminal", run };
+    runs.set(runId, {
+      ...run,
+      state: String(input.activeState ?? "tur_basarisiz"),
+      failReason: String(input.reason),
+      result: "failed",
+      endedAt: new Date(),
+    });
+    if (job) {
+      jobs.set(jobId, {
+        ...job,
+        failedRounds: job.failedRounds + 1,
+        activeState: String(input.activeState ?? "tur_basarisiz"),
+        lastError: String(input.reason),
+      });
+    }
+    return { ok: true, action: "failed", run: runs.get(runId) };
+  }),
+  transactionallyCompleteRound: vi.fn(async (input: Record<string, unknown>) => {
+    const jobId = String(input.jobId);
+    const runId = String(input.runId);
+    const job = jobs.get(jobId);
+    const run = runs.get(runId);
+    const runPatch = (input.runPatch ?? {}) as Record<string, unknown>;
+    if (!run) return { ok: false, action: "missing" };
+    if (run.endedAt && run.result) return { ok: true, action: "already_terminal", run };
+    runs.set(runId, {
+      ...run,
+      ...runPatch,
+      endedAt: new Date(),
+    });
+    if (job) {
+      jobs.set(jobId, {
+        ...job,
+        completedRounds: job.completedRounds + 1,
+        activeState: "tur_tamamlandi",
+        metadata: {
+          ...(job.metadata ?? {}),
+          ...((input.jobMetadataPatch as Record<string, unknown> | undefined) ?? {}),
+        },
+      });
+    }
+    return { ok: true, action: "completed", run: runs.get(runId) };
+  }),
+  idempotentMergeRunMetadata: vi.fn(async (input: Record<string, unknown>) => {
+    const runId = String(input.runId);
+    const run = runs.get(runId);
+    if (!run) return { action: "missing" };
+    const meta = (run.metadata ?? {}) as Record<string, unknown>;
+    runs.set(runId, {
+      ...run,
+      state: (input.state as string | undefined) ?? run.state,
+      symbol: (input.symbol as string | undefined) ?? run.symbol,
+      metadata: {
+        ...meta,
+        ...((input.patch as Record<string, unknown> | undefined) ?? {}),
+        ...(input.runtime ? { runtime: input.runtime } : {}),
+      },
+    });
+    return { action: "merged", run: runs.get(runId) };
+  }),
+  idempotentPatchJobActiveRound: vi.fn(async (input: Record<string, unknown>) => {
+    const jobId = String(input.jobId);
+    const job = jobs.get(jobId);
+    if (!job) return { action: "missing" };
+    const meta = (job.metadata ?? {}) as Record<string, unknown>;
+    jobs.set(jobId, {
+      ...job,
+      activeState: (input.activeState as string | undefined) ?? job.activeState,
+      metadata: {
+        ...meta,
+        ...((input.metadataPatch as Record<string, unknown> | undefined) ?? {}),
+        activeRound: {
+          runId: input.runId,
+          roundNo: input.roundNo,
+          heartbeatAt: input.heartbeatAt ?? new Date().toISOString(),
+          step: input.step,
+          message: input.message,
+        },
+      },
+    });
+    return { action: "patched" };
+  }),
+  auditAutoRoundIntegrity: vi.fn(async () => null),
 }));
 
 describe("auto round engine integration", () => {
   it("10 tur otomatik donguyu tamamlar ve ikinci start istegini engeller", async () => {
     const mod = await import("../src/server/execution/auto-round-engine.service");
+    const ownership = await import("../src/server/execution/scheduler-ownership.service");
+    const roundRegistry = await import("../src/server/execution/round-registry.service");
+    ownership.resetSchedulerOwnershipForTests();
+    roundRegistry.resetRoundRegistryForTests();
     const started = await mod.startAutoRoundJob({
       totalRounds: 10,
       budgetPerTrade: 1000,

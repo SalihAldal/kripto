@@ -1,4 +1,5 @@
 import { env } from "@/lib/config";
+import { resolveRegimeTakeProfitBoost } from "@/src/server/execution/profit-thresholds";
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
@@ -9,15 +10,20 @@ export function resolveSmartTakeProfitPercent(input: {
   volatilityPercent: number;
   confidencePercent: number;
   expectedProfitPercent?: number;
+  marketRegime?: string;
 }) {
   if (!env.EXECUTION_SMART_TP_ENABLED) {
     return Number(Math.max(0.1, input.baseTpPercent).toFixed(4));
   }
   const volatilityBoost = clamp(input.volatilityPercent * env.EXECUTION_SMART_TP_VOL_MULTIPLIER, -0.4, 1.8);
   const confidenceBoost = clamp((input.confidencePercent - 70) * 0.02, -0.4, 0.8);
+  const regimeBoost = resolveRegimeTakeProfitBoost({
+    marketRegime: input.marketRegime ?? "RANGE_SIDEWAYS",
+    confidencePercent: input.confidencePercent,
+  });
   const expectedBase = Number.isFinite(input.expectedProfitPercent ?? NaN) ? Number(input.expectedProfitPercent ?? 0) : input.baseTpPercent;
   const blended = expectedBase * 0.55 + input.baseTpPercent * 0.45;
-  const smart = blended + volatilityBoost + confidenceBoost;
+  const smart = blended + volatilityBoost + confidenceBoost + regimeBoost;
   return Number(clamp(smart, 0.25, env.EXECUTION_TARGET_MAX_PROFIT_PERCENT).toFixed(4));
 }
 

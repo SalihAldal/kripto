@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev --turbopack",
     "build": "node -r ./scripts/load-dotenv.cjs node_modules/next/dist/bin/next build && node scripts/postbuild-standalone.cjs",
     "fix:standalone-assets": "node scripts/postbuild-standalone.cjs",
     "start": "node -r ./scripts/load-dotenv.cjs node_modules/next/dist/bin/next start",

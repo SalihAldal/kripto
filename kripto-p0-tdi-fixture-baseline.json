@@ -1,0 +1,539 @@
+{
+  "sessionId": "cmstltuqn0007un9ksbk3xn9c",
+  "capturedAt": "2026-08-15T13:37:33.277Z",
+  "phase": "before_fix_recorded_artifact",
+  "totals": {
+    "tdiDecisions": 17626,
+    "approved": 0,
+    "wait": 6094,
+    "rejected": 11532,
+    "scoreGe55": 5067,
+    "hybridBuy": 0,
+    "momentumWeakCount": 7721,
+    "techStrongButOthersWeakCount": 6518,
+    "confidenceLt40Count": 17003,
+    "learningBearishMasterCount": 8634
+  },
+  "verdictCounts": {
+    "WAIT": 6094,
+    "REJECTED": 11532
+  },
+  "hybridDecisions": {
+    "HOLD": 11472,
+    "NO_TRADE": 6154
+  },
+  "masterDecisions": {
+    "NO_TRADE": 8538,
+    "SELL": 64,
+    "REDUCE": 32
+  },
+  "scoreGe55HybridBlockerFrequency": {
+    "DUPLICATE_MOMENTUM_TECH": 1300,
+    "COMPOSITE_SCORE": 350,
+    "OTHER": 61,
+    "TECH_STRONG_OTHERS_WEAK": 81
+  },
+  "estimatedDuplicatePaperDowngradeCandidates": 968,
+  "sampleScoreGe55HybridCandidates": [
+    {
+      "candidateId": "hybrid:METRY:485371f8",
+      "symbol": "METRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 60.2858,
+      "hybridDecision": "HOLD",
+      "confidence": 46.17,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TRUMPTRY:966698be",
+      "symbol": "TRUMPTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 57.4241,
+      "hybridDecision": "HOLD",
+      "confidence": 38.32,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:2a98f991",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.3446,
+      "hybridDecision": "HOLD",
+      "confidence": 34.26,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:fd518724",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 65.634,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 40.49,
+      "reasonDetail": "No-trade mode: Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "COMPOSITE_SCORE"
+    },
+    {
+      "candidateId": "hybrid:FILTRY:3bf585cc",
+      "symbol": "FILTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 56.7999,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 40.66,
+      "reasonDetail": "No-trade mode: Timeframe'ler cakisiyor | Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:MITOTRY:839b4e30",
+      "symbol": "MITOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.5226,
+      "hybridDecision": "HOLD",
+      "confidence": 38.2,
+      "reasonDetail": "Momentum guven vermiyor | Haber/sentiment karmasik | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TSTTRY:32379c81",
+      "symbol": "TSTTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 58.5815,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 37.86,
+      "reasonDetail": "No-trade mode: Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Min net kar hedefi icin beklenen hareket %0.80 alti | En az 2 AI yonu ayni degil",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BERATRY:fc5c1ff7",
+      "symbol": "BERATRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 63.7846,
+      "hybridDecision": "HOLD",
+      "confidence": 42.2,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ICPTRY:1dea6148",
+      "symbol": "ICPTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 61.8322,
+      "hybridDecision": "HOLD",
+      "confidence": 46.47,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Wick spike tespit edildi (WAIT) | Manipulasyon riski yuksek",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:XPLTRY:94b15aaf",
+      "symbol": "XPLTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 64.1531,
+      "hybridDecision": "HOLD",
+      "confidence": 48.76,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ENSOTRY:38989fdf",
+      "symbol": "ENSOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 68.9307,
+      "hybridDecision": "HOLD",
+      "confidence": 43.43,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ROBOTRY:c3cb1547",
+      "symbol": "ROBOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 56.4924,
+      "hybridDecision": "HOLD",
+      "confidence": 36.95,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TSTTRY:2194dda0",
+      "symbol": "TSTTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 62.074,
+      "hybridDecision": "HOLD",
+      "confidence": 49.26,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Wick spike tespit edildi (WAIT)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:CFGTRY:7ca18ccb",
+      "symbol": "CFGTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 64.3722,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 39.84,
+      "reasonDetail": "No-trade mode: Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "COMPOSITE_SCORE"
+    },
+    {
+      "candidateId": "hybrid:GPSTRY:84adf3eb",
+      "symbol": "GPSTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 57.375,
+      "hybridDecision": "HOLD",
+      "confidence": 42.14,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:LINKTRY:fd52d170",
+      "symbol": "LINKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 60.8203,
+      "hybridDecision": "HOLD",
+      "confidence": 53.46,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TSTTRY:8694d4bb",
+      "symbol": "TSTTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.6947,
+      "hybridDecision": "HOLD",
+      "confidence": 39.64,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:8fe9e66c",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 61.5529,
+      "hybridDecision": "HOLD",
+      "confidence": 31.87,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BOMETRY:0d0c668e",
+      "symbol": "BOMETRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 65.1029,
+      "hybridDecision": "HOLD",
+      "confidence": 38.98,
+      "reasonDetail": "Momentum guven vermiyor | Haber/sentiment karmasik | Teknik guclu ama diger AI destegi zayif | Wick spike tespit edildi (WAIT)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:RESOLVTRY:5d072042",
+      "symbol": "RESOLVTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 58.7482,
+      "hybridDecision": "HOLD",
+      "confidence": 37.5,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:1000SATSTRY:fdbea393",
+      "symbol": "1000SATSTRY",
+      "strategy": "VOLATILITY_DEFENSIVE",
+      "hybridCompositeScore": 66.1871,
+      "hybridDecision": "HOLD",
+      "confidence": 15.45,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ETHFITRY:5c9f430b",
+      "symbol": "ETHFITRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 62.4411,
+      "hybridDecision": "HOLD",
+      "confidence": 31.3,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:METRY:485371f8",
+      "symbol": "METRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 60.2858,
+      "hybridDecision": "HOLD",
+      "confidence": 46.17,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TRUMPTRY:966698be",
+      "symbol": "TRUMPTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 57.4241,
+      "hybridDecision": "HOLD",
+      "confidence": 38.32,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:2a98f991",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.3446,
+      "hybridDecision": "HOLD",
+      "confidence": 34.26,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:fd518724",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 65.634,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 40.49,
+      "reasonDetail": "No-trade mode: Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "COMPOSITE_SCORE"
+    },
+    {
+      "candidateId": "hybrid:FILTRY:3bf585cc",
+      "symbol": "FILTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 56.7999,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 40.66,
+      "reasonDetail": "No-trade mode: Timeframe'ler cakisiyor | Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:MITOTRY:839b4e30",
+      "symbol": "MITOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.5226,
+      "hybridDecision": "HOLD",
+      "confidence": 38.2,
+      "reasonDetail": "Momentum guven vermiyor | Haber/sentiment karmasik | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TSTTRY:32379c81",
+      "symbol": "TSTTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 58.5815,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 37.86,
+      "reasonDetail": "No-trade mode: Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Min net kar hedefi icin beklenen hareket %0.80 alti | En az 2 AI yonu ayni degil",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BERATRY:fc5c1ff7",
+      "symbol": "BERATRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 63.7846,
+      "hybridDecision": "HOLD",
+      "confidence": 42.2,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ICPTRY:1dea6148",
+      "symbol": "ICPTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 61.8322,
+      "hybridDecision": "HOLD",
+      "confidence": 46.47,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Wick spike tespit edildi (WAIT) | Manipulasyon riski yuksek",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:XPLTRY:94b15aaf",
+      "symbol": "XPLTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 64.1531,
+      "hybridDecision": "HOLD",
+      "confidence": 48.76,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ENSOTRY:38989fdf",
+      "symbol": "ENSOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 68.9307,
+      "hybridDecision": "HOLD",
+      "confidence": 43.43,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ROBOTRY:c3cb1547",
+      "symbol": "ROBOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 56.4924,
+      "hybridDecision": "HOLD",
+      "confidence": 36.95,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TSTTRY:2194dda0",
+      "symbol": "TSTTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 62.074,
+      "hybridDecision": "HOLD",
+      "confidence": 49.26,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Wick spike tespit edildi (WAIT)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:CFGTRY:7ca18ccb",
+      "symbol": "CFGTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 64.3722,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 39.84,
+      "reasonDetail": "No-trade mode: Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "COMPOSITE_SCORE"
+    },
+    {
+      "candidateId": "hybrid:GPSTRY:84adf3eb",
+      "symbol": "GPSTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 57.375,
+      "hybridDecision": "HOLD",
+      "confidence": 42.14,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:LINKTRY:fd52d170",
+      "symbol": "LINKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 60.8203,
+      "hybridDecision": "HOLD",
+      "confidence": 53.46,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TSTTRY:8694d4bb",
+      "symbol": "TSTTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.6947,
+      "hybridDecision": "HOLD",
+      "confidence": 39.64,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:8fe9e66c",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 61.5529,
+      "hybridDecision": "HOLD",
+      "confidence": 31.87,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BOMETRY:0d0c668e",
+      "symbol": "BOMETRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 65.1029,
+      "hybridDecision": "HOLD",
+      "confidence": 38.98,
+      "reasonDetail": "Momentum guven vermiyor | Haber/sentiment karmasik | Teknik guclu ama diger AI destegi zayif | Wick spike tespit edildi (WAIT)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:RESOLVTRY:5d072042",
+      "symbol": "RESOLVTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 58.7482,
+      "hybridDecision": "HOLD",
+      "confidence": 37.5,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:1000SATSTRY:fdbea393",
+      "symbol": "1000SATSTRY",
+      "strategy": "VOLATILITY_DEFENSIVE",
+      "hybridCompositeScore": 66.1871,
+      "hybridDecision": "HOLD",
+      "confidence": 15.45,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:ETHFITRY:5c9f430b",
+      "symbol": "ETHFITRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 62.4411,
+      "hybridDecision": "HOLD",
+      "confidence": 31.3,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:METRY:485371f8",
+      "symbol": "METRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 60.2858,
+      "hybridDecision": "HOLD",
+      "confidence": 46.17,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:TRUMPTRY:966698be",
+      "symbol": "TRUMPTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 57.4241,
+      "hybridDecision": "HOLD",
+      "confidence": 38.32,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:2a98f991",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.3446,
+      "hybridDecision": "HOLD",
+      "confidence": 34.26,
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:fd518724",
+      "symbol": "BANKTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 65.634,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 40.49,
+      "reasonDetail": "No-trade mode: Futures trap riski: LATE_LONG_TRAP | Regime chop/rapid switching (CHOP)",
+      "firstBlocker": "COMPOSITE_SCORE"
+    },
+    {
+      "candidateId": "hybrid:FILTRY:3bf585cc",
+      "symbol": "FILTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 56.7999,
+      "hybridDecision": "NO_TRADE",
+      "confidence": 40.66,
+      "reasonDetail": "No-trade mode: Timeframe'ler cakisiyor | Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    },
+    {
+      "candidateId": "hybrid:MITOTRY:839b4e30",
+      "symbol": "MITOTRY",
+      "strategy": "RANGE_MEAN_REVERSION",
+      "hybridCompositeScore": 59.5226,
+      "hybridDecision": "HOLD",
+      "confidence": 38.2,
+      "reasonDetail": "Momentum guven vermiyor | Haber/sentiment karmasik | Teknik guclu ama diger AI destegi zayif",
+      "firstBlocker": "DUPLICATE_MOMENTUM_TECH"
+    }
+  ]
+}

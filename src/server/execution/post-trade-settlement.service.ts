@@ -11,6 +11,8 @@ import {
 import { getGlobalTicker, placeGlobalMarketBuy, placeGlobalMarketSell } from "@/services/binance-global.service";
 import { env } from "@/lib/config";
 import { publishExecutionEvent } from "@/src/server/execution/execution-event-bus";
+import { bridgeClosedTradePnl } from "@/src/server/forensics/forensic-bridge.service";
+import { mapPositionMonitorExit } from "@/src/server/forensics/exit-forensics.service";
 import { calculateRealizedPnl, calculateUnrealizedPnl } from "@/src/server/execution/pnl-calculator";
 import type { PositionCloseReason, TradingMode } from "@/src/server/execution/types";
 import { resumeScannerWorker } from "@/src/server/scanner/scanner-worker.service";
@@ -827,6 +829,34 @@ export async function settleOpenPosition(input: {
     openFee,
     closeFee,
     slippageCost,
+  });
+
+  const exitForensicsSnapshot = mapPositionMonitorExit({
+    closeReason: input.reason,
+    entryPrice: position.entryPrice,
+    exitPrice,
+    entryTimestamp: position.openedAt,
+    exitTimestamp: new Date(),
+    takeProfitPrice: Number(positionMeta.takeProfitPrice ?? positionMeta.targetSellPrice ?? 0) || null,
+    stopLossPrice: Number(positionMeta.stopLossPrice ?? 0) || null,
+    side: position.side,
+    quantity: finalCloseQty,
+    openFee,
+    closeFee,
+  });
+  bridgeClosedTradePnl({
+    tradeId: position.id,
+    symbol,
+    side: position.side,
+    entryPrice: position.entryPrice,
+    exitPrice,
+    quantity: finalCloseQty,
+    entryFee: openFee,
+    exitFee: closeFee,
+    slippageCost,
+    exitReason: exitForensicsSnapshot.exitReason,
+    exitModel: exitForensicsSnapshot.exitModel,
+    exitForensics: exitForensicsSnapshot,
   });
 
   const createdCloseOrder = await createTradeOrder({

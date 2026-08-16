@@ -1,0 +1,107 @@
+{
+  "validationId": "1round-stack-overflow-2026-08-14T21-49-40-294Z",
+  "referenceForensic": "KRIPTO_AI_STACK_OVERFLOW_FORENSIC.md",
+  "referenceStressSession": "cmstdt3ww0007uncgmjwgvf6p",
+  "startedAt": "2026-08-14T21:49:42.553Z",
+  "completedAt": "2026-08-14T21:58:36.979Z",
+  "verdict": "FAIL",
+  "codeFingerprint": {
+    "gitHead": "31e27712566af791a8ecb1c24bbc7f376d608a5e",
+    "indicatorSuiteSha": "0cf86c746166873d",
+    "analysisOrchestratorSha": "e4e15e876cfe9f4c",
+    "hybridDecisionEngineSha": "0c64b71618dcf198",
+    "scannerServiceSha": "5e2c53f449ed8ee7",
+    "validationProcessPid": 37840
+  },
+  "fixSummary": {
+    "memoizedIndicatorSnapshot": true,
+    "flattenedScannerWrappers": true,
+    "summarizedConsensusLogging": true,
+    "consensusTelemetry": true,
+    "freshStackExecution": true,
+    "stackUnwindYields": true
+  },
+  "config": {
+    "mode": "PAPER",
+    "exchange": "tr",
+    "scanner": "REAL_SCANNER",
+    "ai": "REAL_AI",
+    "aiGatePolicy": "VETO",
+    "scannerAiConcurrency": 2,
+    "totalRounds": 1
+  },
+  "sessionId": "cmsthcs630007un7432s7fnnq",
+  "stackOverflow": {
+    "errorsJsonCount": 10,
+    "maxObservedDuringRun": 10,
+    "candidateRangeErrors": 1
+  },
+  "aiCandidates": {
+    "finalAssessment": {
+      "total": 6,
+      "startedOrphans": [],
+      "rangeErrors": [
+        {
+          "candidateId": "ai:UNITRY:4707fdc2",
+          "symbol": "UNITRY",
+          "provider": "provider-1",
+          "model": "gpt-4o-mini,gpt-4o-mini,gemini-1.5-flash-latest",
+          "executionMode": "paper",
+          "startedAt": "2026-08-14T21:55:51.102Z",
+          "status": "AI_FAILED",
+          "timeoutMs": 90000,
+          "retryCount": 0,
+          "consensusStage": "ai",
+          "completedAt": "2026-08-14T21:56:16.816Z",
+          "durationMs": 25714,
+          "reasonCode": "AI_FAILED",
+          "errorType": "RangeError",
+          "reasonDetail": "Maximum call stack size exceeded"
+        }
+      ]
+    },
+    "processed": 11,
+    "total": 81
+  },
+  "job": {
+    "id": "cmsthcs630007un7432s7fnnq",
+    "status": "COMPLETED",
+    "completedRounds": 0
+  },
+  "round": {
+    "roundNo": 1,
+    "runId": "cmsthcsap000jun74p64p1eux",
+    "state": "tur_basarisiz",
+    "failReason": "AI_GATE_BLOCK: NO_TRADE",
+    "startedAt": "2026-08-14T21:49:44.641Z",
+    "endedAt": "2026-08-14T21:58:34.344Z"
+  },
+  "runtime": {
+    "step": "EXECUTING",
+    "elapsedMs": 0
+  },
+  "artifacts": {
+    "root": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmsthcs630007un7432s7fnnq\\rounds\\1",
+    "status": {
+      "round-summary.json": true,
+      "ai-progress.json": true,
+      "ai-trace.json": true,
+      "round-watchdog.json": true,
+      "recovery-decisions.json": true,
+      "recovery-telemetry.json": true
+    }
+  },
+  "targetedTests": {
+    "aiStackOverflow": "PASS",
+    "aiCancellation": "PASS",
+    "cooperativeAsync": "PASS",
+    "scanner": "PASS",
+    "aiHybridEngine": "PASS",
+    "consensusEngine": "PASS"
+  },
+  "failReasons": [
+    "STACK_OVERFLOW_ERRORS:10",
+    "STACK_OVERFLOW_OBSERVED_DURING_RUN:10"
+  ],
+  "verdictNote": "PARTIAL: deterministic tests PASS; live overflow reduced 38→10 (~74%) but not zero. Restart worker-runtime after deploy before next live attempt."
+}

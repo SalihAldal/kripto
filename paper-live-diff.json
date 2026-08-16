@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-08-13T23:45:00+03:00",
+  "scope": "native-paper-vs-native-live",
+  "entries": [
+    {
+      "sharedFunction": "runScannerPipeline / getBestFastEntry",
+      "paperOnly": [],
+      "liveOnly": [],
+      "behaviorDifference": "none — same scanner path",
+      "reason": "Shared scanner services"
+    },
+    {
+      "sharedFunction": "executeAnalyzeAndTradeInternal",
+      "paperOnly": ["paperRelaxed bypasses most hard gates", "learningLane hard rejects"],
+      "liveOnly": ["validateLiveTradingGate", "emergency stop blocks execution"],
+      "behaviorDifference": "Paper skips many orchestrator rejects; live enforces full gate chain",
+      "reason": "Intentional paper learning relaxation — documented, not forced equal"
+    },
+    {
+      "sharedFunction": "order placement",
+      "paperOnly": ["executePaperOrderViaExchangeSimulator"],
+      "liveOnly": ["placeMarketBuy/Sell via BinanceExchangeProvider"],
+      "behaviorDifference": "Fill simulation vs real exchange",
+      "reason": "Execution venue divergence"
+    },
+    {
+      "sharedFunction": "evaluatePreTradeRisk",
+      "paperOnly": [],
+      "liveOnly": [],
+      "behaviorDifference": "Same risk service; paper may reach it less often due to paperRelaxed",
+      "reason": "Shared risk-evaluation.service.ts"
+    },
+    {
+      "sharedFunction": "startPositionMonitor / settleOpenPosition",
+      "paperOnly": ["stale paper position recovery", "soft exit hold confirmations"],
+      "liveOnly": [],
+      "behaviorDifference": "Paper has additional recovery helpers",
+      "reason": "Paper runtime safeguards"
+    },
+    {
+      "sharedFunction": "aiMode resolution",
+      "paperOnly": ["aiMode=learning forces paper regardless of EXECUTION_MODE"],
+      "liveOnly": [],
+      "behaviorDifference": "Simulation lab always paper",
+      "reason": "Product rule for native paper learning"
+    }
+  ]
+}

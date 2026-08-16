@@ -97,6 +97,11 @@ import {
 } from "@/src/server/execution-engine-v2/entry-ai.gateway.service";
 import { executeApprovedSpotOrder } from "@/src/server/execution-engine-v2/execution-flow.service";
 import { resolvePartialTakeProfitPlan, resolveSmartTakeProfitPercent } from "@/src/server/execution/smart-targeting.service";
+import { shouldRejectHighRiskLowConfidenceEntry } from "@/src/server/execution/profit-thresholds";
+import { resolveRiskEfficiencyAdjustment, resolveVolatilityAwareStopLossPercent } from "@/src/server/execution/risk-efficiency.service";
+import { getConsecutiveLossCount } from "@/src/server/repositories/risk.repository";
+import { tradingFailsafeState } from "@/src/server/trading-core/protection/failsafe-state";
+import type { PortfolioPositionInput } from "@/src/server/trading-core/portfolio/portfolio-types";
 import { toAppError } from "@/src/server/errors/app-error";
 import { ExternalServiceError } from "@/src/server/errors";
 import { evaluateAdaptiveCandidate } from "@/src/server/metrics/self-optimization.service";
@@ -119,6 +124,11 @@ import {
   setIdempotentExecution,
 } from "@/src/server/recovery/failsafe-recovery.service";
 import { executePaperOrderViaExchangeSimulator } from "@/src/server/exchange-simulator/paper-exchange-adapter.service";
+import {
+  buildExecutionTelemetry,
+  evaluatePreSubmitExecution,
+  resolveAdaptiveRetryPolicy,
+} from "@/src/server/execution/execution-intelligence.service";
 import { notifySystemEvent } from "@/src/server/notifications/notification.service";
 import { feedbackLoopEngine } from "@/src/server/trading-core/feedback-loop";
 import type { FeedbackRejectTradeInput } from "@/src/server/trading-core/feedback-loop";
@@ -128,6 +138,23 @@ import {
   resolveAdaptiveAdjustment,
   resolveImmediateLearningRiskAdjustment,
 } from "@/src/server/trading-core/self-learning/learning-store";
+import {
+  evaluateAiExecutionReadiness,
+  resolveAiExecutionGatePolicy,
+  type AiExecutionGateEvaluation,
+} from "@/src/server/execution/ai-execution-gate.service";
+import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
+import {
+  bridgeAiExecutionGate,
+  bridgeEntryTimingForensics,
+  bridgeExecutionCandidateForensic,
+  bridgeFeeEdgeMetrics,
+  bridgeFeeAwareEntryPolicy,
+  bridgeMeanReversionEntry,
+  bridgeStrategyDecision,
+  bridgeTdiDecision,
+} from "@/src/server/forensics/forensic-bridge.service";
+import { computeFeeEdgeMetrics } from "@/src/server/forensics/fee-edge-metrics.service";
 
 function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED" {
   const upper = raw.toUpperCase();
@@ -496,15 +523,20 @@ function resolveNoTradeReasons(input: {
   const uniqueRoleDecisions = new Set(roleDecisions.filter((x) => x === "BUY" || x === "SELL"));
   const conflictingSignals = uniqueRoleDecisions.size > 1;
   const orderBookImbalance = Number(candidate.context.orderBookImbalance ?? 0);
+  const hybridApprovedBuy =
+    input.decision === "BUY" && input.confidence >= env.EXECUTION_FAST_MIN_CONFIDENCE;
 
   const uncertainMarket =
     (marketRegime === "RANGE_SIDEWAYS" || marketRegime === "LOW_VOLATILITY_CALM") &&
     Math.abs(shortMomentum) < 0.08 &&
     Math.abs(shortFlow) < 0.03;
-  if (uncertainMarket) {
+  if (uncertainMarket && !hybridApprovedBuy) {
     reasons.push("Piyasa belirsiz (range/low-vol + dusuk momentum/akis)");
   }
-  if (conflictingSignals || timeframe?.conflict || !timeframe?.trendAligned || !timeframe?.entrySuitable) {
+  if (
+    !hybridApprovedBuy &&
+    (conflictingSignals || timeframe?.conflict || !timeframe?.trendAligned || !timeframe?.entrySuitable)
+  ) {
     reasons.push("Sinyal cakismasi (AI katmanlari veya timeframe uyumsuz)");
   }
   if (candidate.context.volatilityPercent >= env.EXECUTION_BLOCK_HIGH_VOLATILITY_PERCENT) {
@@ -1149,7 +1181,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     }
     await ensureOpenPositionMonitors(user.id).catch(() => null);
     const emergencyStopEnabled = await getEmergencyStopState(user.id);
-    if (emergencyStopEnabled) {
+    if (emergencyStopEnabled && mode !== "paper") {
       publishExecutionEvent({
         executionId,
         stage: "risk-gate",
@@ -1313,13 +1345,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
     const healthyProviders = ai.outputs?.filter((x) => x.ok && x.output) ?? [];
+    const aiGatePolicyEarly = resolveAiExecutionGatePolicy({ mode, learningLane });
     if (healthyProviders.length === 0) {
       await logTradeEvent({
         symbol: selected.context.symbol,
         eventType: "RISK_GATE_BLOCKED",
         reason: "AI response missing",
       });
-      if (!paperRelaxed) {
+      if (!paperRelaxed || aiGatePolicyEarly === "VETO") {
         return finishExecution({
           executionId,
           mode,
@@ -1430,6 +1463,31 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
         details: {
           riskLevel: ai.analysisScorecard?.riskLevel,
+        },
+      });
+    }
+    const entryQuality = shouldRejectHighRiskLowConfidenceEntry({
+      confidencePercent: ai.finalConfidence,
+      aiRiskScore: ai.finalRiskScore,
+    });
+    if (entryQuality.reject && !paperRelaxed && !learningLane) {
+      await logTradeEvent({
+        symbol: selected.context.symbol,
+        eventType: "RISK_GATE_BLOCKED",
+        reason: entryQuality.reason ?? "Entry quality gate",
+        aiConfidence: scorecardConfidence,
+      });
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: entryQuality.reason ?? "ENTRY_QUALITY: elevated AI risk without elite confidence",
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+        details: {
+          aiRiskScore: ai.finalRiskScore,
+          confidence: ai.finalConfidence,
         },
       });
     }
@@ -1816,8 +1874,11 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         symbol = resolvedTry;
       }
     }
-    let side = ai.finalDecision;
-    if (learningLane && !canOpenLearningLaneMicroTrade({ candidate: selected, confidence: scorecardConfidence })) {
+    let side: "BUY" | "SELL";
+    const microTradeEligible = learningLane
+      ? canOpenLearningLaneMicroTrade({ candidate: selected, confidence: scorecardConfidence })
+      : false;
+    if (learningLane && !microTradeEligible) {
       return finishExecution({
         executionId,
         mode,
@@ -1833,28 +1894,103 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         },
       });
     }
-    if (learningLane && (side === "HOLD" || side === "NO_TRADE")) {
-      const aiRawDecision = ai.finalDecision;
-      side = "BUY";
+    const forensicCandidateId =
+      String(selected.context.metadata.decisionId ?? "").trim() ||
+      createCandidateId(symbol, "execution");
+    const aiGatePolicy = resolveAiExecutionGatePolicy({ mode, learningLane });
+    const aiGate: AiExecutionGateEvaluation = evaluateAiExecutionReadiness({
+      ai,
+      policy: aiGatePolicy,
+      learningLane,
+      microTradeEligible,
+    });
+    bridgeAiExecutionGate({
+      candidateId: forensicCandidateId,
+      symbol,
+      aiVerdict: ai.finalDecision,
+      aiFinalDecision: aiGate.aiFinalDecision,
+      consensusDecision: aiGate.consensusDecision,
+      aiGatePolicy: aiGate.policy,
+      aiGateVerdict: aiGate.verdict,
+      executionVerdict: aiGate.verdict,
+      policy: aiGate.policy,
+      reasonCode: aiGate.reasonCode,
+      reasonDetail: aiGate.reasonDetail,
+      executionSide: aiGate.executionSide,
+    });
+    if (aiGate.verdict === "AI_GATE_BLOCK") {
       publishExecutionEvent({
         executionId,
-        symbol: selected.context.symbol,
-        stage: "learning-lane-gate",
+        symbol,
+        stage: "ai-execution-gate",
+        status: "FAILED",
+        message: `AI gate blocked: ${aiGate.reasonCode}`,
+        level: "WARN",
+        context: {
+          aiRawDecision: aiGate.aiRawDecision,
+          policy: aiGate.policy,
+          verdict: aiGate.verdict,
+          reasonCode: aiGate.reasonCode,
+        },
+      });
+      bridgeExecutionCandidateForensic({
+        candidateId: forensicCandidateId,
+        symbol,
+        aiVerdict: ai.finalDecision,
+        executionVerdict: aiGate.verdict,
+        riskVerdict: "NOT_REACHED",
+        sizingVerdict: "NOT_REACHED",
+        orderVerdict: "BLOCKED",
+        reasonCode: aiGate.reasonCode,
+        reasonDetail: aiGate.reasonDetail,
+        timestamp: aiGate.timestamp,
+      });
+      bridgeTdiDecision({
+        candidateId: forensicCandidateId,
+        symbol,
+        verdict: "WAIT",
+        hybridDecision: ai.finalDecision,
+        consensusScore: scorecardConfidence,
+        confidence: ai.finalConfidence,
+        evBelowThreshold: aiGate.reasonCode === "NO_TRADE" || aiGate.reasonCode === "AI_NOT_EXECUTABLE",
+        strategy: marketRegime.strategy,
+        reasonDetail: aiGate.reasonDetail,
+      });
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: `AI_GATE_BLOCK: ${aiGate.reasonCode}`,
+        symbol,
+        decision: ai.finalDecision,
+        details: {
+          aiExecutionGate: aiGate,
+        },
+      });
+    }
+    if (aiGate.verdict === "AI_ADVISORY_ONLY" && aiGate.executionSide) {
+      side = aiGate.executionSide;
+      publishExecutionEvent({
+        executionId,
+        symbol,
+        stage: "ai-execution-gate",
         status: "RUNNING",
-        message: "Learning lane watchlist adayini micro paper trade olarak deniyor",
+        message: "AI advisory-only: paper learning lane proceeding with explicit micro exploration",
         level: "SIGNAL",
         context: {
-          aiRawDecision,
+          aiRawDecision: aiGate.aiRawDecision,
+          policy: aiGate.policy,
+          verdict: aiGate.verdict,
           laneDecision: side,
-          overrideReason: "LEARNING_LANE_EXPLORATION_MICRO_TRADE",
-          originalDecision: aiRawDecision,
-          normalizedDecision: side,
+          reasonCode: aiGate.reasonCode,
           confidence: scorecardConfidence,
           scannerScore: selected.score.score,
         },
       });
-    }
-    if (side !== "BUY" && side !== "SELL") {
+    } else if (aiGate.executionSide) {
+      side = aiGate.executionSide;
+    } else {
       return finishExecution({
         executionId,
         mode,
@@ -1926,6 +2062,17 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
             eventType: "RISK_GATE_BLOCKED",
             price: selected.context.lastPrice,
             reason: `Coin cooldown aktif (${cooldownSec - elapsedSec}s)`,
+          });
+          bridgeTdiDecision({
+            candidateId: forensicCandidateId,
+            symbol: executionSymbol,
+            verdict: "WAIT",
+            cooldownActive: true,
+            hybridDecision: ai.finalDecision,
+            consensusScore: scorecardConfidence,
+            confidence: ai.finalConfidence,
+            strategy: marketRegime.strategy,
+            reasonDetail: `Coin cooldown active (${cooldownSec - elapsedSec}s remaining)`,
           });
           return finishExecution({
             executionId,
@@ -2122,6 +2269,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       volatilityPercent: selected.context.volatilityPercent,
       confidencePercent: ai.finalConfidence,
       expectedProfitPercent: aiTargetProfile?.expectedProfitPercent,
+      marketRegime: marketRegime.mode,
     });
     const baseStopLossPercent =
       input.stopLossPercent ??
@@ -2156,6 +2304,15 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         ).toFixed(4),
       );
     }
+    const atrPercent = Number(
+      selected.context.metadata.atrPercent ?? selected.context.metadata.atr ?? 0,
+    );
+    const volatilityAwareStop = resolveVolatilityAwareStopLossPercent({
+      baseStopLossPercent: stopLossPercent,
+      atrPercent,
+      volatilityPercent: selected.context.volatilityPercent,
+    });
+    stopLossPercent = volatilityAwareStop.stopLossPercent;
     const pumpAdaptiveDurationSec = Number(
       selected.context.metadata.pumpAdaptiveDurationSec ??
         selected.context.metadata.pumpEarlyMaxDurationSec ??
@@ -2427,18 +2584,113 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       },
     });
 
+    if (!hasManualSizing && !learningLane) {
+      const consecutiveLosses = await getConsecutiveLossCount(user.id).catch(() => 0);
+      const equityDrawdownPercent = tradingFailsafeState.snapshot().maxDrawdownPercent ?? 0;
+      const accountEquity = Math.max(env.RISK_TOTAL_CAPITAL_TRY, preValidation.notional * 4);
+      const portfolioPositions: PortfolioPositionInput[] = openPositions.map((position) => ({
+        id: position.id,
+        symbol: position.tradingPair.symbol,
+        side: position.side === "SHORT" ? "SELL" : "BUY",
+        quantity: Number(position.quantity),
+        entryPrice: Number(position.entryPrice),
+        currentPrice: Number(position.markPrice ?? position.entryPrice),
+        strategy: String(
+          (position.metadata as Record<string, unknown> | null)?.strategy ??
+            marketRegime.strategy ??
+            "unknown",
+        ),
+      }));
+      const riskEfficiency = resolveRiskEfficiencyAdjustment({
+        baseStopLossPercent: Number(
+          (
+            baseStopLossPercent *
+            (Number.isFinite(marketRegime.slMultiplier) ? marketRegime.slMultiplier : 1)
+          ).toFixed(4),
+        ),
+        atrPercent,
+        volatilityPercent: selected.context.volatilityPercent,
+        confidencePercent: ai.finalConfidence,
+        aiRiskScore: ai.finalRiskScore,
+        marketRegimeRiskMultiplier: marketRegime.riskMultiplier,
+        marketRegime: marketRegime.mode,
+        consecutiveLosses,
+        equityDrawdownPercent,
+        notional: preValidation.notional,
+        quantity: preValidation.adjustedQuantity,
+        accountEquity,
+        symbol: executionSymbol,
+        strategy: String(selected.context.metadata.strategy ?? marketRegime.strategy ?? "unknown"),
+        openPositions: portfolioPositions,
+        expectedProfitPercent: Number(selected.context.metadata.expectedProfitPercent ?? 0.35),
+        rankingScore: Number(selected.score?.score ?? 60),
+      });
+      if (riskEfficiency.portfolioBlocked || riskEfficiency.adjustedNotional <= 0) {
+        bridgeTdiDecision({
+          candidateId: forensicCandidateId,
+          symbol: executionSymbol,
+          verdict: "WAIT",
+          portfolioBlocked: true,
+          openPositionCount: openPositions.length,
+          maxSlots: runtimeMaxOpenPositions,
+          rank: selected.rank ?? 1,
+          hybridDecision: ai.finalDecision,
+          consensusScore: scorecardConfidence,
+          confidence: ai.finalConfidence,
+          strategy: marketRegime.strategy,
+          reasonDetail: `Portfolio allocation blocked (${riskEfficiency.portfolioAction})`,
+        });
+        return finishExecution({
+          executionId,
+          mode,
+          opened: false,
+          rejected: true,
+          rejectReason: `Portfolio allocation blocked (${riskEfficiency.portfolioAction})`,
+          symbol: executionSymbol,
+          decision: ai.finalDecision,
+        });
+      }
+      stopLossPercent = riskEfficiency.stopLossPercent;
+      preValidation = {
+        ...preValidation,
+        notional: riskEfficiency.adjustedNotional,
+        adjustedQuantity: riskEfficiency.adjustedQuantity,
+      };
+      publishExecutionEvent({
+        executionId,
+        symbol: executionSymbol,
+        stage: "risk-efficiency",
+        status: "RUNNING",
+        message: `Risk efficiency sizing aktif (x${riskEfficiency.notionalMultiplier})`,
+        level: "INFO",
+        context: {
+          notionalMultiplier: riskEfficiency.notionalMultiplier,
+          portfolioAction: riskEfficiency.portfolioAction,
+          portfolioAllocation: riskEfficiency.portfolioAllocation,
+          stopLossSource: riskEfficiency.stopLossSource,
+          factors: riskEfficiency.factors,
+          stopLossPercent,
+        },
+      });
+    }
+
     const bidDepth = Number(selected.context.metadata.bidDepth ?? 0);
     const askDepth = Number(selected.context.metadata.askDepth ?? 0);
     const orderBookImbalance = Number(selected.context.orderBookImbalance ?? 0);
-    const depth = side === "BUY" ? askDepth : bidDepth;
-    const slippagePercent = depth > 0 ? Number(((preValidation.notional / depth) * 100).toFixed(4)) : 100;
-    const liquidityWeak = depth > 0 && preValidation.notional > depth * 1.5;
-    if (!paperRelaxed && (liquidityWeak || slippagePercent > 0.35 || depth <= 0)) {
-      const reason = liquidityWeak
-        ? "Likidite zayif (order book depth yetersiz)"
-        : slippagePercent > 0.35
-          ? `Slippage yuksek (${slippagePercent.toFixed(3)}%)`
-          : "Order book depth okunamadi";
+    const preSubmitExecution = evaluatePreSubmitExecution({
+      side,
+      notional: preValidation.notional,
+      bidDepth,
+      askDepth,
+      spreadPercent: Number(selected.context.spreadPercent ?? 0),
+      liquidity24h: Number(selected.context.volume24h ?? 0),
+      liquidityScore: Number(selected.context.metadata.liquidityScore ?? 60),
+      orderType,
+      marketRegime: String(selected.context.metadata.marketRegime ?? ""),
+      paperRelaxed,
+    });
+    if (!preSubmitExecution.allowed) {
+      const reason = preSubmitExecution.reason ?? "Execution pre-submit guard blocked order";
       await logTradeEvent({
         symbol: executionSymbol,
         eventType: "RISK_GATE_BLOCKED",
@@ -2453,7 +2705,8 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           notional: preValidation.notional,
           bidDepth,
           askDepth,
-          slippagePercent,
+          slippagePercent: preSubmitExecution.estimatedSlippagePct,
+          depthCoverage: preSubmitExecution.depthCoverage,
         },
       }).catch(() => null);
       return finishExecution({
@@ -2640,6 +2893,29 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         reason: riskGate.reasons.join(" | "),
         aiConfidence: ai.finalConfidence,
       });
+      bridgeExecutionCandidateForensic({
+        candidateId: forensicCandidateId,
+        symbol: executionSymbol,
+        aiVerdict: ai.finalDecision,
+        executionVerdict: aiGate.verdict,
+        riskVerdict: riskGate.reasons.join(", "),
+        sizingVerdict: `qty=${preValidation.adjustedQuantity}`,
+        orderVerdict: "BLOCKED",
+        reasonCode: "RISK_GATE_REJECT",
+        reasonDetail: riskGate.reasons.join(", "),
+        timestamp: new Date().toISOString(),
+      });
+      bridgeTdiDecision({
+        candidateId: forensicCandidateId,
+        symbol: executionSymbol,
+        verdict: "WAIT",
+        riskBlocked: true,
+        hybridDecision: ai.finalDecision,
+        consensusScore: scorecardConfidence,
+        confidence: ai.finalConfidence,
+        strategy: marketRegime.strategy,
+        reasonDetail: riskGate.reasons.join(", "),
+      });
       return finishExecution({
         executionId,
         mode,
@@ -2650,6 +2926,91 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
       });
     }
+
+    const feeEdgeMetrics = computeFeeEdgeMetrics({
+      entryPrice,
+      quantity: preValidation.adjustedQuantity,
+      takeProfitPercent,
+      stopLossPercent,
+    });
+    bridgeFeeEdgeMetrics({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      metrics: feeEdgeMetrics,
+    });
+    bridgeFeeAwareEntryPolicy({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      metrics: feeEdgeMetrics,
+      blockingEnabled: false,
+    });
+    bridgeExecutionCandidateForensic({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      aiVerdict: ai.finalDecision,
+      executionVerdict: aiGate.verdict,
+      riskVerdict: riskGate.ok || paperRelaxed ? "APPROVED" : riskGate.reasons.join(", "),
+      sizingVerdict: `qty=${preValidation.adjustedQuantity} notional=${preValidation.notional}`,
+      feeEstimate: feeEdgeMetrics,
+      orderVerdict: "SUBMIT_PENDING",
+      reasonCode: aiGate.reasonCode,
+      reasonDetail: aiGate.reasonDetail,
+      timestamp: new Date().toISOString(),
+    });
+    bridgeStrategyDecision({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      strategyId: marketRegime.strategy,
+      approved: true,
+      reasonCode: "STRATEGY_SELECTED",
+      reasonDetail: marketRegime.reason,
+    });
+    bridgeMeanReversionEntry({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      side: side === "SELL" ? "SHORT" : "LONG",
+      strategyId: marketRegime.strategy,
+      strategySelectionReason: marketRegime.reason,
+      marketRegime: marketRegime.mode,
+      volatilityPercent: selected.context.volatilityPercent,
+      volume24h: selected.context.volume24h,
+      spreadPercent: selected.context.spreadPercent,
+      momentumPercent: selected.context.momentumPercent,
+      shortMomentumPercent: Number(selected.context.metadata.shortMomentumPercent ?? 0),
+      liquidityScore: Number(selected.context.metadata.liquidityScore ?? 0),
+      entryPrice,
+      candidateTimestamp: selected.context.metadata.candidateTimestamp as string | undefined,
+      decisionTimestamp: ai.generatedAt,
+      metadata: {
+        marketRegimeOpenTradeAllowed: marketRegime.openAllowed,
+        scannerScore: selected.score.score,
+        aiConfidence: ai.finalConfidence,
+      },
+    });
+    bridgeEntryTimingForensics({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      side: side === "SELL" ? "SHORT" : "LONG",
+      candidateTimestamp: selected.context.metadata.candidateTimestamp as string | undefined,
+      decisionTimestamp: ai.generatedAt,
+      priceAtCandidate: Number(selected.context.lastPrice ?? entryPrice),
+      priceAtDecision: Number(selected.context.lastPrice ?? entryPrice),
+      priceAtEntry: entryPrice,
+    });
+    bridgeTdiDecision({
+      candidateId: forensicCandidateId,
+      symbol: executionSymbol,
+      verdict: "APPROVED",
+      hybridDecision: ai.finalDecision,
+      consensusScore: scorecardConfidence,
+      confidence: ai.finalConfidence,
+      rank: selected.rank ?? 1,
+      capitalSlot: openPositions.length + 1,
+      maxSlots: runtimeMaxOpenPositions,
+      openPositionCount: openPositions.length,
+      strategy: marketRegime.strategy,
+      reasonDetail: "Execution path approved through TDI and risk gates",
+    });
 
     const riskConfig = await getRiskConfigByUser(user.id).catch(() => null);
     const maxBalancePercent = Number((riskConfig?.metadata as Record<string, unknown> | undefined)?.maxBalancePercentPerCoin ?? 0);
@@ -2897,6 +3258,10 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         : placeLimitSell(executionSymbol, qty, entryPrice, mode === "dry-run");
     };
 
+    const decisionTimestamp = new Date().toISOString();
+    const orderPlacementStartedAt = Date.now();
+    let placementRetryCount = 0;
+
     let placedOrder: Awaited<ReturnType<typeof placeWithQty>> | null = null;
     let submittedQty = baseQty;
     let lastPlaceError: unknown = null;
@@ -2935,7 +3300,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           },
         });
       }
-      for (let attempt = 0; attempt < 2; attempt += 1) {
+      for (let attempt = 0; attempt < 3; attempt += 1) {
         try {
           placedOrder = await placeWithQty(qty);
           const filledQty = Number(placedOrder.executedQty ?? 0);
@@ -2945,8 +3310,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         } catch (error) {
           lastPlaceError = error;
           const message = (error as Error)?.message ?? "";
-          if (isTransientOrderError(message) && attempt < 1) {
-            await new Promise((resolve) => setTimeout(resolve, 900));
+          const retryPolicy = resolveAdaptiveRetryPolicy({
+            errorMessage: message,
+            attempt,
+            marketRegime: String(selected.context.metadata.marketRegime ?? ""),
+          });
+          if (retryPolicy.shouldRetry) {
+            placementRetryCount += 1;
+            await new Promise((resolve) => setTimeout(resolve, retryPolicy.backoffMs));
             continue;
           }
           if (!isTrMinNotionalError(message)) {
@@ -3008,6 +3379,56 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     if (Number.isFinite(settledOrder.executedQty) && settledOrder.executedQty > 0) {
       submittedQty = Number(settledOrder.executedQty.toFixed(8));
     }
+    const placedMetadata = ((placedOrder as { metadata?: Record<string, unknown> }).metadata ??
+      {}) as Record<string, unknown>;
+    const actualFillPrice = Number(
+      placedOrder.price ??
+        placedMetadata.averageFillPrice ??
+        placedMetadata.avgFillPrice ??
+        entryPrice,
+    );
+    const fillCompletedAt = Date.now();
+    const executionTelemetry = buildExecutionTelemetry({
+      executionId,
+      symbol: executionSymbol,
+      side,
+      signalTimestamp:
+        typeof selected.context.metadata.scannedAt === "string"
+          ? selected.context.metadata.scannedAt
+          : undefined,
+      decisionTimestamp,
+      orderTimestamp: orderPlacementStartedAt,
+      exchangeResponseTimestamp: fillCompletedAt,
+      fillTimestamp: fillCompletedAt,
+      expectedPrice: entryPrice,
+      fillPrice: actualFillPrice,
+      spreadPercent: Number(selected.context.spreadPercent ?? 0),
+      bidDepth,
+      askDepth,
+      liquidity24h: Number(selected.context.volume24h ?? 0),
+      depthCoverage: preSubmitExecution.depthCoverage,
+      requestedQty: submittedQty,
+      filledQty: submittedQty,
+      orderStatus: normalizedOrderStatus,
+      orderType,
+      marketRegime: String(selected.context.metadata.marketRegime ?? ""),
+      retryCount: placementRetryCount,
+      latencyMs: fillCompletedAt - orderPlacementStartedAt,
+      metadata: {
+        source: placedMetadata.source ?? "analyze-and-trade",
+        simulationId: placedMetadata.simulationId,
+        fillCount: placedMetadata.fillCount,
+      },
+    });
+    publishExecutionEvent({
+      executionId,
+      symbol: executionSymbol,
+      stage: "execution-telemetry",
+      status: normalizedOrderStatus === "FILLED" ? "SUCCESS" : "RUNNING",
+      message: `Execution telemetry captured (${executionTelemetry.fillStatus}, slippage ${executionTelemetry.slippagePct}%)`,
+      level: "INFO",
+      context: executionTelemetry as unknown as Record<string, unknown>,
+    });
     publishExecutionEvent({
       executionId,
       symbol: executionSymbol,
@@ -3020,24 +3441,28 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         orderId: placedOrder.orderId,
         exchangeOrderId: placedOrder.orderId,
         orderStatus: normalizedOrderStatus,
-        buyPrice: entryPrice,
+        buyPrice: actualFillPrice,
         buyQuantity: submittedQty,
+        expectedPrice: entryPrice,
+        slippagePct: executionTelemetry.slippagePct,
+        fillTimeMs: executionTelemetry.fillTimeMs,
       },
     });
     if (side === "BUY") {
       await logTradeEvent({
         symbol: executionSymbol,
         eventType: "BUY_ORDER_SENT",
-        price: entryPrice,
+        price: actualFillPrice,
         newValue: {
           orderId: placedOrder.orderId,
           status: normalizedOrderStatus,
           quantity: submittedQty,
+          slippagePct: executionTelemetry.slippagePct,
         },
         reason: normalizedOrderStatus,
       });
     }
-    const fee = await estimateFees(executionSymbol, side, submittedQty, entryPrice);
+    const fee = await estimateFees(executionSymbol, side, submittedQty, actualFillPrice);
     const orderRecord = await createTradeOrder({
       userId: user.id,
       exchangeConnectionId: connection.id,
@@ -3054,9 +3479,10 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       exchangeOrderId: placedOrder.orderId,
       submittedAt: new Date(),
       executedAt: normalizedOrderStatus === "FILLED" ? new Date() : undefined,
-      avgExecutionPrice: entryPrice,
+      avgExecutionPrice: actualFillPrice,
       fee: fee.estimatedTakerFee,
       feeCurrency: pair.quoteAsset,
+      slippage: executionTelemetry.slippagePct,
       metadata: {
         mode,
         executionId,
@@ -3065,18 +3491,25 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         requestedLeverage: requestedLeverageSafe,
         requestedQuoteAmountTry: requestedQuoteAmountTry > 0 ? requestedQuoteAmountTry : undefined,
         requestedQuoteAmountUsdt: requestedQuoteAmountUsdt > 0 ? requestedQuoteAmountUsdt : undefined,
+        executionTelemetry,
       },
     });
 
     await addTradeExecution({
       tradeOrderId: orderRecord.id,
       status: normalizedOrderStatus === "FILLED" ? "SUCCESS" : "PENDING",
-      executionPrice: entryPrice,
+      executionPrice: actualFillPrice,
       executedQty: placedOrder.executedQty,
-      quoteQty: Number((placedOrder.executedQty * entryPrice).toFixed(8)),
+      quoteQty: Number((placedOrder.executedQty * actualFillPrice).toFixed(8)),
       fee: fee.estimatedTakerFee,
+      slippage: executionTelemetry.slippagePct,
       executionRef: placedOrder.orderId,
-      metadata: { mode, rawStatus: placedOrder.status },
+      metadata: {
+        mode,
+        rawStatus: placedOrder.status,
+        fillStatus: executionTelemetry.fillStatus,
+        latencyMs: executionTelemetry.fillTimeMs,
+      },
     });
 
     if (normalizedOrderStatus !== "FILLED") {

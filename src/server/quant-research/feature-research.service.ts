@@ -1,5 +1,4 @@
 import type { FeatureResearchStatus } from "@prisma/client";
-import { env } from "@/lib/config";
 import { prisma } from "@/src/server/db/prisma";
 import {
   completeResearchRun,
@@ -8,6 +7,14 @@ import {
   persistFeatureResearchRows,
 } from "@/src/server/quant-research/quant-research.repository";
 import { researchDbOnly } from "@/src/server/quant-research/research-environment.service";
+
+/** Stable feature pipeline policy contract for research/runtime consumers. */
+export const FEATURE_PIPELINE_POLICY = {
+  pythonRuntimeFeaturesEnabled: true,
+  quantResearchDbFeaturesEnabled: true,
+  learningEngineFeatureImportanceEnabled: true,
+  preTradeFeatureValidationRequired: true,
+} as const;
 
 const FEATURE_CATEGORIES: Record<string, string> = {
   RSI: "MOMENTUM",

@@ -1,0 +1,368 @@
+{
+  "reportId": "kripto-46round-zero-trade-forensic",
+  "generatedAt": "2026-08-15T10:30:00.000Z",
+  "methodology": "READ_ONLY artifact aggregation from artifacts/forensics/cmstltuqn0007un9ksbk3xn9c/rounds/{1..46}/*.json — no code changes, no new paper run",
+  "runIdentification": {
+    "canonical": true,
+    "jobId": "cmstltuqn0007un9ksbk3xn9c",
+    "sessionId": "cmstltuqn0007un9ksbk3xn9c",
+    "resumedFromJobId": "cmstkgy6j0022unm8lannq6cg",
+    "analysisId": null,
+    "startedAt": "2026-08-15T00:25:11.096Z",
+    "endedAt": "2026-08-15T07:35:00.703Z",
+    "durationMs": 25767217,
+    "roundCount": 46,
+    "completedRoundArtifacts": 46,
+    "tradeCount": 0,
+    "orderCount": 0,
+    "fillCount": 0,
+    "failedRounds": 46,
+    "otherMatchingRuns": [
+      {
+        "jobId": "cmstkgy6j0022unm8lannq6cg",
+        "roundArtifacts": 2,
+        "note": "Prior job; resumed into cmstltuqn0007un9ksbk3xn9c"
+      },
+      {
+        "jobId": "cmstjiruf0007unr8e78nizga",
+        "roundArtifacts": 3,
+        "note": "5-round smoke validation; also 0 trades"
+      }
+    ]
+  },
+  "aggregateFunnel": {
+    "SCANNER": {
+      "discoveredTotal": 11585,
+      "candidateCountSum": 499,
+      "qualificationRejections": 0,
+      "note": "Per-round scanner-summary universeCount ~500; summary candidateCount sums to 499 across 46 rounds"
+    },
+    "TDI": {
+      "approved": 0,
+      "wait": 6094,
+      "rejected": 11532,
+      "waitReasons": {
+        "NEUTRAL": 5736,
+        "BELOW_THRESHOLD": 358,
+        "NO_SLOT": 0,
+        "COOLDOWN": 0,
+        "RISK": 0,
+        "OTHER": 0
+      },
+      "currentThreshold": 55,
+      "simulatedApprovalRateAtThreshold55": 0.284,
+      "actualApprovalRate": 0
+    },
+    "SIZING": {
+      "passed": 0,
+      "rejected": 0,
+      "confidenceBuckets": {
+        "below40": 0,
+        "40-44": 0,
+        "45": 0,
+        "46-49": 0,
+        "50+": 0
+      },
+      "note": "risk-sizing-trace.json empty for all 46 rounds"
+    },
+    "EXECUTION_READY": {
+      "count": 0
+    },
+    "AI": {
+      "invoked": 191,
+      "success": 175,
+      "failed": 11,
+      "timeout": 100,
+      "remoteCalls": 11124,
+      "degradedCalls": 1338,
+      "decisions": {
+        "NO_TRADE": 596,
+        "REJECT": 13575,
+        "HOLD": 298,
+        "APPROVE": 0,
+        "WAIT": 0
+      },
+      "gateBlocks": 596
+    },
+    "CONSENSUS": {
+      "approved": 0,
+      "rejected": 12216
+    },
+    "RISK": {
+      "passed": 0,
+      "rejected": 0,
+      "unknown": 0,
+      "note": "Never reached — decision traces show riskVerdict NOT_REACHED"
+    },
+    "ORDER": {
+      "ordersCreated": 0
+    },
+    "FILL": {
+      "fills": 0
+    },
+    "TRADE": {
+      "trades": 0
+    },
+    "funnelRejectionsByReason": {
+      "CONSENSUS_REJECT": 12216,
+      "AI_FAILED": 11398,
+      "TDI_REJECTED": 8678,
+      "PUMP_CONFIRM_NO_TRADE": 6359,
+      "SCANNER_REJECT": 4897,
+      "EV_REJECT": 4433,
+      "REJECTED": 9157,
+      "PUMP_NOT_EARLY_OR_CONTINUATION": 4098,
+      "AI_DEGRADED": 4232,
+      "SIM_TIGHT_FILTER": 2136,
+      "CANDIDATE_REJECTED": 2091,
+      "PUMP_SAFETY_FINAL_FAILED": 1444,
+      "PUMP_SAFETY_FAILED": 602,
+      "NO_TRADE": 596,
+      "AI_GATE_BLOCK: NO_TRADE": 298,
+      "Data quality issue (CHANGE24H_FALLBACK)": 440,
+      "AI_NO_RESPONSE": 122,
+      "AI_TIMEOUT": 100,
+      "Data quality issue (PRICE_STALE)": 98,
+      "CONSENSUS_TIMEOUT": 87,
+      "PUMP_WEAK_PROFILE": 215,
+      "Spread too wide": 27,
+      "PUMP_SCAN_FAILED": 1
+    },
+    "funnelRejectionsByStage": {
+      "candidate": 14809,
+      "scanner": 9558,
+      "decision": 16296,
+      "consensus": 12216,
+      "ai": 15817,
+      "ev": 4433,
+      "execution": 596
+    }
+  },
+  "firstBlockingStage": {
+    "classification": "TDI_BOTTLENECK",
+    "priorStage": "SCANNER",
+    "priorCount": 11585,
+    "blockedStage": "TDI_APPROVED",
+    "blockedCount": 0,
+    "evidence": "First canonical funnel stage that drops to zero: 11,585 scanner discoveries → 0 TDI APPROVED across 17,626 TDI records",
+    "confidence": "HIGH"
+  },
+  "terminalRoundFailReasons": {
+    "AI_GATE_BLOCK": 20,
+    "AI_NO_RESPONSE": 12,
+    "SIM_TIGHT_FILTER_15m": 11,
+    "Tur heartbeat zaman asimi": 1,
+    "Tur secim suresi doldu (1200s)": 1,
+    "PUMP_SCAN_FAILED": 1
+  },
+  "rounds": [
+    {"roundNo":1,"runId":"cmstmwomy0001undo0dc1pztv","symbol":null,"startedAt":"2026-08-15T00:25:11.096Z","endedAt":"2026-08-15T00:28:12.242Z","durationMs":181146,"candidateCount":0,"tdiApproved":0,"tdiWait":0,"tdiRejected":0,"executionReady":0,"aiInvoked":0,"aiGateBlocks":0,"orders":0,"trades":0,"failReason":"Tur heartbeat zaman asimi","terminalState":"tur_basarisiz"},
+    {"roundNo":2,"runId":"cmstn0khj000bunugt7431bus","symbol":"FLOKITRY","startedAt":"2026-08-15T00:28:12.343Z","endedAt":"2026-08-15T00:39:51.714Z","durationMs":699371,"candidateCount":17,"tdiApproved":0,"tdiWait":13,"tdiRejected":25,"executionReady":0,"aiInvoked":4,"aiGateBlocks":0,"orders":0,"trades":0,"failReason":"SIM_TIGHT_FILTER_15m","terminalState":"tur_basarisiz"},
+    {"roundNo":3,"runId":"cmstnfl1y02teunugtcsoh317","symbol":"API3TRY","startedAt":"2026-08-15T00:39:52.916Z","endedAt":"2026-08-15T00:50:44.709Z","durationMs":651793,"candidateCount":19,"tdiApproved":0,"tdiWait":25,"tdiRejected":47,"executionReady":0,"aiInvoked":2,"aiGateBlocks":0,"orders":0,"trades":0,"failReason":"AI_NO_RESPONSE","terminalState":"tur_basarisiz"},
+    {"roundNo":4,"runId":"cmstntk1d05hdunugpjny7z0m","symbol":"ENSOTRY","startedAt":"2026-08-15T00:50:44.786Z","endedAt":"2026-08-15T00:56:02.350Z","durationMs":317564,"candidateCount":6,"tdiApproved":0,"tdiWait":31,"tdiRejected":0,"executionReady":0,"aiInvoked":2,"aiGateBlocks":2,"orders":0,"trades":0,"failReason":"AI_GATE_BLOCK: NO_TRADE","terminalState":"tur_basarisiz"},
+    {"roundNo":5,"runId":"cmstnfl1y02teunugtcsoh317","symbol":"CFXTRY","candidateCount":19,"tdiApproved":0,"executionReady":0,"aiInvoked":8,"orders":0,"trades":0,"failReason":"SIM_TIGHT_FILTER_15m","terminalState":"tur_basarisiz"},
+    {"roundNo":6,"symbol":"CFGTRY","candidateCount":7,"tdiApproved":0,"aiGateBlocks":4,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":7,"symbol":"BONKTRY","candidateCount":6,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":8,"symbol":"AITRY","candidateCount":6,"tdiApproved":0,"aiGateBlocks":6,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":9,"symbol":"ONETRY","candidateCount":6,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":10,"symbol":"SAGATRY","candidateCount":14,"tdiApproved":0,"aiGateBlocks":8,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":11,"symbol":"NEIROTRY","candidateCount":13,"tdiApproved":0,"aiGateBlocks":10,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":12,"symbol":"LINKTRY","candidateCount":11,"tdiApproved":0,"aiGateBlocks":12,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":13,"symbol":"RADTRY","candidateCount":6,"tdiApproved":0,"aiGateBlocks":14,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":14,"symbol":"TSTTRY","candidateCount":2,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":15,"symbol":"SHIBTRY","candidateCount":22,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":16,"symbol":"USTCTRY","candidateCount":24,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":17,"symbol":"CHIPTRY","candidateCount":2,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":18,"symbol":"BNBTRY","candidateCount":15,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":19,"symbol":"ACTTRY","candidateCount":14,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":20,"symbol":"CHIPTRY","candidateCount":32,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":21,"symbol":"AITRY","candidateCount":12,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":22,"symbol":"XLMTRY","candidateCount":9,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":23,"symbol":"XAUTTRY","candidateCount":14,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":24,"symbol":"SPELLTRY","candidateCount":8,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":25,"symbol":"SOLTRY","candidateCount":9,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":26,"symbol":"RADTRY","candidateCount":7,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":27,"symbol":"PORTALTRY","candidateCount":6,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":28,"symbol":"SANDTRY","candidateCount":8,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":29,"symbol":"UNITRY","candidateCount":6,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":30,"symbol":"NILTRY","candidateCount":7,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":31,"symbol":"MAGICTRY","candidateCount":6,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":32,"symbol":"MANTRATRY","candidateCount":6,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":33,"symbol":"LUMIATRY","candidateCount":8,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":34,"symbol":"MAGICTRY","candidateCount":10,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":35,"symbol":"MEMETRY","candidateCount":6,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":36,"symbol":"IOTRY","candidateCount":6,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":37,"symbol":"TURBOTRY","candidateCount":6,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":38,"symbol":"PENGUTRY","candidateCount":8,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":39,"symbol":"SOMITRY","candidateCount":2,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":40,"symbol":"STRKTRY","candidateCount":12,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":41,"symbol":null,"candidateCount":31,"tdiApproved":0,"aiInvoked":22,"failReason":"Tur secim suresi doldu (1200s)"},
+    {"roundNo":42,"symbol":"ENATRY","candidateCount":6,"tdiApproved":0,"aiGateBlocks":16,"failReason":"AI_GATE_BLOCK: NO_TRADE"},
+    {"roundNo":43,"symbol":"METRY","candidateCount":26,"tdiApproved":0,"failReason":"SIM_TIGHT_FILTER_15m"},
+    {"roundNo":44,"symbol":"SKLTRY","candidateCount":14,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":45,"symbol":"PENGUTRY","candidateCount":12,"tdiApproved":0,"failReason":"AI_NO_RESPONSE"},
+    {"roundNo":46,"runId":"cmsu1ry642qzrunugcjwwwd1b","symbol":"SAGATRY","startedAt":"2026-08-15T07:21:24.412Z","endedAt":"2026-08-15T07:35:00.703Z","durationMs":816291,"candidateCount":14,"tdiApproved":0,"tdiWait":173,"tdiRejected":0,"executionReady":0,"aiInvoked":10,"aiGateBlocks":16,"orders":0,"trades":0,"failReason":"PUMP_SCAN_FAILED","terminalState":"tur_basarisiz"}
+  ],
+  "anomalySummary": {
+    "candidatesButZeroExecutionReady": 45,
+    "aiInvokedButZeroOrders": 44,
+    "terminalAiGateBlock": 20,
+    "stableBlockerAllRounds": "tdiApproved=0",
+    "alternatingTerminalBlockers": true,
+    "terminalBlockerDistribution": {
+      "AI_VETO_BOTTLENECK": 20,
+      "AI_NO_RESPONSE": 12,
+      "SIM_TIGHT_FILTER": 11,
+      "OTHER": 3
+    }
+  },
+  "configSnapshot": {
+    "source": "artifacts/forensics/cmstltuqn0007un9ksbk3xn9c/rounds/46/resolved-config.json + lib/config.ts defaults",
+    "executionMode": "paper",
+    "exchange": "binance",
+    "EXECUTION_AI_GATE_POLICY": "VETO",
+    "aiGatePolicyEvidence": "decision-trace.json round 4/46: aiGatePolicy=VETO, executionVerdict=AI_GATE_BLOCK",
+    "maxPositions": 3,
+    "maxOpenPositions": 3,
+    "tdiThreshold": 55,
+    "evMinRiskRewardRatio": 1.25,
+    "evMinTradeQualityScore": 45,
+    "aiMinConfidence": 60,
+    "aiMode": "learning",
+    "remoteRequired": false,
+    "scannerUniverse": "ALL_SPOT",
+    "scannerMaxSymbols": 1200,
+    "scannerMaxCycleSec": 180,
+    "autoRoundSelectionBudgetSec": 1200,
+    "binanceTakerFeeRate": 0.0015,
+    "binanceMakerFeeRate": 0.0009
+  },
+  "dataAvailability": {
+    "missingOrDegradedFields": [
+      {"field":"CHANGE24H","count":440,"stage":"scanner","value":"CHANGE24H_FALLBACK","blockingEffect":"scanner/candidate rejection"},
+      {"field":"PRICE","count":98,"stage":"scanner","value":"PRICE_STALE","blockingEffect":"scanner rejection"},
+      {"field":"liquidity","value":0,"stage":"scanner-summary","example":"round 46 METRY liquidity=0 price=0","blockingEffect":"qualification noise; not sole zero-trade cause"},
+      {"field":"sizing/risk traces","value":"EMPTY","stage":"sizing/risk","blockingEffect":"pipeline never reached sizing — no confidence boundary trap observed"}
+    ]
+  },
+  "aiForensic": {
+    "policy": "VETO",
+    "invokedPerRoundMean": 4.2,
+    "executionStageGateBlocksTotal": 596,
+    "terminalRoundAiGateFailures": 20,
+    "vetoProof": {
+      "artifact": "rounds/4/decision-trace.json",
+      "candidateId": "c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "symbol": "ENSOTRY",
+      "aiFinalDecision": "NO_TRADE",
+      "consensusDecision": "NO-TRADE",
+      "aiGateVerdict": "AI_GATE_BLOCK",
+      "orderVerdict": "BLOCKED",
+      "sizingVerdict": "NOT_REACHED",
+      "riskVerdict": "NOT_REACHED"
+    },
+    "notAnOutage": true,
+    "note": "AI invoked successfully in 175/191 ai-progress candidates; failures are decision-level NO_TRADE under VETO, not provider outage"
+  },
+  "tdiForensic": {
+    "dominantWaitReason": "NEUTRAL",
+    "waitReasonPct": {"NEUTRAL": 94.1, "BELOW_THRESHOLD": 5.9},
+    "masterDecisionPattern": "NO_TRADE resolved by master decision engine; Blocked/reduced by LEARNING and MOMENTUM",
+    "thresholdParadox": {
+      "configuredThreshold": 55,
+      "simulatedApprovalAt55": 0.284,
+      "actualApproval": 0,
+      "artifact": "rounds/46/tdi-sensitivity.json"
+    }
+  },
+  "sizingForensic": {
+    "reached": false,
+    "passed": 0,
+    "rejected": 0,
+    "boundaryTrap": false,
+    "note": "No sizing records in any round — cannot analyze 40-44/45/46-49 boundary"
+  },
+  "historicalComparison": "NO_LOCAL_HISTORICAL_COMPARISON_AVAILABLE",
+  "codeDrift": {
+    "note": "All local forensic round-summary.json files show tradeCount=0; no executing paper artifact in repo",
+    "gitHistory": "Single visible commit on key pipeline files (94c564a Sync local kripto platform codebase)",
+    "inference": "Cannot prove config/code delta vs last executing run from repo-local evidence alone"
+  },
+  "rootCauseRanking": {
+    "P0": [
+      {
+        "class": "TDI_BOTTLENECK",
+        "stage": "TDI",
+        "count": 17626,
+        "approved": 0,
+        "percentage": 100,
+        "reasonCode": "NEUTRAL|BELOW_THRESHOLD|masterDecision NO_TRADE",
+        "artifact": "tdi-decisions.json (all rounds)",
+        "confidence": "HIGH"
+      },
+      {
+        "class": "AI_VETO_BOTTLENECK",
+        "stage": "EXECUTION",
+        "count": 596,
+        "percentageOfTerminalRounds": 43.5,
+        "reasonCode": "AI_GATE_BLOCK: NO_TRADE",
+        "artifact": "decision-trace.json",
+        "file": "src/server/execution/ai-execution-gate.service.ts",
+        "confidence": "HIGH"
+      }
+    ],
+    "P1": [
+      {
+        "class": "AI_DECISION_BOTTLENECK",
+        "stage": "AI/CONSENSUS",
+        "count": 12216,
+        "reasonCode": "CONSENSUS_REJECT|PUMP_CONFIRM_NO_TRADE|AI_FAILED",
+        "confidence": "HIGH"
+      },
+      {
+        "class": "SCANNER_BOTTLENECK",
+        "stage": "SCANNER",
+        "count": 4897,
+        "reasonCode": "SCANNER_REJECT",
+        "confidence": "MEDIUM"
+      },
+      {
+        "class": "DATA_MISSING",
+        "stage": "SCANNER",
+        "count": 538,
+        "reasonCode": "CHANGE24H_FALLBACK|PRICE_STALE",
+        "confidence": "MEDIUM"
+      }
+    ],
+    "P2": [
+      {
+        "class": "OTHER",
+        "stage": "ROUND_TERMINAL",
+        "count": 14,
+        "reasonCode": "AI_NO_RESPONSE|SIM_TIGHT_FILTER|PUMP_SCAN_FAILED|heartbeat timeout",
+        "confidence": "MEDIUM"
+      }
+    ]
+  },
+  "primaryRootCause": {
+    "answer": "TDI_BOTTLENECK — Master Decision Engine produces zero APPROVED verdicts across all 17,626 TDI decisions in 46 rounds, preventing any execution-ready candidate on the slot pipeline; round-winner path that bypasses TDI approval is then terminated by AI_VETO_BOTTLENECK (596 execution-stage blocks, 20/46 terminal rounds).",
+    "firstBlockingStage": "TDI_APPROVED (0 of 11,585 scanner discoveries)",
+    "profitability": "PROFITABILITY_CANNOT_BE_EVALUATED_YET"
+  },
+  "contributingCauses": [
+    "AI_VETO_BOTTLENECK — VETO policy blocks all round-winner NO_TRADE decisions at execution (20 terminal rounds)",
+    "AI_DECISION_BOTTLENECK — consensus/AI stack emits NO_TRADE/REJECT on 12,216+ consensus rejects and 6,359 pump confirmations",
+    "Master decision LEARNING/MOMENTUM penalties drive NEUTRAL WAIT on 94% of TDI waits despite scores near threshold",
+    "SIM_TIGHT_FILTER — 11 rounds fail before execution on simulation quality gates",
+    "AI_NO_RESPONSE — 12 rounds fail on AI response timeout/st stall"
+  ],
+  "hundredRoundRecommendation": "NO",
+  "hundredRoundRationale": "System is blocked before order creation in 46/46 rounds (orders=0). A 100-round run would reproduce zero-trade funnel unless TDI approval path or round-winner AI consensus changes.",
+  "nextSteps": [
+    "Investigate why master decision engine approval rate is 0% while tdi-sensitivity simulates 28.4% at threshold 55",
+    "Trace LEARNING/MOMENTUM penalty sources blocking all TDI APPROVED emissions",
+    "For round-winner path: analyze why selected symbols consistently receive AI finalDecision=NO_TRADE before VETO gate",
+    "Do NOT run 100 rounds until at least one round produces executionReady>0 or orders>0 in controlled 2-round validation",
+    "Optional: compare cmstjiruf0007unr8e78nizga smoke run (same VETO policy, same zero-trade pattern) for regression baseline"
+  ]
+}

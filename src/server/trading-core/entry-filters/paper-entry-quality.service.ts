@@ -145,6 +145,8 @@ export function evaluatePaperEntryQuality(input: {
   btcSnapshot?: BtcFilterSnapshot | null;
   minScore?: number;
   pumpLane?: boolean;
+  dataDegraded?: boolean;
+  adaptiveMinScoreDelta?: number;
 }): PaperEntryQualityResult {
   const side = input.side ?? "BUY";
   const context = input.context;
@@ -165,7 +167,14 @@ export function evaluatePaperEntryQuality(input: {
   const btc = input.btcSnapshot;
   const pumpLane = Boolean(input.pumpLane);
   const strongHourPump = isStrongHourPumpContext({ change24h, hourMomentum, tapeMomentum, shortFlow });
-  const minScore = input.minScore ?? (pumpLane ? (strongHourPump ? 50 : 54) : strongHourPump ? 56 : 60);
+  const dataDegraded =
+    Boolean(input.dataDegraded) ||
+    (Math.abs(tapeMomentum) < 0.001 && Math.abs(shortFlow) < 0.01 && hourMomentum >= 0.5);
+  const minScore = Math.max(
+    35,
+    (input.minScore ?? (pumpLane ? (strongHourPump ? 50 : 54) : strongHourPump ? 56 : 60)) +
+      Number(input.adaptiveMinScoreDelta ?? 0),
+  );
 
   const rejectBuckets: string[] = [];
   const reasons: string[] = [];
@@ -184,6 +193,7 @@ export function evaluatePaperEntryQuality(input: {
       reasons.push(`Sert satis: son 5 mumdan ${redCandleCount5} kirmizi`);
     }
     if (
+      !dataDegraded &&
       isFakeHourOnlyPump({
         hourMomentum,
         tapeMomentum,
@@ -195,7 +205,7 @@ export function evaluatePaperEntryQuality(input: {
       rejectBuckets.push("MOMENTUM_TEYITSIZ");
       reasons.push(`Sahte hour-only pump (tape=${tapeMomentum.toFixed(3)}%, hour=${hourMomentum.toFixed(3)}%)`);
     }
-    if (!pumpLane && !strongHourPump) {
+    if (!pumpLane && !strongHourPump && !dataDegraded) {
       const momentumOverride = hourMomentum >= 1.2 || tapeMomentum >= 0.18;
       if (trendDown && ema50 > 0 && ema200 > 0) {
         if (!momentumOverride) {
@@ -259,9 +269,12 @@ export function evaluatePaperEntryQuality(input: {
     100,
   );
 
-  if (qualityScore < minScore && !strongHourPump) {
+  if (qualityScore < minScore && !strongHourPump && !dataDegraded) {
     rejectBuckets.push("KALITE_SKORU_DUSUK");
     reasons.push(`Kalite skoru dusuk (${qualityScore}/100 < ${minScore})`);
+  } else if (qualityScore < minScore && dataDegraded && qualityScore < Math.max(28, minScore - 12)) {
+    rejectBuckets.push("KALITE_SKORU_DUSUK");
+    reasons.push(`Kalite skoru cok dusuk (${qualityScore}/100 < ${Math.max(28, minScore - 12)})`);
   }
 
   const uniqueBuckets = [...new Set(rejectBuckets)];

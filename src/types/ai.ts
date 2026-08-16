@@ -1,3 +1,5 @@
+import type { IndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+
 export type AIDecision = "BUY" | "SELL" | "HOLD" | "NO_TRADE";
 
 export type AIRecommendedAction =
@@ -73,8 +75,24 @@ export type TechnicalSnapshot = {
   averageVolume: number;
 };
 
+export type AIAnalysisRuntimeControl = {
+  abortSignal?: AbortSignal;
+  executionMode?: string;
+};
+
+export type AIConsensusTelemetry = {
+  indicatorSnapshotBuildMs?: number;
+  indicatorSnapshotBuildCount?: number;
+  hybridDecisionMs?: number;
+  consensusAssemblyMs?: number;
+};
+
 export type AIAnalysisInput = {
   symbol: string;
+  runtimeControl?: AIAnalysisRuntimeControl;
+  /** Memoized once per consensus invocation by analysis orchestrator. */
+  indicatorSnapshot?: Readonly<IndicatorSnapshot>;
+  consensusTelemetry?: AIConsensusTelemetry;
   lastPrice: number;
   klines: Array<{
     open: number;
@@ -311,6 +329,7 @@ export type AIDecisionPayload = {
     marketNotSuitableSummary: string;
   };
   shortTermReport?: string;
+  confidenceCalibration?: Record<string, unknown>;
   consensusEngine?: {
     finalDecision: "BUY" | "WATCHLIST" | "NO-TRADE" | "REJECT";
     decisionConfidence: number;
@@ -435,5 +454,6 @@ export type AIConsensusResult = {
   roleScores?: AIRoleScore[];
   decisionPayload?: AIDecisionPayload;
   analysisScorecard?: AIAnalysisScorecard;
+  consensusTelemetry?: AIConsensusTelemetry;
   generatedAt: string;
 };

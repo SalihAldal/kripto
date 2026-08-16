@@ -10,6 +10,6 @@ export async function GET(request: NextRequest) {
   const limit = Number(request.nextUrl.searchParams.get("limit") ?? 50);
   if (!symbol) return apiError("symbol gerekli");
 
-  const data = await getOrderBook(symbol, Number.isNaN(limit) ? 50 : limit);
+  const data = await getOrderBook(symbol, Number.isNaN(limit) ? 50 : limit, "ui");
   return apiOk(data);
 }

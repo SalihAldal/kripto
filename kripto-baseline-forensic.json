@@ -1,0 +1,140 @@
+{
+  "generatedAt": "2026-08-13T23:45:00+03:00",
+  "scope": "native-kripto-trading-engine",
+  "note": "Phase 0 forensic baseline — no behavior changes captured from static code mapping",
+  "executionPath": {
+    "entry": [
+      "app/api/trades/rounds/start/route.ts",
+      "services/trading-engine.service.ts",
+      "src/server/execution/auto-round-engine.service.ts"
+    ],
+    "selection": [
+      "src/server/execution/round-selection.service.ts",
+      "src/server/scanner/fast-entry.service.ts",
+      "src/server/scanner/scanner.service.ts"
+    ],
+    "analysis": [
+      "src/server/ai/analysis-orchestrator.ts",
+      "src/server/ai/consensus-engine.ts",
+      "src/server/ai/hybrid-decision-engine.ts",
+      "src/server/decision-engine/master-decision-engine.service.ts"
+    ],
+    "gates": [
+      "src/server/execution/entry-decision-engine.service.ts",
+      "src/server/execution/execution-orchestrator.service.ts",
+      "src/server/risk/risk-evaluation.service.ts",
+      "src/server/execution/signal-quality-gate.service.ts"
+    ],
+    "paperExecution": [
+      "src/server/exchange-simulator/paper-exchange-adapter.service.ts",
+      "src/server/exchange-simulator/exchange-simulator.service.ts"
+    ],
+    "exit": [
+      "src/server/execution/position-monitor.service.ts",
+      "src/server/execution/smart-exit-engine.service.ts",
+      "src/server/execution/post-trade-settlement.service.ts"
+    ],
+    "simulationLab": [
+      "brainos-lab/simulation-v1/run-simulation.ts",
+      "src/server/simulation/backtest.service.ts"
+    ]
+  },
+  "scanner": {
+    "pipeline": "runScannerPipeline",
+    "fastEntry": "getBestFastEntry / getPumpFastEntry",
+    "rejectionPoints": [
+      "market-health-filter",
+      "signal-scoring",
+      "candidate-ranking",
+      "regime-intelligence",
+      "paper-entry-quality",
+      "pump-entry-safety"
+    ],
+    "silentRiskBeforeP0": "Some fast-entry continue/skip paths lacked structured terminal records"
+  },
+  "candidates": {
+    "generation": "discovery-pipeline + market-context-builder + rankCandidates",
+    "traceModule": "src/server/forensics/forensic-collector.service.ts",
+    "artifact": "candidate-trace.json"
+  },
+  "strategies": {
+    "configSources": [
+      "lib/config.ts",
+      "src/server/config/strategy-config.service.ts",
+      "src/server/config/strategy-runtime.service.ts"
+    ],
+    "runtimeMerge": "getRuntimeStrategyParams"
+  },
+  "ai": {
+    "orchestrator": "runAIConsensusFromInput",
+    "modes": ["REMOTE", "DEGRADED_LOCAL", "AI_DEGRADED"],
+    "providers": "src/server/ai/providers/remote-llm.ts",
+    "auditModule": "src/server/forensics/forensic-bridge.service.ts#bridgeAiProviderResult"
+  },
+  "ev": {
+    "engine": "buildHybridDecision + confidence-calibration-intelligence",
+    "auditModule": "bridgeHybridEv",
+    "unknownGate": "EV UNKNOWN must not silently become PASS"
+  },
+  "decision": {
+    "master": "master-decision-engine.service.ts",
+    "paperLearningFilter": "evaluateAutoRoundLearningCandidate",
+    "traceModule": "decision-observability + forensic-bridge"
+  },
+  "risk": {
+    "service": "risk-evaluation.service.ts",
+    "sizing": "unified-execution-pipeline.service.ts + risk-efficiency.service.ts",
+    "traceModule": "bridgeRiskSizing"
+  },
+  "execution": {
+    "orchestrator": "executeAnalyzeAndTradeInternal",
+    "paperBranch": "executePaperOrderViaExchangeSimulator",
+    "liveBranch": "Binance placeMarketBuy/Sell",
+    "auditModule": "bridgePaperFill"
+  },
+  "exit": {
+    "monitor": "position-monitor.service.ts",
+    "replayEngine": "src/server/forensics/exit-replay.engine.ts",
+    "precedence": "same-candle default STOP_LOSS before TAKE_PROFIT"
+  },
+  "simulation": {
+    "integrityGuard": "src/server/forensics/simulation-integrity.guard.ts",
+    "lookAheadRiskAreas": [
+      "backtest candle iteration",
+      "scanner snapshot timing",
+      "AI input klines window"
+    ]
+  },
+  "pnl": {
+    "calculator": "src/server/execution/pnl-calculator.ts",
+    "ledger": "src/server/forensics/pnl-ledger.service.ts",
+    "settlementHook": "post-trade-settlement.service.ts"
+  },
+  "db": {
+    "healthCheck": "validatePaperDbHealth",
+    "failFastCode": "PAPER_DB_UNAVAILABLE",
+    "models": ["AutoRoundJob", "AutoRoundRun", "Position", "TradeOrder"]
+  },
+  "timing": {
+    "autoRoundSelectionBudgetSec": "AUTO_ROUND_SELECTION_BUDGET_SEC",
+    "heartbeatStaleSec": 180,
+    "paperSessionStaleMs": 900000
+  },
+  "errors": {
+    "knownSilentPatterns": [
+      "cooperative selection continue without terminal",
+      "degraded AI reported as generic success",
+      "Binance empty candidate list without explicit error"
+    ]
+  },
+  "duplicatedCalculations": [
+    "PnL: pnl-calculator vs settlement inline math",
+    "Fees: fee-profile vs exchange-simulator",
+    "Consensus: summarizeConsensus vs buildHybridDecision overlap"
+  ],
+  "paperVsLiveShared": {
+    "shared": ["scanner", "AI", "orchestrator skeleton", "position monitor", "settlement"],
+    "paperOnly": ["paperRelaxed gates", "exchange simulator", "learning lane filters"],
+    "liveOnly": ["validateLiveTradingGate", "real Binance orders", "emergency stop enforcement"]
+  }
+}

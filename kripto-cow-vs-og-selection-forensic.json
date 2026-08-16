@@ -1,0 +1,231 @@
+{
+  "forensicId": "KRIPTO_COW_VS_OG_LIVE_SELECTION_FORENSIC",
+  "generatedAt": "2026-08-15T13:12:00.000Z",
+  "methodology": "read-only native Kripto forensic; no code/config changes; paper run left running",
+  "liveSession": {
+    "jobId": "cmsud4nf7001eungwnhftv9k6",
+    "runIdRound2": "cmsudp8gd0119ungwiwcnl4m3",
+    "runIdRound1": "cmsud4p5u0021ungw5tfxix4k",
+    "status": "RUNNING",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "currentRound": 2,
+    "activeState": "tariyor",
+    "coinSelectionMode": "scanner_best",
+    "aiMode": "learning",
+    "executionMode": "paper"
+  },
+  "symbolClarification": {
+    "userLabelOg": "OG",
+    "nativeActiveSymbol": "0GTRY",
+    "nativeBaseAsset": "0G",
+    "distinctSymbolOgTry": "OGTRY",
+    "ogTryPresentInRound2": false,
+    "note": "UI/runtime shows 0GTRY (Zero-G). OGTRY is a different pair with zero Round-2 pipeline presence."
+  },
+  "currentRound": {
+    "roundNo": 2,
+    "state": "tariyor",
+    "selectionFinalized": false,
+    "selectedReason": null,
+    "runtimeStep": "AI_ANALYSIS",
+    "runtimePipeline": "scanner-full",
+    "runtimeScannerPhase": "consensus",
+    "selectionStartedAt": "2026-08-15T12:55:15.232Z",
+    "rankingCompletedAt": "2026-08-15T12:56:57.883Z",
+    "forensicSnapshotAt": "2026-08-15T12:57:14.187Z",
+    "selectionAttempt": 1,
+    "scannerBatchSize": 79,
+    "scannerBatchFirstSymbol": "PROVETRY",
+    "scannerBatchLastSymbol": "0GTRY",
+    "inferredCycleCursor": 224,
+    "watchlistSize": 315
+  },
+  "cowVisibility": {
+    "classification": "NOT_DISCOVERED",
+    "inScannerUniverse": true,
+    "inWatchlist": true,
+    "watchlistIndex": 0,
+    "inRound2DiscoveryBatch": false,
+    "inRound2TradeEventLog": false,
+    "inRound2SystemLogs": false,
+    "inRound2ForensicArtifacts": false,
+    "topGainerAtForensicTime": {
+      "rank": 1,
+      "change24h": 67.857,
+      "priorityScore": 60.62,
+      "volume24h": 550049631,
+      "reason": "top-gainer change=67.86% volume=550049631"
+    },
+    "firstBlockingStage": "SCANNER_CYCLE_MISS",
+    "firstBlockingReasonCode": "NOT_IN_CYCLE_BATCH",
+    "firstBlockingReasonDetail": "COWTRY not in Round-2 scanner cycle batch (cursor=224, batch=79 symbols PROVETRY..0GTRY). Prepended watchlist head (idx 0) excluded by rotational cursor window."
+  },
+  "cowPipeline": {
+    "scannerUniverse": { "status": "eligible", "symbol": "COWTRY", "watchlistIndex": 0 },
+    "scannerCycleBatch": { "status": "absent", "reason": "NOT_IN_CYCLE_BATCH" },
+    "marketContextBuilt": false,
+    "candidateCreated": false,
+    "pumpCache": { "status": "absent", "note": "sole cache candidate was MEGATRY" },
+    "pumpLiveScan": { "status": "empty", "at": "2026-08-15T12:56:14.861Z", "candidates": 0 },
+    "pumpConfirmation": null,
+    "ranking": null,
+    "tdi": null,
+    "aiInvoked": false,
+    "executionReady": false,
+    "rejectionStage": "SCANNER_CYCLE_MISS"
+  },
+  "ogPipeline": {
+    "symbol": "0GTRY",
+    "note": "0GTRY is the native active symbol; selection not finalized at forensic time",
+    "scannerUniverse": { "status": "in_batch", "discoveryOrdinal": "79/79" },
+    "scannerScanned": true,
+    "marketContextBuilt": true,
+    "candidateCreated": true,
+    "ranking": { "status": "completed", "at": "2026-08-15T12:56:57.883Z", "batchRankNote": "AI queue position 2 (Scanner ai 1/79 after TOWNSTRY)" },
+    "aiInvoked": true,
+    "aiStartedAt": "2026-08-15T12:57:02.004Z",
+    "aiResultAt": "2026-08-15T12:57:13.177Z",
+    "aiVerdict": "NO_TRADE",
+    "aiConfidence": 21.53,
+    "tdi": null,
+    "executionReady": false,
+    "finalSelection": false
+  },
+  "sideBySideAtDecisionWindow": {
+    "comparisonTimestamp": "2026-08-15T12:56:57.883Z",
+    "note": "COW has no native decision-time row in Round 2; COW column from absence + live top-gainer API at forensic time only",
+    "fields": {
+      "COWTRY": {
+        "symbol": "COWTRY",
+        "nativeDecisionTimeData": false,
+        "topGainerApiForensicTime": {
+          "change24h": 67.857,
+          "priorityScore": 60.62,
+          "volume24h": 550049631
+        }
+      },
+      "0GTRY": {
+        "symbol": "0GTRY",
+        "aiAnalysisStartedAt": "2026-08-15T12:57:02.004Z",
+        "price": 8.03,
+        "volume24h": 24496466.0143,
+        "spreadPercent": 0.1244,
+        "volatility": 0.2907,
+        "klineCount": 80,
+        "aiDecision": "NO_TRADE",
+        "aiConfidence": 21.53,
+        "aiRiskScore": 54.23,
+        "aiRegime": "HIGH_VOLATILITY_CHAOS",
+        "aiComposite": 55.24
+      }
+    }
+  },
+  "rankingChain": {
+    "round2SelectionFlow": [
+      "runCooperativeRoundSelection",
+      "getPumpFastEntry (cache)",
+      "MEGATRY pump confirmation -> PUMP_CONFIRM_NO_TRADE (early)",
+      "getPumpFastEntry (live) -> 0 candidates",
+      "getBestFastEntry -> runScannerPipeline (scanner-full)",
+      "discovery batch 79 symbols (PROVETRY..0GTRY)",
+      "rankCandidates -> rankForFastEntry / candidate-ranking.service",
+      "AI consensus queue (in progress at forensic time)"
+    ],
+    "ogOverCowDecision": {
+      "function": "scanner.service cycleSymbols cursor window + rankForFastEntry (fast-entry.service.ts)",
+      "applies": false,
+      "reason": "COW never entered candidate pool; no OG > COW score comparison possible",
+      "effectiveDecision": "0GTRY visible because in cycle batch; COW invisible due to cycle miss and empty pump lane after MEGATRY rejection"
+    },
+    "pumpLaneRound2": {
+      "cacheCandidate": "MEGATRY",
+      "cacheRejectedAt": "2026-08-15T12:55:15.469Z",
+      "cacheReasonCode": "PUMP_CONFIRM_NO_TRADE",
+      "cacheReasonDetail": "Pump confirmation NO_TRADE (early)",
+      "liveScanAt": "2026-08-15T12:56:14.861Z",
+      "liveCandidates": 0
+    }
+  },
+  "pumpDetection": {
+    "classification": "PUMP_VISIBLE_TO_TOP_GAINER_API_BUT_NOT_IN_SELECTION_UNIVERSE",
+    "marketVisibleNow": {
+      "cowChange24h": 67.857,
+      "cowTopGainerRank": 1
+    },
+    "systemAtSelectionTime": {
+      "cowInScannerBatch": false,
+      "cowInPumpCache": false,
+      "cowTradeEvents": 0,
+      "scannerTimestamp": "2026-08-15T12:56:45.810Z",
+      "rankingTimestamp": "2026-08-15T12:56:57.883Z",
+      "zeroGAiTimestamp": "2026-08-15T12:57:02.004Z"
+    },
+    "interpretation": "COW pump was visible to discoverTopGainerSymbols/watchlist prepend but never materialized in Round-2 selection scanner batch or pump cache consumed by selection."
+  },
+  "dataFreshness": {
+    "COWTRY": { "status": "no_round2_native_data" },
+    "0GTRY": {
+      "aiAnalysisStartedAt": "2026-08-15T12:57:02.004Z",
+      "priceAtAiStart": 8.03,
+      "klineCount": 80,
+      "stalenessNote": "fresh enough for AI invocation; no stale/missing flag in trade event"
+    },
+    "comparison": "Cannot compute COW vs 0G staleness delta — COW never fetched in Round 2"
+  },
+  "cowRejections": [],
+  "scoreGap": {
+    "computable": false,
+    "reason": "COW did not reach ranking stage",
+    "zeroGPartialSignals": {
+      "scannerAiQueueIndex": 1,
+      "aiConfidence": 21.53,
+      "aiDecision": "NO_TRADE"
+    }
+  },
+  "artifacts": {
+    "round2Exported": false,
+    "missing": [
+      "scanner-summary.json",
+      "scanner-qualification.json",
+      "candidate-lifecycle.json",
+      "tdi-decisions.json",
+      "slot-opportunity-report.json",
+      "pump-scan-lifecycle.json",
+      "decision-trace.json",
+      "ai-trace.json",
+      "resolved-config.json"
+    ],
+    "round1PartialExport": {
+      "path": "artifacts/forensics/cmsud4nf7001eungwnhftv9k6/rounds/1/",
+      "symbol": "MAVTRY",
+      "result": "failed",
+      "containsCow": false,
+      "contains0G": false,
+      "containsOGTRY": false
+    },
+    "liveEvidenceSources": [
+      "AutoRoundRun/AutoRoundJob metadata (PostgreSQL)",
+      "TradeEventLog (PostgreSQL)",
+      "SystemLog auto-round-runtime (PostgreSQL)",
+      "dev server structured logs (terminal)",
+      "discoverTopGainerSymbols live API (forensic-time snapshot)",
+      "data/exchange-info-tr.json",
+      "data/scanner-cursor.json"
+    ]
+  },
+  "liveObservationVsEvidence": {
+    "whatWeSeeNow": "COW showing strong pump (+67.86% 24h, #1 top gainer); UI/runtime highlighting 0GTRY during Round-2 selection AI phase",
+    "whatSystemKnewAtDecisionTime": "COW absent from Round-2 scanner batch and trade logs; 0GTRY in batch with AI NO_TRADE (conf 21.53); selection not finalized (selectedReason null)",
+    "criticalDistinction": "0GTRY is current runtime candidate during in-progress selection, not a completed final pick over COW"
+  },
+  "rootCause": {
+    "classification": "SCANNER_NOT_DISCOVERED",
+    "confidence": 0.92,
+    "summary": "COWTRY was not in the Round-2 scanner cycle batch (rotating cursor window) and never entered pump-cache selection (MEGATRY was the sole cache candidate and was rejected). No ranking/TDI comparison occurred.",
+    "expectedOrBug": "expected_behavior_given_cursor_rotation",
+    "designGap": "Top-gainer prepend to watchlist head does not guarantee scan when cursor window excludes index 0; pump cache did not surface COW despite #1 top-gainer status at forensic time"
+  },
+  "brainOsParityWarranted": false,
+  "brainOsNote": "Native root cause is established without BrainOS: COW never discovered in Round-2 selection universe. BrainOS comparison would not change the primary finding."
+}

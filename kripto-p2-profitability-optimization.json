@@ -1,0 +1,98 @@
+{
+  "validationId": "p2-profitability-2026-08-14T22-45-29-533Z",
+  "verdict": "PASS",
+  "startedAt": "2026-08-14T22:45:32.599Z",
+  "completedAt": "2026-08-14T23:10:40.904Z",
+  "sessionId": "cmstjckww0007unsg4v4iff2q",
+  "config": {
+    "maxRounds": 3,
+    "aiGatePolicy": "VETO",
+    "experimentalChangesPromoted": false
+  },
+  "unitTests": {
+    "total": 34,
+    "p2Optimization": 11,
+    "p2TdiSlot": 11,
+    "p1Engineering": 11,
+    "roundExport": 1
+  },
+  "roundAnalysis": [
+    {
+      "roundNo": 1,
+      "present": [
+        "slot-allocation-analysis.json",
+        "slot-allocation-experiment.json",
+        "tdi-sensitivity.json",
+        "fee-aware-entry-experiment.json",
+        "entry-timing-experiment.json",
+        "ai-strategy-interaction.json",
+        "opportunity-value.json",
+        "profitability-experiments.json",
+        "promotion-decisions.json",
+        "promotion-gate.json"
+      ],
+      "missing": [],
+      "experimentCount": 4,
+      "anyPromoted": false,
+      "safetyPreserved": {
+        "aiGate": true,
+        "riskGate": true,
+        "sizingGate": true,
+        "executionIntegrity": true,
+        "pnlReconciliation": true
+      }
+    },
+    {
+      "roundNo": 2,
+      "present": [],
+      "missing": [
+        "slot-allocation-analysis.json",
+        "slot-allocation-experiment.json",
+        "tdi-sensitivity.json",
+        "fee-aware-entry-experiment.json",
+        "entry-timing-experiment.json",
+        "ai-strategy-interaction.json",
+        "opportunity-value.json",
+        "profitability-experiments.json",
+        "promotion-decisions.json",
+        "promotion-gate.json"
+      ],
+      "experimentCount": 0,
+      "anyPromoted": false,
+      "safetyPreserved": null
+    },
+    {
+      "roundNo": 3,
+      "present": [],
+      "missing": [
+        "slot-allocation-analysis.json",
+        "slot-allocation-experiment.json",
+        "tdi-sensitivity.json",
+        "fee-aware-entry-experiment.json",
+        "entry-timing-experiment.json",
+        "ai-strategy-interaction.json",
+        "opportunity-value.json",
+        "profitability-experiments.json",
+        "promotion-decisions.json",
+        "promotion-gate.json"
+      ],
+      "experimentCount": 0,
+      "anyPromoted": false,
+      "safetyPreserved": null
+    }
+  ],
+  "acceptance": {
+    "p2ArtifactsGenerated": true,
+    "noAutoPromotion": true,
+    "baselineBehaviorIntact": true,
+    "safetyPreserved": true
+  },
+  "recommendedProductionChanges": [],
+  "researchOnlyChanges": [
+    "MR regime filter",
+    "Fee-aware entry floor",
+    "Entry timing protection",
+    "Slot 3 vs 4 simulation",
+    "TDI threshold sensitivity"
+  ]
+}

@@ -1,0 +1,402 @@
+{
+  "reportId": "kripto-tdi-zero-approval-forensic",
+  "generatedAt": "2026-08-15T10:45:00.000Z",
+  "methodology": "READ_ONLY — code trace + artifact aggregation from cmstltuqn0007un9ksbk3xn9c rounds 1-46",
+  "referenceRun": {
+    "jobId": "cmstltuqn0007un9ksbk3xn9c",
+    "rounds": 46,
+    "tdiDecisions": 17626,
+    "tdiApproved": 0,
+    "tdiWait": 6094,
+    "tdiRejected": 11532
+  },
+  "executiveAnswer": {
+    "primaryRootCause": "TDI_APPROVAL_DEFINITION_MISMATCH",
+    "exactRule": "tdi-sensitivity.service.ts treats APPROVED as consensusScore >= 55, but runtime TDI APPROVED requires hybrid finalDecision === 'BUY' OR master legacyDecision === 'BUY'. Hybrid never emits BUY (0/17626); master never emits BUY/STRONG_BUY (0/8634 master records). Score >= 55 candidates are mapped to HOLD (hybrid) or NO_TRADE (master low confidence), not APPROVED.",
+    "confidence": "HIGH",
+    "paradoxExplained": {
+      "sensitivity28_4Pct": "5067 of 17626 TDI records have consensusScore >= 55 (28.7%)",
+      "runtime0Pct": "0 records have verdict APPROVED because approval never uses score >= 55 alone",
+      "sensitivityEngine": "Simplified counterfactual in src/server/forensics/tdi-sensitivity.service.ts",
+      "productionEngine": "hybrid-decision-engine.ts + master-decision-engine.service.ts + conflict-detection.service.ts"
+    }
+  },
+  "aggregateEvidence": {
+    "consensusScoreGe55": 5067,
+    "consensusScoreGe55Pct": 28.74,
+    "hybridDecisionBuy": 0,
+    "hybridDecisionHold": 11472,
+    "hybridDecisionNoTrade": 6154,
+    "masterDecisionBuy": 0,
+    "masterDecisionStrongBuy": 0,
+    "masterDecisionWatchlist": 0,
+    "masterDecisionWait": 0,
+    "masterDecisionNoTrade": 8538,
+    "masterDecisionSell": 64,
+    "masterDecisionReduce": 32,
+    "scoreGe55ByHybridDecision": {
+      "HOLD": 3226,
+      "NO_TRADE": 1841,
+      "BUY": 0
+    },
+    "scoreGe55ByMasterDecision": {
+      "NO_TRADE": 3125
+    },
+    "waitReasonDetailCounts": {
+      "momentumGuvenVermiyor": 5535,
+      "teknikGucluDigerAiZayif": 5675,
+      "aiGateBlocked": 358
+    },
+    "waitReasonCodeCounts": {
+      "NEUTRAL": 5736,
+      "BELOW_THRESHOLD": 358
+    }
+  },
+  "masterDecisionCallGraph": [
+    {"stage": "scanner", "function": "scanner.service / candidate-ranking", "output": "ScannerCandidate + score"},
+    {"stage": "strategy", "function": "strategy-selector / market-regime", "output": "selectedStrategy, regimePolicy"},
+    {"stage": "MI/MC/SI", "function": "analysis-orchestrator.ts → provider adapters", "output": "AIProviderResult[] (technical, sentiment, risk roles)"},
+    {"stage": "hybrid", "function": "hybrid-decision-engine.ts → buildHybridConsensus", "output": "finalDecision BUY|HOLD|NO_TRADE, composite score, bridgeTdiDecision(hybrid:*)"},
+    {"stage": "EV", "function": "hybrid-decision-engine.ts → bridgeHybridEv", "output": "expectedValue vs runtimeMinCompositeScore"},
+    {"stage": "master", "function": "analysis-orchestrator.ts → adjudicateWithMasterDecisionEngine", "substeps": [
+      "runAllExperts → domain-experts.ts (MARKET,MOMENTUM,VOLUME,LIQUIDITY,RISK,NEWS,EXECUTION,LEARNING)",
+      "computeConsensusMetrics → consensusScore, confidence",
+      "resolveMasterDecision → MasterDecisionType",
+      "resolveEffectiveTradingDecision → legacyDecision (BUY preservation rules)",
+      "bridgeTdiDecision(tdi:*) verdict from legacyDecision"
+    ]},
+    {"stage": "TDI verdict", "rules": {
+      "hybridPath": "finalDecision === 'BUY' → APPROVED; HOLD → WAIT; else REJECTED",
+      "masterPath": "legacyDecision === 'BUY' → APPROVED; master WAIT|WATCHLIST → WAIT; else REJECTED",
+      "NOT_USED": "consensusScore >= 55 does NOT produce APPROVED"
+    }},
+    {"stage": "execution", "function": "execution-orchestrator.service.ts", "note": "Round winner may reach AI gate even when TDI REJECTED; separate from slot APPROVED path"}
+  ],
+  "sensitivityDivergence": {
+    "artifact": "rounds/*/tdi-sensitivity.json",
+    "generator": "src/server/forensics/tdi-sensitivity.service.ts",
+    "sensitivityFormula": "wouldApprove = count(consensusScore >= effectiveThreshold) / count(positive consensusScore)",
+    "thresholdUsed": 55,
+    "simulatedApprovalAt55": 0.284,
+    "actualApprovalRate": 0,
+    "differences": [
+      {"dimension": "approval criterion", "sensitivity": "consensusScore >= 55", "runtime": "hybrid finalDecision === BUY OR master legacyDecision === BUY"},
+      {"dimension": "score source", "sensitivity": "Mixed hybrid composite + master expert average from same tdi-decisions.json field", "runtime": "Hybrid uses composite; master uses avg(expert scores) — same field name, different semantics"},
+      {"dimension": "momentum gate", "sensitivity": "ignored", "runtime": "momentumWeak forces BUY→HOLD in hybrid-decision-engine.ts:1071-1076"},
+      {"dimension": "master confidence", "sensitivity": "ignored", "runtime": "resolveMasterDecision requires confidence >= 40 (WAIT) or >= 62 (BUY); blended confidence often 20-27"},
+      {"dimension": "expert matrix", "sensitivity": "ignored", "runtime": "BUY requires bullishCount >= 4, matrix.momentum >= 60, matrix.execution >= 55"},
+      {"dimension": "LEARNING expert", "sensitivity": "ignored", "runtime": "Bearish LEARNING/MOMENTUM in attribution → NO_TRADE + human-readable blockers"}
+    ],
+    "isSimplifiedModel": true
+  },
+  "sampleCandidates": [
+    {
+      "candidateId": "hybrid:METRY:485371f8",
+      "symbol": "METRY",
+      "round": 4,
+      "strategy": "RANGE_MEAN_REVERSION",
+      "consensusScore": 60.2858,
+      "confidence": 46.17,
+      "hybridDecision": "HOLD",
+      "masterDecision": null,
+      "verdict": "WAIT",
+      "waitReasonCode": "NEUTRAL",
+      "expectedApprovalFromScore": true,
+      "actualMasterDecision": "HOLD (hybrid)",
+      "deltaExplanation": "Score>=55 but momentumWeak → finalDecision HOLD; sensitivity would count as approvable"
+    },
+    {
+      "candidateId": "tdi:METRY:e6880433",
+      "symbol": "METRY",
+      "round": 4,
+      "strategy": "RANGE_MEAN_REVERSION",
+      "consensusScore": 63.62,
+      "confidence": 27.05,
+      "hybridDecision": "HOLD",
+      "masterDecision": "NO_TRADE",
+      "verdict": "REJECTED",
+      "expectedApprovalFromScore": true,
+      "actualMasterDecision": "NO_TRADE",
+      "deltaExplanation": "Expert consensusScore 63.6 but blended confidence 27 < 40 WAIT floor; LEARNING+MOMENTUM bearish in attribution"
+    },
+    {
+      "candidateId": "hybrid:ENSOTRY:38989fdf",
+      "symbol": "ENSOTRY",
+      "round": 4,
+      "strategy": "RANGE_MEAN_REVERSION",
+      "consensusScore": 68.9307,
+      "confidence": 43.43,
+      "hybridDecision": "HOLD",
+      "masterDecision": null,
+      "verdict": "WAIT",
+      "waitReasonCode": "NEUTRAL",
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+      "expectedApprovalFromScore": true,
+      "actualMasterDecision": "HOLD",
+      "deltaExplanation": "Composite 68.9 still HOLD — techStrongButOthersWeak downgrade at hybrid-decision-engine.ts:1071-1076"
+    },
+    {
+      "candidateId": "tdi:ENSOTRY:4a9eb521",
+      "symbol": "ENSOTRY",
+      "round": 4,
+      "strategy": "RANGE_MEAN_REVERSION",
+      "consensusScore": 53.14,
+      "confidence": 23.57,
+      "masterDecision": "NO_TRADE",
+      "hybridDecision": "HOLD",
+      "verdict": "REJECTED",
+      "expectedApprovalFromScore": false,
+      "actualMasterDecision": "NO_TRADE",
+      "deltaExplanation": "Round winner path: TDI REJECTED before AI gate"
+    },
+    {
+      "candidateId": "c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "symbol": "ENSOTRY",
+      "round": 4,
+      "strategy": "RANGE_MEAN_REVERSION",
+      "consensusScore": 75,
+      "confidence": 23.57,
+      "hybridDecision": "NO_TRADE",
+      "verdict": "WAIT",
+      "waitReasonCode": "BELOW_THRESHOLD",
+      "reasonDetail": "AI finalDecision=NO_TRADE blocked by VETO gate policy",
+      "stage": "execution-bridge after AI gate",
+      "expectedApprovalFromScore": true,
+      "actualMasterDecision": "AI NO_TRADE (post-TDI)",
+      "deltaExplanation": "Execution-stage TDI bridge after AI gate block — not slot approval"
+    },
+    {
+      "candidateId": "hybrid:TRUMPTRY:966698be",
+      "symbol": "TRUMPTRY",
+      "round": 4,
+      "consensusScore": 57.4241,
+      "confidence": 38.32,
+      "hybridDecision": "HOLD",
+      "verdict": "WAIT",
+      "expectedApprovalFromScore": true,
+      "actualMasterDecision": "HOLD"
+    },
+    {
+      "candidateId": "tdi:TRUMPTRY:1bb168b5",
+      "symbol": "TRUMPTRY",
+      "round": 4,
+      "consensusScore": 55.14,
+      "confidence": 20.31,
+      "masterDecision": "NO_TRADE",
+      "hybridDecision": "HOLD",
+      "verdict": "REJECTED",
+      "expectedApprovalFromScore": true,
+      "actualMasterDecision": "NO_TRADE",
+      "deltaExplanation": "Score exactly at 55 band but confidence 20 → NO_TRADE"
+    },
+    {
+      "candidateId": "hybrid:BANKTRY:2a98f991",
+      "symbol": "BANKTRY",
+      "round": 3,
+      "consensusScore": 59.3446,
+      "hybridDecision": "HOLD",
+      "verdict": "WAIT",
+      "reasonDetail": "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif | Futures trap | Regime chop"
+    },
+    {
+      "candidateId": "hybrid:MUBARAKTRY:cc70dc3e",
+      "symbol": "MUBARAKTRY",
+      "round": 4,
+      "consensusScore": 53.9485,
+      "hybridDecision": "HOLD",
+      "verdict": "WAIT",
+      "expectedApprovalFromScore": false
+    },
+    {
+      "candidateId": "decision:ENSOTRY:35e0c212",
+      "symbol": "ENSOTRY",
+      "round": 4,
+      "stage": "scanner scorecard at execution",
+      "score": 64,
+      "confidence": 65.6,
+      "status": "REJECTED",
+      "reasons": ["Directional edge not clear", "Regime chop/rapid switching warning"],
+      "note": "Separate from TDI slot path — round-winner execution scorecard"
+    }
+  ],
+  "learningPenaltyForensic": {
+    "expertSource": "src/server/decision-engine/experts/domain-experts.ts → analyzeLearningExpert",
+    "behavior": {
+      "noHistory": "NO_OPINION score 50, topRisk insufficientHistory",
+      "withHistory": "score from avgWin*0.55 + avgReturn component; bearish if avgWin < 45 or avgReturn < 0"
+    },
+    "tdiEffect": "Appears in master attribution as blocker: 'Blocked/reduced by LEARNING and MOMENTUM' in buildHumanReadableDecision",
+    "masterRejectRule": "resolveMasterDecision returns NO_TRADE when metrics.confidence < 40 even if consensusScore >= 45",
+    "hybridEffect": "No direct LEARNING penalty in hybrid path; learning gates in execution-orchestrator apply at execution not TDI artifact for most candidates",
+    "canForceApprovedToWaitReject": true,
+    "example": "tdi:METRY — consensusScore 63.6, master NO_TRADE, blockers LEARNING+MOMENTUM, confidence 27"
+  },
+  "momentumPenaltyForensic": {
+    "hybridDefinition": "momentumWeak = sentiment.score < AI_HYBRID_MIN_SENTIMENT_SCORE(52) + regimePolicy.minSentimentDelta OR lowMomentumInput (|shortMomentum| < 0.08 AND |shortFlowImbalance| < 0.03)",
+    "hybridEffects": [
+      "Blocks momentumSupportive → prevents initial BUY at line 996",
+      "Adds reason 'Momentum guven vermiyor' to noTradeReasonList",
+      "Triggers techStrongButOthersWeak → downgrades BUY to HOLD",
+      "5535 WAIT records cite momentum in reasonDetail"
+    ],
+    "masterDefinition": "analyzeMomentumExpert score from shortMomentum, change5m, volumeSpike; low scores → bearish opinion in attribution",
+    "masterBuyRequires": "matrix.momentum >= 60 AND bullishCount >= 4 (resolveMasterDecision line 121)",
+    "distributionNote": "APPROVED count is 0 — momentum distribution among APPROVED not computable",
+    "waitRejectedWithScoreGe55": {
+      "WAIT_ge55": 1468,
+      "REJECTED_ge55": 3599
+    }
+  },
+  "overrideRules": [
+    {
+      "rule": "TDI APPROVED requires BUY not score>=55",
+      "source": "hybrid-decision-engine.ts:1464-1465, master-decision-engine.service.ts:80-81",
+      "affectedCandidates": 5067,
+      "percentage": 28.74,
+      "effect": "All score>=55 candidates remain WAIT/REJECTED"
+    },
+    {
+      "rule": "hybrid techStrongButOthersWeak: BUY → HOLD",
+      "source": "hybrid-decision-engine.ts:1071-1076",
+      "affectedCandidates": 5675,
+      "percentage": 32.2,
+      "effect": "Technical pass + momentumWeak → HOLD not APPROVED"
+    },
+    {
+      "rule": "hybrid momentumWeak gate",
+      "source": "hybrid-decision-engine.ts:801,996",
+      "affectedCandidates": 5535,
+      "percentage": 31.4,
+      "effect": "Prevents BUY; emits NEUTRAL WAIT"
+    },
+    {
+      "rule": "master confidence floor (<40 → NO_TRADE)",
+      "source": "conflict-detection.service.ts:123-124",
+      "affectedCandidates": 8538,
+      "percentage": 48.4,
+      "effect": "Expert path REJECTED even when score 55-67"
+    },
+    {
+      "rule": "master BUY bar (score>=68, conf>=62, bullish>=4, momentum>=60, execution>=55)",
+      "source": "conflict-detection.service.ts:121",
+      "affectedCandidates": "all",
+      "effect": "Never reached in 46-round run (masterBuy=0)"
+    },
+    {
+      "rule": "hybrid BUY preservation requires hybridDecision=BUY + hybridConfidence>=65",
+      "source": "conflict-detection.service.ts:182-196",
+      "affectedCandidates": 0,
+      "effect": "Never triggered — hybridBuy=0"
+    }
+  ],
+  "learningModeAudit": {
+    "resolvedAiMode": "learning",
+    "meaning": "job.aiMode=learning enables paper auto-round (isPaperAutoRoundJob) and paperRelaxed paths in hybrid/execution",
+    "doesNot": "Directly set TDI verdict to APPROVED",
+    "does": [
+      "Sets paperRelaxed=true in execution-orchestrator when mode=paper (lowers some hybrid floors)",
+      "Sets learningLane=true when executionMode=paper in auto-round-engine (enables micro-trade advisory path with ADVISORY gate only if EXECUTION_AI_GATE_POLICY=ADVISORY — run used VETO)",
+      "Applies learning policy blocks at execution stage (LEARNING_IMMEDIATE_BLOCK etc.) — live-only immediate blocks skipped in paper but hybrid momentum still applies"
+    ],
+    "intentionallyReducesApprovals": "Indirectly — paperRelaxed lowers some floors but momentumWeak + master confidence floors still block all BUY/APPROVED"
+  },
+  "aiTdiInteraction": {
+    "terminalAiGateRounds": 20,
+    "separation": "TDI slot approval and round-winner AI gate are distinct stages",
+    "ensotryRound4Sequence": [
+      {"order": 1, "stage": "hybrid TDI", "verdict": "WAIT", "hybridDecision": "HOLD", "consensusScore": 68.93},
+      {"order": 2, "stage": "master TDI", "verdict": "REJECTED", "masterDecision": "NO_TRADE", "consensusScore": 53.14},
+      {"order": 3, "stage": "AI execution", "aiFinalDecision": "NO_TRADE", "aiGate": "VETO BLOCK"},
+      {"order": 4, "stage": "post-gate TDI bridge", "verdict": "WAIT", "waitReasonCode": "BELOW_THRESHOLD"}
+    ],
+    "conclusion": "Round winner ENSOTRY: TDI REJECTED/WAIT before AI; AI then NO_TRADE; not a case of TDI APPROVED then AI veto"
+  },
+  "historicalBaseline": "NO_EXECUTING_LOCAL_BASELINE",
+  "configAudit": {
+    "sources": [
+      "artifacts/forensics/cmstltuqn0007un9ksbk3xn9c/rounds/46/resolved-config.json",
+      "lib/config.ts defaults",
+      "rounds/46/tdi-sensitivity.json"
+    ],
+    "tdiThresholdInSensitivity": 55,
+    "tdiThresholdInProductionMaster": "Not a single score gate — resolveMasterDecision multi-rule",
+    "aiMode": "learning",
+    "EXECUTION_AI_GATE_POLICY": "VETO",
+    "AI_HYBRID_MIN_COMPOSITE_SCORE": 62,
+    "AI_HYBRID_MIN_SENTIMENT_SCORE": 52,
+    "AI_HYBRID_MIN_EDGE_SCORE": 70,
+    "TRADING_DECISION_POLICY": {
+      "preserveHybridBuyOnMasterDefer": true,
+      "minHybridConfidenceToPreserve": 65,
+      "minMasterConsensusToPreserve": 45,
+      "minMasterConfidenceToPreserve": 40
+    },
+    "hiddenOverrideFinding": "tdi-sensitivity DEFAULT_THRESHOLD=55 hardcoded in forensic service — not read from runtime strategy config; uses wrong approval function entirely"
+  },
+  "primaryRootCause": {
+    "classification": "TDI_MASTER_DECISION_OVERRULE",
+    "exactRule": "Runtime TDI APPROVED is gated on BUY outcomes (hybrid + master legacy), while tdi-sensitivity falsely equates APPROVED with consensusScore >= 55. Hybrid converts all score-qualified setups to HOLD via momentumWeak/techStrongButOthersWeak; master rejects via confidence < 40 and never reaches BUY thresholds.",
+    "affected": 5067,
+    "observed": "5067 records score>=55, 0 APPROVED, 3226 HOLD, 3125 master NO_TRADE among score>=55",
+    "expected": "Sensitivity predicts ~5067*0.284≈1430 approvable at threshold semantics — but production has 0 because approval semantics differ",
+    "difference": "Sensitivity measures score pass rate; production measures BUY pass rate under momentum+confidence+expert matrix rules",
+    "confidence": "HIGH"
+  },
+  "contributingCauses": [
+    {"priority": "P0", "class": "SENSITIVITY_MODEL_DIVERGENCE", "detail": "tdi-sensitivity.service.ts is not the production decision engine"},
+    {"priority": "P0", "class": "HYBRID_MOMENTUM_GATE", "detail": "momentumWeak + techStrongButOthersWeak → 0 hybrid BUY"},
+    {"priority": "P1", "class": "MASTER_CONFIDENCE_FLOOR", "detail": "blended confidence ~20-27 → NO_TRADE despite score 55-68"},
+    {"priority": "P1", "class": "DUAL_SCORE_SEMANTICS", "detail": "Same consensusScore field stores hybrid composite vs master expert average"},
+    {"priority": "P2", "class": "AI_GATE_ROUND_WINNER", "detail": "20 rounds fail at AI VETO after TDI already rejected — separate from slot APPROVED=0"}
+  ],
+  "fixProposals": [
+    {
+      "id": "FIX-A",
+      "title": "Align tdi-sensitivity with production TDI verdict logic",
+      "whatChanges": "Replace score>=threshold counterfactual with replay of hybrid+master verdict rules (or import resolveMasterDecision + hybrid finalDecision path)",
+      "why": "Eliminates 28.4% vs 0% false paradox in forensic reports",
+      "risk": "LOW — forensic-only",
+      "expectedEffect": "sensitivity approvalRate matches runtime approvalRate (~0% for this run)",
+      "metrics": ["approvalRate delta sensitivity vs runtime < 1%"],
+      "regressionTests": ["tdi-sensitivity.service unit test with fixture tdi-decisions.json"]
+    },
+    {
+      "id": "FIX-B",
+      "title": "Document/clarify TDI APPROVED semantics in forensic types",
+      "whatChanges": "Rename sensitivity metric to scoreAboveThresholdRate; add separate projectedBuyApprovalRate using hybrid+master rules",
+      "why": "Prevents operators interpreting threshold 55 as approval threshold",
+      "risk": "LOW",
+      "expectedEffect": "Forensic dashboards stop implying false approvable pool",
+      "metrics": ["zero mislabeled APPROVED projections"],
+      "regressionTests": ["forensic export schema validation"]
+    },
+    {
+      "id": "FIX-C",
+      "title": "Separate hybrid composite vs master expert scores in TDI artifacts",
+      "whatChanges": "Store hybridCompositeScore and masterExpertConsensusScore as distinct fields in TdiDecisionRecord",
+      "why": "Enables accurate reconciliation; fixes mixed score stream in sensitivity",
+      "risk": "MEDIUM — artifact schema change",
+      "expectedEffect": "Score reconciliation delta identifiable per candidate",
+      "metrics": ["runtimeScore vs recomputedScore logged with source tag"],
+      "regressionTests": ["round forensic export snapshot test"]
+    }
+  ],
+  "twoRoundValidationDesign": {
+    "run": false,
+    "acceptance": [
+      "After FIX-A/B/C implementation: tdi-sensitivity approvalRate within 2pp of runtime TDI APPROVED rate",
+      "TDI APPROVED > 0 OR documented proof that BUY gates legitimately block 100% with unchanged business rules",
+      "If APPROVED>0: sizing trace non-empty for at least one candidate",
+      "AI gate exercised under VETO with no bypass",
+      "Full artifact bundle: tdi-decisions.json, tdi-sensitivity.json, decision-trace.json, risk-sizing-trace.json"
+    ],
+    "successMetrics": {
+      "tdiApprovedMin": 1,
+      "sensitivityRuntimeDeltaMaxPct": 2,
+      "ordersOptional": "Only if downstream AI gate passes — not required for TDI fix validation"
+    }
+  },
+  "artifactNotes": {
+    "decisionIntelligenceJson": "NOT_PRESENT — closest artifacts: tdi-decisions.json, decision-trace.json, consensus-trace.json"
+  }
+}

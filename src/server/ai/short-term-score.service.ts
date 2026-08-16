@@ -1,5 +1,5 @@
 import type { AIAnalysisInput, AIConsensusResult } from "@/src/types/ai";
-import { buildIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { resolveIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
 
 export type ShortTermScoreBreakdown = {
   structure: number;
@@ -15,7 +15,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export function computeShortTermScore(input: AIAnalysisInput, consensus: AIConsensusResult) {
-  const ind = buildIndicatorSnapshot(input);
+  const ind = resolveIndicatorSnapshot(input);
   const mtf = input.multiTimeframe;
   const rr = Number(consensus.decisionPayload?.riskRewardRatio ?? 0);
   const volumeBoost = Number(ind.volumeBoost ?? 1);

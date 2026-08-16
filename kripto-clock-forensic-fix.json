@@ -1,0 +1,62 @@
+{
+  "validationId": "clock-forensic-2026-08-14T17-13-16-710Z",
+  "startedAt": "2026-08-14T17:13:20.674Z",
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY",
+    "clockSync": {
+      "status": "PASS",
+      "reasonCode": "CLOCK_SYNC_OK",
+      "reasonDetail": "Clock skew 39ms within threshold",
+      "timestamp": "2026-08-14T17:13:20.595Z",
+      "metadata": {
+        "localTime": "2026-08-14T17:13:20.594Z",
+        "serverTime": "2026-08-14T17:13:20.555Z",
+        "clockOffsetMs": -39,
+        "clockSkewMs": 39,
+        "apiLatencyMs": 118,
+        "skewThresholdMs": 5000,
+        "endpoint": "https://www.binance.tr/api/v3/time",
+        "timestampSource": "binance.api.v3.time"
+      }
+    },
+    "blockCode": null
+  },
+  "clockProbe": {
+    "localTime": "2026-08-14T17:13:18.856Z",
+    "localTimeMs": 1786727598856,
+    "serverTime": "2026-08-14T17:13:18.813Z",
+    "serverTimeMs": 1786727598813,
+    "rawServerTime": 1786727598813,
+    "clockOffsetMs": -43,
+    "clockSkewMs": 43,
+    "measuredLatencyMs": 472,
+    "skewThresholdMs": 5000,
+    "timestampSource": "binance.api.v3.time",
+    "sampleTimestamp": "2026-08-14T17:13:18.856Z",
+    "attempt": 1,
+    "endpoint": "https://www.binance.tr/api/v3/time",
+    "passed": true,
+    "staleServerTime": false,
+    "unitConversionApplied": false
+  },
+  "sessionId": "cmst7hc5k0007unsgnsvne5y4",
+  "round": {
+    "state": "tur_basarisiz",
+    "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=53.0, sentiment=40.9, mtf=50.8) | EMA trend uyumsuz (EMA50=0.4282, EMA200=0.4267) | Kalite skoru dusuk (50/100 < 52)",
+    "symbol": "USUALTRY",
+    "endedAt": "2026-08-14T17:34:40.683Z"
+  },
+  "artifacts": {
+    "roundSummaryExists": true,
+    "recoveryDecisionsExists": true,
+    "recoveryTelemetryExists": true,
+    "exportErrorExists": false,
+    "exportStatus": "COMPLETED",
+    "exportKind": "failed-round-partial",
+    "clockForensicsExists": false
+  },
+  "verdict": "PASS",
+  "failReasons": [],
+  "completedAt": "2026-08-14T17:34:43.414Z"
+}

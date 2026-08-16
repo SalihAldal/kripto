@@ -1,22 +1,13 @@
-import { getExchangeInfo, getTicker } from "@/services/binance.service";
+import { getTicker } from "@/services/binance.service";
 import { getCircuitSnapshot } from "@/src/server/resilience/circuit-breaker";
 import { MAX_API_LATENCY_MS } from "@/src/server/execution-safety/execution-safety.types";
 import type { PreTradeSafetyInput, SafetyValidationStageResult } from "@/src/server/execution-safety/execution-safety.types";
-import { getSafetyCache, setSafetyCache } from "@/src/server/execution-safety/safety-cache.service";
+import {
+  evaluateClockSync,
+  persistClockSyncForensics,
+} from "@/src/server/execution-safety/clock-sync.service";
 
 const latencySamples: number[] = [];
-const MAX_CLOCK_SKEW_MS = 5_000;
-
-async function checkClockSync() {
-  const cached = getSafetyCache<{ skewMs: number; ok: boolean }>("clock:sync");
-  if (cached) return cached;
-  const info = await getExchangeInfo().catch(() => null);
-  const serverTime = Number((info as { serverTime?: number } | null)?.serverTime ?? 0);
-  const skewMs = serverTime > 0 ? Math.abs(Date.now() - serverTime) : 0;
-  const result = { skewMs, ok: serverTime <= 0 || skewMs <= MAX_CLOCK_SKEW_MS };
-  setSafetyCache("clock:sync", result, 30_000);
-  return result;
-}
 
 export async function validateApiHealth(input: PreTradeSafetyInput): Promise<SafetyValidationStageResult> {
   const reasons: string[] = [];
@@ -34,13 +25,22 @@ export async function validateApiHealth(input: PreTradeSafetyInput): Promise<Saf
   latencySamples.push(latencyMs);
   if (latencySamples.length > 100) latencySamples.shift();
 
-  const clock = await checkClockSync();
+  const clock = await evaluateClockSync();
   if (!clock.ok) {
-    reasons.push(`Clock synchronization failed (skew ${clock.skewMs}ms)`);
+    reasons.push(`Clock synchronization failed (skew ${Number.isFinite(clock.skewMs) ? clock.skewMs : "unknown"}ms)`);
   }
 
+  persistClockSyncForensics(clock.forensics, {
+    executionId: input.executionId,
+  });
+
   if (!ticker) {
-    return { stage: "API", passed: false, reasons, metadata: { latencyMs, clockSkewMs: clock.skewMs } };
+    return {
+      stage: "API",
+      passed: false,
+      reasons,
+      metadata: { latencyMs, clockSkewMs: clock.skewMs, clockForensics: clock.forensics },
+    };
   }
 
   if (latencyMs > MAX_API_LATENCY_MS) {
@@ -65,6 +65,7 @@ export async function validateApiHealth(input: PreTradeSafetyInput): Promise<Saf
       avgLatencyMs: Number(avgLatency.toFixed(2)),
       connectionQuality: Number(connectionQuality.toFixed(2)),
       clockSkewMs: clock.skewMs,
+      clockForensics: clock.forensics,
       openCircuits: open.map((row) => row.key),
     },
   };
@@ -78,3 +79,5 @@ export function getApiLatencyStats() {
     count: latencySamples.length,
   };
 }
+
+export { MAX_CLOCK_SKEW_MS } from "@/src/server/execution-safety/clock-sync.service";

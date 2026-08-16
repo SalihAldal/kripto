@@ -1,0 +1,122 @@
+{
+  "validationId": "p0-ai-cancellation-2026-08-14",
+  "validatedAt": "2026-08-14T19:20:15.000Z",
+  "phase": "TARGETED_TESTS_PASSED",
+  "incidentReference": {
+    "sessionId": "cmst8nza40007unvsi2211emo",
+    "roundNo": 4,
+    "runId": "cmstaljbi09zsunvsk1hn8ik0",
+    "classification": ["CANCELLATION_FAILURE", "SELECTION_BUDGET_BUG", "RECOVERY_DETECTION_BUG"]
+  },
+  "rootCause": {
+    "primary": "withBoundedAwait used Promise.race without aborting inner consensus/provider/Prisma work",
+    "secondary": "selectionBudgetMs checked only between pool items via shouldAbort/checkBudget(false)",
+    "tertiary": "failAiCandidate not invoked on cooperative pool worker timeout path; PIXELTRY remained STARTED"
+  },
+  "fixesApplied": {
+    "P0-1_abortPropagation": {
+      "path": [
+        "registerRoundCancellation(jobId) -> AbortSignal",
+        "runCooperativeRoundSelection -> FastEntryRuntimeHooks.abortSignal",
+        "scanner mapWithConcurrency -> runCooperativePool(abortSignal, selectionDeadlineMs)",
+        "withBoundedAwait / withCancellableBoundedAwait(signal)",
+        "runAIConsensusFromInput(input, { signal })",
+        "analyzeLaneWithSingleProvider(..., signal) -> withAiRetry({ signal })",
+        "AIAnalysisInput.runtimeControl.abortSignal -> analyzeWithRemoteModel -> postJson/getJson parent signal"
+      ],
+      "files": [
+        "src/server/execution/cancellable-work.service.ts",
+        "src/server/execution/cooperative-async.service.ts",
+        "src/server/scanner/scanner.service.ts",
+        "src/server/ai/analysis-orchestrator.ts",
+        "src/server/ai/utils.ts",
+        "src/server/ai/providers/remote-llm.ts"
+      ]
+    },
+    "P0-2_timeoutCancelsWork": {
+      "behavior": "withCancellableBoundedAwait rejects CooperativeAsyncTimeoutError and aborts linked AbortController before cleanup",
+      "file": "src/server/execution/cancellable-work.service.ts"
+    },
+    "P0-3_workerTimeoutTerminalizes": {
+      "behavior": "runCooperativePool onWorkerTimeout + scanner catch call failAiCandidate(AI_TIMEOUT) with timeoutAt/aborted/signalPropagated",
+      "file": "src/server/scanner/scanner.service.ts"
+    },
+    "P0-4_midFlightBudget": {
+      "behavior": [
+        "selectionDeadlineMs + selectionBudgetMs passed into runCooperativePool",
+        "budget interval + effectiveTimeout capped by remainingMsUntil(deadline)",
+        "startSelectionBudgetEnforcer(jobId) calls cancelRoundSelection at absolute deadline",
+        "RoundRuntimeController.checkBudget(true) on all heartbeat paths"
+      ],
+      "files": [
+        "src/server/execution/cooperative-async.service.ts",
+        "src/server/execution/round-runtime.service.ts",
+        "src/server/execution/round-selection.service.ts"
+      ]
+    },
+    "P0-5_boundedPrisma": {
+      "behavior": "withBoundedPrisma wraps getRuntimeExecutionContext in consensus and idempotentMergeRunMetadata in round persist",
+      "defaultTimeoutMs": 15000,
+      "file": "src/server/execution/bounded-prisma.service.ts"
+    },
+    "P0-6_recovery": {
+      "behavior": "watchdog STALLED/budget -> cancelRoundSelection + terminalizeOpenAiCandidates; assessRoundProgressState preserved ACTIVE_PROGRESS grace",
+      "file": "src/server/execution/round-selection.service.ts"
+    },
+    "P0-7_processIsolation": {
+      "used": false,
+      "note": "AbortSignal + cooperative pool timeout isolation used as primary; worker_threads/process boundary reserved as fallback"
+    },
+    "P0-8_forensicFields": {
+      "started": ["candidateId", "symbol", "provider", "model", "executionMode", "startedAt"],
+      "timeout": ["timeoutAt", "timeoutMs", "aborted", "abortReason", "signalPropagated"],
+      "cancel": ["cancelledAt", "cancelReason", "signalPropagated"],
+      "file": "src/server/forensics/ai-runtime.service.ts"
+    },
+    "P0-9_artifacts": {
+      "minimumPartialBundle": [
+        "ai-progress.json",
+        "ai-trace.json",
+        "round-watchdog.json",
+        "recovery-decisions.json",
+        "recovery-telemetry.json",
+        "round-summary.json"
+      ],
+      "writer": "writeMinimumAiStallArtifacts"
+    }
+  },
+  "tests": {
+    "command": "npx vitest run tests/ai-cancellation.test.ts tests/cooperative-async.test.ts",
+    "passed": 14,
+    "failed": 0,
+    "suites": [
+      "Hung consensus -> AI_TIMEOUT -> slot release -> next candidate",
+      "Abort parent signal cancels bounded await",
+      "Pool continues after hung worker",
+      "Selection budget / cancelRoundSelection aborts in-flight work",
+      "cancelRoundSelection aborts active consensus lanes",
+      "Bounded Prisma hang -> BoundedPrismaError, no STARTED orphan",
+      "Concurrency pool completes all items (no permanent slot)",
+      "Recovery progress states HEARTBEAT_ONLY vs STALLED",
+      "Candidate forensic provider/model at STARTED",
+      "AI timeout minimum partial artifact bundle"
+    ]
+  },
+  "liveRoundValidation": {
+    "status": "PASS",
+    "validationId": "1round-ai-cancel-2026-08-14T19-30-42-079Z",
+    "sessionId": "cmstce95w0007unronp6bkn7p",
+    "completedAt": "2026-08-14T19:36:44.716Z",
+    "report": "KRIPTO_ONE_ROUND_AI_CANCELLATION_VALIDATION.md",
+    "json": "kripto-one-round-ai-cancellation-validation.json",
+    "startedOrphans": 0,
+    "jobTerminal": true,
+    "roundTerminal": true,
+    "artifactsComplete": true
+  },
+  "remainingBlockers": [
+    "Live AI_TIMEOUT with full timeout forensic fields not observed this round (no hung consensus)",
+    "Selection budget mid-flight abort not exercised (round ended at 336s vs 1200s budget)",
+    "Five-round stress validation still deferred"
+  ]
+}

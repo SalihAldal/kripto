@@ -352,7 +352,7 @@ async function discoverIntradaySpikeLeaders(limit = 32): Promise<TopGainerDiscov
     seeds,
     Math.max(3, Math.min(10, env.SCANNER_CONTEXT_CONCURRENCY)),
     async (row): Promise<TopGainerDiscoveryItem | null> => {
-      const context = await buildMarketContext(row.symbol, { lite: true, forceLive: true }).catch(() => null);
+      const context = await buildMarketContext(row.symbol, { lite: true, priority: "high" }).catch(() => null);
       if (!context) return null;
       const shortMomentum = finite(context.metadata.shortMomentumPercent);
       const hourMomentum = finite(context.metadata.hourMomentumPercent);
@@ -462,7 +462,7 @@ async function scanTopPumpCandidates(limit = 6) {
     async (symbol): Promise<PumpEarlyCandidate | null> => {
       const leader = leaderMap.get(symbol);
       const isIntradayLeader = leader?.reason.includes("intraday-spike") ?? false;
-      const context = await buildMarketContext(symbol, { lite: false, forceLive: true });
+      const context = await buildMarketContext(symbol, { lite: false, priority: "high" });
       const enrichedContext = attachTopGainerMeta(context, leader);
       const score = scoreContext(enrichedContext);
       const candidate: ScannerCandidate = { rank: 1, context: enrichedContext, score };

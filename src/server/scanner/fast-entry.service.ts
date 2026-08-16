@@ -1,5 +1,11 @@
 import type { AIDecision } from "@/src/types/ai";
 import { logger } from "@/lib/logger";
+import {
+  PumpScanFailedError,
+  recordPumpScanEvent,
+  runBoundedLivePumpScan,
+} from "@/src/server/scanner/pump-scan-lifecycle.service";
+import { traceCandidateFailed, traceCandidateReject, traceCandidateWait } from "@/src/server/forensics/candidate-lifecycle.service";
 import { env } from "@/lib/config";
 import { getRuntimeExecutionContext } from "@/src/server/repositories/execution.repository";
 import { getAdaptiveExecutionPolicy } from "@/src/server/metrics/performance.service";
@@ -25,6 +31,13 @@ import {
   type PumpEarlyCandidate,
 } from "@/src/server/scanner/pump-early-catcher.service";
 import type { ScannerCandidate, ScannerPipelineResult } from "@/src/types/scanner";
+import type { AsyncRuntimeTelemetry } from "@/src/server/execution/cooperative-async.service";
+import {
+  resolveAiConsensusTimeoutMs,
+  resolveMarketContextTimeoutMs,
+  startPeriodicRuntimeHeartbeat,
+  withBoundedAwait,
+} from "@/src/server/execution/cooperative-async.service";
 
 export type FastEntryResult = {
   selected: ScannerCandidate | null;
@@ -68,7 +81,57 @@ type FastEntryOptions = {
   scanLimit?: number;
   scanCycles?: number;
   maxDurationSec?: number;
+  skipInitialPumpPass?: boolean;
+  runtime?: FastEntryRuntimeHooks;
 };
+
+export type FastEntryRuntimeHooks = {
+  ensureActive?: () => void | Promise<void>;
+  onPumpScan?: (scope: "cache" | "live", candidateCount: number, remaining: number) => void | Promise<void>;
+  onPumpConfirmation?: (symbol: string, index: number, total: number) => void | Promise<void>;
+  onAiAnalysis?: (symbol: string, phase: "started" | "completed", decision?: string) => void | Promise<void>;
+  onCandidateRejected?: (symbol: string, reason: string) => void | Promise<void>;
+  onFullScan?: (cycle: number, maxCycles: number) => void | Promise<void>;
+  onScannerCheckpoint?: (info: {
+    phase: "context" | "discovery" | "ranking" | "ai" | "consensus";
+    processed: number;
+    total: number;
+    symbol?: string;
+  }) => void | Promise<void>;
+  onHeartbeat?: () => void | Promise<void>;
+  onProgress?: () => void | Promise<void>;
+  asyncTelemetry?: AsyncRuntimeTelemetry;
+  shouldAbort?: () => void;
+  abortSignal?: AbortSignal;
+  selectionBudgetMs?: number;
+  selectionDeadlineMs?: number;
+  forceFreshScanner?: boolean;
+  roundId?: string;
+  runId?: string;
+};
+
+function buildScannerPipelineRuntime(
+  runtime: FastEntryRuntimeHooks | undefined,
+  attachIfRunning: boolean,
+) {
+  return {
+    attachIfRunning,
+    attachMaxWaitMs: env.AUTO_ROUND_SCANNER_ATTACH_MAX_WAIT_MS,
+    preferLastResultOnAttachTimeout: attachIfRunning,
+    maxCycleSec: env.AUTO_ROUND_SCANNER_MAX_CYCLE_SEC,
+    phaseDeadlineMs: runtime?.selectionDeadlineMs,
+    selectionDeadlineMs: runtime?.selectionDeadlineMs,
+    selectionBudgetMs: runtime?.selectionBudgetMs,
+    shouldAbort: runtime?.shouldAbort,
+    abortSignal: runtime?.abortSignal,
+    onHeartbeat: runtime?.onHeartbeat,
+    onProgress: runtime?.onProgress,
+    telemetry: runtime?.asyncTelemetry,
+    onCheckpoint: runtime?.onScannerCheckpoint,
+    roundId: runtime?.roundId,
+    runId: runtime?.runId,
+  };
+}
 
 function rankForFastEntry(candidate: ScannerCandidate) {
   const aiConfidence = candidate.ai?.finalConfidence ?? 0;
@@ -413,13 +476,41 @@ function resolvePumpAdaptiveDurationSec(context: ScannerCandidate["context"], re
   });
 }
 
+function tracePumpCandidateReject(symbol: string, reasonCode: string, reasonDetail: string) {
+  traceCandidateReject({
+    symbol,
+    stage: "candidate",
+    reasonCode,
+    reasonDetail,
+  });
+}
+
+function traceScanCycleWait(pool: ScannerCandidate[], reasonCode: string, reasonDetail: string) {
+  traceCandidateWait({
+    symbol: pool[0]?.context.symbol ?? "SCAN_CYCLE",
+    stage: "scanner",
+    reasonCode,
+    reasonDetail,
+  });
+}
+
 async function confirmPumpEarlyCandidate(input: {
   base: ScannerCandidate;
   runtimeStrategy: Awaited<ReturnType<typeof getRuntimeStrategyParams>>;
   maxDurationSec?: number;
   mode?: "early" | "continuation" | "intraday";
+  runtime?: FastEntryRuntimeHooks;
 }) {
-  const liveContext = await buildMarketContext(input.base.context.symbol, { lite: false, forceLive: true });
+  const stopHeartbeat = startPeriodicRuntimeHeartbeat(input.runtime?.onHeartbeat);
+  try {
+    await input.runtime?.ensureActive?.();
+    input.runtime?.shouldAbort?.();
+    const liveContext = await withBoundedAwait(
+      `pump-context:${input.base.context.symbol}`,
+      buildMarketContext(input.base.context.symbol, { lite: false, priority: "critical" }),
+      resolveMarketContextTimeoutMs(),
+      input.runtime?.asyncTelemetry,
+    );
   const adaptiveDurationSec = resolvePumpAdaptiveDurationSec(liveContext, input.maxDurationSec);
   const breakout = evaluateMomentumBreakout(liveContext);
   const tapeMomentum = Number(liveContext.metadata.shortMomentumPercent ?? 0);
@@ -472,7 +563,14 @@ async function confirmPumpEarlyCandidate(input: {
     liveContext.fakeSpikeScore <= (isPaperMode ? 4.5 : isIntraday ? 3 : 2.8) &&
     liveContext.pumpRisk <= (isPaperMode ? 94 : isIntraday ? 88 : 85) &&
     tradeVelocity >= (isPaperMode ? 0.02 : isIntraday ? 0.04 : 0.06);
-  if (!stillEarly && !stillContinuation) return null;
+  if (!stillEarly && !stillContinuation) {
+    tracePumpCandidateReject(
+      input.base.context.symbol,
+      "PUMP_NOT_EARLY_OR_CONTINUATION",
+      "Candidate failed early/continuation gate",
+    );
+    return null;
+  }
 
   const pumpSafety = evaluatePumpEntrySafety({
     context: liveContext,
@@ -497,7 +595,14 @@ async function confirmPumpEarlyCandidate(input: {
         liveContext.spreadPercent <= 0.32 &&
         liveContext.fakeSpikeScore <= 3.2 &&
         liveContext.pumpRisk <= 86);
-    if (!safetyOverride) return null;
+    if (!safetyOverride) {
+      tracePumpCandidateReject(
+        input.base.context.symbol,
+        "PUMP_SAFETY_FAILED",
+        pumpSafety.reason ?? "Pump safety check failed",
+      );
+      return null;
+    }
   }
 
   const score = scoreContext(liveContext);
@@ -513,7 +618,14 @@ async function confirmPumpEarlyCandidate(input: {
     },
     undefined,
   );
-  const ai = await runAIConsensusFromInput(aiInput);
+  await input.runtime?.onAiAnalysis?.(liveContext.symbol, "started");
+  const ai = await withBoundedAwait(
+    `pump-ai:${liveContext.symbol}`,
+    runAIConsensusFromInput(aiInput),
+    resolveAiConsensusTimeoutMs(),
+    input.runtime?.asyncTelemetry,
+  );
+  await input.runtime?.onAiAnalysis?.(liveContext.symbol, "completed", ai.finalDecision);
   const riskVeto = Boolean(ai.roleScores?.find((row) => row.role === "AI-3_RISK")?.veto);
   const roleScores = ai.roleScores ?? [];
   const technicalRole = Number(roleScores.find((row) => row.role === "AI-1_TECHNICAL")?.score ?? 0);
@@ -583,6 +695,11 @@ async function confirmPumpEarlyCandidate(input: {
     weakPumpCalmRegime ||
     weakPumpHourOnlyMomentum
   ) {
+    tracePumpCandidateReject(
+      input.base.context.symbol,
+      "PUMP_WEAK_PROFILE",
+      "Pump weak profile composite gate",
+    );
     return null;
   }
   const pumpSafetyFinal = evaluatePumpEntrySafety({
@@ -595,8 +712,22 @@ async function confirmPumpEarlyCandidate(input: {
     marketRegime,
     compositeAvg,
   });
-  if (!pumpSafetyFinal.ok) return null;
-  if (riskVeto || ai.finalRiskScore > (stillContinuation ? 82 : 78)) return null;
+  if (!pumpSafetyFinal.ok) {
+    tracePumpCandidateReject(
+      input.base.context.symbol,
+      "PUMP_SAFETY_FINAL_FAILED",
+      pumpSafetyFinal.reason ?? "Final pump safety check failed",
+    );
+    return null;
+  }
+  if (riskVeto || ai.finalRiskScore > (stillContinuation ? 82 : 78)) {
+    tracePumpCandidateReject(
+      input.base.context.symbol,
+      riskVeto ? "PUMP_RISK_VETO" : "PUMP_RISK_SCORE_HIGH",
+      riskVeto ? "AI risk veto" : `finalRiskScore=${ai.finalRiskScore}`,
+    );
+    return null;
+  }
   const aiBuy = ai.finalDecision === "BUY" && !ai.rejected && ai.finalConfidence >= (stillContinuation ? 40 : 45);
   const highQualityOverride =
     !aiBuy &&
@@ -623,7 +754,14 @@ async function confirmPumpEarlyCandidate(input: {
     ai.finalRiskScore <= 82 &&
     compositeAvg >= 62 &&
     (technicalRole >= 52 || change24h >= 35);
-  if (!aiBuy && !highQualityOverride && !continuationOverride && !strongGainerBypass) return null;
+  if (!aiBuy && !highQualityOverride && !continuationOverride && !strongGainerBypass) {
+    tracePumpCandidateReject(
+      input.base.context.symbol,
+      "PUMP_NO_BUY_SIGNAL",
+      `AI decision=${ai.finalDecision}, rejected=${ai.rejected}`,
+    );
+    return null;
+  }
 
   const confidence = aiBuy
     ? Math.max(ai.finalConfidence, Math.min(stillContinuation ? 76 : 82, breakout.score || change24h * 0.55))
@@ -663,6 +801,9 @@ async function confirmPumpEarlyCandidate(input: {
         : ai.analysisScorecard,
     },
   } satisfies ScannerCandidate;
+  } finally {
+    stopHeartbeat();
+  }
 }
 
 function selectTradableCandidates(
@@ -1185,17 +1326,51 @@ async function confirmFocusedCandidate(
       },
       undefined,
     );
-    const ai = await runAIConsensusFromInput(aiInput);
-    if (ai.rejected) return null;
-    if (ai.finalDecision !== "BUY" && ai.finalDecision !== "SELL") return null;
-    if ((ai.finalConfidence ?? 0) < minConfidence) return null;
+    const ai = await withBoundedAwait(
+      `focus-ai-consensus:${candidate.context.symbol}`,
+      runAIConsensusFromInput(aiInput),
+      resolveAiConsensusTimeoutMs(),
+    );
+    if (ai.rejected) {
+      traceCandidateReject({
+        symbol: candidate.context.symbol,
+        stage: "ai",
+        reasonCode: "AI_REJECTED",
+        reasonDetail: ai.rejectReason ?? "AI rejected candidate",
+      });
+      return null;
+    }
+    if (ai.finalDecision !== "BUY" && ai.finalDecision !== "SELL") {
+      traceCandidateReject({
+        symbol: candidate.context.symbol,
+        stage: "consensus",
+        reasonCode: "AI_NO_TRADE",
+        reasonDetail: `AI decision=${ai.finalDecision}`,
+      });
+      return null;
+    }
+    if ((ai.finalConfidence ?? 0) < minConfidence) {
+      traceCandidateReject({
+        symbol: candidate.context.symbol,
+        stage: "decision",
+        reasonCode: "LOW_CONFIDENCE",
+        reasonDetail: `confidence=${ai.finalConfidence ?? 0} < ${minConfidence}`,
+      });
+      return null;
+    }
     return {
       ...candidate,
       context,
       score,
       ai,
     };
-  } catch {
+  } catch (error) {
+    traceCandidateFailed({
+      symbol: candidate.context.symbol,
+      stage: "ai",
+      reasonCode: "AI_ANALYSIS_FAILED",
+      reasonDetail: (error as Error).message,
+    });
     return null;
   }
 }
@@ -1275,20 +1450,41 @@ async function selectPumpFastEntry(input: {
   maxDurationSec?: number;
   minConfidence: number;
   includeLiveScan?: boolean;
+  runtime?: FastEntryRuntimeHooks;
 }): Promise<FastEntryResult | null> {
-  const tryList = async (candidates: Awaited<ReturnType<typeof getCachedPumpCandidates>>) => {
-    for (const pumpCandidate of candidates) {
-      if (input.excludedSymbols.has(pumpCandidate.candidate.context.symbol.toUpperCase())) continue;
+  const tryList = async (
+    candidates: Awaited<ReturnType<typeof getCachedPumpCandidates>>,
+    scope: "cache" | "live",
+  ) => {
+    const eligible = candidates.filter(
+      (row) => !input.excludedSymbols.has(row.candidate.context.symbol.toUpperCase()),
+    );
+    await input.runtime?.onPumpScan?.(scope, candidates.length, eligible.length);
+    for (let index = 0; index < eligible.length; index += 1) {
+      const pumpCandidate = eligible[index];
+      await input.runtime?.ensureActive?.();
+      input.runtime?.shouldAbort?.();
+      const symbol = pumpCandidate.candidate.context.symbol.toUpperCase();
+      await input.runtime?.onPumpConfirmation?.(symbol, index + 1, eligible.length);
       const pumpSelected = await confirmPumpEarlyCandidate({
         base: pumpCandidate.candidate,
         runtimeStrategy: input.runtimeStrategy,
         maxDurationSec: input.maxDurationSec,
         mode: pumpCandidate.mode,
-      }).catch(() => null);
+        runtime: input.runtime,
+      }).catch((error) => {
+        traceCandidateFailed({
+          symbol,
+          stage: "candidate",
+          reasonCode: "PUMP_CONFIRM_FAILED",
+          reasonDetail: (error as Error).message,
+        });
+        return null;
+      });
       if (pumpSelected) {
         return {
           selected: pumpSelected,
-          reason: `Pump Catcher [${pumpCandidate.mode}] (cache): ${pumpCandidate.reason}`,
+          reason: `Pump Catcher [${pumpCandidate.mode}] (${scope}): ${pumpCandidate.reason}`,
           diagnostics: {
             candidateCount: candidates.length,
             tradableCount: 1,
@@ -1298,9 +1494,19 @@ async function selectPumpFastEntry(input: {
             requireUnanimous: false,
           },
           scannedAt: new Date().toISOString(),
-          evaluated: 0,
+          evaluated: index + 1,
         } satisfies FastEntryResult;
       }
+      await input.runtime?.onCandidateRejected?.(
+        symbol,
+        `Pump confirmation NO_TRADE (${pumpCandidate.mode})`,
+      );
+      traceCandidateReject({
+        symbol,
+        stage: "candidate",
+        reasonCode: "PUMP_CONFIRM_NO_TRADE",
+        reasonDetail: `Pump confirmation NO_TRADE (${pumpCandidate.mode})`,
+      });
     }
     return null;
   };
@@ -1314,8 +1520,20 @@ async function selectPumpFastEntry(input: {
     },
     "Pump Catcher selection attempt",
   );
+  recordPumpScanEvent({
+    kind: "start",
+    scope: "cache",
+    message: "Pump fast entry selection started",
+    meta: { excludedCount: input.excludedSymbols.size },
+  });
   const cached = getCachedPumpCandidates(24);
-  const cachedHit = await tryList(cached);
+  recordPumpScanEvent({
+    kind: "cache_scan",
+    scope: "cache",
+    candidateCount: cached.length,
+    message: `Pump cache scan complete (${cached.length} candidates)`,
+  });
+  const cachedHit = await tryList(cached, "cache");
   if (cachedHit) return cachedHit;
   if (cached.length === 0) {
     logger.info(
@@ -1334,8 +1552,32 @@ async function selectPumpFastEntry(input: {
     );
   }
   if (input.includeLiveScan) {
-    const liveCandidates = await resolveLiveTopGainerPumpCandidates({ limit: 24 }).catch(() => []);
-    const liveHit = await tryList(liveCandidates);
+    await input.runtime?.ensureActive?.();
+    input.runtime?.shouldAbort?.();
+    let liveCandidates: Awaited<ReturnType<typeof resolveLiveTopGainerPumpCandidates>> = [];
+    try {
+      liveCandidates = await runBoundedLivePumpScan(
+        "resolveLiveTopGainerPumpCandidates",
+        () => resolveLiveTopGainerPumpCandidates({ limit: 24 }),
+        {
+          selectionDeadlineMs: input.runtime?.selectionDeadlineMs,
+          telemetry: input.runtime?.asyncTelemetry,
+          scope: "live",
+        },
+      );
+    } catch (error) {
+      if (error instanceof PumpScanFailedError) {
+        recordPumpScanEvent({
+          kind: "failed",
+          scope: "live",
+          blockKind: error.blockKind,
+          message: error.message,
+        });
+        throw error;
+      }
+      throw error;
+    }
+    const liveHit = await tryList(liveCandidates, "live");
     if (liveHit) return liveHit;
     if (liveCandidates.length === 0) {
       logger.info(
@@ -1354,6 +1596,17 @@ async function selectPumpFastEntry(input: {
       );
     }
   }
+  recordPumpScanEvent({
+    kind: "end",
+    scope: "live",
+    message: "Pump fast entry selection finished without match",
+  });
+  traceCandidateWait({
+    symbol: "PUMP_SCAN",
+    stage: "scanner",
+    reasonCode: "PUMP_NO_MATCH",
+    reasonDetail: "Pump cache and live scan exhausted without confirmation",
+  });
   return null;
 }
 
@@ -1404,24 +1657,32 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
   let scan: ScannerPipelineResult | null = null;
   let lastResult: FastEntryResult | null = null;
 
-  const pumpHit = await selectPumpFastEntry({
-    excludedSymbols,
-    runtimeStrategy: strategyParams,
-    maxDurationSec: options?.maxDurationSec,
-    minConfidence: effectivePolicy.minConfidence,
-    includeLiveScan: true,
-  });
+  const pumpHit = options?.skipInitialPumpPass
+    ? null
+    : await selectPumpFastEntry({
+        excludedSymbols,
+        runtimeStrategy: strategyParams,
+        maxDurationSec: options?.maxDurationSec,
+        minConfidence: effectivePolicy.minConfidence,
+        includeLiveScan: true,
+        runtime: options?.runtime,
+      });
   if (pumpHit) return pumpHit;
 
   const tradableOptions = { paperMode: usePaperProfile };
+  const useScannerAttach = !(options?.runtime?.forceFreshScanner ?? false);
 
   for (let cycle = 0; cycle < maxScanCycles; cycle += 1) {
+    await options?.runtime?.ensureActive?.();
+    options?.runtime?.shouldAbort?.();
+    await options?.runtime?.onFullScan?.(cycle + 1, maxScanCycles);
     if (!scan || scan.candidates.length === 0 || cycle > 0) {
       scan = await runScannerPipeline(undefined, {
         includeAi: true,
         persist: false,
         persistRejected: false,
         executionMode,
+        runtime: buildScannerPipelineRuntime(options?.runtime, useScannerAttach),
       });
     }
     if (scan.totalSymbols === 0 || scan.candidates.length === 0) {
@@ -1430,6 +1691,7 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
         persist: false,
         persistRejected: false,
         executionMode,
+        runtime: buildScannerPipelineRuntime(options?.runtime, false),
       });
     }
     const candidatePoolRaw =
@@ -1647,6 +1909,11 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
         scannedAt: scan.scannedAt,
         evaluated: scan.aiEvaluatedSymbols,
       };
+      traceScanCycleWait(
+        candidatePool,
+        "PAPER_NO_TRADE",
+        lastResult.reason,
+      );
       continue;
     }
 
@@ -1672,6 +1939,7 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
         scannedAt: scan.scannedAt,
         evaluated: scan.aiEvaluatedSymbols,
       };
+      traceScanCycleWait(candidatePool, "NO_TRADABLE_CANDIDATE", lastResult.reason);
       continue;
     }
 
@@ -1689,6 +1957,7 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
         scannedAt: scan.scannedAt,
         evaluated: scan.aiEvaluatedSymbols,
       };
+      traceScanCycleWait(tradable, "FOCUS_CONFIRM_FAILED", lastResult.reason);
       continue;
     }
     if (usePaperProfile && !isPaperApprovedLane(focusSelected)) {
@@ -1699,6 +1968,7 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
         scannedAt: scan.scannedAt,
         evaluated: scan.aiEvaluatedSymbols,
       };
+      traceScanCycleWait([focusSelected], "PAPER_LANE_MISMATCH", lastResult.reason);
       continue;
     }
     return {
@@ -1739,6 +2009,7 @@ export async function getPumpFastEntry(input: {
   maxDurationSec?: number;
   minConfidence?: number;
   includeLiveScan?: boolean;
+  runtime?: FastEntryRuntimeHooks;
 }): Promise<FastEntryResult> {
   ensurePumpEarlyCatcherStarted();
   const runtimeStrategy = await getRuntimeStrategyParams();
@@ -1750,6 +2021,7 @@ export async function getPumpFastEntry(input: {
       maxDurationSec: input.maxDurationSec,
       minConfidence: input.minConfidence ?? 45,
       includeLiveScan: input.includeLiveScan ?? true,
+      runtime: input.runtime,
     })) ?? {
       selected: null,
       reason: "Pump cache bos",

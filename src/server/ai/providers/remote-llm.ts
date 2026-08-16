@@ -413,9 +413,15 @@ function buildPrompt(input: AIAnalysisInput, lane: AnalysisLane) {
   ].join("\n");
 }
 
-async function postJson(url: string, init: RequestInit, timeoutMs: number) {
+async function postJson(url: string, init: RequestInit, timeoutMs: number, parentSignal?: AbortSignal) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Math.max(800, timeoutMs));
+  const timeout = setTimeout(() => controller.abort(new Error(`HTTP timeout after ${timeoutMs}ms`)), Math.max(800, timeoutMs));
+  const onParentAbort = () => controller.abort(parentSignal?.reason ?? new Error("Parent abort"));
+  if (parentSignal?.aborted) {
+    controller.abort(parentSignal.reason ?? new Error("Parent abort"));
+  } else if (parentSignal) {
+    parentSignal.addEventListener("abort", onParentAbort, { once: true });
+  }
   try {
     const response = await fetch(url, { ...init, signal: controller.signal });
     if (!response.ok) {
@@ -425,12 +431,19 @@ async function postJson(url: string, init: RequestInit, timeoutMs: number) {
     return await response.json();
   } finally {
     clearTimeout(timeout);
+    if (parentSignal) parentSignal.removeEventListener("abort", onParentAbort);
   }
 }
 
-async function getJson(url: string, init: RequestInit, timeoutMs: number) {
+async function getJson(url: string, init: RequestInit, timeoutMs: number, parentSignal?: AbortSignal) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Math.max(800, timeoutMs));
+  const timeout = setTimeout(() => controller.abort(new Error(`HTTP timeout after ${timeoutMs}ms`)), Math.max(800, timeoutMs));
+  const onParentAbort = () => controller.abort(parentSignal?.reason ?? new Error("Parent abort"));
+  if (parentSignal?.aborted) {
+    controller.abort(parentSignal.reason ?? new Error("Parent abort"));
+  } else if (parentSignal) {
+    parentSignal.addEventListener("abort", onParentAbort, { once: true });
+  }
   try {
     const response = await fetch(url, { ...init, signal: controller.signal });
     if (!response.ok) {
@@ -440,10 +453,11 @@ async function getJson(url: string, init: RequestInit, timeoutMs: number) {
     return await response.json();
   } finally {
     clearTimeout(timeout);
+    if (parentSignal) parentSignal.removeEventListener("abort", onParentAbort);
   }
 }
 
-async function callOpenAI(apiKey: string, prompt: string, timeoutMs: number) {
+async function callOpenAI(apiKey: string, prompt: string, timeoutMs: number, parentSignal?: AbortSignal) {
   const json = await postJson(
     "https://api.openai.com/v1/chat/completions",
     {
@@ -466,11 +480,12 @@ async function callOpenAI(apiKey: string, prompt: string, timeoutMs: number) {
       }),
     },
     timeoutMs,
+    parentSignal,
   ) as { choices?: Array<{ message?: { content?: string } }> };
   return json.choices?.[0]?.message?.content ?? "";
 }
 
-async function callAnthropic(apiKey: string, prompt: string, timeoutMs: number) {
+async function callAnthropic(apiKey: string, prompt: string, timeoutMs: number, parentSignal?: AbortSignal) {
   const models = await resolveAnthropicModels(apiKey, timeoutMs);
   let lastError: unknown = null;
   for (const model of models) {
@@ -491,6 +506,7 @@ async function callAnthropic(apiKey: string, prompt: string, timeoutMs: number) 
           }),
         },
         timeoutMs,
+        parentSignal,
       ) as { content?: Array<{ type?: string; text?: string }> };
       return json.content?.find((x) => x.type === "text")?.text ?? "";
     } catch (error) {
@@ -504,7 +520,7 @@ async function callAnthropic(apiKey: string, prompt: string, timeoutMs: number) 
   throw lastError instanceof Error ? lastError : new Error("Anthropic model resolution failed");
 }
 
-async function callGemini(apiKey: string, prompt: string, timeoutMs: number) {
+async function callGemini(apiKey: string, prompt: string, timeoutMs: number, parentSignal?: AbortSignal) {
   const models = await resolveGeminiModels(apiKey, timeoutMs);
   let lastError: unknown = null;
   for (const model of models) {
@@ -535,6 +551,7 @@ async function callGemini(apiKey: string, prompt: string, timeoutMs: number) {
             }),
           },
           timeoutMs,
+          parentSignal,
         );
       let json: {
         candidates?: Array<{
@@ -787,6 +804,7 @@ export async function analyzeWithRemoteModel(
   const task = (async () => {
     try {
       const prompt = buildPrompt(input, lane);
+      const parentSignal = input.runtimeControl?.abortSignal;
       const timeoutMs =
         provider === "openai"
           ? Math.max(9000, config.timeoutMs)
@@ -795,10 +813,10 @@ export async function analyzeWithRemoteModel(
             : Math.max(9000, config.timeoutMs);
       const raw =
         provider === "openai"
-          ? await callOpenAI(apiKey, prompt, timeoutMs)
+          ? await callOpenAI(apiKey, prompt, timeoutMs, parentSignal)
           : provider === "anthropic"
-            ? await callAnthropic(apiKey, prompt, timeoutMs)
-            : await callGemini(apiKey, prompt, timeoutMs);
+            ? await callAnthropic(apiKey, prompt, timeoutMs, parentSignal)
+            : await callGemini(apiKey, prompt, timeoutMs, parentSignal);
 
       const output = toOutput(parseLenientModelOutput(raw), input, lane, config.name);
       if (!output) {

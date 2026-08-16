@@ -1,5 +1,12 @@
 import type { AIAnalysisInput, AIProviderResult } from "@/src/types/ai";
 import { buildExpertResult, clampScore, scoreToOpinion } from "@/src/server/decision-engine/experts/expert.utils";
+import {
+  hasMomentumExpertTelemetry,
+  scoreMomentumContinuation,
+  scoreMomentumImpulse,
+  scoreMomentumRelativeStrength,
+  scoreMomentumVelocity,
+} from "@/src/server/decision-engine/experts/momentum-expert.utils";
 
 export function analyzeMarketExpert(input: AIAnalysisInput, providers?: AIProviderResult[]) {
   const regime = input.marketRegime;
@@ -39,21 +46,34 @@ export function analyzeMarketExpert(input: AIAnalysisInput, providers?: AIProvid
 
 export function analyzeMomentumExpert(input: AIAnalysisInput, providers?: AIProviderResult[]) {
   const signals = input.marketSignals;
-  const mom = clampScore(Math.abs(signals?.shortMomentumPercent ?? 0) * 8 + Math.abs(signals?.change5m ?? 0) * 10);
-  const continuation = clampScore((signals?.change15m ?? 0) > 0 && (signals?.change5m ?? 0) > 0 ? 75 : 45);
-  const velocity = clampScore((signals?.tradeVelocity ?? 0) * 10 + (signals?.volumeSpikeRatio ?? 1) * 20);
-  const relStrength = clampScore(50 + (signals?.change24h ?? 0) * 3);
+  if (!hasMomentumExpertTelemetry(input)) {
+    return buildExpertResult({
+      expertType: "MOMENTUM",
+      opinion: "NO_OPINION",
+      score: 50,
+      summary: "Insufficient short-window momentum telemetry",
+      positiveFactors: [],
+      negativeFactors: [],
+      topRisks: ["insufficientMomentumTelemetry"],
+      metadata: { sampleSize: input.klines?.length ?? 0 },
+    });
+  }
+  const mom = scoreMomentumImpulse(input);
+  const continuation = scoreMomentumContinuation(input);
+  const velocity = scoreMomentumVelocity(input);
+  const relStrength = scoreMomentumRelativeStrength(input);
   const score = clampScore(mom * 0.35 + continuation * 0.25 + velocity * 0.2 + relStrength * 0.2);
   const momentumProvider = providers?.find((row) => row.providerId.includes("2") || row.providerName.toLowerCase().includes("sentiment"));
   const bias = momentumProvider?.output?.decision === "BUY" ? 5 : momentumProvider?.output?.decision === "SELL" ? -5 : 0;
+  const shortMomentumPercent = Number(signals?.shortMomentumPercent ?? 0);
 
   return buildExpertResult({
     expertType: "MOMENTUM",
     opinion: scoreToOpinion(score, bias),
     score,
     summary: `Momentum ${mom.toFixed(0)} continuation ${continuation.toFixed(0)} velocity ${velocity.toFixed(0)}`,
-    positiveFactors: [(signals?.shortMomentumPercent ?? 0) > 1 ? "shortMomentumPositive" : "", (signals?.change5m ?? 0) > 0 ? "5mAcceleration" : ""].filter(Boolean),
-    negativeFactors: [(signals?.shortMomentumPercent ?? 0) < -1 ? "shortMomentumNegative" : "", (signals?.change5m ?? 0) < 0 ? "5mDeceleration" : ""].filter(Boolean),
+    positiveFactors: [shortMomentumPercent > 1 ? "shortMomentumPositive" : "", (signals?.change5m ?? 0) > 0 ? "5mAcceleration" : ""].filter(Boolean),
+    negativeFactors: [shortMomentumPercent < -1 ? "shortMomentumNegative" : "", (signals?.change5m ?? 0) < 0 ? "5mDeceleration" : ""].filter(Boolean),
     topRisks: [(signals?.regimeUnstableBreakoutCondition ?? false) ? "unstableBreakout" : ""].filter(Boolean),
     metadata: { mom, continuation, velocity, relStrength },
   });

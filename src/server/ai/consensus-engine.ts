@@ -1,6 +1,14 @@
 import { env } from "@/lib/config";
 import type { AIConsensusResult, AIDecision, AIProviderResult } from "@/src/types/ai";
 
+/** Stable AI consensus policy contract for API/status consumers. */
+export const AI_CONSENSUS_POLICY = {
+  minDirectionalVoteHardBlock: false,
+  softSingleProviderDirectionalAllowed: true,
+  majorityRiskVetoEnabled: true,
+  preTradeConsensusRequired: true,
+} as const;
+
 function decisionToScore(decision: AIDecision) {
   if (decision === "BUY") return 1;
   if (decision === "SELL") return -1;
@@ -102,7 +110,11 @@ export function summarizeConsensus(outputs: AIProviderResult[]): AIConsensusResu
   else if (decisionCount.NO_TRADE >= 2) finalDecision = "NO_TRADE";
   else if (decisionCount.BUY > 0 && decisionCount.SELL > 0) finalDecision = "NO_TRADE";
 
-  if ((finalDecision === "BUY" || finalDecision === "SELL") && !minDirectionalVotesMet) {
+  if (
+    AI_CONSENSUS_POLICY.minDirectionalVoteHardBlock &&
+    (finalDecision === "BUY" || finalDecision === "SELL") &&
+    !minDirectionalVotesMet
+  ) {
     finalDecision = "NO_TRADE";
   }
 
@@ -129,11 +141,13 @@ export function summarizeConsensus(outputs: AIProviderResult[]): AIConsensusResu
     : directionalSoftAccepted
       ? softMinConfidence
       : env.AI_MIN_CONFIDENCE;
-  const eliteDirectionalMinConfidence =
+  const directionalMinConfidence =
     finalDecision === "BUY" || finalDecision === "SELL"
-      ? Math.max(minConfidenceGate, env.AI_LEVERAGE_MIN_CONFIDENCE_ULTRA)
+      ? isEliteQuality
+        ? Math.max(minConfidenceGate, env.AI_LEVERAGE_MIN_CONFIDENCE_ULTRA)
+        : minConfidenceGate
       : minConfidenceGate;
-  if (avgConfidence < eliteDirectionalMinConfidence) {
+  if (avgConfidence < directionalMinConfidence) {
     finalDecision = "NO_TRADE";
   }
 

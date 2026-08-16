@@ -1,0 +1,54 @@
+export * from "@/src/server/forensics/forensic.types";
+export * from "@/src/server/forensics/forensic-context";
+export * from "@/src/server/forensics/forensic-collector.service";
+export * from "@/src/server/forensics/forensic-artifacts.service";
+export * from "@/src/server/forensics/exit-replay.engine";
+export * from "@/src/server/forensics/simulation-integrity.guard";
+export * from "@/src/server/forensics/pnl-ledger.service";
+export * from "@/src/server/forensics/paper-session-state.service";
+export * from "@/src/server/forensics/resolved-config.service";
+export * from "@/src/server/forensics/db-health.service";
+export * from "@/src/server/forensics/native-paper-diagnostics.service";
+export * from "@/src/server/forensics/binance-request-audit.service";
+export * from "@/src/server/forensics/forensic-bridge.service";
+export * from "@/src/server/forensics/ai-runtime.service";
+export * from "@/src/server/forensics/round-progress-watchdog.service";
+export * from "@/src/server/forensics/transaction-telemetry.service";
+export * from "@/src/server/forensics/recovery-telemetry.service";
+export * from "@/src/server/forensics/stall-error-taxonomy";
+export { explainCandidateNotTraded, getForensicSessionSnapshot } from "@/src/server/forensics/forensic-collector.service";
+export * from "@/src/server/forensics/candidate-lifecycle.service";
+export * from "@/src/server/forensics/round-forensic-export.service";
+export * from "@/src/server/forensics/fee-edge-metrics.service";
+export * from "@/src/server/forensics/exit-forensics.service";
+export * from "@/src/server/forensics/regime-classifier.service";
+export * from "@/src/server/forensics/scanner-qualification-forensics.service";
+export * from "@/src/server/forensics/mean-reversion-regime-audit.service";
+export * from "@/src/server/forensics/ev-calibration.service";
+export * from "@/src/server/forensics/entry-timing-forensics.service";
+export * from "@/src/server/forensics/ev-component-attribution.service";
+export * from "@/src/server/forensics/mr-regime-gating-experiment.service";
+export * from "@/src/server/forensics/opportunity-funnel.service";
+export * from "@/src/server/forensics/trade-pattern-analysis.service";
+export * from "@/src/server/forensics/fee-aware-edge-research.service";
+export * from "@/src/server/forensics/promotion-gate.service";
+export * from "@/src/server/forensics/p1-forensic-report.service";
+export * from "@/src/server/forensics/tdi-decision-forensics.service";
+export * from "@/src/server/forensics/slot-opportunity-report.service";
+export * from "@/src/server/forensics/strategy-comparison-harness.service";
+export * from "@/src/server/forensics/fee-aware-entry-policy.service";
+export * from "@/src/server/forensics/volatility-breakout-validation.service";
+export * from "@/src/server/forensics/p2-forensic-report.service";
+export * from "@/src/server/forensics/slot-allocation-analysis.service";
+export * from "@/src/server/forensics/slot-allocation-experiment.service";
+export * from "@/src/server/forensics/tdi-sensitivity.service";
+export * from "@/src/server/forensics/ai-strategy-interaction.service";
+export * from "@/src/server/forensics/opportunity-value.service";
+export * from "@/src/server/forensics/p2-experiment-services";
+export * from "@/src/server/forensics/experiment-registry.service";
+export * from "@/src/server/forensics/paper-preflight.service";
+export {
+  evaluateAiExecutionGate,
+  evaluateAiExecutionReadiness,
+  resolveAiExecutionGatePolicy,
+} from "@/src/server/execution/ai-execution-gate.service";

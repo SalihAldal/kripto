@@ -11,11 +11,15 @@ import { createProviderAdapter } from "@/src/server/ai/provider-factory";
 import { getProviderConfigs } from "@/src/server/ai/provider-registry";
 import { summarizeConsensus } from "@/src/server/ai/consensus-engine";
 import { buildHybridDecision } from "@/src/server/ai/hybrid-decision-engine";
+import { buildIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
 import { buildMultiTimeframeAnalysis } from "@/src/server/ai/multi-timeframe.service";
 import { detectMarketRegime } from "@/src/server/scanner/market-regime.service";
 import { recordRegimeStability } from "@/src/server/scanner/regime-stability.service";
 import { collectPreTradeFuturesIntelligence } from "@/src/server/futures/futures-intelligence.service";
 import { withAiRetry } from "@/src/server/ai/utils";
+import { throwIfAborted, yieldAsyncStackUnwind, runOnFreshStack } from "@/src/server/execution/cancellable-work.service";
+import { withBoundedPrisma } from "@/src/server/execution/bounded-prisma.service";
+import { CooperativeAsyncCancelledError, CooperativeAsyncTimeoutError } from "@/src/server/execution/cooperative-async.types";
 import { markHeartbeat } from "@/src/server/observability/heartbeat";
 import { withCircuitBreaker } from "@/src/server/resilience/circuit-breaker";
 import { logTradeEvent } from "@/src/server/observability/trade-event-log";
@@ -38,6 +42,12 @@ import {
 } from "@/src/server/observability/decision-observability.service";
 import { getActiveDecisionId } from "@/src/server/observability/decision-trace-context";
 import { adjudicateWithMasterDecisionEngine } from "@/src/server/decision-engine/master-decision-engine.service";
+import { applyConfidenceCalibrationToDecision, mapPersistedCalibrationBins } from "@/src/server/ai/confidence-calibration-intelligence.service";
+import { listConfidenceCalibration } from "@/src/server/learning-engine/learning-engine.repository";
+import { bridgeAiProviderResult, bridgeConsensusResult } from "@/src/server/forensics/forensic-bridge.service";
+import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
+import { recordConsensusAudit } from "@/src/server/forensics/ai-runtime.service";
+import { STALL_ERROR_CODES } from "@/src/server/forensics/stall-error-taxonomy";
 import type { AIAnalysisInput, AIConsensusResult, AIModelOutput, AIProviderResult } from "@/src/types/ai";
 
 function aggregateModelOutputs(parts: AIModelOutput[], input: AIAnalysisInput): AIModelOutput {
@@ -125,10 +135,31 @@ function buildLaneProviderMap() {
   } as const;
 }
 
+export function resolveAiLaneProviders() {
+  const laneProviderMap = buildLaneProviderMap();
+  const configs = getProviderConfigs();
+  const modelFor = (providerId: string) => configs.find((row) => row.id === providerId)?.model;
+  return {
+    laneProviderMap,
+    primaryProvider: laneProviderMap.technical,
+    primaryModel: modelFor(laneProviderMap.technical),
+    models: {
+      technical: modelFor(laneProviderMap.technical),
+      momentum: modelFor(laneProviderMap.momentum),
+      risk: modelFor(laneProviderMap.risk),
+    },
+  };
+}
+
+export type AIConsensusOptions = {
+  signal?: AbortSignal;
+};
+
 async function analyzeLaneWithSingleProvider(
   input: AIAnalysisInput,
   lane: "technical" | "momentum" | "risk",
   providerId: string,
+  signal?: AbortSignal,
 ): Promise<AIProviderResult> {
   const providerConfig = getProviderConfigs().find((x) => x.id === providerId);
   if (!providerConfig) {
@@ -151,6 +182,7 @@ async function analyzeLaneWithSingleProvider(
               context: `${provider.config.id}:technical`,
               timeoutMs: Math.max(11_000, provider.config.timeoutMs + 6_000),
               retries: 1,
+              signal,
             },
           )
         : lane === "momentum"
@@ -160,6 +192,7 @@ async function analyzeLaneWithSingleProvider(
                 context: `${provider.config.id}:momentum`,
                 timeoutMs: Math.max(11_000, provider.config.timeoutMs + 6_000),
                 retries: 1,
+                signal,
               },
             )
           : await withAiRetry(
@@ -168,6 +201,7 @@ async function analyzeLaneWithSingleProvider(
                 context: `${provider.config.id}:risk`,
                 timeoutMs: Math.max(16_000, provider.config.timeoutMs + 9_000),
                 retries: 0,
+                signal,
               },
             );
     if (!output) {
@@ -199,8 +233,21 @@ async function analyzeLaneWithSingleProvider(
         latencyMs: result.latencyMs,
       },
     });
+    bridgeAiProviderResult({
+      symbol: input.symbol,
+      provider: result.providerId,
+      model: result.model,
+      latencyMs: result.latencyMs,
+      ok: result.ok,
+      remote: Boolean(result.remoteOk),
+      degraded: result.degraded,
+      reason: result.failureCategory,
+    });
     return result;
   } catch (error) {
+    if (error instanceof CooperativeAsyncCancelledError || error instanceof CooperativeAsyncTimeoutError) {
+      throw error;
+    }
     const result = {
       providerId: provider.config.id,
       providerName: provider.config.name,
@@ -231,6 +278,16 @@ async function analyzeLaneWithSingleProvider(
         failureCategory: result.failureCategory,
         latencyMs: result.latencyMs,
       },
+    });
+    bridgeAiProviderResult({
+      symbol: input.symbol,
+      provider: result.providerId,
+      model: result.model,
+      latencyMs: result.latencyMs,
+      ok: false,
+      remote: false,
+      degraded: true,
+      reason: result.error,
     });
     return result;
   }
@@ -586,8 +643,11 @@ export async function runAIConsensus(
   return runAIConsensusFromInput(input);
 }
 
-export async function runAIConsensusFromInput(input: AIAnalysisInput): Promise<AIConsensusResult> {
-  const result = await runAIConsensusFromInputImpl(input);
+export async function runAIConsensusFromInput(
+  input: AIAnalysisInput,
+  options?: AIConsensusOptions,
+): Promise<AIConsensusResult> {
+  const result = await runAIConsensusFromInputImpl(input, options);
   observeAiDecision({
     decisionId: getActiveDecisionId() ?? createDecisionId(),
     symbol: input.symbol,
@@ -597,11 +657,19 @@ export async function runAIConsensusFromInput(input: AIAnalysisInput): Promise<A
   return result;
 }
 
-export async function runLegacyAIConsensusFromInput(input: AIAnalysisInput): Promise<AIConsensusResult> {
-  return runAIConsensusFromInputImpl(input);
+export async function runLegacyAIConsensusFromInput(
+  input: AIAnalysisInput,
+  options?: AIConsensusOptions,
+): Promise<AIConsensusResult> {
+  return runAIConsensusFromInputImpl(input, options);
 }
 
-async function runAIConsensusFromInputImpl(input: AIAnalysisInput): Promise<AIConsensusResult> {
+async function runAIConsensusFromInputImpl(
+  input: AIAnalysisInput,
+  options?: AIConsensusOptions,
+): Promise<AIConsensusResult> {
+  const signal = options?.signal ?? input.runtimeControl?.abortSignal;
+  throwIfAborted(signal, "AI consensus aborted");
   const now = Date.now();
   const lastKlineClose = input.klines[input.klines.length - 1]?.closeTime ?? 0;
   const klineAgeSec = lastKlineClose ? Math.floor((now - lastKlineClose) / 1000) : null;
@@ -756,23 +824,72 @@ async function runAIConsensusFromInputImpl(input: AIAnalysisInput): Promise<AICo
   );
 
   const laneProviderMap = buildLaneProviderMap();
-  const [technicalSingle, momentumSingle, riskSingle] = await Promise.all([
-    withCircuitBreaker(
-      "ai:technical",
-      () => analyzeLaneWithSingleProvider(input, "technical", laneProviderMap.technical),
-      { threshold: 4, cooldownMs: 20_000 },
-    ),
-    withCircuitBreaker(
-      "ai:momentum",
-      () => analyzeLaneWithSingleProvider(input, "momentum", laneProviderMap.momentum),
-      { threshold: 4, cooldownMs: 20_000 },
-    ),
-    withCircuitBreaker(
-      "ai:risk",
-      () => analyzeLaneWithSingleProvider(input, "risk", laneProviderMap.risk),
-      { threshold: 4, cooldownMs: 20_000 },
-    ),
-  ]);
+  const consensusStarted = Date.now();
+  const consensusCandidateId = createCandidateId(input.symbol, "ai");
+  const snapshotBuildStarted = Date.now();
+  const indicatorSnapshot =
+    input.indicatorSnapshot ??
+    (await runOnFreshStack(() => Object.freeze(buildIndicatorSnapshot(input))));
+  const indicatorSnapshotBuildMs = input.indicatorSnapshot ? 0 : Date.now() - snapshotBuildStarted;
+  const consensusInput: AIAnalysisInput = {
+    ...input,
+    runtimeControl: {
+      ...input.runtimeControl,
+      abortSignal: signal,
+    },
+    indicatorSnapshot,
+    consensusTelemetry: {
+      indicatorSnapshotBuildCount: input.indicatorSnapshot ? 0 : 1,
+      indicatorSnapshotBuildMs,
+    },
+  };
+  await yieldAsyncStackUnwind();
+  throwIfAborted(signal, "AI consensus pre-lane aborted");
+  let technicalSingle: AIProviderResult;
+  let momentumSingle: AIProviderResult;
+  let riskSingle: AIProviderResult;
+  try {
+    [technicalSingle, momentumSingle, riskSingle] = await Promise.all([
+      withCircuitBreaker(
+        "ai:technical",
+        () => analyzeLaneWithSingleProvider(consensusInput, "technical", laneProviderMap.technical, signal),
+        { threshold: 4, cooldownMs: 20_000 },
+      ),
+      withCircuitBreaker(
+        "ai:momentum",
+        () => analyzeLaneWithSingleProvider(consensusInput, "momentum", laneProviderMap.momentum, signal),
+        { threshold: 4, cooldownMs: 20_000 },
+      ),
+      withCircuitBreaker(
+        "ai:risk",
+        () => analyzeLaneWithSingleProvider(consensusInput, "risk", laneProviderMap.risk, signal),
+        { threshold: 4, cooldownMs: 20_000 },
+      ),
+    ]);
+  } catch (error) {
+    if (error instanceof CooperativeAsyncCancelledError || signal?.aborted) {
+      recordConsensusAudit({
+        symbol: input.symbol,
+        candidateId: consensusCandidateId,
+        consensusStart: new Date(consensusStarted).toISOString(),
+        consensusEnd: new Date().toISOString(),
+        durationMs: Date.now() - consensusStarted,
+        status: "CONSENSUS_TIMEOUT",
+        reasonDetail: (error as Error).message,
+      });
+      throw error;
+    }
+    recordConsensusAudit({
+      symbol: input.symbol,
+      candidateId: consensusCandidateId,
+      consensusStart: new Date(consensusStarted).toISOString(),
+      consensusEnd: new Date().toISOString(),
+      durationMs: Date.now() - consensusStarted,
+      status: "CONSENSUS_FAILED",
+      reasonDetail: (error as Error).message,
+    });
+    throw new Error(`${STALL_ERROR_CODES.CONSENSUS_FAILED}: ${(error as Error).message}`);
+  }
   const technical = [technicalSingle];
   const momentum = [momentumSingle];
   const risk = [riskSingle];
@@ -807,15 +924,34 @@ async function runAIConsensusFromInputImpl(input: AIAnalysisInput): Promise<AICo
     });
   }
 
-  const { user } = await getRuntimeExecutionContext();
+  const { user } = await withBoundedPrisma(
+    "ai-consensus.getRuntimeExecutionContext",
+    () => getRuntimeExecutionContext(),
+    undefined,
+    { signal },
+  );
+  throwIfAborted(signal, "AI consensus post-lane aborted");
   const weightedAggregated = await applyAiPerformanceWeights(user.id, aggregated);
-  const consensus = buildHybridDecision({
-    analysisInput: input,
-    technicalResults: technical,
-    momentumResults: momentum,
-    riskResults: risk,
-    allOutputs: weightedAggregated,
-  });
+  await yieldAsyncStackUnwind();
+  throwIfAborted(signal, "AI consensus pre-hybrid aborted");
+  const hybridStarted = Date.now();
+  const consensus = await runOnFreshStack(() =>
+    buildHybridDecision({
+      analysisInput: consensusInput,
+      technicalResults: technical,
+      momentumResults: momentum,
+      riskResults: risk,
+      allOutputs: weightedAggregated,
+    }),
+  );
+  const hybridDecisionMs = Date.now() - hybridStarted;
+  consensusInput.consensusTelemetry = {
+    ...consensusInput.consensusTelemetry,
+    hybridDecisionMs,
+    consensusAssemblyMs: Date.now() - consensusStarted,
+  };
+  await yieldAsyncStackUnwind();
+  throwIfAborted(signal, "AI consensus post-hybrid aborted");
   const baseConsensus = summarizeConsensus(weightedAggregated);
   const finalConsensus: AIConsensusResult = {
     ...consensus,
@@ -825,9 +961,20 @@ async function runAIConsensusFromInputImpl(input: AIAnalysisInput): Promise<AICo
     ),
     finalRiskScore: Number((((consensus.finalRiskScore * 0.8) + (baseConsensus.finalRiskScore * 0.2))).toFixed(2)),
   };
-  finalConsensus.analysisScorecard = buildAnalysisScorecard(input, finalConsensus);
+  finalConsensus.analysisScorecard = await runOnFreshStack(() =>
+    buildAnalysisScorecard(consensusInput, finalConsensus),
+  );
+  finalConsensus.consensusTelemetry = consensusInput.consensusTelemetry;
+  bridgeConsensusResult({
+    symbol: input.symbol,
+    consensus: finalConsensus,
+    providers: weightedAggregated,
+    masterRuleId: finalConsensus.decisionPayload?.consensusEngine?.finalDecision,
+  });
   if (finalConsensus.decisionPayload) {
-    finalConsensus.decisionPayload.shortTermReport = buildShortTermReport(input, finalConsensus);
+    finalConsensus.decisionPayload.shortTermReport = await runOnFreshStack(() =>
+      buildShortTermReport(consensusInput, finalConsensus),
+    );
   }
   ensureAiPerformanceEvaluator(user.id);
   await recordAiPerformancePrediction({
@@ -865,15 +1012,14 @@ async function runAIConsensusFromInputImpl(input: AIAnalysisInput): Promise<AICo
       decision: finalConsensus.finalDecision,
       confidence: finalConsensus.finalConfidence,
       risk: finalConsensus.finalRiskScore,
-      hybridPayload: finalConsensus.decisionPayload,
-      roleScores: finalConsensus.roleScores,
-      providerResults: aggregated.map((x) => ({
-        providerId: x.providerId,
-        ok: x.ok,
-        latencyMs: x.latencyMs,
-        decision: x.output?.decision ?? null,
-        remote: Boolean((x.output?.metadata as Record<string, unknown> | undefined)?.remote),
-      })),
+      providerCount: aggregated.length,
+      remoteProviderCount: aggregated.filter((row) =>
+        Boolean((row.output?.metadata as Record<string, unknown> | undefined)?.remote),
+      ).length,
+      degradedProviderCount: degradedProviders.length,
+      roleScoreKeys: Object.keys(finalConsensus.roleScores ?? {}),
+      hasDecisionPayload: Boolean(finalConsensus.decisionPayload),
+      consensusTelemetry: consensusInput.consensusTelemetry,
       laneProviderMap,
     },
     "AI analyze response",
@@ -909,5 +1055,34 @@ async function runAIConsensusFromInputImpl(input: AIAnalysisInput): Promise<AICo
     providerResults: weightedAggregated,
   });
 
-  return adjudicated;
+  const persistedCalibration = await listConfidenceCalibration().catch(() => []);
+  const calibrationBins = mapPersistedCalibrationBins(persistedCalibration);
+
+  const calibrated = applyConfidenceCalibrationToDecision({
+    result: adjudicated,
+    providerResults: weightedAggregated,
+    bins: calibrationBins.length ? calibrationBins : undefined,
+    marketRegime: input.marketRegime?.mode,
+  });
+  calibrated.consensusTelemetry = consensusInput.consensusTelemetry;
+  if (calibrated.decisionPayload && typeof calibrated.decisionPayload === "object") {
+    (calibrated.decisionPayload as Record<string, unknown>).consensusTelemetry =
+      consensusInput.consensusTelemetry;
+  }
+  recordConsensusAudit({
+    symbol: input.symbol,
+    candidateId: consensusCandidateId,
+    consensusStart: new Date(consensusStarted).toISOString(),
+    consensusEnd: new Date().toISOString(),
+    durationMs: Date.now() - consensusStarted,
+    providerVotes: weightedAggregated.map((row) => ({
+      provider: row.providerName,
+      decision: row.output?.decision,
+      weight: row.output?.confidence,
+    })),
+    finalDecision: calibrated.finalDecision,
+    confidence: calibrated.finalConfidence,
+    status: "COMPLETED",
+  });
+  return calibrated;
 }

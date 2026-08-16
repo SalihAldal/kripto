@@ -1,8 +1,17 @@
 import { env } from "@/lib/config";
 import { logger } from "@/lib/logger";
-import { buildIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { bridgeHybridEv, bridgeTdiDecision } from "@/src/server/forensics/forensic-bridge.service";
+import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
+import { resolveIndicatorSnapshot, type IndicatorSnapshot } from "@/src/server/ai/indicator-suite";
 import { computeShortTermScore } from "@/src/server/ai/short-term-score.service";
 import { resolveMinimumProtectedProfitPercent } from "@/src/server/execution/profit-thresholds";
+import {
+  resolveLowMomentumInput,
+  resolveMomentumSupportive,
+  resolveMomentumWeak,
+  resolvePaperMomentumWaiver,
+  resolveTechStrongButOthersWeak,
+} from "@/src/server/ai/hybrid-momentum-gates";
 import type { AIAnalysisInput, AIDecision, AIConsensusResult, AIProviderResult, AIRoleScore, AIDecisionPayload } from "@/src/types/ai";
 
 function clamp(value: number, min: number, max: number) {
@@ -321,8 +330,11 @@ function unique<T>(items: T[]) {
   return Array.from(new Set(items));
 }
 
-function scoreTechnical(input: AIAnalysisInput, provider: AIProviderResult | null): AIRoleScore {
-  const ind = buildIndicatorSnapshot(input);
+function scoreTechnical(
+  input: AIAnalysisInput,
+  provider: AIProviderResult | null,
+  ind: Readonly<IndicatorSnapshot>,
+): AIRoleScore {
   const rationale: string[] = [];
   let score = 50;
   const emaBull = ind.ema20 > ind.ema50 && ind.ema50 > ind.ema200;
@@ -508,8 +520,8 @@ function scoreRisk(
   target: number | null,
   stop: number | null,
   runtimeMaxRiskScore: number,
+  ind: Readonly<IndicatorSnapshot>,
 ): AIRoleScore {
-  const ind = buildIndicatorSnapshot(input);
   const rationale: string[] = [];
   let score = 72;
   let veto = false;
@@ -644,8 +656,8 @@ export function buildHybridDecision(input: {
   const runtimeMaxRiskScore = Number(strategyParams.riskVetoLevel ?? env.AI_MAX_RISK_SCORE);
   let target = toFinitePrice(techProvider?.output?.targetPrice ?? sentProvider?.output?.targetPrice ?? null);
   let stop = toFinitePrice(riskProvider?.output?.stopPrice ?? techProvider?.output?.stopPrice ?? null);
-  const indicators = buildIndicatorSnapshot(input.analysisInput);
-  const technical = scoreTechnical(input.analysisInput, techProvider);
+  const indicators = resolveIndicatorSnapshot(input.analysisInput);
+  const technical = scoreTechnical(input.analysisInput, techProvider, indicators);
   const sentiment = scoreSentiment(input.analysisInput, sentProvider);
   const lastPrice = Number(input.analysisInput.lastPrice);
   const baseMinProfitPercent = toFinitePercent(
@@ -715,7 +727,7 @@ export function buildHybridDecision(input: {
       }
     }
   }
-  const risk = scoreRisk(input.analysisInput, riskProvider, target, stop, runtimeMaxRiskScore);
+  const risk = scoreRisk(input.analysisInput, riskProvider, target, stop, runtimeMaxRiskScore, indicators);
   const roleScores = [technical, sentiment, risk];
   const regimePolicy = resolveRegimePolicy(input.analysisInput.marketRegime);
   const composite =
@@ -790,10 +802,13 @@ export function buildHybridDecision(input: {
         regimePolicy.mode === "WEAK_BEARISH_TREND")) ||
     (paperRelaxed && mtfAlignmentScore >= 40 && !mtfConflict);
   const technicalWeak = technical.score < runtimeMinTechScore + regimePolicy.minTechDelta;
-  const lowMomentumInput =
-    Math.abs(Number(input.analysisInput.marketSignals?.shortMomentumPercent ?? 0)) < 0.08 &&
-    Math.abs(Number(input.analysisInput.marketSignals?.shortFlowImbalance ?? 0)) < 0.03;
-  const momentumWeak = sentiment.score < env.AI_HYBRID_MIN_SENTIMENT_SCORE + regimePolicy.minSentimentDelta || lowMomentumInput;
+  const lowMomentumInput = resolveLowMomentumInput(input.analysisInput.marketSignals);
+  const momentumWeak = resolveMomentumWeak({
+    sentimentScore: sentiment.score,
+    minSentimentScore: env.AI_HYBRID_MIN_SENTIMENT_SCORE,
+    regimeSentimentDelta: regimePolicy.minSentimentDelta,
+    lowMomentumInput,
+  });
   const news = input.analysisInput.marketSignals?.newsSentiment ?? "NEUTRAL";
   const sentimentMeta = (sentProvider?.output?.metadata ?? {}) as Record<string, unknown>;
   const sentimentFlags = Array.isArray(sentimentMeta.redFlags)
@@ -944,9 +959,17 @@ export function buildHybridDecision(input: {
   const technicalStrong =
     (technicalOk && technical.score >= adaptiveTechnicalFloor) ||
     (paperRelaxed && technical.score >= Math.max(36, paperTechFloor - 4));
-  const momentumSupportive =
-    (sentimentOk && !momentumWeak && !newsComplex) ||
-    (paperRelaxed && sentiment.score >= 32 && !newsComplex);
+  const paperMomentumWaiver = resolvePaperMomentumWaiver({
+    paperRelaxed,
+    sentimentScore: sentiment.score,
+    newsComplex,
+  });
+  const momentumSupportive = resolveMomentumSupportive({
+    sentimentOk,
+    momentumWeak,
+    newsComplex,
+    paperMomentumWaiver,
+  });
   const regimeSuitable =
     !regimePolicy.forceSkip &&
     ((!uncertainDirection || recoverableEntryWindow || allowPumpRegimeOverride) &&
@@ -1063,8 +1086,14 @@ export function buildHybridDecision(input: {
     consensusDecision = "NO-TRADE";
   }
 
-  const techStrongButOthersWeak =
-    technicalStrong && (riskVeto || (!allowPumpOverride && (momentumWeak || qualityWeak)));
+  const techStrongButOthersWeak = resolveTechStrongButOthersWeak({
+    technicalStrong,
+    riskVeto,
+    allowPumpOverride,
+    momentumWeak,
+    qualityWeak,
+    paperMomentumWaiver,
+  });
   if (finalDecision === "BUY" && techStrongButOthersWeak) {
     consensusDecision = "WATCHLIST";
     finalDecision = "HOLD";
@@ -1425,6 +1454,48 @@ export function buildHybridDecision(input: {
       "AI_NO_TRADE_DIAGNOSTICS",
     );
   }
+
+  const forensicCandidateId = createCandidateId(input.analysisInput.symbol, "hybrid");
+  bridgeHybridEv({
+    candidateId: forensicCandidateId,
+    symbol: input.analysisInput.symbol,
+    expectedValue: Number(composite.toFixed(4)),
+    threshold: runtimeMinCompositeScore,
+    expectedRiskReward: rrValue,
+    winProbability: confidence,
+    expectedProfit: target && lastPrice > 0 ? Math.abs(((target - lastPrice) / lastPrice) * 100) : undefined,
+    expectedLoss: stop && lastPrice > 0 ? Math.abs(((lastPrice - stop) / lastPrice) * 100) : undefined,
+    verdict:
+      finalDecision === "BUY"
+        ? "APPROVED"
+        : finalDecision === "HOLD"
+          ? "WAIT"
+          : rejectReason || noTradeReasonList.length > 0
+            ? "REJECTED"
+            : "UNKNOWN",
+    reasonCode:
+      finalDecision === "BUY"
+        ? "EV_PASS"
+        : finalDecision === "HOLD"
+          ? "EV_WAIT"
+          : rejectReason
+            ? "EV_REJECT"
+            : "EV_UNKNOWN",
+  });
+  bridgeTdiDecision({
+    candidateId: forensicCandidateId,
+    symbol: input.analysisInput.symbol,
+    verdict:
+      finalDecision === "BUY" ? "APPROVED" : finalDecision === "HOLD" ? "WAIT" : "REJECTED",
+    hybridDecision: finalDecision,
+    consensusScore: Number(composite.toFixed(4)),
+    confidence,
+    evBelowThreshold: finalDecision !== "BUY" && Number(composite.toFixed(4)) < runtimeMinCompositeScore,
+    strategy: String(input.analysisInput.marketRegime?.selectedStrategy ?? "UNKNOWN"),
+    reasonDetail:
+      rejectReason ??
+      (noTradeReasonList.length > 0 ? noTradeReasonList.join(" | ") : `Hybrid decision ${finalDecision}`),
+  });
 
   return {
     finalDecision,

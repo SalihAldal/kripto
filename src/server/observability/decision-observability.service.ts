@@ -38,6 +38,12 @@ import type {
 } from "@/src/server/observability/decision-observability.types";
 import type { AIConsensusResult } from "@/src/types/ai";
 import {
+  bridgeExecutionDecision,
+  bridgeRiskSizing,
+  bridgeScannerObservability,
+} from "@/src/server/forensics/forensic-bridge.service";
+import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
+import {
   appendDecisionTimelineEvents,
   listDecisionLogs,
   getDecisionLogByDecisionId,
@@ -122,6 +128,18 @@ export function observeScannerDecision(input: ScannerDecisionObservabilityInput)
       metrics: input.metrics ?? null,
     },
   });
+  bridgeScannerObservability(input);
+  if (input.status !== "QUALIFIED" && input.status !== "PASS") {
+    bridgeExecutionDecision({
+      candidateId: createCandidateId(input.symbol, "scanner"),
+      symbol: input.symbol,
+      approved: false,
+      reasonCode: input.reasons[0] ?? "SCANNER_REJECT",
+      reasonDetail: input.reasons.join(" | ") || input.status,
+      stage: "decision",
+      score: input.scannerScore,
+    });
+  }
 
   if (isDecisionPersistenceDeferred()) return;
 
@@ -277,6 +295,13 @@ export function observeRiskGateDecision(input: {
     message: input.message,
     details: input.details,
   });
+  bridgeRiskSizing({
+    candidateId: createCandidateId(input.symbol, "risk"),
+    symbol: input.symbol,
+    approved: input.outcome === "PASS" || input.outcome === "APPROVED",
+    rejectionReason: input.outcome === "PASS" || input.outcome === "APPROVED" ? undefined : input.message,
+    riskParameters: input.details,
+  });
 }
 
 export function observeTradeDecision(input: {
@@ -368,6 +393,15 @@ export function observeExecutionDecision(input: ExecutionDecisionObservabilityIn
     outcome: input.opened ? "OPENED" : input.rejected ? "REJECT" : "COMPLETE",
     message: input.rejectReason ?? (input.opened ? "Trade opened" : "Execution completed"),
     details: input.metadata,
+  });
+  bridgeExecutionDecision({
+    candidateId: createCandidateId(input.symbol, input.opened ? "execution" : "decision"),
+    symbol: input.symbol,
+    approved: input.opened,
+    reasonCode: input.rejectReason ?? (input.opened ? "EXECUTION_OPENED" : "EXECUTION_REJECT"),
+    reasonDetail: input.rejectReason ?? (input.opened ? "Trade opened" : "Execution rejected or skipped"),
+    stage: input.opened ? "execution" : "decision",
+    score: input.candidate?.score,
   });
 
   safeObserve(

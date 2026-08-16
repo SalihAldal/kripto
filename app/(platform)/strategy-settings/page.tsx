@@ -62,10 +62,13 @@ export default function StrategySettingsPage() {
   const [draft, setDraft] = useState<StrategyConfig | null>(null);
   const [versions, setVersions] = useState<ConfigEnvelope[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
+      setLoadError(null);
       const [cfg, vers] = await Promise.all([
         apiGet<{ active: ConfigEnvelope }>("/api/strategy/config").catch(() => null),
         apiGet<ConfigEnvelope[]>("/api/strategy/config/versions?limit=20").catch(() => []),
@@ -73,6 +76,8 @@ export default function StrategySettingsPage() {
       if (cfg?.active) {
         setActive(cfg.active);
         setDraft(cfg.active.config);
+      } else {
+        setLoadError("Strateji konfigurasyonu yuklenemedi.");
       }
       setVersions(vers ?? []);
       setLoading(false);
@@ -155,12 +160,23 @@ export default function StrategySettingsPage() {
     });
   };
 
-  if (loading || !draft) {
+  if (loading) {
     return (
       <div className="space-y-5">
         <h1 className="text-3xl font-black tracking-tight">{t("strategySettings.title")}</h1>
         <Panel title="Yukleniyor...">
           <p className="text-sm text-on-surface-variant">Konfigurasyon verisi aliniyor.</p>
+        </Panel>
+      </div>
+    );
+  }
+
+  if (!draft) {
+    return (
+      <div className="space-y-5">
+        <h1 className="text-3xl font-black tracking-tight">{t("strategySettings.title")}</h1>
+        <Panel title="Yukleme basarisiz">
+          <p className="text-sm text-on-surface-variant">{loadError ?? "Konfigurasyon bulunamadi."}</p>
         </Panel>
       </div>
     );

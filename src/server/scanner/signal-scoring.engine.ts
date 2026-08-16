@@ -2,6 +2,15 @@ import { env } from "@/lib/config";
 import { evaluateMomentumBreakout } from "@/src/server/scanner/momentum-breakout.service";
 import type { MarketContext, ScannerScore } from "@/src/types/scanner";
 
+/** Stable signal generation policy contract for API/status consumers. */
+export const SIGNAL_GENERATION_POLICY = {
+  preTradeScoringRequired: true,
+  momentumBreakoutGateEnabled: true,
+  rankingBeforeAiConsensus: true,
+  qualityGateAfterAiConsensus: true,
+  workerSnapshotPreferred: true,
+} as const;
+
 function normalize(value: number, min: number, max: number) {
   if (value <= min) return 0;
   if (value >= max) return 100;

@@ -5,47 +5,48 @@
     "workspace": "brainos-lab/simulation-v1",
     "targetTrades": 100,
     "completedTrades": 70,
-    "accepted": 11,
-    "rejected": 59,
-    "wins": 7,
-    "losses": 4,
-    "totalPnlUsdt": 82.6284,
-    "startedAt": "2026-08-01T23:32:15.914Z",
-    "updatedAt": "2026-08-01T23:32:16.149Z",
+    "accepted": 3,
+    "rejected": 67,
+    "wins": 2,
+    "losses": 1,
+    "totalPnlUsdt": -0.4488,
+    "startedAt": "2026-08-04T22:33:27.279Z",
+    "updatedAt": "2026-08-04T22:33:27.474Z",
     "status": "running"
   },
   "metrics": {
-    "winRate": 63.64,
-    "profitFactor": 11.811,
-    "expectancy": 7.5117,
-    "sharpeRatio": 0.91,
-    "averageConfidence": 71.52,
-    "averageHoldingTimeSec": 1712,
-    "averageRiskScore": 45.99,
-    "acceptanceRate": 15.71,
+    "winRate": 66.67,
+    "profitFactor": 0.944,
+    "expectancy": -0.1496,
+    "sharpeRatio": -0.025,
+    "sortinoRatio": -0.019,
+    "maxDrawdownUsdt": 7.9774,
+    "averageDrawdownUsdt": 4.8974,
+    "recoveryFactor": -0.0563,
+    "capitalEfficiency": 0,
+    "averageConfidence": 72.37,
+    "averageHoldingTimeSec": 1276,
+    "averageRiskScore": 47.78,
+    "acceptanceRate": 4.29,
     "topRejectionReasons": [
       {
+        "reason": "Strategy momentum_scalp (TREND_PULLBACK) misaligned with regime allowed set",
+        "count": 6
+      },
+      {
+        "reason": "Strategy trend_pullback (TREND_PULLBACK) misaligned with regime allowed set",
+        "count": 5
+      },
+      {
         "reason": "AI consensus NO_TRADE",
-        "count": 19
+        "count": 5
       },
       {
-        "reason": "Risk per trade exceeds threshold",
-        "count": 4
+        "reason": "Strategy breakout_follow (BREAKOUT_CONTINUATION) misaligned with regime allowed set",
+        "count": 5
       },
       {
-        "reason": "Exchange restriction: symbol temporarily blocked",
-        "count": 3
-      },
-      {
-        "reason": "Abnormal volatility breaker",
-        "count": 2
-      },
-      {
-        "reason": "Signal not actionable",
-        "count": 2
-      },
-      {
-        "reason": "Liquidity below threshold (256320 < 5000000)",
+        "reason": "Ranking below threshold (59.87 < 88)",
         "count": 1
       },
       {
@@ -53,10 +54,78 @@
         "count": 1
       },
       {
-        "reason": "Ranking below threshold (48.17 < 55)",
+        "reason": "Ranking below threshold (48.17 < 88)",
+        "count": 1
+      },
+      {
+        "reason": "Ranking below threshold (46.4 < 82)",
         "count": 1
       }
     ],
-    "cumulativeMissedProfitUsdt": 140.8259
+    "cumulativeMissedProfitUsdt": 215.2416,
+    "regimePerformanceByGroup": [
+      {
+        "regime": "RANGE_SIDEWAYS",
+        "tradeCount": 2,
+        "winRate": 100,
+        "profitFactor": 999,
+        "sharpeRatio": 1.5713,
+        "sortinoRatio": 1.5713,
+        "maxDrawdown": 0,
+        "expectancy": 3.7643,
+        "totalPnl": 7.5286
+      },
+      {
+        "regime": "WEAK_BULLISH_TREND",
+        "tradeCount": 1,
+        "winRate": 0,
+        "profitFactor": 0,
+        "sharpeRatio": 0,
+        "sortinoRatio": -1,
+        "maxDrawdown": 7.9774,
+        "expectancy": -7.9774,
+        "totalPnl": -7.9774
+      }
+    ],
+    "executionQuality": {
+      "executionCount": 3,
+      "successRate": 100,
+      "rejectionRate": 0,
+      "partialFillRate": 0,
+      "averageSlippagePct": 0.1667,
+      "averageFillTimeMs": 221,
+      "averageLatencyMs": 221,
+      "averageQualityScore": 67.7167,
+      "profitFactor": 0.9437,
+      "maxDrawdown": 7.9774
+    },
+    "portfolioAllocation": {
+      "tradeCount": 3,
+      "averageCapitalUtilization": 8.1921,
+      "averagePortfolioExposure": 8.1921,
+      "averageConcentration": 4.6046,
+      "averageAllocationMultiplier": 0.9034,
+      "portfolioBlockedRate": 0,
+      "capitalEfficiency": 0,
+      "profitFactor": 0.9437,
+      "sharpeRatio": -0.0255,
+      "sortinoRatio": -0.0188,
+      "maxDrawdown": 7.9774,
+      "portfolioStability": 93.55
+    },
+    "confidenceCalibration": {
+      "sampleCount": 70,
+      "averageCalibrationError": 10.15,
+      "averageConfidenceAccuracy": 89.85,
+      "overestimationRate": 100,
+      "underestimationRate": 0,
+      "decisionAccuracy": 0,
+      "expectedValueAccuracy": 0,
+      "profitFactor": 0.9437,
+      "sharpeRatio": -0.0255,
+      "sortinoRatio": -0.0188,
+      "falsePositiveRate": 1.43,
+      "falseNegativeRate": 0
+    }
   }
 }

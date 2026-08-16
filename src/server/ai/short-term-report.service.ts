@@ -1,5 +1,5 @@
 import type { AIAnalysisInput, AIConsensusResult } from "@/src/types/ai";
-import { buildIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
+import { resolveIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
 import { computeShortTermScore } from "@/src/server/ai/short-term-score.service";
 
 function formatPrice(value: number | null | undefined) {
@@ -89,7 +89,7 @@ function buildSetup(params: {
 
 // buildShortTermReportVerbose: detailed legacy format (used internally for full diagnostic output)
 export function buildShortTermReportVerbose(input: AIAnalysisInput, consensus: AIConsensusResult) {
-  const indicators = buildIndicatorSnapshot(input);
+  const indicators = resolveIndicatorSnapshot(input);
   const mtf = input.multiTimeframe;
   const scorecard = consensus.analysisScorecard;
   const shortTermScore = computeShortTermScore(input, consensus);
@@ -222,7 +222,7 @@ export function buildShortTermReportVerbose(input: AIAnalysisInput, consensus: A
 
 // buildShortTermReport: compact Mod A (tarama) format
 export function buildShortTermReport(input: AIAnalysisInput, consensus: AIConsensusResult) {
-  const indicators = buildIndicatorSnapshot(input);
+  const indicators = resolveIndicatorSnapshot(input);
   const scorecard = consensus.analysisScorecard;
   const shortTermScore = computeShortTermScore(input, consensus);
   const confidenceScore = Number(shortTermScore.total ?? scorecard?.confidenceScore ?? consensus.finalConfidence ?? 0);

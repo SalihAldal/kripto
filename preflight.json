@@ -1,0 +1,142 @@
+{
+  "attemptId": "5round-2026-08-14T22-50-18-796Z-preflight",
+  "userId": "cmpbhrfn10000un90aroynt6t",
+  "generatedAt": "2026-08-14T22:50:23.024Z",
+  "overallVerdict": "DEGRADED",
+  "canStart": true,
+  "blockReason": null,
+  "blockCode": null,
+  "database": {
+    "status": "PASS",
+    "reasonCode": "DB_HEALTHY",
+    "reasonDetail": "PostgreSQL reachable and AutoRound schema accessible",
+    "timestamp": "2026-08-14T22:50:21.362Z"
+  },
+  "binance": {
+    "status": "PASS",
+    "reasonCode": "BINANCE_TR_HEALTHY",
+    "reasonDetail": "BTCTRY ticker ok (3005643)",
+    "timestamp": "2026-08-14T22:50:22.777Z",
+    "metadata": {
+      "symbol": "BTCTRY",
+      "price": 3005643
+    }
+  },
+  "ai": {
+    "status": "PASS",
+    "reasonCode": "AI_CONFIGURED",
+    "reasonDetail": "3 enabled AI provider(s)",
+    "timestamp": "2026-08-14T22:50:22.892Z",
+    "metadata": {
+      "providers": [
+        {
+          "id": "provider-1",
+          "name": "OpenAI",
+          "model": "gpt-4o-mini"
+        },
+        {
+          "id": "provider-2",
+          "name": "OpenAI",
+          "model": "gpt-4o-mini"
+        },
+        {
+          "id": "provider-3",
+          "name": "Gemini",
+          "model": "gemini-1.5-flash-latest"
+        }
+      ],
+      "remoteRequired": false
+    }
+  },
+  "emergencyStop": {
+    "status": "PASS",
+    "reasonCode": "EMERGENCY_STOP_INACTIVE",
+    "reasonDetail": "Emergency stop inactive",
+    "timestamp": "2026-08-14T22:50:22.904Z"
+  },
+  "activeJobs": {
+    "status": "PASS",
+    "reasonCode": "NO_ACTIVE_JOB",
+    "reasonDetail": "No RUNNING auto-round job blocking startup",
+    "timestamp": "2026-08-14T22:50:23.013Z"
+  },
+  "zombieRounds": {
+    "status": "WARN",
+    "reasonCode": "ZOMBIE_ROUNDS_RECONCILED",
+    "reasonDetail": "Reconciled 1 stale round record(s) before startup",
+    "timestamp": "2026-08-14T22:50:23.016Z",
+    "metadata": {
+      "reconciledCount": 1
+    }
+  },
+  "workerLocks": {
+    "status": "PASS",
+    "reasonCode": "WORKER_LOCKS_CLEAR",
+    "reasonDetail": "No local scheduler loops registered",
+    "timestamp": "2026-08-14T22:50:23.016Z",
+    "metadata": {
+      "registry": {
+        "processOwnerId": "DESKTOP-3R7HR9F:20420:483cfe19",
+        "loopCount": 0,
+        "ownerCount": 0,
+        "loops": [],
+        "leases": []
+      },
+      "staleLocalLoops": 0
+    }
+  },
+  "resolvedConfig": {
+    "status": "PASS",
+    "reasonCode": "PAPER_CONFIG_OK",
+    "reasonDetail": "Resolved runtime config confirms paper execution mode",
+    "timestamp": "2026-08-14T22:50:23.024Z",
+    "metadata": {
+      "executionMode": "paper",
+      "exchange": "binance"
+    }
+  },
+  "duplicatePaperJobs": {
+    "status": "PASS",
+    "reasonCode": "NO_DUPLICATE_PAPER_JOBS",
+    "reasonDetail": "At most one RUNNING paper job for user",
+    "timestamp": "2026-08-14T22:50:23.018Z"
+  },
+  "clockSync": {
+    "status": "PASS",
+    "reasonCode": "CLOCK_SYNC_OK",
+    "reasonDetail": "Clock skew 28ms within threshold",
+    "timestamp": "2026-08-14T22:50:22.891Z",
+    "metadata": {
+      "localTime": "2026-08-14T22:50:22.889Z",
+      "serverTime": "2026-08-14T22:50:22.917Z",
+      "clockOffsetMs": 28,
+      "clockSkewMs": 28,
+      "apiLatencyMs": 111,
+      "skewThresholdMs": 5000,
+      "endpoint": "https://www.binance.tr/api/v3/time",
+      "timestampSource": "binance.api.v3.time"
+    }
+  },
+  "reconciledRounds": [
+    {
+      "roundId": "cmstjcl8b000munsgxq0psjhh",
+      "jobId": "cmstjckww0007unsg4v4iff2q",
+      "previousState": "tariyor",
+      "newState": "tur_basarisiz",
+      "reasonCode": "PREFLIGHT_STALE_RUNNING_JOB",
+      "reasonDetail": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE); prior=tariyor; evidence={\"heartbeatAt\":\"2026-08-14T22:50:09.983Z\",\"state\":\"tariyor\",\"jobSchedulerActive\":false}",
+      "timestamp": "2026-08-14T22:50:22.927Z"
+    }
+  ],
+  "reconciledJobs": [
+    {
+      "jobId": "cmstjckww0007unsg4v4iff2q",
+      "previousStatus": "RUNNING",
+      "newStatus": "STOPPED",
+      "reasonCode": "PREFLIGHT_STALE_RUNNING_JOB",
+      "reasonDetail": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE)",
+      "timestamp": "2026-08-14T22:50:22.927Z"
+    }
+  ],
+  "artifactPath": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\preflight\\5round-2026-08-14T22-50-18-796Z-preflight"
+}

@@ -1,0 +1,127 @@
+{
+  "reportId": "kripto-p0-tdi-forensic-reconciliation",
+  "generatedAt": "2026-08-15T11:05:00.000Z",
+  "scope": "Forensic observability only — no trading behavior changes",
+  "fixes": {
+    "FIX-A": {
+      "title": "Align TDI sensitivity with production verdict semantics",
+      "status": "IMPLEMENTED",
+      "files": [
+        "src/server/forensics/tdi-sensitivity.service.ts",
+        "src/server/forensics/tdi-verdict-replay.service.ts"
+      ],
+      "newMetrics": [
+        "scoreAboveThresholdCount",
+        "scoreAboveThresholdRate",
+        "runtimeApprovalEquivalentCount",
+        "runtimeApprovalEquivalentRate",
+        "runtimeWaitCount",
+        "runtimeRejectedCount",
+        "productionReplayStatus",
+        "productionReplayReason"
+      ]
+    },
+    "FIX-B": {
+      "title": "Rename misleading sensitivity approval metrics",
+      "status": "IMPLEMENTED",
+      "schemaVersion": "tdi-sensitivity-v2",
+      "renamed": {
+        "misleading": "approvalRate (when meaning score >= threshold)",
+        "scoreCounterfactual": "scoreAboveThresholdRate",
+        "productionApproval": "runtimeApprovalEquivalentRate"
+      },
+      "backwardCompatibility": {
+        "approvalRate": "maps to recorded runtime TDI APPROVED rate (deprecated field retained)",
+        "sensitivityPoints[].approvalRate": "alias of scoreAboveThresholdRate",
+        "compatibilityBlock": "documents legacy semantics"
+      }
+    },
+    "FIX-C": {
+      "title": "Split hybrid and master score semantics",
+      "status": "IMPLEMENTED",
+      "schemaVersion": "tdi-decision-v2",
+      "newFields": [
+        "hybridCompositeScore",
+        "masterExpertConsensusScore",
+        "scoreType",
+        "legacyDecision"
+      ],
+      "files": [
+        "src/server/forensics/forensic.types.ts",
+        "src/server/forensics/tdi-decision-forensics.service.ts",
+        "src/server/forensics/round-forensic-export.service.ts",
+        "src/server/decision-engine/master-decision-engine.service.ts"
+      ]
+    }
+  },
+  "beforeAfterSemantics": {
+    "before": {
+      "sensitivityApproval": "consensusScore >= 55 (mislabeled as approvalRate)",
+      "consensusScore": "single field with mixed hybrid composite / master expert average semantics",
+      "operatorRisk": "28.4% displayed as approval while runtime APPROVED = 0%"
+    },
+    "after": {
+      "scoreAboveThresholdRate": "counterfactual score >= threshold (≈28.4% on canonical run)",
+      "runtimeApprovalEquivalentRate": "production replay: hybrid BUY OR master legacy BUY (0% on canonical run)",
+      "scoreType": "HYBRID_COMPOSITE | MASTER_EXPERT_AVERAGE | UNKNOWN",
+      "explanation": "Score threshold pass is not equivalent to production TDI APPROVED"
+    }
+  },
+  "canonical46RoundValidation": {
+    "jobId": "cmstltuqn0007un9ksbk3xn9c",
+    "tdiDecisionCount": 17626,
+    "scoreAboveThresholdRate": 0.2874,
+    "scoreAboveThresholdRateTolerance": "0.27–0.30",
+    "runtimeApprovalEquivalentRate": 0,
+    "runtimeApprovalEquivalentCount": 0,
+    "recordedApprovalRate": 0,
+    "productionReplayStatus": "PARTIAL",
+    "productionReplayReason": "8634/17626 master records infer legacyDecision without stored expert opinions",
+    "testFile": "tests/forensics/tdi-sensitivity-reconciliation.test.ts",
+    "testResult": "PASS (13/13)"
+  },
+  "tradingBehaviorProof": {
+    "modifiedTradingLogic": false,
+    "modifiedFilesTradingPath": [],
+    "forensicOnlyChanges": [
+      "tdi-sensitivity.service.ts",
+      "tdi-verdict-replay.service.ts",
+      "tdi-decision-forensics.service.ts",
+      "forensic.types.ts",
+      "round-forensic-export.service.ts"
+    ],
+    "observabilityOnlyBridgeChange": {
+      "file": "master-decision-engine.service.ts",
+      "change": "records legacyDecision + score fields in bridgeTdiDecision forensic artifact only",
+      "verdictLogicUnchanged": true
+    },
+    "unchanged": [
+      "hybrid-decision-engine BUY/HOLD/NO_TRADE rules",
+      "resolveMasterDecision thresholds",
+      "momentumWeak gates",
+      "learning behavior",
+      "AI VETO execution gate",
+      "sizing/risk/scanner/strategy"
+    ]
+  },
+  "tests": {
+    "suite": "tests/forensics/tdi-sensitivity-reconciliation.test.ts",
+    "cases": 13,
+    "passed": 13,
+    "regressionSuite": "tests/forensics/p2-tdi-slot-strategy.test.ts also PASS (11/11)"
+  },
+  "remainingIssues": [
+    "Historical artifacts lack legacyDecision on master records — replay status PARTIAL until re-export",
+    "No UI dashboard consumer updated (none found in src/features); future UI must use scoreAboveThresholdRate vs runtimeApprovalEquivalentRate labels",
+    "Canonical run still produces 0 APPROVED by design — this fix clarifies measurement, not trading outcomes"
+  ],
+  "twoRoundValidationDesign": {
+    "runAfterDeploy": false,
+    "acceptance": [
+      "tdi-sensitivity-v2 scoreAboveThresholdRate within 2pp of score counterfactual",
+      "runtimeApprovalEquivalentRate matches replay within 2pp of recorded APPROVED",
+      "tdi-decision-v2 artifacts show distinct hybridCompositeScore / masterExpertConsensusScore",
+      "No change to order/trade counts without separate trading fix"
+    ]
+  }
+}

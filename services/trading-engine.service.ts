@@ -10,10 +10,15 @@ import {
 import {
   ensureAutoRoundRecovery,
   getAutoRoundRunsHistory,
+  getAutoRoundSchedulerRegistry,
+  getAutoRoundRoundRegistry,
   getAutoRoundStatus,
+  getSchedulerProductionHealth,
+  getSchedulerRecoveryTimeline,
   removeAutoRoundRun,
   startAutoRoundJob,
   stopAutoRoundJob,
+  triggerSchedulerRecovery,
 } from "@/src/server/execution/auto-round-engine.service";
 import { listExecutionEvents, listPersistedExecutionEvents } from "@/src/server/execution/execution-event-bus";
 import { listTradeHistory } from "@/src/server/repositories/trade.repository";
@@ -167,6 +172,26 @@ export async function getTradeRoundHistory(
 
 export async function ensureTradeRoundRecovery() {
   return ensureAutoRoundRecovery();
+}
+
+export async function getTradeRoundProductionHealth(userId?: string) {
+  return getSchedulerProductionHealth(userId);
+}
+
+export async function triggerTradeRoundRecovery(input?: { jobId?: string; userId?: string; force?: boolean }) {
+  return triggerSchedulerRecovery(input);
+}
+
+export async function getTradeRoundRecoveryTimeline(jobId: string, limit = 50) {
+  return getSchedulerRecoveryTimeline(jobId, limit);
+}
+
+export function getTradeRoundSchedulerRegistry() {
+  return getAutoRoundSchedulerRegistry();
+}
+
+export function getTradeRoundRegistry() {
+  return getAutoRoundRoundRegistry();
 }
 
 export async function deleteTradeRoundRun(runId: string, userId?: string) {

@@ -906,12 +906,15 @@ model AutoRoundJob {
   metadata          Json?
   startedAt         DateTime?
   finishedAt        DateTime?
+  persistVersion    Int            @default(0)
+  activeRunId       String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   rounds            AutoRoundRun[]
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+  @@index([activeRunId])
 }
 
 model AutoRoundRun {
@@ -931,6 +934,8 @@ model AutoRoundRun {
   feeTotal       Float?
   result         String?
   failReason     String?
+  idempotencyKey String?      @unique
+  persistVersion Int          @default(0)
   startedAt      DateTime     @default(now())
   endedAt        DateTime?
   metadata       Json?
@@ -939,6 +944,7 @@ model AutoRoundRun {
 
   @@index([jobId, roundNo])
   @@index([state, createdAt])
+  @@index([jobId, roundNo, endedAt])
 }
 
 model AppSetting {
