@@ -59,7 +59,7 @@ function toSafeJsonValue(
   depth = 0,
   seen?: WeakSet<object>,
 ): Prisma.InputJsonValue {
-  if (value == null) return null;
+  if (value == null) return "[NULL]";
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
     return value;
   }
@@ -175,13 +175,15 @@ export function observeScannerDecision(input: ScannerDecisionObservabilityInput)
   });
   bridgeScannerObservability(input);
   if (input.status !== "QUALIFIED" && input.status !== "PASS") {
+    const rejectStage: "decision" | "execution" =
+      input.rejectTelemetry?.rejectStage === "execution" ? "execution" : "decision";
     bridgeExecutionDecision({
       candidateId: input.rejectTelemetry?.candidateId ?? createCandidateId(input.symbol, "scanner"),
       symbol: input.symbol,
       approved: false,
       reasonCode: exactReasonCode,
       reasonDetail: exactReasonDetail,
-      stage: input.rejectTelemetry?.rejectStage ?? "decision",
+      stage: rejectStage,
       score: input.scannerScore,
     });
   }
@@ -446,7 +448,7 @@ export function observeExecutionDecision(input: ExecutionDecisionObservabilityIn
     reasonCode: input.rejectReason ?? (input.opened ? "EXECUTION_OPENED" : "EXECUTION_REJECT"),
     reasonDetail: input.rejectReason ?? (input.opened ? "Trade opened" : "Execution rejected or skipped"),
     stage: input.opened ? "execution" : "decision",
-    score: input.candidate?.score,
+    score: input.candidate?.score?.score,
   });
 
   safeObserve(

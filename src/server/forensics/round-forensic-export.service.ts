@@ -38,6 +38,7 @@ import {
 import { getCanonicalEventLog } from "@/src/server/forensics/canonical-event.service";
 import { summarizeFunnelTraces } from "@/src/server/forensics/candidate-funnel-trace.service";
 import { evaluateConfigDrift } from "@/src/server/forensics/config-hash.service";
+import { buildEdgeAccountingReport } from "@/src/server/forensics/edge-accounting-calculator.service";
 
 export type RoundForensicExportInput = {
   session: ForensicSessionContext;
@@ -487,6 +488,7 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     shadowOutcomes: "shadow-outcomes.json",
     moverGroundTruth: "mover-ground-truth.json",
     edgeAnalytics: "edge-analytics.json",
+    edgeAccounting: "edge-accounting.json",
   };
 
   safeWriteJson(path.join(rootDir, "candidate-trace.json"), {
@@ -649,6 +651,16 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     scoreCalibration: getScoreCalibration(tracked),
     analytics: getEdgeAnalytics(tracked, movers),
   }, tracker);
+  safeWriteJson(
+    path.join(rootDir, "edge-accounting.json"),
+    buildEdgeAccountingReport({
+      tracked: tracked as unknown as Record<string, unknown>[],
+      canonicalEvents: canonicalEvents as unknown as Record<string, unknown>[],
+      orders: roundOrders as unknown as Record<string, unknown>[],
+      pnlEntries: roundPnl as unknown as Record<string, unknown>[],
+    }),
+    tracker,
+  );
 
   const postEntrySymbols = (process.env.FORENSIC_POST_ENTRY_SYMBOLS ?? "")
     .split(",")
@@ -775,22 +787,27 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     );
 
     summary.funnelState = {
-      ...summary.funnelState,
-      tdiDecisions: p2Reports.tdiDecisions.length,
-      scannerQualificationRejections: p1Reports.scannerQualificationRejections.length,
-      runtimeTdiApproved,
-      runtimeTdiWait,
-      runtimeTdiRejected,
-      upstreamCandidateRejected: Number(rejectionCountsByReason.SCANNER_REJECT ?? 0),
-      hybridRejected: Number(rejectionCountsByReason.TDI_REJECTED ?? 0),
-      consensusRejected: Number(rejectionCountsByReason.CONSENSUS_REJECT ?? 0),
-      masterRejected: Number(rejectionCountsByReason.AI_REJECTED ?? 0),
+      rejectionCountsByStage: {
+        ...(summary.funnelState?.rejectionCountsByStage ?? {}),
+        TDI_DECISIONS: p2Reports.tdiDecisions.length,
+        SCANNER_QUALIFICATION_REJECTIONS: p1Reports.scannerQualificationRejections.length,
+        TDI_APPROVED: runtimeTdiApproved,
+        TDI_WAIT: runtimeTdiWait,
+        TDI_REJECTED: runtimeTdiRejected,
+      },
+      rejectionCountsByReason: {
+        ...(summary.funnelState?.rejectionCountsByReason ?? {}),
+        UPSTREAM_CANDIDATE_REJECTED: Number(rejectionCountsByReason.SCANNER_REJECT ?? 0),
+        HYBRID_REJECTED: Number(rejectionCountsByReason.TDI_REJECTED ?? 0),
+        CONSENSUS_REJECTED: Number(rejectionCountsByReason.CONSENSUS_REJECT ?? 0),
+        MASTER_REJECTED: Number(rejectionCountsByReason.AI_REJECTED ?? 0),
+      },
     };
-    summary.artifactRefs = refs;
+    (summary as Record<string, unknown>).artifactRefs = refs;
     safeWriteJson(path.join(rootDir, "round-summary.json"), summary, tracker);
   } catch (error) {
     tracker.failed.push({ file: "p1-p2-reports", reason: (error as Error).message });
-    summary.artifactRefs = refs;
+    (summary as Record<string, unknown>).artifactRefs = refs;
     summary.exportStatus = tracker.failed.length > 0 ? "PARTIAL" : "COMPLETED";
     safeWriteJson(path.join(rootDir, "round-summary.json"), summary, tracker);
   }
@@ -805,6 +822,7 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     "canonical-events.json",
     "runtime-telemetry.json",
     "edge-analytics.json",
+    "edge-accounting.json",
     "pnl-ledger.json",
     "fee-aware-entry-policy.json",
     "exit-forensics.json",

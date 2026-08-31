@@ -153,7 +153,7 @@ export function resolvePortfolioExposureFactor(input: {
     positions: input.openPositions,
     intent: {
       symbol: input.symbol,
-      side: "LONG",
+      side: "BUY",
       requestedNotional: input.requestedNotional,
       strategy: input.strategy,
     },

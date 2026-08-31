@@ -5,7 +5,13 @@ import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.
 import { hashCanonicalConfig } from "@/src/server/forensics/config-hash.service";
 
 export async function resolveRuntimeConfigSnapshot(userId?: string): Promise<ResolvedConfigSnapshot> {
-  const runtime = userId ? await getRuntimeStrategyParams(userId).catch(() => null) : null;
+  const runtime = userId ? await getRuntimeStrategyParams().catch(() => null) : null;
+  const runtimeLegacy = runtime as
+    | {
+        trade?: Record<string, unknown>;
+        risk?: Record<string, unknown>;
+      }
+    | null;
   const venue = resolveCanonicalVenueConfig();
   const policy = {
     ai: "ADVISORY",
@@ -13,11 +19,11 @@ export async function resolveRuntimeConfigSnapshot(userId?: string): Promise<Res
     learning: "ADVISORY",
   } as const;
   const configScope = {
-    opportunityConfig: runtime?.trade ?? {},
-    hotConfig: runtime?.trade ?? {},
-    microConfig: runtime?.trade ?? {},
-    finalRankConfig: runtime?.trade ?? {},
-    riskConfig: runtime?.risk ?? {
+    opportunityConfig: runtimeLegacy?.trade ?? {},
+    hotConfig: runtimeLegacy?.trade ?? {},
+    microConfig: runtimeLegacy?.trade ?? {},
+    finalRankConfig: runtimeLegacy?.trade ?? {},
+    riskConfig: runtimeLegacy?.risk ?? {
       maxDailyLossPercent: env.RISK_MAX_DAILY_LOSS_PERCENT,
       maxOpenPositions: env.EXECUTION_MAX_OPEN_POSITIONS,
     },
@@ -68,25 +74,27 @@ export async function resolveRuntimeConfigSnapshot(userId?: string): Promise<Res
       executionMode: env.EXECUTION_MODE,
       minConfidence: env.AI_MIN_CONFIDENCE,
       strictAnalystMode: env.AI_STRICT_ANALYST_MODE,
-      remoteRequired: Boolean(env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || env.GEMINI_API_KEY),
+      remoteRequired: Boolean(
+        process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY,
+      ),
     },
-    strategyConfig: runtime?.trade ?? {},
+    strategyConfig: runtimeLegacy?.trade ?? {},
     evConfig: {
       minRiskRewardRatio: env.EXECUTION_MIN_RR_RATIO,
       minTradeQualityScore: env.EXECUTION_MIN_TRADE_QUALITY_SCORE,
     },
-    risk: runtime?.risk ?? {
+    risk: runtimeLegacy?.risk ?? {
       maxDailyLossPercent: env.RISK_MAX_DAILY_LOSS_PERCENT,
       maxOpenPositions: env.EXECUTION_MAX_OPEN_POSITIONS,
     },
-    sizing: runtime?.trade ?? {},
+    sizing: runtimeLegacy?.trade ?? {},
     fees: {
       binanceTakerFeeRate: env.BINANCE_TAKER_FEE_RATE,
       binanceMakerFeeRate: env.BINANCE_MAKER_FEE_RATE,
     },
     simulationWindow: {
       autoRoundSelectionBudgetSec: env.AUTO_ROUND_SELECTION_BUDGET_SEC,
-      autoRoundMaxWaitSecDefault: env.AUTO_ROUND_MAX_WAIT_SEC,
+      autoRoundMaxWaitSecDefault: env.AUTO_ROUND_SELECTION_BUDGET_SEC,
     },
     maxPositions: env.EXECUTION_MAX_OPEN_POSITIONS ?? 1,
     timeframes: ["1m", "5m", "15m", "1h", "4h"],

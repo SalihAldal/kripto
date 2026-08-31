@@ -2,8 +2,13 @@ import { createHash } from "node:crypto";
 import type {
   AiStrategyInteractionReport,
   AiStrategyInteractionRow,
-  ForensicSessionContext,
 } from "@/src/server/forensics/forensic.types";
+
+type ForensicSessionContext = {
+  consensus?: Array<{ symbol?: string; finalDecision?: string }>;
+  decisions: Array<{ stage: string; symbol: string; reasonDetail: string }>;
+  pnlEntries: Array<{ tradeId: string; symbol: string; netPnL: number }>;
+};
 
 function deterministicHash(payload: unknown) {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex").slice(0, 16);

@@ -60,7 +60,7 @@ export function runEngineSanityChecks(): EngineSanityReport {
         klines: [],
         volume24h: 1_000_000,
         orderBookSummary: { bestBid: 99.9, bestAsk: 100.1, bidDepth: 100, askDepth: 100 },
-        recentTradesSummary: { buySellRatio: 1.02 },
+        recentTradesSummary: { buyVolume: 510_000, sellVolume: 500_000, buySellRatio: 1.02 },
         spread: 0.05,
         volatility: 1,
         marketSignals: {},

@@ -66,7 +66,7 @@ export type ConsensusAuditRecord = {
   providerVotes?: Array<{ provider: string; decision?: string; weight?: number }>;
   finalDecision?: string;
   confidence?: number;
-  status: "COMPLETED" | "CONSENSUS_TIMEOUT" | "CONSENSUS_FAILED";
+  status: "COMPLETED" | "CONSENSUS_TIMEOUT" | "CONSENSUS_FAILED" | "AI_PROVIDER_DEGRADED";
   reasonDetail?: string;
 };
 

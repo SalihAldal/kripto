@@ -106,6 +106,6 @@ describe("fix4 observability", () => {
     expect(identity.configHash === null || identity.configHash.length > 10).toBe(true);
     const generated = generateValidationReport(runId);
     expect(generated.found).toBe(true);
-    expect(String(generated.report)).toContain("## RUN IDENTITY");
+    expect(String(generated.report)).toContain("## RUN INFO");
   });
 });

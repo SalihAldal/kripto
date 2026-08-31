@@ -179,12 +179,14 @@ export function buildStrategyRegimeMatrix(input: {
     const wins = trades.filter((row) => row.netPnL > 0);
     const grossWins = wins.reduce((acc, row) => acc + row.netPnL, 0);
     const grossLosses = Math.abs(trades.filter((row) => row.netPnL < 0).reduce((acc, row) => acc + row.netPnL, 0));
+    const sampleLabel: "SUFFICIENT" | "NOT_ENOUGH_DATA" =
+      cell.sampleSize >= minCellSample ? "SUFFICIENT" : "NOT_ENOUGH_DATA";
     return {
       ...cell,
       winRate: cell.tradeCount > 0 ? round(wins.length / cell.tradeCount) : 0,
       expectancy: cell.tradeCount > 0 ? round(cell.netPnL / cell.tradeCount) : 0,
       profitFactor: grossLosses > 0 ? round(grossWins / grossLosses) : grossWins > 0 ? Number.POSITIVE_INFINITY : 0,
-      sampleLabel: cell.sampleSize >= minCellSample ? "SUFFICIENT" : "NOT_ENOUGH_DATA",
+      sampleLabel,
     };
   });
 

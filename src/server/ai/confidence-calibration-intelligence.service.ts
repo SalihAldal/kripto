@@ -98,7 +98,8 @@ export function mapPersistedCalibrationBins(
     predictedBin: string;
     predictedAvg: number;
     actualSuccessRate: number;
-    count: number;
+    count?: number;
+    sampleCount?: number;
     calibrationError: number;
   }>,
 ): CalibrationBin[] {
@@ -111,7 +112,7 @@ export function mapPersistedCalibrationBins(
         binEnd: start + 9,
         predictedAvg: row.predictedAvg,
         actualSuccessRate: row.actualSuccessRate,
-        count: row.count,
+        count: Number(row.count ?? row.sampleCount ?? 0),
         calibrationError: row.calibrationError,
       };
     })
@@ -226,7 +227,10 @@ export function buildConfidenceCalibrationTelemetry(input: {
     input.result.finalConsensusConfidence ?? input.result.decisionPayload?.confidenceScore ?? rawConfidence,
   );
   const disagreement = resolveModelDisagreementScore(input.providerResults);
-  const master = input.result.decisionPayload?.masterDecisionEngine;
+  const master = (input.result.decisionPayload as Record<string, unknown> | undefined)
+    ?.masterDecisionEngine as
+    | { conflictScore?: number; agreementScore?: number }
+    | undefined;
   const conflictScore = Number(master?.conflictScore ?? 0);
   const agreementScore = Number(master?.agreementScore ?? 50);
   const calibrated = applyConfidenceCalibration({

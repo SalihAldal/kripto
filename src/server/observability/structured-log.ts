@@ -21,7 +21,8 @@ export type ActionType =
   | "manual_round_start"
   | "manual_round_stop"
   | "position_report"
-  | "round_status";
+  | "round_status"
+  | "round_runtime_heartbeat";
 
 export type StructuredLogStatus = "RUNNING" | "SUCCESS" | "FAILED" | "SKIPPED";
 

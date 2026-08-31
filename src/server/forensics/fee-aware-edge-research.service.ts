@@ -54,6 +54,8 @@ export function buildFeeAwareEdgeResearchReport(input: {
         fee: expectedRoundTripFee,
         ratio: metrics.expectedGrossToFeeRatio,
       }) as FeeEdgeClassification;
+      const evidenceQuality: "HIGH" | "INSUFFICIENT" =
+        classification === "UNKNOWN" ? "INSUFFICIENT" : "HIGH";
       return {
         candidateId: decision.candidateId,
         symbol: decision.symbol,
@@ -62,7 +64,7 @@ export function buildFeeAwareEdgeResearchReport(input: {
         expectedNet: round(expectedNet),
         edgeAfterFees,
         classification,
-        evidenceQuality: (classification === "UNKNOWN" ? "INSUFFICIENT" : "HIGH") as const,
+        evidenceQuality,
       };
     })
     .filter(Boolean) as FeeAwareEdgeResearchReport["rows"];

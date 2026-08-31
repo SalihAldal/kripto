@@ -174,7 +174,7 @@ export async function appendRecoveryAuditEvent(input: {
     }
 
     return { event, state: nextState };
-  }, { timeoutMs: 20_000, maxWaitMs: 10_000 });
+  }, { timeout: 20_000, maxWait: 10_000 });
 }
 
 export async function pingDatabaseConnectivity() {

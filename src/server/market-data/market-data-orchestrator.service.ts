@@ -103,10 +103,18 @@ export function resolveAdaptiveTtlMs(input: {
   if (input.kind === "klines" && input.interval === "1h") {
     return round(Math.max(30_000, tierMs.klines * 2.2 * priorityFactor));
   }
-  if (input.kind === "contextBundle") {
-    return round(Math.min(tierMs.ticker, tierMs.klines) * priorityFactor);
-  }
-  const base = tierMs[input.kind === "contextBundle" ? "ticker" : input.kind] ?? 10_000;
+  const base =
+    input.kind === "ticker"
+      ? tierMs.ticker
+      : input.kind === "klines"
+        ? tierMs.klines
+        : input.kind === "orderBook"
+          ? tierMs.orderBook
+          : input.kind === "recentTrades"
+            ? tierMs.recentTrades
+            : input.kind === "exchangeInfo"
+              ? tierMs.exchangeInfo
+              : tierMs.ticker;
   return round(base * priorityFactor);
 }
 

@@ -756,6 +756,39 @@ export type PaperPreflightArtifact = {
   reconciledJobs: PaperJobReconciliationRecord[];
 };
 
+export type ValidationDbReadiness = {
+  status: "PASS" | "FAIL";
+  reasonCode: string;
+  reasonDetail: string;
+  checkedAt: string;
+  databaseUrlConfigured: boolean;
+  requiredTables: Array<{ table: string; exists: boolean }>;
+  missingTables: string[];
+  migrationTablePresent: boolean;
+  latestMigration?: string | null;
+};
+
+export type PreValidationGateCheckStatus = "PASS" | "FAIL" | "WARN" | "NOT_RECORDED";
+
+export type PreValidationGateCheck = {
+  code: string;
+  status: PreValidationGateCheckStatus;
+  detail: string;
+  metadata?: Record<string, unknown>;
+};
+
+export type PreValidationGateResult = {
+  status: "READY" | "NOT_READY";
+  checkedAt: string;
+  blockers: string[];
+  checks: PreValidationGateCheck[];
+};
+
+// Backward-compatible exports for modules that still import these from forensic.types.
+export type ForensicSessionContext = import("./forensic-context").ForensicSessionContext;
+export type ScannerDecisionObservabilityInput =
+  import("@/src/server/observability/decision-observability.types").ScannerDecisionObservabilityInput;
+
 export const FORENSIC_ARTIFACT_CAPS = {
   scannerSymbolsPerCycle: 200,
   candidateTracePerSession: 500,

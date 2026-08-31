@@ -4,6 +4,7 @@ import { getScannerWorkerSnapshot } from "@/src/server/scanner/scanner-worker.se
 import { getCircuitSnapshot } from "@/src/server/resilience/circuit-breaker";
 import { getCanonicalInstanceOwnership } from "@/src/server/candidate/instance-ownership.service";
 import { summarizeFunnelTraces } from "@/src/server/forensics/candidate-funnel-trace.service";
+import { sampleResourceTelemetry } from "@/src/server/forensics/resource-telemetry.service";
 
 export function buildRuntimeTelemetrySnapshot(input: { runId: string; roundId: string; checkpointAt?: string }) {
   const market = getMarketDataDaemon().telemetry();
@@ -12,6 +13,7 @@ export function buildRuntimeTelemetrySnapshot(input: { runId: string; roundId: s
   const ownership = getCanonicalInstanceOwnership();
   const funnel = summarizeFunnelTraces(input.runId);
   const authority = getCanonicalAuthorityCounters();
+  const resource = sampleResourceTelemetry();
   return {
     generatedAt: input.checkpointAt ?? new Date().toISOString(),
     runId: input.runId,
@@ -27,6 +29,17 @@ export function buildRuntimeTelemetrySnapshot(input: { runId: string; roundId: s
     },
     pipelineFunnel: funnel,
     authority,
+    resources: {
+      cpuPercent: resource.cpuPercent,
+      eventLoopLagP95Ms: resource.eventLoopLagP95Ms,
+      redisLatencyMs: market.redisLatencyMs ?? null,
+      memory: resource.memory,
+      alerts: [
+        ...resource.alerts,
+        ...(typeof market.redisLatencyMs === "number" && market.redisLatencyMs > 200 ? ["REDIS_LATENCY_HIGH"] : []),
+      ],
+      sampledAt: resource.timestamp,
+    },
     breaker: {
       domains: breakers,
       summary: {

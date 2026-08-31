@@ -30,16 +30,28 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "lib/**/*.ts",
+    "lib/**/*.tsx",
+    "services/**/*.ts",
+    "services/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
     ".next/types/**/*.ts",
-    "**/*.mts",
-    ".next/dev/types/**/*.ts",
-    ".next/dev/dev/types/**/*.ts"
+    "*.mts"
   ],
   "exclude": [
     "node_modules",
     ".next/dev/types/**/*.ts",
-    "scripts/_gen-18round-deep-report.ts"
+    ".next/dev/dev/types/**/*.ts",
+    "scripts/**",
+    "artifacts/**",
+    "coverage/**",
+    "dist/**",
+    "tmp/**",
+    "brainos-lab/**"
   ]
 }

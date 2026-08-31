@@ -92,7 +92,7 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
       policyFlags: { regimeGating: true, feeFloor: true, entryTimingProtection: true },
     },
     evidenceRefs: ["P2 combined research bundle — not for production promotion"],
-  });
+  }) as P2ForensicSessionBundle["strategyComparison"];
   const baselineMetrics = buildCanonicalBaseline({ pnlEntries: session.pnlEntries });
 
   const mrRegimeExperiment = buildSingleChangeExperiment({
@@ -143,13 +143,15 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
   });
   const trendFollowingValidation = buildTrendFollowingValidation({
     strategyPerformance: p1.strategyPerformance,
-  });
+  }) as P2ForensicSessionBundle["trendFollowingValidation"];
   const outOfSampleEvaluation = buildOutOfSampleEvaluation({
     rows: comparisonRows,
     baseline: { label: "BASELINE", policyFlags: {} },
     candidate: { label: mrRegimeExperiment.candidate.label, policyFlags: mrRegimeExperiment.candidate.policyFlags },
   });
-  const profitConcentration = buildProfitConcentrationReport({ rows: comparisonRows });
+  const profitConcentration = buildProfitConcentrationReport({
+    rows: comparisonRows,
+  }) as P2ForensicSessionBundle["profitConcentration"];
 
   const promotionGate = evaluatePromotionGate({
     changeId: "p2-single-change-mr-regime-filter",
@@ -160,8 +162,8 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
     minSampleSize: 20,
     acceptanceTest: ACCEPTANCE_TEST,
     outOfSampleSupport: outOfSampleEvaluation.available ? outOfSampleEvaluation.support : null,
-    topSymbolContributionPct: profitConcentration.available ? profitConcentration.topSymbolContributionPct : undefined,
-    top1TradeContributionPct: profitConcentration.available ? profitConcentration.top1TradeContributionPct : undefined,
+    topSymbolContributionPct: profitConcentration?.available ? profitConcentration.topSymbolContributionPct : undefined,
+    top1TradeContributionPct: profitConcentration?.available ? profitConcentration.top1TradeContributionPct : undefined,
   });
 
   const promotionDecisions = [

@@ -1,5 +1,13 @@
 export * from "@/src/server/forensics/forensic.types";
-export * from "@/src/server/forensics/forensic-context";
+export {
+  runWithForensicSession,
+  setForensicSession,
+  clearForensicSession,
+  getForensicSession,
+  ensureForensicSession,
+  attachForensicRound,
+  getOrCreateForensicSession,
+} from "@/src/server/forensics/forensic-context";
 export * from "@/src/server/forensics/forensic-collector.service";
 export * from "@/src/server/forensics/forensic-artifacts.service";
 export * from "@/src/server/forensics/exit-replay.engine";
@@ -11,7 +19,26 @@ export * from "@/src/server/forensics/db-health.service";
 export * from "@/src/server/forensics/native-paper-diagnostics.service";
 export * from "@/src/server/forensics/binance-request-audit.service";
 export * from "@/src/server/forensics/forensic-bridge.service";
-export * from "@/src/server/forensics/ai-runtime.service";
+export {
+  beginAiBatch,
+  getAiBatchProgress,
+  startAiCandidate,
+  completeAiCandidate,
+  cancelAiCandidate,
+  failAiCandidate,
+  terminalizeOpenAiCandidates,
+  getConsensusAudits,
+  resetAiRuntimeState,
+  writeAiProgressArtifact,
+  writeMinimumAiStallArtifacts,
+  toStallErrorFromAi,
+} from "@/src/server/forensics/ai-runtime.service";
+export type {
+  AiCandidateStatus,
+  AiCandidateRecord,
+  AiBatchProgress,
+  ConsensusAuditRecord,
+} from "@/src/server/forensics/ai-runtime.service";
 export * from "@/src/server/forensics/round-progress-watchdog.service";
 export * from "@/src/server/forensics/transaction-telemetry.service";
 export * from "@/src/server/forensics/recovery-telemetry.service";
@@ -60,6 +87,9 @@ export * from "@/src/server/forensics/config-hash.service";
 export * from "@/src/server/forensics/canonical-event.service";
 export * from "@/src/server/forensics/runtime-telemetry-snapshot.service";
 export * from "@/src/server/forensics/validation-report-generator.service";
+export * from "@/src/server/forensics/prevalidation-gate.service";
+export * from "@/src/server/forensics/edge-accounting-calculator.service";
+export * from "@/src/server/forensics/resource-telemetry.service";
 export {
   evaluateAiExecutionGate,
   evaluateAiExecutionReadiness,

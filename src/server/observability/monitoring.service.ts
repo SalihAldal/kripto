@@ -62,7 +62,7 @@ export async function getMonitoringSnapshot() {
     heartbeat,
     circuits: circuits.map((row) => ({
       ...row,
-      failures: toNumber(row.failures),
+      failureCount: toNumber(row.failureCount),
     })),
     updatedAt: new Date().toISOString(),
   };

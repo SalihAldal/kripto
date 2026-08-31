@@ -11,9 +11,18 @@ export type ExitForensicSnapshot = {
   entryTimestamp: string;
   exitTimestamp: string;
   durationMs: number;
+  holdDurationMs?: number;
   tpLevel?: number | null;
   slLevel?: number | null;
   strategyExit?: boolean;
+  strategyExitReason?: string | null;
+  timeExitReason?: string | null;
+  normalizedCloseReason?: string | null;
+  closeReasonAlias?: string | null;
+  priceAtMonitorTick?: number | null;
+  decisionTimestamp?: string | null;
+  monitorPrecedenceRule?: string;
+  replayPrecedenceRule?: "STOP_LOSS" | "TAKE_PROFIT";
   realizedGrossPnL?: number;
   closeReason?: PositionCloseReason | string | null;
   replayWindowEnded?: boolean;
@@ -28,7 +37,6 @@ const POSITION_MONITOR_REASON_MAP: Partial<Record<PositionCloseReason, ExitReaso
   REVERSE_SIGNAL: "STRATEGY_EXIT",
   EARLY_PROFIT_PROTECT: "STRATEGY_EXIT",
   TRAILING_PROFIT_LOCK: "STRATEGY_EXIT",
-  SMART_EXIT: "STRATEGY_EXIT",
 };
 
 function normalizeTimeoutReason(reason: PositionCloseReason) {

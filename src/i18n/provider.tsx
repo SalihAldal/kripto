@@ -9,7 +9,7 @@ type I18nContextValue = {
   locales: Locale[];
   localeLabels: Record<Locale, string>;
   setLocale: (next: Locale) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: string, fallback?: string) => string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -38,8 +38,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: TranslationKey) => {
-      return messages[locale][key] ?? messages.tr[key] ?? key;
+    (key: string, fallback?: string) => {
+      const translated = (messages[locale] as Partial<Record<string, string>>)[key];
+      const fallbackLocale = (messages.tr as Partial<Record<string, string>>)[key as TranslationKey];
+      return translated ?? fallbackLocale ?? fallback ?? key;
     },
     [locale],
   );

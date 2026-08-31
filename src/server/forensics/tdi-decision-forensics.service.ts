@@ -72,7 +72,7 @@ function deriveBlockingConditions(input: {
   firstBlockingCondition?: TdiFirstBlockingCondition;
   blockingConditions?: TdiFirstBlockingCondition[];
   waitReasonCode?: TdiWaitReasonCode;
-}) {
+}): TdiFirstBlockingCondition[] {
   if (Array.isArray(input.blockingConditions) && input.blockingConditions.length > 0) {
     return input.blockingConditions;
   }
@@ -206,12 +206,14 @@ export function buildTdiDecisionRecord(input: {
       : input.verdict === "APPROVED"
         ? "TDI APPROVED"
         : "TDI REJECTED");
-  const blockingConditions = deriveBlockingConditions({
+  const blockingConditions: TdiFirstBlockingCondition[] = deriveBlockingConditions({
     reasonDetail,
     firstBlockingCondition: input.firstBlockingCondition,
     blockingConditions: input.blockingConditions,
     waitReasonCode,
   });
+  const firstBlockingCondition: TdiFirstBlockingCondition =
+    blockingConditions[0] ?? input.firstBlockingCondition ?? "OTHER";
   const baseRecord: TdiDecisionRecord = {
     candidateId: input.candidateId,
     symbol: input.symbol.toUpperCase(),
@@ -256,7 +258,7 @@ export function buildTdiDecisionRecord(input: {
     openPositionCount: input.openPositionCount,
     strategy: input.strategy,
     forensicRegime: input.forensicRegime,
-    firstBlockingCondition: blockingConditions[0] ?? input.firstBlockingCondition ?? "OTHER",
+    firstBlockingCondition,
     blockingConditions,
     ...scoreFields,
     reasonDetail,

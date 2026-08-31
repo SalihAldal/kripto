@@ -225,9 +225,6 @@ export type ScannerPipelineRuntimeOptions = {
   runId?: string;
   forbidLegacyScanner?: boolean;
   shouldAbort?: () => void;
-  abortSignal?: AbortSignal;
-  selectionDeadlineMs?: number;
-  selectionBudgetMs?: number;
   onHeartbeat?: () => void | Promise<void>;
   onProgress?: () => void | Promise<void>;
   onRuntimeProgress?: (patch: {
@@ -451,6 +448,8 @@ export async function runScannerPipeline(
           .filter((row) => row.state === "HOT" || row.state === "PROMOTED")
           .map((row) => row.symbol),
         evaluationSymbols: opportunitySymbols,
+        duplicatesRemoved: 0,
+        notDiscoveredCount: 0,
       }
     : buildScannerCyclePlan({
         watchlist,

@@ -188,6 +188,7 @@ export function buildDecisionFeatureSnapshot(input: BuildDecisionFeatureSnapshot
   const technicalRole = roleScores.find((row) => row.role === "AI-1_TECHNICAL");
   const sentimentRole = roleScores.find((row) => row.role === "AI-2_SENTIMENT");
   const timeframe = input.ai.decisionPayload?.timeframeAnalysis;
+  const timeframeRecord = timeframe as Record<string, unknown> | undefined;
   const masterMatrix =
     input.ai.decisionPayload?.masterDecisionEngine &&
     typeof input.ai.decisionPayload.masterDecisionEngine === "object" &&
@@ -209,7 +210,7 @@ export function buildDecisionFeatureSnapshot(input: BuildDecisionFeatureSnapshot
   const mtfAlignment = optionalNumber(metadata.mtfAlignmentScore ?? timeframe?.alignmentScore);
   const mtfScore = optionalNumber(timeframe?.alignmentScore ?? metadata.mtfAlignmentScore);
   const mtfState = optionalString(timeframe?.dominantTrend ?? metadata.mtfDominantTrend);
-  const mtfTimestamp = optionalString(timeframe?.capturedAt ?? metadata.mtfCapturedAt);
+  const mtfTimestamp = optionalString(timeframeRecord?.capturedAt ?? metadata.mtfCapturedAt);
   const regime = optionalString(input.regime ?? metadata.marketRegime);
   const volume = optionalNumber(input.candidate.context.volume24h);
   const liquidity = optionalNumber(metadata.effectiveLiquidity24h ?? input.candidate.context.volume24h);

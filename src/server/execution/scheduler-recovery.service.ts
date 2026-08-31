@@ -16,6 +16,7 @@ import { STALL_ERROR_CODES } from "@/src/server/forensics/stall-error-taxonomy";
 import type {
   JobHealthEvaluation,
   ProductionHealthSnapshot,
+  RecoveryAuditEvent,
   RecoveryFailureKind,
   RecoveryHealthIssue,
   RecoveryPolicyDecision,
@@ -58,6 +59,13 @@ const RUNTIME_STALL_FAILURES = new Set<RecoveryFailureKind>([
   "AI_TIMEOUT",
   "DISCOVERY_TIMEOUT",
 ]);
+
+function getAppendedAuditEvent(audit: unknown): RecoveryAuditEvent | null {
+  if (!audit || Array.isArray(audit) || typeof audit !== "object" || !("event" in audit)) {
+    return null;
+  }
+  return (audit as { event: RecoveryAuditEvent }).event;
+}
 
 let configuredDeps: SchedulerRecoveryDeps | null = null;
 const recoveryQueues = new Map<string, Promise<SchedulerRecoveryResult>>();
@@ -178,7 +186,7 @@ export async function evaluateJobHealth(jobId: string): Promise<JobHealthEvaluat
         failure: "LEASE_HELD_BY_PEER",
         severity: "info",
         message: "Scheduler lease owned by another process",
-        evidence: { leaseOwnerId: lease.ownerId },
+        evidence: { leaseOwnerId: lease?.ownerId ?? null },
       });
     }
   }
@@ -641,7 +649,7 @@ export async function executeSchedulerRecovery(input: {
   const previous = recoveryQueues.get(input.jobId);
   if (previous) return previous;
 
-  const task = (async () => {
+  const task: Promise<SchedulerRecoveryResult> = (async (): Promise<SchedulerRecoveryResult> => {
     const started = Date.now();
     const operator = input.operator ?? "automatic";
     const evaluation = await evaluateJobHealth(input.jobId);
@@ -682,7 +690,7 @@ export async function executeSchedulerRecovery(input: {
         action: decision.action,
         result: "skipped" as const,
         decision,
-        auditEvent: audit?.event ?? {
+        auditEvent: getAppendedAuditEvent(audit) ?? {
           id: "skipped",
           timestamp: new Date().toISOString(),
           jobId: input.jobId,
@@ -721,7 +729,20 @@ export async function executeSchedulerRecovery(input: {
         action: "NO_ACTION",
         result: "skipped",
         decision,
-        auditEvent: audit!.event,
+        auditEvent: getAppendedAuditEvent(audit) ?? {
+          id: "recovery-blocked",
+          timestamp: new Date().toISOString(),
+          jobId: input.jobId,
+          component: decision.component,
+          failure: decision.failure,
+          decision,
+          action: "NO_ACTION",
+          result: "skipped",
+          durationMs: Date.now() - started,
+          operator,
+          trigger: input.trigger,
+          message: "Recovery blocked",
+        },
         skipped: true,
         reason: "Recovery blocked",
       };
@@ -752,7 +773,20 @@ export async function executeSchedulerRecovery(input: {
         action: decision.action,
         result: "failure",
         decision,
-        auditEvent: audit!.event,
+        auditEvent: getAppendedAuditEvent(audit) ?? {
+          id: "recovery-failure",
+          timestamp: new Date().toISOString(),
+          jobId: input.jobId,
+          component: decision.component,
+          failure: decision.failure,
+          decision,
+          action: decision.action,
+          result: "failure",
+          durationMs: Date.now() - started,
+          operator,
+          trigger: input.trigger,
+          message: (error as Error).message,
+        },
         reason: (error as Error).message,
       };
     }
@@ -784,7 +818,20 @@ export async function executeSchedulerRecovery(input: {
       result: applied.result,
       decision,
       spawn: applied.spawn,
-      auditEvent: audit!.event,
+      auditEvent: getAppendedAuditEvent(audit) ?? {
+        id: "recovery-result",
+        timestamp: new Date().toISOString(),
+        jobId: input.jobId,
+        component: decision.component,
+        failure: decision.failure,
+        decision,
+        action: decision.action,
+        result: applied.result,
+        durationMs: Date.now() - started,
+        operator,
+        trigger: input.trigger,
+        message: applied.message,
+      },
       reason: applied.message,
     };
   })();

@@ -222,7 +222,7 @@ export function resolveIndicatorSnapshot(input: AIAnalysisInput): Readonly<Indic
   return buildIndicatorSnapshot(input);
 }
 
-export function buildIndicatorSnapshot(input: AIAnalysisInput): IndicatorSnapshot {
+export function buildIndicatorSnapshot(input: AIAnalysisInput) {
   const closes = input.klines.map((x) => x.close);
   const highs = input.klines.map((x) => x.high);
   const lows = input.klines.map((x) => x.low);

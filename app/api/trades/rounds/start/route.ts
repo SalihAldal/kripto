@@ -47,6 +47,12 @@ export async function POST(request: NextRequest) {
     } finally {
       await releaseLock();
     }
+    const resolvedJobId =
+      "jobId" in data && typeof data.jobId === "string"
+        ? data.jobId
+        : "job" in data && data.job && typeof (data.job as { id?: unknown }).id === "string"
+          ? ((data.job as { id: string }).id ?? undefined)
+          : undefined;
     await writeStructuredLog({
       level: data.started ? "INFO" : "WARN",
       source: "round-start-route",
@@ -56,7 +62,7 @@ export async function POST(request: NextRequest) {
       requestId: request.headers.get("x-request-id") ?? undefined,
       sessionId: request.headers.get("x-session-id") ?? undefined,
       userId: access.user.id,
-      transactionId: data.jobId,
+      transactionId: resolvedJobId,
       errorCode: data.started ? undefined : "ROUND_START_REJECTED",
       errorDetail: data.reason,
       context: parsed.data as unknown as Record<string, unknown>,
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
       userId: access.user.id,
       action: "EXECUTE",
       entityType: "AutoRoundJob",
-      entityId: data.jobId,
+      entityId: resolvedJobId ?? "round-start-rejected",
       newValues: parsed.data,
       metadata: {
         started: data.started,

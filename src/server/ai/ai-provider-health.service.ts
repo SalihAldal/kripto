@@ -88,6 +88,14 @@ export function isConsensusEligibleHealth(state: AiProviderHealthState): boolean
   return state === "HEALTHY";
 }
 
+function isAiProviderHealthState(value: unknown): value is AiProviderHealthState {
+  return typeof value === "string" && AI_PROVIDER_HEALTH_STATES.includes(value as AiProviderHealthState);
+}
+
+export function resolveHealthState(row: AIProviderResult): AiProviderHealthState {
+  return isAiProviderHealthState(row.healthState) ? row.healthState : classifyProviderHealthState(row);
+}
+
 export function attachProviderHealthState(row: AIProviderResult): AIProviderResult {
   const healthState = classifyProviderHealthState(row);
   const meta = (row.output?.metadata as Record<string, unknown> | undefined) ?? {};
@@ -115,7 +123,7 @@ export function buildProviderHealthRecord(
   lane?: string,
   retryCount = 0,
 ): AiProviderHealthRecord {
-  const healthState = row.healthState ?? classifyProviderHealthState(row);
+  const healthState = resolveHealthState(row);
   return {
     provider: row.providerId,
     requestId: `${row.providerId}:${lane ?? "lane"}:${startedAt}`,
@@ -140,7 +148,7 @@ export function evaluateProviderHealthGate(
   );
   const counts = emptyCounts();
   for (const row of annotated) {
-    const state = row.healthState ?? classifyProviderHealthState(row);
+    const state = resolveHealthState(row);
     counts[state] += 1;
   }
 
@@ -148,9 +156,7 @@ export function evaluateProviderHealthGate(
   const degradedCount = counts.DEGRADED;
   const unavailableCount =
     counts.UNAVAILABLE + counts.TIMEOUT + counts.INVALID_RESPONSE + counts.RATE_LIMITED + counts.ABORTED;
-  const eligibleForConsensus = annotated.filter((row) =>
-    isConsensusEligibleHealth(row.healthState ?? classifyProviderHealthState(row)),
-  );
+  const eligibleForConsensus = annotated.filter((row) => isConsensusEligibleHealth(resolveHealthState(row)));
 
   let gate: AiProviderHealthGate = "ALL_DEGRADED";
   if (healthyCount > 0 && degradedCount === 0 && unavailableCount === 0) gate = "ALL_HEALTHY";
@@ -208,7 +214,7 @@ export function buildAllProvidersDegradedConsensusResult(input: {
 }
 
 export function consensusVoteLabel(row: AIProviderResult): string {
-  const state = row.healthState ?? classifyProviderHealthState(row);
+  const state = resolveHealthState(row);
   if (!isConsensusEligibleHealth(state)) return "UNAVAILABLE_EVIDENCE";
   return row.output?.decision ?? "UNKNOWN";
 }

@@ -308,7 +308,7 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
     });
     const observationMs = Math.min(
       input.selectionBudgetMs,
-      Math.max(90_000, Math.min(96_000, Number(env.AUTO_ROUND_LOOP_INTERVAL_MS ?? 95_000))),
+      Math.max(90_000, Math.min(96_000, Number(env.AUTO_ROUND_SCANNER_MAX_CYCLE_SEC ?? 95) * 1000)),
     );
     const observationDeadline = Date.now() + observationMs;
     while (Date.now() < observationDeadline) {

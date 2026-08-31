@@ -97,6 +97,9 @@ export type AIConsensusTelemetry = {
   aiRetryCount?: number;
   aiAllProvidersDegradedCount?: number;
   aiPath?: string;
+  healthyProviderCount?: number;
+  degradedProviderCount?: number;
+  unavailableProviderCount?: number;
   phaseTraces?: Array<{
     phase: string;
     freshStackUsed: boolean;
@@ -146,6 +149,7 @@ export type AIAnalysisInput = {
     shortTradeCount?: number;
     tradeVelocity?: number;
     volumeSpikeRatio?: number;
+    mtfAlignmentScore?: number;
     btcDominanceBias?: number;
     socialSentimentScore?: number;
     newsSentiment?: "POSITIVE" | "NEGATIVE" | "NEUTRAL";
@@ -350,6 +354,11 @@ export type AIDecisionPayload = {
   };
   shortTermReport?: string;
   confidenceCalibration?: Record<string, unknown>;
+  masterDecisionEngine?: {
+    conflictScore?: number;
+    agreementScore?: number;
+    [key: string]: unknown;
+  };
   consensusEngine?: {
     finalDecision: "BUY" | "WATCHLIST" | "NO-TRADE" | "REJECT";
     decisionConfidence: number;
@@ -465,6 +474,7 @@ export type AIConsensusResult = {
   finalDecision: AIDecision;
   finalConsensusDecision?: "BUY" | "WATCHLIST" | "NO-TRADE" | "REJECT";
   finalConsensusConfidence?: number;
+  vetoStatus?: string;
   finalConfidence: number;
   finalRiskScore: number;
   score: number;

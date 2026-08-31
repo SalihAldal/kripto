@@ -19,6 +19,7 @@ import type {
   BookSample,
   FinalRankedCandidate,
   HardRejectCode,
+  MicroFeatures,
   MicroEvaluateInput,
   MicroEvaluateResult,
 } from "@/src/server/microstructure/types";

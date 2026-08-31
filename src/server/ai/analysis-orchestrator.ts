@@ -22,6 +22,7 @@ import {
   classifyProviderHealthState,
   consensusVoteLabel,
   evaluateProviderHealthGate,
+  resolveHealthState,
 } from "@/src/server/ai/ai-provider-health.service";
 import { throwIfAborted, yieldAsyncStackUnwind, runOnFreshStack } from "@/src/server/execution/cancellable-work.service";
 import { withBoundedPrisma } from "@/src/server/execution/bounded-prisma.service";
@@ -305,7 +306,7 @@ async function executeLaneProviderCall(
       providerId: finalized.providerId,
       ok: finalized.ok,
       remoteOk: Boolean(finalized.remoteOk),
-      healthState: finalized.healthState ?? classifyProviderHealthState(finalized),
+      healthState: resolveHealthState(finalized),
       error: finalized.failureCategory,
     });
     const requestEndedAt = new Date().toISOString();
@@ -373,7 +374,7 @@ async function executeLaneProviderCall(
       providerId: finalized.providerId,
       ok: false,
       remoteOk: false,
-      healthState: finalized.healthState ?? classifyProviderHealthState(finalized),
+      healthState: resolveHealthState(finalized),
       error: finalized.error,
       failureCategory: finalized.failureCategory,
     });
@@ -1142,7 +1143,6 @@ async function runAIConsensusFromInputImpl(
       outputs: degradedLaneOutputs,
       health: providerHealthEval,
     });
-    degradedConsensus.consensusTelemetry = consensusInput.consensusTelemetry;
     bridgeConsensusResult({
       symbol: input.symbol,
       consensus: degradedConsensus,
@@ -1155,9 +1155,10 @@ async function runAIConsensusFromInputImpl(
       consensusStart: new Date(consensusStarted).toISOString(),
       consensusEnd: new Date().toISOString(),
       durationMs: Date.now() - consensusStarted,
-      providerVotes: Object.fromEntries(
-        degradedLaneOutputs.map((row) => [row.providerId, consensusVoteLabel(row)]),
-      ),
+      providerVotes: degradedLaneOutputs.map((row) => ({
+        provider: row.providerId,
+        decision: consensusVoteLabel(row),
+      })),
       finalDecision: degradedConsensus.finalDecision,
       confidence: degradedConsensus.finalConfidence,
       status: "AI_PROVIDER_DEGRADED",

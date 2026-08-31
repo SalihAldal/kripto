@@ -82,8 +82,6 @@ export function evaluateRiskRules(input: {
     stopLossConfigured?: boolean;
     aiRiskScore?: number;
     marketRegime?: string;
-    volatilityPercent?: number;
-    liquidity24h?: number;
   };
   state: {
     paused: boolean;

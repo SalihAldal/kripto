@@ -142,9 +142,14 @@ export function buildScannerQualificationRejections(input: {
     if (!rows.some((row) => row.stage === "qualification" || row.stage === "filter")) {
       const exact = deriveExactScannerRejectReason(input.context, input.score);
       if (exact) {
+        const allowedStages = ["filter", "ranking", "universe", "qualification", "candidate_generation"] as const;
+        const rejectStage =
+          allowedStages.includes(exact.rejectStage as (typeof allowedStages)[number])
+            ? (exact.rejectStage as "filter" | "ranking" | "universe" | "qualification" | "candidate_generation")
+            : "qualification";
         pushRejection(rows, {
           symbol,
-          stage: exact.rejectStage,
+          stage: rejectStage,
           filter: exact.rejectReasonCode.toLowerCase(),
           reasonCode: exact.rejectReasonCode,
           exclusionCategory: exact.rejectReasonCode === "SPREAD_TOO_WIDE" ? "SPREAD" : "QUALIFICATION",

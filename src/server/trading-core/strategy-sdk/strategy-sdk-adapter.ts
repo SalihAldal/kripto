@@ -70,7 +70,10 @@ export class StrategySdkAdapter implements SignalStrategy {
 
   private createDefaultIntent(signal: StrategySignal): ExecutionIntent | undefined {
     if (signal.side === "HOLD") return undefined;
+    const traceId = randomUUID();
     return {
+      candidateId: `${signal.symbol}:${traceId}`,
+      executionIntentId: traceId,
       symbol: signal.symbol,
       side: signal.side,
       score: signal.score,

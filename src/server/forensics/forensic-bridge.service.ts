@@ -221,7 +221,7 @@ export function bridgeConsensusResult(input: {
     symbol: input.symbol,
     providerVotes,
     weights,
-    confidence: input.consensus.confidence,
+    confidence: input.consensus.finalConfidence,
     masterRuleId: input.masterRuleId,
     finalDecision: input.consensus.finalDecision,
     reason: `${input.consensus.explanation ?? ""}${reasonSuffix}`,
@@ -435,14 +435,19 @@ export function bridgeExecutionCandidateForensic(input: import("@/src/server/for
 
 export function bridgeCandidateFromScanner(input: ScannerCandidate, rank: number) {
   const candidateId = createCandidateId(input.context.symbol, "scanner");
+  const meta = input.context.metadata as Record<string, unknown>;
+  const strategyId =
+    typeof meta.regime === "object" && meta.regime !== null && typeof (meta.regime as Record<string, unknown>).selectedStrategy === "string"
+      ? ((meta.regime as Record<string, unknown>).selectedStrategy as string)
+      : undefined;
   recordCandidateTrace({
     candidateId,
     symbol: input.context.symbol,
-    strategyId: input.context.regime?.selectedStrategy,
-    strategyScore: input.score,
+    strategyId,
+    strategyScore: Number(input.score.score ?? 0),
     marketContext: input.context as unknown as Record<string, unknown>,
-    technicalInputs: input.metrics as unknown as Record<string, unknown>,
-    source: input.source ?? "scanner",
+    technicalInputs: input.score.metrics as unknown as Record<string, unknown>,
+    source: "scanner",
     ranking: rank,
   });
   return candidateId;

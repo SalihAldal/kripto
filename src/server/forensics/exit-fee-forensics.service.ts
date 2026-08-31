@@ -66,7 +66,7 @@ export function buildExitForensicsReport(input: {
 export function buildReplayExitDiagnostics(input: {
   pnlEntries: PnlLedgerEntry[];
 }) {
-  const boolToTri = (value: boolean): "TRUE" | "FALSE" => (value ? "TRUE" : "FALSE");
+  const boolToTri = (value: boolean): "YES" | "NO" => (value ? "YES" : "NO");
   return {
     generatedAt: new Date().toISOString(),
     rows: input.pnlEntries.map((row) => {
@@ -77,6 +77,14 @@ export function buildReplayExitDiagnostics(input: {
       const slHit = isReplay && row.exitReason === "STOP_LOSS";
       const strategyHit = isReplay && row.exitReason === "STRATEGY_EXIT";
       const timeHit = isReplay && row.exitReason === "TIME_EXIT";
+      const tpWouldHitBeforeBoundary: "UNKNOWN" | "YES" | "NO" = isEndOfReplay ? "UNKNOWN" : boolToTri(tpHit);
+      const slWouldHitBeforeBoundary: "UNKNOWN" | "YES" | "NO" = isEndOfReplay ? "UNKNOWN" : boolToTri(slHit);
+      const strategyExitWouldHitBeforeBoundary: "UNKNOWN" | "YES" | "NO" = isEndOfReplay
+        ? "UNKNOWN"
+        : boolToTri(strategyHit);
+      const timeExitWouldHitBeforeBoundary: "UNKNOWN" | "YES" | "NO" = isEndOfReplay
+        ? "UNKNOWN"
+        : boolToTri(timeHit);
       return {
         tradeId: row.tradeId,
         positionId: row.positionId ?? row.tradeId,
@@ -84,10 +92,10 @@ export function buildReplayExitDiagnostics(input: {
         exitReason: row.exitReason,
         exitModel: row.exitModel,
         replayWindowEnded: exit?.replayWindowEnded,
-        tpWouldHitBeforeBoundary: isEndOfReplay ? "UNKNOWN" : boolToTri(tpHit),
-        slWouldHitBeforeBoundary: isEndOfReplay ? "UNKNOWN" : boolToTri(slHit),
-        strategyExitWouldHitBeforeBoundary: isEndOfReplay ? "UNKNOWN" : boolToTri(strategyHit),
-        timeExitWouldHitBeforeBoundary: isEndOfReplay ? "UNKNOWN" : boolToTri(timeHit),
+        tpWouldHitBeforeBoundary,
+        slWouldHitBeforeBoundary,
+        strategyExitWouldHitBeforeBoundary,
+        timeExitWouldHitBeforeBoundary,
         positionMonitorActive: row.exitModel === "POSITION_MONITOR" ? "TRUE" : isReplay ? "FALSE" : "UNKNOWN",
         hadPreviousExitCandidate:
           typeof exit?.strategyExit === "boolean" ? boolToTri(Boolean(exit.strategyExit)) : "UNKNOWN",

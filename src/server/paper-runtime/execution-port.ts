@@ -87,34 +87,34 @@ export class CanonicalPaperExecutionAdapter implements ExecutionPort {
     };
   }
 
-  async cancelOrder() {
+  async cancelOrder(_input: { orderId: string; reason?: string }) {
     return { ok: true };
   }
 
-  async getOrderState() {
+  async getOrderState(_input: { orderId: string }) {
     return { state: "UNKNOWN" as const };
   }
 
-  async reconcile() {
+  async reconcile(_input?: { symbol?: string }) {
     return { ok: true };
   }
 }
 
 export class BinanceLiveExecutionAdapter implements ExecutionPort {
   readonly kind = "LIVE" as const;
-  async submitEntry(): Promise<ExecutionPortOrderResult> {
+  async submitEntry(_intent: ExecutionPortOrderInput): Promise<ExecutionPortOrderResult> {
     throw new Error("LIVE_ADAPTER_HARD_LOCKED");
   }
-  async submitExit(): Promise<ExecutionPortOrderResult> {
+  async submitExit(_intent: ExecutionPortOrderInput): Promise<ExecutionPortOrderResult> {
     throw new Error("LIVE_ADAPTER_HARD_LOCKED");
   }
-  async cancelOrder() {
+  async cancelOrder(_input: { orderId: string; reason?: string }): Promise<{ ok: boolean }> {
     throw new Error("LIVE_ADAPTER_HARD_LOCKED");
   }
-  async getOrderState() {
+  async getOrderState(_input: { orderId: string }): Promise<{ state: ExecutionPortOrderState; metadata?: Record<string, unknown> }> {
     throw new Error("LIVE_ADAPTER_HARD_LOCKED");
   }
-  async reconcile() {
+  async reconcile(_input?: { symbol?: string }): Promise<{ ok: boolean; details?: Record<string, unknown> }> {
     throw new Error("LIVE_ADAPTER_HARD_LOCKED");
   }
 }

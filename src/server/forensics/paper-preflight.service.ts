@@ -398,7 +398,9 @@ export async function runPaperSessionPreflight(input: {
   }
 
   const providers = getProviderConfigs();
-  const remoteRequired = Boolean(env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || env.GEMINI_API_KEY);
+  const remoteRequired = Boolean(
+    process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY,
+  );
   const ai =
     providers.length === 0
       ? checkResult(

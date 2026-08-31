@@ -603,6 +603,9 @@ class CandidateStore {
     this.executionIntents.clear();
   }
 
+  private normalizeCandidateId(candidateId: string): string;
+  private normalizeCandidateId(candidateId: string, strict: true): string;
+  private normalizeCandidateId(candidateId: string, strict: false): string | null;
   private normalizeCandidateId(candidateId: string, strict = true) {
     const normalized = String(candidateId ?? "").trim();
     if (!normalized) {
@@ -696,7 +699,7 @@ function normalizeMicroOutcomeReasons(row: FinalRankedCandidate): string[] {
   for (const code of source) {
     if (code.startsWith("EXECUTION_")) mapped.add(code);
   }
-  const has = (code: string) => source.includes(code);
+  const has = (code: string) => source.some((item) => item === code);
   if (row.state === "WARMING") mapped.add("MICRO_WARMUP_INCOMPLETE");
   if (has("MICRO_DATA_STALE")) mapped.add("MICRO_DATA_STALE");
   if (has("MICRO_LOW_ACTIVITY")) mapped.add("MICRO_LOW_ACTIVITY");
