@@ -26,15 +26,6 @@ export function walkOrderBook(input: OrderBookWalkInput): OrderBookWalkResult {
     worstPrice = level.price;
   }
 
-  if (remaining > 0 && fills.length > 0) {
-    const impactBps = input.impactSlippageBpsPerLevel ?? 8;
-    const impactMultiplier = 1 + (input.side === "BUY" ? impactBps : -impactBps) / 10_000;
-    const impactPrice = round8(worstPrice * impactMultiplier);
-    fills.push({ quantity: round8(remaining), price: impactPrice });
-    worstPrice = impactPrice;
-    remaining = 0;
-  }
-
   const executedQty = round8(fills.reduce((sum, fill) => sum + fill.quantity, 0));
   const notional = fills.reduce((sum, fill) => sum + fill.quantity * fill.price, 0);
   const avgFillPrice = executedQty > 0 ? round8(notional / executedQty) : input.referencePrice;

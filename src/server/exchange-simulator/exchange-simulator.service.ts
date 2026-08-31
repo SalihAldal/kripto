@@ -9,8 +9,6 @@ import {
 import { applyLatencyDelay, simulateLatency } from "@/src/server/exchange-simulator/latency-simulator";
 import { averageFillPrice, newSimulationOrderId, splitIntoPartialFills } from "@/src/server/exchange-simulator/partial-fill-engine";
 import {
-  applyFallbackSlippage,
-  buildSyntheticLevels,
   computeDynamicSlippageBps,
   computeSlippagePct,
   computeSpreadPct,
@@ -19,6 +17,7 @@ import {
 import type { MarketSimulationInput, MarketSimulationResult } from "@/src/server/exchange-simulator/exchange-simulator.types";
 import { ACTIVE_ORDER_TYPE, DEFAULT_EXCHANGE } from "@/src/server/exchange-simulator/exchange-simulator.types";
 import { persistExecutionSimulation } from "@/src/server/exchange-simulator/exchange-simulator.repository";
+import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
 
 function round8(value: number) {
   return Number(value.toFixed(8));
@@ -26,6 +25,7 @@ function round8(value: number) {
 
 export async function simulateMarketExecution(input: MarketSimulationInput): Promise<MarketSimulationResult> {
   const startedAt = Date.now();
+  const decisionAtMs = input.decisionAt ? Date.parse(input.decisionAt) : startedAt;
   const latency = simulateLatency();
   const orderType = input.orderType ?? ACTIVE_ORDER_TYPE;
   if (orderType !== "MARKET") {
@@ -52,11 +52,25 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
 
   const filterCheck = await validateSimulationFilters({ ...input, quantity: targetQty }, referencePrice);
   if (!filterCheck.ok) {
-    return rejectSimulation(input, filterCheck.rejectReason, startedAt, latency);
+    return rejectSimulation(input, classifyFilterRejectReason(filterCheck.rejectReason), startedAt, latency);
   }
   targetQty = filterCheck.filter.adjustedQuantity;
 
+  // Fill should use execution-time book (after modeled latency), not decision-time quote.
+  await applyLatencyDelay(latency);
+  const exchangeSimulatedAt = Date.now();
+  const daemon = getMarketDataDaemon();
+  const hasWsState = Boolean(daemon.getLatest(input.symbol));
+  if (hasWsState && !daemon.isFresh(input.symbol)) {
+    return rejectSimulation(input, "PAPER_EXECUTION_DATA_STALE", startedAt, latency);
+  }
+
   const orderBook = await getOrderBook(input.symbol, 50).catch(() => ({ bids: [], asks: [] }));
+  const bidLevels = orderBook.bids.filter((row) => row.price > 0 && row.quantity > 0);
+  const askLevels = orderBook.asks.filter((row) => row.price > 0 && row.quantity > 0);
+  if (bidLevels.length === 0 || askLevels.length === 0) {
+    return rejectSimulation(input, "PAPER_EXECUTION_DATA_STALE", startedAt, latency);
+  }
   const bestBid = orderBook.bids[0]?.price ?? referencePrice * 0.9995;
   const bestAsk = orderBook.asks[0]?.price ?? referencePrice * 1.0005;
   const spreadPct = input.spreadPercent ?? computeSpreadPct(bestBid, bestAsk);
@@ -74,14 +88,7 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
     aggressiveSellPct: input.aggressiveSellPct,
   });
 
-  const levels =
-    input.side === "BUY"
-      ? orderBook.asks.length > 0
-        ? orderBook.asks
-        : buildSyntheticLevels(referencePrice, "BUY", targetQty)
-      : orderBook.bids.length > 0
-        ? orderBook.bids
-        : buildSyntheticLevels(referencePrice, "SELL", targetQty);
+  const levels = input.side === "BUY" ? orderBook.asks : orderBook.bids;
 
   let walk = walkOrderBook({
     side: input.side,
@@ -92,18 +99,8 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
   });
 
   if (walk.executedQty <= 0) {
-    const fallbackPrice = applyFallbackSlippage(referencePrice, input.side, slippageBps);
-    walk = {
-      fills: [{ quantity: targetQty, price: fallbackPrice }],
-      executedQty: targetQty,
-      remainingQty: 0,
-      avgFillPrice: fallbackPrice,
-      bestPrice: referencePrice,
-      worstPrice: fallbackPrice,
-    };
+    return rejectSimulation(input, "PAPER_INSUFFICIENT_LIQUIDITY", startedAt, latency);
   }
-
-  await applyLatencyDelay(latency);
   const actualDelayMs = Date.now() - startedAt;
 
   const partialFills = splitIntoPartialFills({
@@ -152,6 +149,10 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
   const simulationId = newSimulationOrderId("simulation");
   const orderId = newSimulationOrderId("paper");
   const status = walk.remainingQty > 0 ? "PARTIALLY_FILLED" : "FILLED";
+  const spreadCostQuote = Math.max(
+    0,
+    (input.side === "BUY" ? Math.max(0, avgFillPrice - bestAsk) : Math.max(0, bestBid - avgFillPrice)) * walk.executedQty,
+  );
 
   const result: MarketSimulationResult = {
     ok: true,
@@ -180,6 +181,12 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
       slippageBps,
       spreadPct,
       depthCoverage,
+      decisionAt: new Date(decisionAtMs).toISOString(),
+      exchangeSimulatedAt: new Date(exchangeSimulatedAt).toISOString(),
+      firstFillAt: feeFills[0]?.filledAt ?? null,
+      filledAt: feeFills[feeFills.length - 1]?.filledAt ?? null,
+      orderLifecycle: ["CREATED", "SUBMITTED", status].join("->"),
+      spreadCostQuote: Number(spreadCostQuote.toFixed(8)),
       quoteOrderQty: input.quoteOrderQty,
     },
   };
@@ -191,6 +198,17 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
   }).catch(() => null);
 
   return result;
+}
+
+function classifyFilterRejectReason(rawReason: string) {
+  const message = String(rawReason ?? "").toLowerCase();
+  if (message.includes("notional")) return "PAPER_MIN_NOTIONAL";
+  if (message.includes("minqty") || message.includes("min qty")) return "PAPER_MIN_QTY";
+  if (message.includes("maxqty") || message.includes("max qty")) return "PAPER_MAX_QTY";
+  if (message.includes("step")) return "PAPER_STEP_SIZE";
+  if (message.includes("tick")) return "PAPER_TICK_SIZE";
+  if (message.includes("symbol not found")) return "PAPER_SYMBOL_NOT_EXECUTABLE";
+  return "PAPER_FILTER_REJECT";
 }
 
 function rejectSimulation(

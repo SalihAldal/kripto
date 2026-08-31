@@ -26,7 +26,9 @@ export function resolveShadowConfig(overrides?: Partial<ShadowOutcomeConfig>): S
 }
 
 /** Ground-truth mover: return over rolling window (not 24h). */
-export const MOVER_SPECS: Array<{ moveClass: 3 | 5 | 7 | 10 | 15 | 20; horizonMin: number }> = [
+export const MOVER_SPECS: Array<{ moveClass: 1 | 2 | 3 | 5 | 7 | 10 | 15 | 20; horizonMin: number }> = [
+  { moveClass: 1, horizonMin: 5 },
+  { moveClass: 2, horizonMin: 10 },
   { moveClass: 3, horizonMin: 15 },
   { moveClass: 5, horizonMin: 30 },
   { moveClass: 7, horizonMin: 60 },

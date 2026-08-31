@@ -26,6 +26,7 @@ import { getCanonicalInstanceOwnership } from "@/src/server/candidate/instance-o
 import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
 import { observeCanonicalShadowTick } from "@/src/server/shadow-outcome/shadow-outcome-engine";
 import { persistShadowOutcomes } from "@/src/server/shadow-outcome/persist";
+import { setLegacyScannerCounters } from "@/src/server/execution/authority-counters.service";
 
 export type CooperativeSelectionInput = {
   jobId: string;
@@ -330,6 +331,10 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
         .sort((a, b) => Number(b.finalScore ?? b.microScore ?? 0) - Number(a.finalScore ?? a.microScore ?? 0));
       const selectedRecord = ready[0];
       const legacyAfter = getLegacyScannerTelemetry({ runId: input.runId, roundId: String(input.roundNo) });
+      setLegacyScannerCounters({
+        invocation: legacyAfter.runScopedInvocation,
+        persist: legacyAfter.runScopedPersistence,
+      });
       if (legacyAfter.runScopedInvocation > legacyBefore.runScopedInvocation) {
         return {
           selected: null,
@@ -350,16 +355,9 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
       }
       if (selectedRecord) {
         const scannerCandidates = getMicrostructureEngine().toScannerCandidates();
-        let selected = scannerCandidates.find(
+        const selected = scannerCandidates.find(
           (row) => String(row.context.metadata.opportunityCandidateId ?? "") === selectedRecord.candidateId,
         );
-        if (!selected) {
-          // Candidate store can be ahead of scanner candidate projection; recover by symbol
-          // so EXECUTION_READY records do not silently disappear from downstream pipeline.
-          selected = scannerCandidates
-            .filter((row) => row.context.symbol.toUpperCase() === selectedRecord.symbol.toUpperCase())
-            .sort((a, b) => Number(b.score.score ?? 0) - Number(a.score.score ?? 0))[0];
-        }
         if (selected) {
           await controller.transition("SYMBOL_SELECTED", `${selected.context.symbol} canonical opportunity secimi`, {
             currentSymbol: selected.context.symbol.toUpperCase(),
@@ -371,6 +369,13 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
             reason: `CANDIDATE_STORE_EXECUTION_READY:${selectedRecord.candidateId}`,
           };
         }
+        return {
+          selected: null,
+          source: null,
+          reason: `HANDOFF_CANDIDATE_NOT_FOUND:${selectedRecord.candidateId}`,
+          aborted: true,
+          abortCode: "CANCELLED",
+        };
       }
       const telemetry = store.getTelemetry();
       controller.noteProgress("Candidate store observation tick", {

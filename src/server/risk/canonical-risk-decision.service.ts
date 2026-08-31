@@ -3,6 +3,7 @@ import { evaluatePreTradeRisk, type PreTradeRiskInput } from "@/src/server/risk/
 export type CanonicalRiskVerdict = "ALLOW" | "REJECT";
 
 export type CanonicalRiskDecision = {
+  candidateId: string;
   verdict: CanonicalRiskVerdict;
   reasonCodes: string[];
   reasons: string[];
@@ -11,6 +12,7 @@ export type CanonicalRiskDecision = {
 };
 
 export type CanonicalRiskInput = PreTradeRiskInput & {
+  candidateId: string;
   lastPrice?: number;
   dataAgeMs?: number;
   dataUnavailable?: boolean;
@@ -46,6 +48,25 @@ export function mapRiskReasonsToCodes(reasons: string[]): string[] {
 
 export async function evaluateCanonicalRiskDecision(input: CanonicalRiskInput): Promise<CanonicalRiskDecision> {
   const timestamp = new Date().toISOString();
+  const candidateId = String(input.candidateId ?? "").trim();
+  if (!candidateId) {
+    return {
+      candidateId: "",
+      verdict: "REJECT",
+      reasonCodes: ["HANDOFF_IDENTITY_MISSING"],
+      reasons: ["Missing candidateId"],
+      metrics: {
+        confidencePercent: input.confidencePercent,
+        spreadPercent: input.spreadPercent,
+        liquidity24h: input.liquidity24h,
+        volatilityPercent: input.volatilityPercent,
+        lastPrice: input.lastPrice ?? null,
+        dataAgeMs: input.dataAgeMs ?? null,
+        paused: false,
+      },
+      timestamp,
+    };
+  }
   const reasonCodes: string[] = [];
   const reasons: string[] = [];
 
@@ -75,6 +96,7 @@ export async function evaluateCanonicalRiskDecision(input: CanonicalRiskInput): 
   const uniqueReasons = [...new Set(reasons)];
 
   return {
+    candidateId,
     verdict: uniqueCodes.length > 0 ? "REJECT" : "ALLOW",
     reasonCodes: uniqueCodes,
     reasons: uniqueReasons,

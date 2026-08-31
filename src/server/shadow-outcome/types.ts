@@ -1,7 +1,7 @@
 export const OUTCOME_HORIZONS_MIN = [1, 3, 5, 10, 15, 30, 60, 120] as const;
 export type OutcomeHorizonMin = (typeof OUTCOME_HORIZONS_MIN)[number];
 
-export const MOVE_CLASSES = [3, 5, 7, 10, 15, 20] as const;
+export const MOVE_CLASSES = [1, 2, 3, 5, 7, 10, 15, 20] as const;
 export type MoveClass = (typeof MOVE_CLASSES)[number];
 
 export const REACH_THRESHOLDS = [1, 2, 3, 5, 7, 10, 15, 20] as const;

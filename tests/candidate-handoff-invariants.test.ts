@@ -8,6 +8,16 @@ function candidateId(seed: string) {
   return `cand-${seed}`;
 }
 
+function toExecutionReady(id: string) {
+  const store = getCanonicalCandidateStore();
+  store.transitionCandidate(id, "HOT");
+  store.transitionCandidate(id, "MICRO_WARMING");
+  store.transitionCandidate(id, "MICRO_ANALYZED");
+  store.transitionCandidate(id, "MICRO_CONFIRMED");
+  store.transitionCandidate(id, "FINAL_RANKED");
+  store.transitionCandidate(id, "EXECUTION_READY");
+}
+
 describe("candidate handoff invariants", () => {
   beforeEach(() => {
     resetCanonicalCandidateStoreForTests();
@@ -53,8 +63,10 @@ describe("candidate handoff invariants", () => {
       detectedAt: Date.now(),
       detectedPrice: 1,
     });
-    store.transitionCandidate(id, "EXECUTION_READY");
+    toExecutionReady(id);
+    store.transitionCandidate(id, "RISK_PENDING", ["RISK_EVALUATION_STARTED"]);
     store.transitionCandidate(id, "RISK_ALLOWED");
+    store.transitionCandidate(id, "PAPER_ATTEMPT");
     store.transitionCandidate(id, "PAPER_OPENED");
     store.transitionCandidate(id, "PAPER_CLOSED");
     expect(store.getCandidate(id)?.state).toBe("PAPER_CLOSED");
@@ -72,8 +84,8 @@ describe("candidate handoff invariants", () => {
       detectedAt: Date.now(),
       detectedPrice: 1,
     });
-    store.transitionCandidate(id, "EXECUTION_READY");
-    store.transitionCandidate(id, "RISK_PENDING_WITH_REASON", ["RISK_EVALUATION_STARTED"]);
+    toExecutionReady(id);
+    store.transitionCandidate(id, "RISK_PENDING", ["RISK_EVALUATION_STARTED"]);
     store.transitionCandidate(id, "RISK_ALLOWED", ["RISK_GATE_ALLOW"]);
     store.transitionCandidate(id, "PAPER_ATTEMPT", ["PAPER_ORDER_SUBMIT_ATTEMPT"]);
     store.transitionCandidate(id, "PAPER_OPENED", ["PAPER_POSITION_OPENED"]);
@@ -81,7 +93,7 @@ describe("candidate handoff invariants", () => {
       .getTelemetry()
       .recentTransitions.filter((row) => row.candidateId === id)
       .map((row) => row.state);
-    expect(transitions).toContain("RISK_PENDING_WITH_REASON");
+    expect(transitions).toContain("RISK_PENDING");
     expect(transitions).toContain("PAPER_ATTEMPT");
     expect(transitions[transitions.length - 1]).toBe("PAPER_OPENED");
   });
@@ -96,8 +108,8 @@ describe("candidate handoff invariants", () => {
       detectedAt: Date.now(),
       detectedPrice: 5,
     });
-    store.transitionCandidate(id, "EXECUTION_READY");
-    store.transitionCandidate(id, "RISK_PENDING_WITH_REASON", ["RISK_EVALUATION_STARTED"]);
+    toExecutionReady(id);
+    store.transitionCandidate(id, "RISK_PENDING", ["RISK_EVALUATION_STARTED"]);
     store.transitionCandidate(id, "RISK_REJECTED", ["RISK_SPREAD_TOO_HIGH"]);
     const transitions = store
       .getTelemetry()

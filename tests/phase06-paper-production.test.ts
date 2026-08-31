@@ -35,6 +35,7 @@ function market(symbol: string, last: number, bid: number, ask: number, qty = 10
 function intent(extra: Partial<PaperIntent> = {}): PaperIntent {
   return {
     intentId: extra.intentId ?? "i1",
+    executionIntentId: extra.executionIntentId ?? `ei-${extra.intentId ?? "i1"}`,
     candidateId: extra.candidateId ?? "AAAUSDT:1",
     symbol: extra.symbol ?? "AAAUSDT",
     side: "BUY",

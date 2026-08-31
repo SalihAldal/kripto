@@ -161,6 +161,13 @@ describe("micro lifecycle fixes", () => {
 
   it("warming candidate NOT_EXECUTION_READY olmaz", () => {
     const store = getCanonicalCandidateStore();
+    store.createCandidate({
+      candidateId: "warm-1",
+      symbol: "ETHUSDT",
+      lane: "EARLY",
+      detectedAt: Date.now() - 1_000,
+      detectedPrice: 50,
+    });
     const warmedRow = {
       candidateId: "warm-1",
       symbol: "ETHUSDT",

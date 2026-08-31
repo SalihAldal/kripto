@@ -11,6 +11,7 @@ import { markHeartbeat } from "@/src/server/observability/heartbeat";
 import { withCircuitBreaker } from "@/src/server/resilience/circuit-breaker";
 import type { ExchangeBalance, FeeEstimate, KlineItem, OrderBookSnapshot, PlaceOrderResult, RecentTrade } from "@/src/types/exchange";
 import { pushLog } from "@/services/log.service";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 let tradableSymbolSetCache: Set<string> | null = null;
 let tradableSymbolSetCacheAt = 0;
@@ -98,6 +99,21 @@ async function resolveSymbolForExchange(symbol: string) {
     return preferredVariants[0] ?? normalized;
   }
   return preferredVariants[0] ?? normalized;
+}
+
+export async function getExecutionVenueEligibility(symbol: string) {
+  const venue = resolveCanonicalVenueConfig();
+  const normalized = symbol.toUpperCase();
+  const tradable = await getTradableSymbolSet().catch(() => new Set<string>());
+  const preferredVariants = candidateSymbolVariants(normalized);
+  const executable = preferredVariants.some((candidate) => tradable.has(candidate));
+  return {
+    symbol: normalized,
+    liveExecutionVenue: venue.liveExecutionVenue,
+    paperExecutionVenue: venue.paperExecutionVenue,
+    executionVenueEligible: executable,
+    reasonCode: executable ? "VENUE_EXECUTABLE" : "VENUE_NOT_EXECUTABLE",
+  };
 }
 
 export async function resolveExchangeSymbol(symbol: string) {

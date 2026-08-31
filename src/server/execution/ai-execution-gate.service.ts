@@ -2,6 +2,7 @@ import type { AIConsensusResult } from "@/src/types/ai";
 import type { TradingMode } from "@/src/server/execution/types";
 import { env } from "@/lib/config";
 import { resolveConsensusForExecutionGate } from "@/src/server/decision-engine/decision-contract.service";
+import { recordAiEvaluation } from "@/src/server/execution/authority-counters.service";
 
 export type AiExecutionGateVerdict = "AI_GATE_PASS" | "AI_GATE_BLOCK" | "AI_ADVISORY_ONLY";
 
@@ -100,10 +101,10 @@ function advisoryEvaluation(input: {
 }
 
 export function resolveAiExecutionGatePolicy(_input?: { mode: TradingMode; learningLane: boolean }): AiExecutionGatePolicy {
-  const mode = _input?.mode ?? (env.EXECUTION_MODE as TradingMode);
-  // Canonical guard: paper/dry-run must stay advisory to avoid synthetic hard vetoes.
-  if (mode === "paper" || mode === "dry-run") return "ADVISORY";
-  return env.EXECUTION_AI_GATE_POLICY === "VETO" ? "VETO" : "ADVISORY";
+  void _input;
+  void env.EXECUTION_AI_GATE_POLICY;
+  // Canonical runtime: AI is advisory-only in all modes.
+  return "ADVISORY";
 }
 
 export function resolveConsensusDecision(
@@ -130,7 +131,7 @@ export function evaluateAiExecutionGate(input: {
   const timestamp = new Date().toISOString();
 
   if (isExecutableDecision(aiRawDecision)) {
-    return {
+    const result: AiExecutionGateEvaluation = {
       verdict: "AI_GATE_PASS",
       policy: input.policy,
       aiRawDecision,
@@ -141,49 +142,32 @@ export function evaluateAiExecutionGate(input: {
       reasonDetail: `AI finalDecision=${aiRawDecision}`,
       timestamp,
     };
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
 
-  if (input.policy === "ADVISORY") {
-    const noOpinion = NO_OPINION_DECISIONS.has(aiRawDecision);
-    return advisoryEvaluation({
+  const noOpinion = NO_OPINION_DECISIONS.has(aiRawDecision);
+  if (input.override?.overridePolicy === "ADVISORY" && input.learningLane && input.microTradeEligible) {
+    const result = advisoryEvaluation({
       aiRawDecision: aiRawDecision || "NO_OPINION",
       aiFinalDecision: aiFinalDecision || "NO_OPINION",
       consensusDecision,
-      reasonCode: noOpinion ? "AI_NO_OPINION" : "AI_ADVISORY",
-      reasonDetail: `AI finalDecision=${aiRawDecision || "NO_OPINION"} is advisory; deterministic path continues`,
-    });
-  }
-
-  const hasAuditedOverride =
-    input.override?.overridePolicy === "ADVISORY" &&
-    Boolean(input.override.overrideReason?.trim()) &&
-    Boolean(input.override.overrideSource?.trim()) &&
-    Boolean(input.override.overrideAudit?.trim());
-  const overrideAllowsDecision =
-    !input.override?.allowedAiDecisions || input.override.allowedAiDecisions.includes(aiRawDecision);
-
-  if (input.learningLane && input.microTradeEligible && hasAuditedOverride && overrideAllowsDecision) {
-    return {
-      verdict: "AI_ADVISORY_ONLY",
-      policy: "ADVISORY",
-      aiRawDecision,
-      aiFinalDecision,
-      consensusDecision,
-      executionSide: "BUY",
       reasonCode: "AI_ADVISORY_OVERRIDE",
-      reasonDetail: `Audited override active (${input.override!.overrideSource}): ${input.override!.overrideReason}`,
-      timestamp,
-    };
+      reasonDetail: `Audited override active (${input.override.overrideSource ?? "unknown"})`,
+      executionSide: "BUY",
+    });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
-
-  return blockEvaluation({
-    policy: input.policy,
-    aiRawDecision,
-    aiFinalDecision,
+  const result = advisoryEvaluation({
+    aiRawDecision: aiRawDecision || "NO_OPINION",
+    aiFinalDecision: aiFinalDecision || "NO_OPINION",
     consensusDecision,
-    reasonCode: BLOCKING_DECISIONS.has(aiRawDecision) ? "AI_VETO" : "AI_NOT_EXECUTABLE",
-    reasonDetail: `AI finalDecision=${aiRawDecision} blocked by ${input.policy} gate policy`,
+    reasonCode: noOpinion ? "AI_NO_OPINION" : "AI_ADVISORY",
+    reasonDetail: `AI finalDecision=${aiRawDecision || "NO_OPINION"} is advisory; deterministic path continues`,
   });
+  recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+  return result;
 }
 
 /** Canonical pre-order AI readiness check — advisory on production; VETO remains explicit-only. */
@@ -194,89 +178,101 @@ export function evaluateAiExecutionReadiness(input: {
   microTradeEligible: boolean;
   override?: AiExecutionGateOverride;
 }): AiExecutionGateEvaluation {
-  const advisory = input.policy === "ADVISORY";
+  const advisory = true;
 
   if (!input.ai) {
     if (advisory) {
-      return advisoryEvaluation({
+      const result = advisoryEvaluation({
         aiRawDecision: "MISSING",
         aiFinalDecision: "MISSING",
         consensusDecision: null,
         reasonCode: "AI_TIMEOUT",
         reasonDetail: "AI consensus missing/timeout; advisory only, deterministic path continues",
       });
+      recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+      return result;
     }
-    return blockEvaluation({
-      policy: input.policy,
+    const result = advisoryEvaluation({
       aiRawDecision: "MISSING",
       aiFinalDecision: "MISSING",
       consensusDecision: null,
-      reasonCode: "AI_VERDICT_MISSING",
-      reasonDetail: "AI consensus result missing; execution blocked",
+      reasonCode: "AI_TIMEOUT",
+      reasonDetail: "AI consensus result missing; advisory only",
     });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
 
   const aiFinalDecision = normalizeDecision(input.ai.finalDecision);
   if (!aiFinalDecision) {
     if (advisory) {
-      return advisoryEvaluation({
+      const result = advisoryEvaluation({
         aiRawDecision: "MISSING",
         aiFinalDecision: "NO_OPINION",
         consensusDecision: resolveConsensusDecision(input.ai),
         reasonCode: "AI_NO_OPINION",
         reasonDetail: "AI finalDecision missing; advisory only",
       });
+      recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+      return result;
     }
-    return blockEvaluation({
-      policy: input.policy,
+    const result = advisoryEvaluation({
       aiRawDecision: "MISSING",
-      aiFinalDecision: "MISSING",
+      aiFinalDecision: "NO_OPINION",
       consensusDecision: resolveConsensusDecision(input.ai),
-      reasonCode: "AI_VERDICT_MISSING",
-      reasonDetail: "AI finalDecision missing; execution blocked",
+      reasonCode: "AI_NO_OPINION",
+      reasonDetail: "AI finalDecision missing; advisory only",
     });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
 
   const consensusDecision = resolveConsensusDecision(input.ai);
 
   if (!hasAiProviderEvidence(input.ai)) {
     if (advisory) {
-      return advisoryEvaluation({
+      const result = advisoryEvaluation({
         aiRawDecision: aiFinalDecision,
         aiFinalDecision,
         consensusDecision,
         reasonCode: "AI_TIMEOUT",
         reasonDetail: "No healthy AI provider outputs; advisory only",
       });
+      recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+      return result;
     }
-    return blockEvaluation({
-      policy: input.policy,
+    const result = advisoryEvaluation({
       aiRawDecision: aiFinalDecision,
       aiFinalDecision,
       consensusDecision,
-      reasonCode: "AI_EVIDENCE_MISSING",
-      reasonDetail: "No healthy AI provider outputs; execution blocked",
+      reasonCode: "AI_TIMEOUT",
+      reasonDetail: "No healthy AI provider outputs; advisory only",
     });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
 
   if (!consensusDecision) {
     if (advisory) {
-      return advisoryEvaluation({
+      const result = advisoryEvaluation({
         aiRawDecision: aiFinalDecision,
         aiFinalDecision,
         consensusDecision: null,
         reasonCode: "AI_NO_OPINION",
         reasonDetail: "Consensus missing; advisory only",
       });
+      recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+      return result;
     }
-    return blockEvaluation({
-      policy: input.policy,
+    const result = advisoryEvaluation({
       aiRawDecision: aiFinalDecision,
       aiFinalDecision,
       consensusDecision: null,
-      reasonCode: "AI_CONSENSUS_MISSING",
-      reasonDetail: "AI verdict present but consensus decision missing; execution blocked",
+      reasonCode: "AI_NO_OPINION",
+      reasonDetail: "AI verdict present but consensus decision missing; advisory only",
     });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
 
   const normalizedConsensus = normalizeDecision(consensusDecision);
@@ -290,22 +286,25 @@ export function evaluateAiExecutionReadiness(input: {
     (aiBlocking && consensusExecutable);
   if (mismatch) {
     if (advisory) {
-      return advisoryEvaluation({
+      const result = advisoryEvaluation({
         aiRawDecision: aiFinalDecision,
         aiFinalDecision,
         consensusDecision: normalizedConsensus,
         reasonCode: "AI_DECISION_CONFLICT",
         reasonDetail: `AI finalDecision (${aiFinalDecision}) conflicts with consensus (${normalizedConsensus}); advisory only`,
       });
+      recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+      return result;
     }
-    return blockEvaluation({
-      policy: input.policy,
+    const result = advisoryEvaluation({
       aiRawDecision: aiFinalDecision,
       aiFinalDecision,
       consensusDecision: normalizedConsensus,
       reasonCode: "AI_DECISION_CONFLICT",
-      reasonDetail: `AI finalDecision (${aiFinalDecision}) conflicts with consensus (${normalizedConsensus})`,
+      reasonDetail: `AI finalDecision (${aiFinalDecision}) conflicts with consensus (${normalizedConsensus}); advisory only`,
     });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
   }
 
   return evaluateAiExecutionGate({

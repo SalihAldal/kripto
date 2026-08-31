@@ -45,7 +45,7 @@ export function recordTerminalOutcome(input: Omit<CandidateTerminalRecord, "time
     bumpCount(session.rejectionCountsByStage, record.stage);
     bumpCount(session.rejectionCountsByReason, record.reasonCode);
   }
-  const candidate = session.candidates.find((row) => row.symbol === record.symbol && !row.terminal);
+  const candidate = session.candidates.find((row) => row.candidateId === record.candidateId);
   if (candidate) {
     candidate.terminal = record;
   }

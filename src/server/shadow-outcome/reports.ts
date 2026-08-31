@@ -44,6 +44,8 @@ export function getDailyEdgeReport(input: {
     uniqueMoveCount: rows.length,
     uniqueSymbols: new Set(rows.map((row) => row.snapshot.symbol)).size,
     groundTruth: {
+      move1: input.movers.filter((row) => row.moveClass === 1).length,
+      move2: input.movers.filter((row) => row.moveClass === 2).length,
       move3: input.movers.filter((row) => row.moveClass === 3).length,
       move5: input.movers.filter((row) => row.moveClass === 5).length,
       move7: input.movers.filter((row) => row.moveClass === 7).length,

@@ -1,12 +1,14 @@
 export type OrderSide = "BUY" | "SELL";
 export type OrderType = "MARKET" | "LIMIT";
 export type OrderState =
-  | "PENDING"
+  | "CREATED"
   | "SUBMITTED"
   | "PARTIALLY_FILLED"
   | "FILLED"
   | "CANCELED"
   | "REJECTED"
+  | "EXPIRED"
+  | "PENDING"
   | "UNKNOWN";
 export type PositionState = "PLANNED" | "OPENING" | "OPEN" | "REDUCING" | "CLOSING" | "CLOSED" | "ERROR";
 export type ExitReason =
@@ -57,6 +59,7 @@ export type FillResult = {
 
 export type PaperIntent = {
   intentId: string;
+  executionIntentId: string;
   candidateId: string;
   symbol: string;
   side: OrderSide;
@@ -76,6 +79,8 @@ export type PaperIntent = {
 export type PaperPosition = {
   positionId: string;
   candidateId: string;
+  executionIntentId: string;
+  executionReference: string;
   symbol: string;
   lane: string;
   score: number;

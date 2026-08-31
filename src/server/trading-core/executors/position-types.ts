@@ -21,6 +21,9 @@ export type TrailingStopState = {
 
 export type ManagedPosition = {
   id: string;
+  candidateId: string;
+  executionIntentId: string;
+  executionReference: string;
   botId: string;
   symbol: string;
   side: PositionSide;
@@ -47,6 +50,9 @@ export type ManagedPosition = {
 };
 
 export type OpenPositionRequest = {
+  candidateId: string;
+  executionIntentId: string;
+  executionReference: string;
   botId?: string;
   symbol: string;
   side: PositionSide;

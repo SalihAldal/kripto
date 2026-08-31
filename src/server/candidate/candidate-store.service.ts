@@ -1,6 +1,7 @@
-import type { OpportunityCandidate, OpportunityScanResult } from "@/src/server/opportunity/types";
 import type { FinalRankedCandidate, MicroEvaluateResult } from "@/src/server/microstructure/types";
+import type { OpportunityCandidate, OpportunityScanResult } from "@/src/server/opportunity/types";
 import { createRuntimeInstanceId } from "@/src/server/runtime/instance-id";
+import { recordCanonicalEvent } from "@/src/server/forensics/canonical-event.service";
 
 export type CandidateLifecycleState =
   | "DISCOVERED"
@@ -9,19 +10,27 @@ export type CandidateLifecycleState =
   | "MICRO_WARMING"
   | "MICRO_ANALYZED"
   | "MICRO_CONFIRMED"
+  | "MICRO_REJECTED"
   | "FINAL_RANKED"
   | "EXECUTION_READY"
   | "NOT_EXECUTION_READY"
-  | "RISK_PENDING_WITH_REASON"
+  | "RISK_PENDING"
   | "RISK_ALLOWED"
   | "RISK_REJECTED"
   | "PAPER_ATTEMPT"
   | "PAPER_OPENED"
-  | "PAPER_REJECTED_WITH_REASON"
+  | "PAPER_REJECTED"
   | "PAPER_CLOSED"
-  | "MICRO_REJECTED"
-  | "RANKED_OUT"
-  | "EXPIRED";
+  | "EXPIRED"
+  | "ERROR";
+
+export type HandoffErrorCode =
+  | "HANDOFF_IDENTITY_MISSING"
+  | "HANDOFF_CANDIDATE_NOT_FOUND"
+  | "HANDOFF_ILLEGAL_TRANSITION"
+  | "HANDOFF_DUPLICATE_EXECUTION"
+  | "HANDOFF_STATE_MISMATCH"
+  | "PIPELINE_INVARIANT_VIOLATION";
 
 export type CanonicalCandidateRecord = {
   candidateId: string;
@@ -33,12 +42,15 @@ export type CanonicalCandidateRecord = {
   confirmedAt?: number | null;
   finalRankAt?: number | null;
   executionDecisionAt?: number | null;
+  executionIntentId?: string | null;
   opportunityScore?: number | null;
   microScore?: number | null;
   liquidityScore?: number | null;
   finalScore?: number | null;
   reasonCodes: string[];
   stageReasons: string[];
+  terminalStage: CandidateLifecycleState | null;
+  terminalReason: string | null;
   decisionClass?: "DATA_INVALID" | "QUALITY_TOO_LOW" | null;
   timing?: FinalRankedCandidate["timing"];
   lastUpdatedAt: number;
@@ -58,6 +70,33 @@ type CandidateStoreTelemetry = {
   created: number;
   expired: number;
   byState: Record<string, number>;
+  transitionByState: Record<string, number>;
+  handoffErrors: Array<{
+    at: number;
+    code: HandoffErrorCode;
+    candidateId: string | null;
+    symbol: string | null;
+    detail: string;
+  }>;
+  handoffErrorCounts: Record<HandoffErrorCode, number>;
+  pipelineInvariantViolations: number;
+  funnel: {
+    microAnalyzed: number;
+    microConfirmed: number;
+    microRejected: number;
+    microPending: number;
+    finalRanked: number;
+    executionReady: number;
+    notExecutionReady: number;
+    rankPending: number;
+    riskPending: number;
+    riskAllowed: number;
+    riskRejected: number;
+    paperAttempt: number;
+    paperOpened: number;
+    paperRejected: number;
+    paperPending: number;
+  };
   recentTransitions: Array<{
     at: number;
     candidateId: string;
@@ -78,13 +117,45 @@ const ACTIVE_STATES = new Set<CandidateLifecycleState>([
   "FINAL_RANKED",
   "EXECUTION_READY",
   "NOT_EXECUTION_READY",
-  "RISK_PENDING_WITH_REASON",
+  "RISK_PENDING",
   "RISK_ALLOWED",
   "RISK_REJECTED",
   "PAPER_ATTEMPT",
   "PAPER_OPENED",
-  "PAPER_REJECTED_WITH_REASON",
+  "PAPER_REJECTED",
 ]);
+
+const TERMINAL_STATES = new Set<CandidateLifecycleState>([
+  "NOT_EXECUTION_READY",
+  "MICRO_REJECTED",
+  "RISK_REJECTED",
+  "PAPER_REJECTED",
+  "PAPER_CLOSED",
+  "EXPIRED",
+  "ERROR",
+]);
+
+const ALLOWED_TRANSITIONS: Record<CandidateLifecycleState, ReadonlySet<CandidateLifecycleState>> = {
+  DISCOVERED: new Set(["WATCHING", "HOT", "MICRO_WARMING", "EXPIRED", "ERROR"]),
+  WATCHING: new Set(["HOT", "MICRO_WARMING", "EXPIRED", "ERROR"]),
+  HOT: new Set(["MICRO_WARMING", "MICRO_ANALYZED", "EXPIRED", "ERROR"]),
+  MICRO_WARMING: new Set(["MICRO_ANALYZED", "EXPIRED", "ERROR"]),
+  MICRO_ANALYZED: new Set(["MICRO_CONFIRMED", "MICRO_REJECTED", "EXPIRED", "ERROR"]),
+  MICRO_CONFIRMED: new Set(["FINAL_RANKED", "EXPIRED", "ERROR"]),
+  MICRO_REJECTED: new Set(["EXPIRED", "ERROR"]),
+  FINAL_RANKED: new Set(["EXECUTION_READY", "NOT_EXECUTION_READY", "EXPIRED", "ERROR"]),
+  EXECUTION_READY: new Set(["RISK_PENDING", "EXPIRED", "ERROR"]),
+  NOT_EXECUTION_READY: new Set(["EXPIRED", "ERROR"]),
+  RISK_PENDING: new Set(["RISK_ALLOWED", "RISK_REJECTED", "EXPIRED", "ERROR"]),
+  RISK_ALLOWED: new Set(["PAPER_ATTEMPT", "EXPIRED", "ERROR"]),
+  RISK_REJECTED: new Set(["EXPIRED", "ERROR"]),
+  PAPER_ATTEMPT: new Set(["PAPER_OPENED", "PAPER_REJECTED", "ERROR"]),
+  PAPER_OPENED: new Set(["PAPER_CLOSED", "ERROR"]),
+  PAPER_REJECTED: new Set(["EXPIRED", "ERROR"]),
+  PAPER_CLOSED: new Set(["EXPIRED"]),
+  EXPIRED: new Set(),
+  ERROR: new Set(),
+};
 
 class CandidateStore {
   readonly instanceId = createRuntimeInstanceId("candidate-store");
@@ -92,7 +163,11 @@ class CandidateStore {
   private transitions = 0;
   private created = 0;
   private expired = 0;
+  private invariantViolations = 0;
   private readonly events: CandidateStoreTelemetry["recentTransitions"] = [];
+  private readonly handoffErrors: CandidateStoreTelemetry["handoffErrors"] = [];
+  private readonly transitionByState = new Map<CandidateLifecycleState, number>();
+  private readonly executionIntents = new Map<string, string>();
 
   createCandidate(input: {
     candidateId: string;
@@ -105,11 +180,12 @@ class CandidateStore {
     opportunityInstanceId?: string;
     ttlMs?: number;
   }) {
-    const existing = this.rows.get(input.candidateId);
+    const normalizedCandidateId = this.normalizeCandidateId(input.candidateId);
+    const existing = this.rows.get(normalizedCandidateId);
     if (existing) return existing;
     const now = Date.now();
     const row: CanonicalCandidateRecord = {
-      candidateId: input.candidateId,
+      candidateId: normalizedCandidateId,
       symbol: input.symbol.toUpperCase(),
       lane: input.lane,
       state: "DISCOVERED",
@@ -118,6 +194,8 @@ class CandidateStore {
       opportunityScore: input.opportunityScore ?? null,
       reasonCodes: [...new Set(input.reasonCodes ?? [])],
       stageReasons: [],
+      terminalStage: null,
+      terminalReason: null,
       lastUpdatedAt: now,
       expiresAt: now + Math.max(30_000, input.ttlMs ?? 10 * 60_000),
       instances: {
@@ -125,14 +203,42 @@ class CandidateStore {
         candidateStoreInstanceId: this.instanceId,
       },
     };
-    this.rows.set(row.candidateId, row);
+    this.rows.set(normalizedCandidateId, row);
     this.created += 1;
     return row;
   }
 
   updateCandidate(candidateId: string, patch: Partial<CanonicalCandidateRecord>) {
-    const row = this.rows.get(candidateId);
+    const normalizedCandidateId = this.normalizeCandidateId(candidateId);
+    const row = this.rows.get(normalizedCandidateId);
     if (!row) return null;
+    if (patch.candidateId && patch.candidateId !== normalizedCandidateId) {
+      this.recordHandoffError({
+        code: "HANDOFF_STATE_MISMATCH",
+        candidateId: normalizedCandidateId,
+        symbol: row.symbol,
+        detail: "candidateId is immutable",
+      });
+      return null;
+    }
+    if (patch.symbol && patch.symbol.toUpperCase() !== row.symbol) {
+      this.recordHandoffError({
+        code: "HANDOFF_STATE_MISMATCH",
+        candidateId: normalizedCandidateId,
+        symbol: row.symbol,
+        detail: `symbol mismatch (${patch.symbol} !== ${row.symbol})`,
+      });
+      return null;
+    }
+    if (patch.lane && patch.lane !== row.lane) {
+      this.recordHandoffError({
+        code: "HANDOFF_STATE_MISMATCH",
+        candidateId: normalizedCandidateId,
+        symbol: row.symbol,
+        detail: `lane mismatch (${patch.lane} !== ${row.lane})`,
+      });
+      return null;
+    }
     const next: CanonicalCandidateRecord = {
       ...row,
       ...patch,
@@ -140,12 +246,14 @@ class CandidateStore {
       stageReasons: patch.stageReasons ? [...new Set(patch.stageReasons)] : row.stageReasons,
       lastUpdatedAt: Date.now(),
     };
-    this.rows.set(candidateId, next);
+    this.rows.set(normalizedCandidateId, next);
     return next;
   }
 
   getCandidate(candidateId: string) {
-    return this.rows.get(candidateId) ?? null;
+    const normalizedCandidateId = this.normalizeCandidateId(candidateId, false);
+    if (!normalizedCandidateId) return null;
+    return this.rows.get(normalizedCandidateId) ?? null;
   }
 
   getActiveCandidates() {
@@ -154,8 +262,38 @@ class CandidateStore {
   }
 
   transitionCandidate(candidateId: string, state: CandidateLifecycleState, reasons?: string[]) {
-    const row = this.rows.get(candidateId);
-    if (!row) return null;
+    const normalizedCandidateId = this.normalizeCandidateId(candidateId, false);
+    if (!normalizedCandidateId) {
+      this.recordHandoffError({
+        code: "HANDOFF_IDENTITY_MISSING",
+        candidateId: null,
+        symbol: null,
+        detail: "transitionCandidate called without candidateId",
+      });
+      return null;
+    }
+    const row = this.rows.get(normalizedCandidateId);
+    if (!row) {
+      this.recordHandoffError({
+        code: "HANDOFF_CANDIDATE_NOT_FOUND",
+        candidateId: normalizedCandidateId,
+        symbol: null,
+        detail: `transition target state=${state}`,
+      });
+      return null;
+    }
+    if (row.state !== state) {
+      const allowed = ALLOWED_TRANSITIONS[row.state];
+      if (!allowed.has(state)) {
+        this.recordHandoffError({
+          code: "HANDOFF_ILLEGAL_TRANSITION",
+          candidateId: normalizedCandidateId,
+          symbol: row.symbol,
+          detail: `${row.state} -> ${state}`,
+        });
+        return null;
+      }
+    }
     this.transitions += 1;
     row.state = state;
     row.lastUpdatedAt = Date.now();
@@ -167,16 +305,41 @@ class CandidateStore {
     if (state === "EXECUTION_READY" || state === "NOT_EXECUTION_READY") {
       row.executionDecisionAt = Date.now();
     }
-    this.rows.set(candidateId, row);
+    const normalizedReasons = (reasons ?? []).filter(Boolean);
+    if (TERMINAL_STATES.has(state)) {
+      row.terminalStage = state;
+      row.terminalReason = normalizedReasons[0] ?? `TERMINAL_${state}`;
+    } else {
+      row.terminalStage = null;
+      row.terminalReason = null;
+    }
+    this.rows.set(normalizedCandidateId, row);
+    this.transitionByState.set(state, (this.transitionByState.get(state) ?? 0) + 1);
     this.events.push({
       at: row.lastUpdatedAt,
       candidateId: row.candidateId,
       symbol: row.symbol,
       lane: row.lane,
       state,
-      reasons: reasons ?? [],
+      reasons: normalizedReasons,
     });
     if (this.events.length > 10_000) this.events.splice(0, this.events.length - 10_000);
+    recordCanonicalEvent({
+      candidateId: row.candidateId,
+      symbol: row.symbol,
+      eventType: toLifecycleEventType(state),
+      sourceService: "candidate-store",
+      sourceInstanceId: this.instanceId,
+      payload: {
+        lane: row.lane,
+        lifecycleState: state,
+        terminalStage: row.terminalStage,
+        terminalReason: row.terminalReason,
+        reasonCodes: normalizedReasons.length > 0 ? normalizedReasons : ["UNSPECIFIED_REASON"],
+        stageReasons: row.stageReasons,
+      },
+    });
+    this.assertFunnelInvariants();
     return row;
   }
 
@@ -184,9 +347,7 @@ class CandidateStore {
     for (const [id, row] of this.rows) {
       if (row.state === "PAPER_CLOSED" || row.state === "EXPIRED") continue;
       if (row.expiresAt <= now) {
-        row.state = "EXPIRED";
-        row.lastUpdatedAt = now;
-        this.rows.set(id, row);
+        this.transitionCandidate(id, "EXPIRED", ["CANDIDATE_TTL_EXPIRED"]);
         this.expired += 1;
       }
     }
@@ -204,6 +365,15 @@ class CandidateStore {
   }) {
     const now = Date.now();
     for (const row of input.result.ranked) {
+      if (!row.candidateId?.trim()) {
+        this.recordHandoffError({
+          code: "HANDOFF_IDENTITY_MISSING",
+          candidateId: null,
+          symbol: row.symbol,
+          detail: "opportunity candidate missing candidateId",
+        });
+        continue;
+      }
       const created = this.createCandidate({
         candidateId: row.candidateId,
         symbol: row.symbol,
@@ -232,16 +402,36 @@ class CandidateStore {
   }) {
     const now = Date.now();
     for (const row of input.result.ranked) {
-      const created = this.createCandidate({
-        candidateId: row.candidateId,
-        symbol: row.symbol,
-        lane: row.lane,
-        detectedAt: row.firstDetectedAt,
-        detectedPrice: row.firstDetectionPrice,
-        opportunityScore: row.opportunityScore,
-        reasonCodes: row.reasonCodes,
-        ttlMs: input.ttlMs,
-      });
+      const normalizedCandidateId = this.normalizeCandidateId(row.candidateId, false);
+      if (!normalizedCandidateId) {
+        this.recordHandoffError({
+          code: "HANDOFF_IDENTITY_MISSING",
+          candidateId: null,
+          symbol: row.symbol,
+          detail: "micro result missing candidateId",
+        });
+        continue;
+      }
+      const created = this.rows.get(normalizedCandidateId);
+      if (!created) {
+        this.recordHandoffError({
+          code: "HANDOFF_CANDIDATE_NOT_FOUND",
+          candidateId: normalizedCandidateId,
+          symbol: row.symbol,
+          detail: "micro result candidate was not discovered by opportunity stage",
+        });
+        continue;
+      }
+      if (created.symbol !== row.symbol.toUpperCase()) {
+        this.recordHandoffError({
+          code: "HANDOFF_STATE_MISMATCH",
+          candidateId: normalizedCandidateId,
+          symbol: row.symbol,
+          detail: `symbol mismatch (${row.symbol} !== ${created.symbol})`,
+        });
+        this.transitionCandidate(normalizedCandidateId, "ERROR", ["HANDOFF_STATE_MISMATCH"]);
+        continue;
+      }
       created.instances.microInstanceId = input.microInstanceId;
       created.microScore = row.microScore;
       created.liquidityScore = row.liquidityScore;
@@ -250,6 +440,7 @@ class CandidateStore {
       created.reasonCodes = [...new Set([...(created.reasonCodes ?? []), ...(row.reasonCodes ?? [])])];
       created.expiresAt = now + Math.max(30_000, input.ttlMs ?? 10 * 60_000);
       this.rows.set(created.candidateId, created);
+
       const outcomeReasons = normalizeMicroOutcomeReasons(row);
       this.transitionCandidate(created.candidateId, "MICRO_ANALYZED", outcomeReasons);
       if (row.state === "WARMING") {
@@ -271,8 +462,64 @@ class CandidateStore {
         this.transitionCandidate(created.candidateId, "MICRO_REJECTED", outcomeReasons);
       } else if (row.state === "EXPIRED") {
         this.transitionCandidate(created.candidateId, "EXPIRED", outcomeReasons);
+      } else {
+        this.recordHandoffError({
+          code: "PIPELINE_INVARIANT_VIOLATION",
+          candidateId: created.candidateId,
+          symbol: created.symbol,
+          detail: `MICRO_ANALYZED produced unresolved row.state=${row.state}`,
+        });
       }
     }
+  }
+
+  registerExecutionIntent(input: {
+    candidateId: string;
+    executionIntentId: string;
+    strategyContext: string;
+  }): { ok: true } | { ok: false; code: HandoffErrorCode; detail: string } {
+    const candidateId = this.normalizeCandidateId(input.candidateId, false);
+    const executionIntentId = input.executionIntentId.trim();
+    const strategyContext = input.strategyContext.trim().toUpperCase();
+    if (!candidateId || !executionIntentId || !strategyContext) {
+      this.recordHandoffError({
+        code: "HANDOFF_IDENTITY_MISSING",
+        candidateId: candidateId ?? null,
+        symbol: null,
+        detail: "registerExecutionIntent missing required identity fields",
+      });
+      return { ok: false, code: "HANDOFF_IDENTITY_MISSING", detail: "missing identity fields" };
+    }
+    const row = this.rows.get(candidateId);
+    if (!row) {
+      this.recordHandoffError({
+        code: "HANDOFF_CANDIDATE_NOT_FOUND",
+        candidateId,
+        symbol: null,
+        detail: "registerExecutionIntent candidate not found",
+      });
+      return { ok: false, code: "HANDOFF_CANDIDATE_NOT_FOUND", detail: "candidate not found" };
+    }
+    const uniqueKey = `${candidateId}|${strategyContext}`;
+    const existing = this.executionIntents.get(uniqueKey);
+    if (existing && existing !== executionIntentId) {
+      this.recordHandoffError({
+        code: "HANDOFF_DUPLICATE_EXECUTION",
+        candidateId,
+        symbol: row.symbol,
+        detail: `duplicate execution intent for ${strategyContext}`,
+      });
+      return {
+        ok: false,
+        code: "HANDOFF_DUPLICATE_EXECUTION",
+        detail: `existing executionIntentId=${existing}`,
+      };
+    }
+    this.executionIntents.set(uniqueKey, executionIntentId);
+    row.executionIntentId = executionIntentId;
+    row.lastUpdatedAt = Date.now();
+    this.rows.set(candidateId, row);
+    return { ok: true };
   }
 
   getTelemetry(): CandidateStoreTelemetry {
@@ -281,6 +528,36 @@ class CandidateStore {
     for (const row of this.rows.values()) {
       byState[row.state] = (byState[row.state] ?? 0) + 1;
     }
+    const transitionByState: Record<string, number> = {};
+    for (const [state, count] of this.transitionByState.entries()) {
+      transitionByState[state] = count;
+    }
+
+    const handoffErrorCounts = {
+      HANDOFF_IDENTITY_MISSING: 0,
+      HANDOFF_CANDIDATE_NOT_FOUND: 0,
+      HANDOFF_ILLEGAL_TRANSITION: 0,
+      HANDOFF_DUPLICATE_EXECUTION: 0,
+      HANDOFF_STATE_MISMATCH: 0,
+      PIPELINE_INVARIANT_VIOLATION: 0,
+    } satisfies Record<HandoffErrorCode, number>;
+    for (const row of this.handoffErrors) {
+      handoffErrorCounts[row.code] = (handoffErrorCounts[row.code] ?? 0) + 1;
+    }
+
+    const microAnalyzed = transitionByState.MICRO_ANALYZED ?? 0;
+    const microConfirmed = transitionByState.MICRO_CONFIRMED ?? 0;
+    const microRejected = transitionByState.MICRO_REJECTED ?? 0;
+    const finalRanked = transitionByState.FINAL_RANKED ?? 0;
+    const executionReady = transitionByState.EXECUTION_READY ?? 0;
+    const notExecutionReady = transitionByState.NOT_EXECUTION_READY ?? 0;
+    const riskPending = transitionByState.RISK_PENDING ?? 0;
+    const riskAllowed = transitionByState.RISK_ALLOWED ?? 0;
+    const riskRejected = transitionByState.RISK_REJECTED ?? 0;
+    const paperAttempt = transitionByState.PAPER_ATTEMPT ?? 0;
+    const paperOpened = transitionByState.PAPER_OPENED ?? 0;
+    const paperRejected = transitionByState.PAPER_REJECTED ?? 0;
+
     return {
       instanceId: this.instanceId,
       active: this.getActiveCandidates().length,
@@ -289,6 +566,27 @@ class CandidateStore {
       created: this.created,
       expired: this.expired,
       byState,
+      transitionByState,
+      handoffErrors: this.handoffErrors.slice(-500),
+      handoffErrorCounts,
+      pipelineInvariantViolations: this.invariantViolations,
+      funnel: {
+        microAnalyzed,
+        microConfirmed,
+        microRejected,
+        microPending: Math.max(0, microAnalyzed - (microConfirmed + microRejected)),
+        finalRanked,
+        executionReady,
+        notExecutionReady,
+        rankPending: Math.max(0, microConfirmed - finalRanked),
+        riskPending,
+        riskAllowed,
+        riskRejected,
+        paperAttempt,
+        paperOpened,
+        paperRejected,
+        paperPending: Math.max(0, riskAllowed - (paperOpened + paperRejected + paperAttempt)),
+      },
       recentTransitions: this.events.slice(-500),
     };
   }
@@ -298,7 +596,83 @@ class CandidateStore {
     this.transitions = 0;
     this.created = 0;
     this.expired = 0;
+    this.invariantViolations = 0;
     this.events.length = 0;
+    this.handoffErrors.length = 0;
+    this.transitionByState.clear();
+    this.executionIntents.clear();
+  }
+
+  private normalizeCandidateId(candidateId: string, strict = true) {
+    const normalized = String(candidateId ?? "").trim();
+    if (!normalized) {
+      if (strict) throw new Error("HANDOFF_IDENTITY_MISSING");
+      return null;
+    }
+    return normalized;
+  }
+
+  private recordHandoffError(input: {
+    code: HandoffErrorCode;
+    candidateId: string | null;
+    symbol: string | null;
+    detail: string;
+  }) {
+    this.handoffErrors.push({
+      at: Date.now(),
+      code: input.code,
+      candidateId: input.candidateId,
+      symbol: input.symbol ? input.symbol.toUpperCase() : null,
+      detail: input.detail,
+    });
+    if (this.handoffErrors.length > 10_000) {
+      this.handoffErrors.splice(0, this.handoffErrors.length - 10_000);
+    }
+  }
+
+  private assertFunnelInvariants() {
+    const c = (state: CandidateLifecycleState) => this.transitionByState.get(state) ?? 0;
+    const checks: Array<{ ok: boolean; detail: string }> = [
+      {
+        ok: c("MICRO_ANALYZED") >= c("MICRO_CONFIRMED") + c("MICRO_REJECTED"),
+        detail: "MICRO_ANALYZED < MICRO_CONFIRMED + MICRO_REJECTED",
+      },
+      {
+        ok: c("MICRO_CONFIRMED") >= c("FINAL_RANKED"),
+        detail: "MICRO_CONFIRMED < FINAL_RANKED",
+      },
+      {
+        ok: c("FINAL_RANKED") >= c("EXECUTION_READY") + c("NOT_EXECUTION_READY"),
+        detail: "FINAL_RANKED < EXECUTION_READY + NOT_EXECUTION_READY",
+      },
+      {
+        ok: c("EXECUTION_READY") >= c("RISK_PENDING"),
+        detail: "EXECUTION_READY < RISK_PENDING",
+      },
+      {
+        ok: c("RISK_PENDING") >= c("RISK_ALLOWED") + c("RISK_REJECTED"),
+        detail: "RISK_PENDING < RISK_ALLOWED + RISK_REJECTED",
+      },
+      {
+        ok: c("RISK_ALLOWED") >= c("PAPER_ATTEMPT"),
+        detail: "RISK_ALLOWED < PAPER_ATTEMPT",
+      },
+      {
+        ok: c("PAPER_ATTEMPT") >= c("PAPER_OPENED") + c("PAPER_REJECTED"),
+        detail: "PAPER_ATTEMPT < PAPER_OPENED + PAPER_REJECTED",
+      },
+    ];
+    for (const check of checks) {
+      if (!check.ok) {
+        this.invariantViolations += 1;
+        this.recordHandoffError({
+          code: "PIPELINE_INVARIANT_VIOLATION",
+          candidateId: null,
+          symbol: null,
+          detail: check.detail,
+        });
+      }
+    }
   }
 }
 
@@ -347,6 +721,31 @@ function classifyDecisionClass(reasons: string[]): "DATA_INVALID" | "QUALITY_TOO
     ["MICRO_DATA_STALE", "MICRO_INVALID_BOOK", "MICRO_ZERO_LIQUIDITY", "MICRO_EXTREME_SPREAD"].includes(reason),
   );
   return dataInvalid ? "DATA_INVALID" : "QUALITY_TOO_LOW";
+}
+
+function toLifecycleEventType(state: CandidateLifecycleState) {
+  const map: Record<CandidateLifecycleState, string> = {
+    DISCOVERED: "CANDIDATE_DISCOVERED",
+    WATCHING: "CANDIDATE_WATCHING",
+    HOT: "CANDIDATE_HOT",
+    MICRO_WARMING: "MICRO_WARMING",
+    MICRO_ANALYZED: "MICRO_ANALYZED",
+    MICRO_CONFIRMED: "MICRO_CONFIRMED",
+    MICRO_REJECTED: "MICRO_REJECTED",
+    FINAL_RANKED: "FINAL_RANKED",
+    EXECUTION_READY: "EXECUTION_READY",
+    NOT_EXECUTION_READY: "NOT_EXECUTION_READY",
+    RISK_PENDING: "RISK_PENDING",
+    RISK_ALLOWED: "RISK_ALLOWED",
+    RISK_REJECTED: "RISK_REJECTED",
+    PAPER_ATTEMPT: "PAPER_ATTEMPT",
+    PAPER_OPENED: "PAPER_OPENED",
+    PAPER_REJECTED: "PAPER_REJECTED",
+    PAPER_CLOSED: "PAPER_CLOSED",
+    EXPIRED: "CANDIDATE_EXPIRED",
+    ERROR: "CANDIDATE_ERROR",
+  };
+  return map[state];
 }
 
 const globalRef = globalThis as typeof globalThis & {

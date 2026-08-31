@@ -71,6 +71,9 @@ export class PositionManager implements TradingModule {
     const entryPrice = readNumber(intent.metadata?.entryPrice, readNumber(intent.metadata?.price, 1));
     const quantity = readNumber(intent.metadata?.quantity, readNumber(intent.metadata?.adjustedQuantity, 1));
     return this.openPosition({
+      candidateId: intent.candidateId,
+      executionIntentId: intent.executionIntentId,
+      executionReference: intent.idempotencyKey,
       botId: String(intent.metadata?.botId ?? "default"),
       symbol: intent.symbol,
       side: intent.side,
@@ -94,6 +97,9 @@ export class PositionManager implements TradingModule {
     const takeProfit = request.takeProfit ?? this.defaultTakeProfit(request.side, request.entryPrice);
     const position: ManagedPosition = {
       id: randomUUID(),
+      candidateId: request.candidateId,
+      executionIntentId: request.executionIntentId,
+      executionReference: request.executionReference,
       botId,
       symbol,
       side: request.side,

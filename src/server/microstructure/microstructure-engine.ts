@@ -25,9 +25,11 @@ import type {
 import type { MarketContext, ScannerCandidate, ScannerScore } from "@/src/types/scanner";
 import { createRuntimeInstanceId } from "@/src/server/runtime/instance-id";
 import { getCanonicalCandidateStore } from "@/src/server/candidate/candidate-store.service";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 const BOOK_HISTORY_LIMIT = 32;
 const JOURNAL_LIMIT = 800;
+const CANONICAL_VENUE = resolveCanonicalVenueConfig();
 
 export class MicrostructureEngine {
   readonly config: MicrostructureConfig;
@@ -336,6 +338,13 @@ function toMarketContext(row: FinalRankedCandidate): MarketContext {
       firstDetectionPrice: row.firstDetectionPrice,
       reasonCodes: row.reasonCodes,
       discoverySource: "MICROSTRUCTURE",
+      discoveryVenue: CANONICAL_VENUE.discoveryVenue,
+      marketDataVenue: CANONICAL_VENUE.marketDataVenue,
+      microstructureVenue: CANONICAL_VENUE.microstructureVenue,
+      paperExecutionVenue: CANONICAL_VENUE.paperExecutionVenue,
+      metadataVenue: CANONICAL_VENUE.metadataVenue,
+      executionVenueEligible: true,
+      metadataFresh: true,
       dataQualityOk: !row.hardReject && row.state !== "WARMING",
       aiAdvisory: row.ai,
       tdiShadow: row.tdi,

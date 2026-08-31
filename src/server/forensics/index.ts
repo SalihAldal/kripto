@@ -56,6 +56,10 @@ export * from "@/src/server/forensics/trend-following-analysis.service";
 export * from "@/src/server/forensics/forensic-csv-export.service";
 export * from "@/src/server/forensics/paper-preflight.service";
 export * from "@/src/server/forensics/variant-d-shadow-observer.service";
+export * from "@/src/server/forensics/config-hash.service";
+export * from "@/src/server/forensics/canonical-event.service";
+export * from "@/src/server/forensics/runtime-telemetry-snapshot.service";
+export * from "@/src/server/forensics/validation-report-generator.service";
 export {
   evaluateAiExecutionGate,
   evaluateAiExecutionReadiness,

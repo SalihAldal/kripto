@@ -31,10 +31,19 @@ function parseSymbolAssets(symbol: string) {
 export async function executeApprovedSpotOrder(input: {
   executionId: string;
   userId: string;
+  candidateId?: string;
+  executionIntentId?: string;
   symbol: string;
+  lane?: string;
   side: "BUY" | "SELL";
   mode?: "paper" | "live" | "dry-run";
   riskApproved: boolean;
+  riskDecisionId?: string;
+  decisionAt?: string;
+  riskAllowedAt?: string;
+  executionVenue?: string;
+  marketDataVenue?: string;
+  configHash?: string;
   urgency?: "normal" | "high" | "emergency";
   entryAnalysisId?: string;
   exitAnalysisId?: string;
@@ -79,7 +88,14 @@ export async function executeApprovedSpotOrder(input: {
   }
 
   const mode = input.mode ?? (env.EXECUTION_MODE === "live" ? "live" : "paper");
-  const idempotencyKey = buildIdempotencyKey({ userId: input.userId, symbol: input.symbol, side: input.side });
+  const idempotencyKey = buildIdempotencyKey({
+    userId: input.userId,
+    symbol: input.symbol,
+    side: input.side,
+    candidateId: input.candidateId,
+    executionIntentId: input.executionIntentId,
+    scope: "ENTRY",
+  });
   const dup = await checkIdempotency(idempotencyKey);
   if (dup.duplicate) {
     return {
@@ -262,11 +278,20 @@ export async function executeApprovedSpotOrder(input: {
       const paper = await simulatePaperExecution({
         userId: input.userId,
         executionId: input.executionId,
+        candidateId: input.candidateId,
+        executionIntentId: input.executionIntentId,
         symbol: input.symbol,
+        lane: input.lane,
         side: input.side,
         estimatedPrice: price,
         quoteAsset,
         baseAsset,
+        executionVenue: input.executionVenue,
+        marketDataVenue: input.marketDataVenue,
+        riskDecisionId: input.riskDecisionId,
+        decisionAt: input.decisionAt,
+        riskAllowedAt: input.riskAllowedAt,
+        configHash: input.configHash,
         openPositionCount: input.openPositionCount ?? 0,
         allowMultipleOpenPositions: !env.EXECUTION_BLOCK_WHEN_OPEN_POSITION,
         quoteOrderQty: input.side === "BUY" ? plan.quoteSpend : undefined,

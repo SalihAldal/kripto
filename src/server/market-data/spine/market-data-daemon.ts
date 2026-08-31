@@ -23,9 +23,11 @@ import { recordPublicMarketRestCall, getPublicMarketRestCallsPerMinute } from "@
 import { bindSharedRestLimiterKv, getSharedRestLimiter } from "@/src/server/market-data/spine/shared-rest-limiter";
 import { filterTradeableUniverse, resolveQuoteAssets, type TradeableSymbol } from "@/src/server/market-data/spine/universe";
 import { FakeMarketSocket, WsConnection, type SocketFactory, type WsLifecycleState } from "@/src/server/market-data/spine/ws-connection";
+import { SubscriptionCommandQueue } from "@/src/server/market-data/spine/subscription-command-queue";
 import type { ExchangeInfoResponse, KlineItem, OrderBookSnapshot, RecentTrade } from "@/src/types/exchange";
 import type { MarketContextBundle, MarketDataTicker } from "@/src/server/market-data/market-data.types";
 import { createRuntimeInstanceId } from "@/src/server/runtime/instance-id";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 const DEFAULT_DEEP_KINDS: DeepStreamKind[] = ["aggTrade", "bookTicker", "kline_1m"];
 const UNIVERSE_TTL_MS = 6 * 60 * 60 * 1000;
@@ -35,6 +37,8 @@ export type MarketDataDaemonTelemetry = {
   dynamicSubscriptionManagerInstanceId: string;
   wsLightState: WsLifecycleState;
   wsDeepState: WsLifecycleState;
+  lightSocketState: WsLifecycleState;
+  deepSocketState: WsLifecycleState;
   uptimeMs: number;
   reconnectCount: number;
   eventsPerSec: number;
@@ -58,18 +62,36 @@ export type MarketDataDaemonTelemetry = {
   memoryBytes: number;
   socketOpen: number;
   socketClose: number;
+  lightOpenCount: number;
+  deepOpenCount: number;
+  lightCloseCount: number;
+  deepCloseCount: number;
+  count1008: number;
   reconnectAttempt: number;
   reconnectSuccess: number;
   subscriptionAdded: number;
   subscriptionRemoved: number;
+  subscriptionRequested: number;
+  subscriptionActivated: number;
+  duplicateSubscriptionSuppressed: number;
+  controlCommandsLast1s: number;
+  controlCommandsLast5s: number;
+  controlCommandsPerSecMax: number;
+  controlCommandRateViolation: number;
   plannedRotation: number;
+  marketDataVenue: string;
+  metadataVenue: string;
   recentSocketCloses: Array<{
     connectionId: string;
+    socketRole: string;
     timestamp: string;
     closeCode: number | null;
     closeReason: string;
     uptimeMs: number;
     activeSubscriptions: number;
+    pendingSubscriptions: number;
+    commandsLast1s: number;
+    commandsLast5s: number;
   }>;
 };
 
@@ -110,16 +132,22 @@ export class MarketDataDaemon {
   private readonly ingestLag: number[] = [];
   private readonly snapshotReadLag: number[] = [];
   private eventsWindow: number[] = [];
-  private subscribeQueue: Array<{ method: "SUBSCRIBE" | "UNSUBSCRIBE"; params: string[] }> = [];
   private subscribeTimer: ReturnType<typeof setInterval> | null = null;
   private klineGapSymbols = new Set<string>();
   private fakeLight: FakeMarketSocket | null = null;
   private fakeDeep: FakeMarketSocket | null = null;
   private readonly options: MarketDataDaemonOptions;
   private kv: SharedKv;
+  private readonly venueConfig = resolveCanonicalVenueConfig();
+  private readonly commandQueue = new SubscriptionCommandQueue(this.venueConfig.maxControlCommandsPerSec);
   private wsLifecycle = {
     socketOpen: 0,
     socketClose: 0,
+    lightOpenCount: 0,
+    deepOpenCount: 0,
+    lightCloseCount: 0,
+    deepCloseCount: 0,
+    count1008: 0,
     reconnectAttempt: 0,
     reconnectSuccess: 0,
     subscriptionAdded: 0,
@@ -161,7 +189,7 @@ export class MarketDataDaemon {
       logger.warn({ err: error }, "MarketDataDaemon universe bootstrap failed");
     });
     if (this.options.autoConnect !== false) this.connectStreams();
-    this.subscribeTimer = setInterval(() => this.flushSubscribeQueue(), 220);
+    this.subscribeTimer = setInterval(() => this.flushSubscribeQueue(), 120);
     logger.info({ universe: this.universe.length }, "MarketDataDaemon started");
   }
 
@@ -172,6 +200,7 @@ export class MarketDataDaemon {
     this.redisState.stop();
     if (this.subscribeTimer) clearInterval(this.subscribeTimer);
     this.subscribeTimer = null;
+    this.commandQueue.reset();
   }
 
   connectStreams() {
@@ -179,11 +208,13 @@ export class MarketDataDaemon {
     const factory = this.options.socketFactory;
     this.light = new WsConnection({
       name: "binance-miniTicker",
+      socketRole: this.venueConfig.lightSocketRole,
       url: `${wsBase}/ws/!miniTicker@arr`,
       factory,
       onMessage: (raw, receiveTime) => this.ingest(raw, receiveTime),
       onOpen: () => {
         this.wsLifecycle.socketOpen += 1;
+        this.wsLifecycle.lightOpenCount += 1;
         this.wsLifecycle.reconnectSuccess += 1;
         logger.info("MarketDataDaemon all-market stream connected");
       },
@@ -197,11 +228,13 @@ export class MarketDataDaemon {
     });
     this.deep = new WsConnection({
       name: "binance-deep",
+      socketRole: this.venueConfig.deepSocketRole,
       url: `${wsBase}/ws`,
       factory,
       onMessage: (raw, receiveTime) => this.ingest(raw, receiveTime),
       onOpen: () => {
         this.wsLifecycle.socketOpen += 1;
+        this.wsLifecycle.deepOpenCount += 1;
         this.wsLifecycle.reconnectSuccess += 1;
         this.restoreDeepSubscriptions();
       },
@@ -393,6 +426,8 @@ export class MarketDataDaemon {
       dynamicSubscriptionManagerInstanceId: this.subscriptions.instanceId,
       wsLightState: this.light?.state ?? "IDLE",
       wsDeepState: this.deep?.state ?? "IDLE",
+      lightSocketState: this.light?.state ?? "IDLE",
+      deepSocketState: this.deep?.state ?? "IDLE",
       uptimeMs: this.light?.uptimeMs ?? 0,
       reconnectCount: (this.light?.reconnectCount ?? 0) + (this.deep?.reconnectCount ?? 0),
       eventsPerSec: this.eventsWindow.length,
@@ -416,11 +451,27 @@ export class MarketDataDaemon {
       memoryBytes: this.store.estimatedMemoryBytes(),
       socketOpen: this.wsLifecycle.socketOpen,
       socketClose: this.wsLifecycle.socketClose,
+      lightOpenCount: this.wsLifecycle.lightOpenCount,
+      deepOpenCount: this.wsLifecycle.deepOpenCount,
+      lightCloseCount: this.wsLifecycle.lightCloseCount,
+      deepCloseCount: this.wsLifecycle.deepCloseCount,
+      count1008: this.wsLifecycle.count1008,
       reconnectAttempt: this.wsLifecycle.reconnectAttempt,
       reconnectSuccess: this.wsLifecycle.reconnectSuccess,
       subscriptionAdded: this.wsLifecycle.subscriptionAdded,
       subscriptionRemoved: this.wsLifecycle.subscriptionRemoved,
+      subscriptionRequested: this.commandQueue.telemetry().subscriptionRequested,
+      subscriptionActivated: this.commandQueue.telemetry().subscriptionActivated,
+      duplicateSubscriptionSuppressed:
+        this.commandQueue.telemetry().duplicateSubscriptionSuppressed +
+        this.subscriptions.telemetry().duplicateSubscriptionSuppressed,
+      controlCommandsLast1s: this.commandQueue.telemetry().commandsLast1s,
+      controlCommandsLast5s: this.commandQueue.telemetry().commandsLast5s,
+      controlCommandsPerSecMax: this.commandQueue.telemetry().controlCommandsPerSecMax,
+      controlCommandRateViolation: this.commandQueue.telemetry().controlRateViolation,
       plannedRotation: this.wsLifecycle.plannedRotation,
+      marketDataVenue: this.venueConfig.marketDataVenue,
+      metadataVenue: this.venueConfig.metadataVenue,
       recentSocketCloses: this.wsLifecycle.recentSocketCloses.slice(-20),
     };
   }
@@ -471,13 +522,18 @@ export class MarketDataDaemon {
   }
 
   private enqueue(method: "SUBSCRIBE" | "UNSUBSCRIBE", params: string[]) {
-    this.subscribeQueue.push({ method, params });
+    this.commandQueue.enqueue(method, params);
+    if (method === "SUBSCRIBE") {
+      this.subscriptions.markRequested(params);
+    }
   }
 
   private flushSubscribeQueue() {
-    const next = this.subscribeQueue.shift();
+    const next = this.commandQueue.dequeueBatch();
     if (!next) return;
     this.deep?.send({ method: next.method, params: next.params, id: Date.now() });
+    if (next.method === "SUBSCRIBE") this.subscriptions.markActive(next.params);
+    if (next.method === "UNSUBSCRIBE") this.subscriptions.markInactive(next.params);
   }
 
   private async bootstrapKlines(symbol: string) {
@@ -517,15 +573,30 @@ export class MarketDataDaemon {
     });
   }
 
-  private recordSocketClose(meta: { connectionId: string; at: number; closeCode?: number; closeReason?: string; uptimeMs: number }) {
+  private recordSocketClose(meta: {
+    connectionId: string;
+    socketRole: string;
+    at: number;
+    closeCode?: number;
+    closeReason?: string;
+    uptimeMs: number;
+  }) {
     this.wsLifecycle.socketClose += 1;
+    if (meta.socketRole === this.venueConfig.lightSocketRole) this.wsLifecycle.lightCloseCount += 1;
+    if (meta.socketRole === this.venueConfig.deepSocketRole) this.wsLifecycle.deepCloseCount += 1;
+    if (Number(meta.closeCode) === 1008) this.wsLifecycle.count1008 += 1;
+    const queueTelemetry = this.commandQueue.telemetry();
     this.wsLifecycle.recentSocketCloses.push({
       connectionId: meta.connectionId,
+      socketRole: meta.socketRole,
       timestamp: new Date(meta.at).toISOString(),
       closeCode: Number.isFinite(Number(meta.closeCode)) ? Number(meta.closeCode) : null,
       closeReason: String(meta.closeReason ?? ""),
       uptimeMs: Math.max(0, Number(meta.uptimeMs ?? 0)),
       activeSubscriptions: this.subscriptions.desiredStreams().length,
+      pendingSubscriptions: queueTelemetry.pendingSubscribe + queueTelemetry.pendingUnsubscribe,
+      commandsLast1s: queueTelemetry.commandsLast1s,
+      commandsLast5s: queueTelemetry.commandsLast5s,
     });
     if (this.wsLifecycle.recentSocketCloses.length > 120) {
       this.wsLifecycle.recentSocketCloses.splice(0, this.wsLifecycle.recentSocketCloses.length - 120);

@@ -25,6 +25,19 @@ import { buildTdiDataQualityArtifacts } from "@/src/server/forensics/tdi-data-qu
 import { TDI_DECISION_SCHEMA_VERSION } from "@/src/server/forensics/forensic.types";
 import { getAutoRoundRunById } from "@/src/server/repositories/auto-round.repository";
 import { readRuntimeFromMetadata } from "@/src/server/execution/round-runtime.service";
+import { buildRuntimeTelemetrySnapshot } from "@/src/server/forensics/runtime-telemetry-snapshot.service";
+import { getShadowOutcomeEngine } from "@/src/server/shadow-outcome/shadow-outcome-engine";
+import {
+  getDailyEdgeReport,
+  getEdgeAnalytics,
+  getLanePerformance,
+  getMissedMovers,
+  getMoverRecall,
+  getScoreCalibration,
+} from "@/src/server/shadow-outcome/reports";
+import { getCanonicalEventLog } from "@/src/server/forensics/canonical-event.service";
+import { summarizeFunnelTraces } from "@/src/server/forensics/candidate-funnel-trace.service";
+import { evaluateConfigDrift } from "@/src/server/forensics/config-hash.service";
 
 export type RoundForensicExportInput = {
   session: ForensicSessionContext;
@@ -466,6 +479,14 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     tdiDataQuality: "tdi-data-quality.json",
     tdiInputContract: "tdi-input-contract.json",
     tdiMissingTelemetry: "tdi-missing-telemetry-report.json",
+    runIdentity: "run-identity.json",
+    configDrift: "config-drift.json",
+    canonicalEvents: "canonical-events.json",
+    pipelineFunnelCounters: "pipeline-funnel-counters.json",
+    runtimeTelemetry: "runtime-telemetry.json",
+    shadowOutcomes: "shadow-outcomes.json",
+    moverGroundTruth: "mover-ground-truth.json",
+    edgeAnalytics: "edge-analytics.json",
   };
 
   safeWriteJson(path.join(rootDir, "candidate-trace.json"), {
@@ -567,6 +588,67 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
   if (resolvedConfig) {
     safeWriteJson(path.join(rootDir, "resolved-config.json"), resolvedConfig, tracker);
   }
+  const runIdentity = {
+    runId,
+    sessionId: session.sessionId,
+    configHash: resolvedConfig?.configHash ?? null,
+    startedAt: summary.startedAt,
+    endedAt: summary.endedAt,
+    mode: session.mode,
+    venue: resolvedConfig?.venueRouting?.marketDataVenue ?? null,
+  };
+  safeWriteJson(path.join(rootDir, "run-identity.json"), runIdentity, tracker);
+
+  const configDrift = evaluateConfigDrift({
+    runId,
+    initialHash: String(runRow?.metadata && typeof runRow.metadata === "object" ? (runRow.metadata as Record<string, unknown>).configHash ?? "" : ""),
+    currentHash: String(resolvedConfig?.configHash ?? ""),
+  });
+  safeWriteJson(path.join(rootDir, "config-drift.json"), configDrift, tracker);
+  const canonicalEvents = getCanonicalEventLog(runId);
+  safeWriteJson(path.join(rootDir, "canonical-events.json"), {
+    runId,
+    count: canonicalEvents.length,
+    events: canonicalEvents,
+  }, tracker);
+  const funnel = summarizeFunnelTraces(runId);
+  safeWriteJson(path.join(rootDir, "pipeline-funnel-counters.json"), {
+    runId,
+    scannerAiReached: funnel.scannerAiReached,
+    tdiEntered: funnel.tdiEntered,
+    tdiSkipped: funnel.tdiSkipped,
+    tdiApproved: funnel.tdiApproved,
+    executionAiReached: funnel.executionAiReached,
+    executionReady: funnel.executionReady,
+    traceCount: funnel.traces.length,
+  }, tracker);
+  const runtimeTelemetry = buildRuntimeTelemetrySnapshot({ runId, roundId });
+  safeWriteJson(path.join(rootDir, "runtime-telemetry.json"), runtimeTelemetry, tracker);
+  const shadow = getShadowOutcomeEngine();
+  const movers = shadow.getMoverEvents();
+  const tracked = shadow.getTracked();
+  safeWriteJson(path.join(rootDir, "shadow-outcomes.json"), {
+    runId,
+    trackedCount: tracked.length,
+    tracked,
+  }, tracker);
+  safeWriteJson(path.join(rootDir, "mover-ground-truth.json"), {
+    runId,
+    moverCount: movers.length,
+    events: movers,
+  }, tracker);
+  safeWriteJson(path.join(rootDir, "edge-analytics.json"), {
+    runId,
+    summary: getDailyEdgeReport({ rows: tracked, movers }),
+    lanePerformance: getLanePerformance(tracked, movers),
+    moverRecall: [1, 2, 3, 5, 7, 10, 15, 20].map((threshold) => ({
+      threshold,
+      recall: getMoverRecall(tracked, movers, threshold),
+      missed: getMissedMovers(tracked, movers, threshold),
+    })),
+    scoreCalibration: getScoreCalibration(tracked),
+    analytics: getEdgeAnalytics(tracked, movers),
+  }, tracker);
 
   const postEntrySymbols = (process.env.FORENSIC_POST_ENTRY_SYMBOLS ?? "")
     .split(",")
@@ -718,6 +800,11 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     "round-liveness.json",
     "recovery-decisions.json",
     "recovery-telemetry.json",
+    "run-identity.json",
+    "config-drift.json",
+    "canonical-events.json",
+    "runtime-telemetry.json",
+    "edge-analytics.json",
     "pnl-ledger.json",
     "fee-aware-entry-policy.json",
     "exit-forensics.json",

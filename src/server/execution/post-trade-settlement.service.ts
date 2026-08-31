@@ -892,15 +892,20 @@ export async function settleOpenPosition(input: {
     };
   }
 
-  const closeFeeEst = await estimateFees(symbol, closeSide, finalCloseQty, exitPrice);
-  const closeFee = closeFeeEst.estimatedTakerFee;
+  const closeFillPrice = Number(closeOrder.price ?? 0) > 0 ? Number(closeOrder.price) : exitPrice;
+  const closeFeeFromOrder = Number((closeOrder.metadata as Record<string, unknown> | undefined)?.fee ?? 0);
+  const closeFeeEst = await estimateFees(symbol, closeSide, finalCloseQty, closeFillPrice);
+  const closeFee = Number.isFinite(closeFeeFromOrder) && closeFeeFromOrder > 0 ? closeFeeFromOrder : closeFeeEst.estimatedTakerFee;
   const openFee = resolveOpenFee(position);
-  const slippageCost = Number(((closeOrder.price ? Math.abs(closeOrder.price - exitPrice) : 0) * finalCloseQty).toFixed(8));
+  const slippageCostAttribution = Number((closeOrder.metadata as Record<string, unknown> | undefined)?.slippagePct ?? 0);
+  const spreadCostAttribution = Number((closeOrder.metadata as Record<string, unknown> | undefined)?.spreadCostQuote ?? 0);
+  // Fill price already includes spread/slippage effect. Avoid double-counting in net PnL.
+  const slippageCost = 0;
 
   const pnl = calculateRealizedPnl({
     side: position.side,
     entryPrice: position.entryPrice,
-    exitPrice,
+    exitPrice: closeFillPrice,
     quantity: finalCloseQty,
     openFee,
     closeFee,
@@ -909,11 +914,11 @@ export async function settleOpenPosition(input: {
 
   const exitForensicsSnapshot = recordClosedTradeForensics({
     reason: input.reason,
-    closePrice: exitPrice,
+    closePrice: closeFillPrice,
     quantity: finalCloseQty,
     openFee,
     closeFee,
-    slippageCost,
+    slippageCost: spreadCostAttribution,
     decisionTimestamp,
   });
 
@@ -925,20 +930,22 @@ export async function settleOpenPosition(input: {
     side: closeSide,
     type: "MARKET",
     quantity: finalCloseQty,
-    price: exitPrice,
+    price: closeFillPrice,
     status: "FILLED",
     clientOrderId: closeOrder.clientOrderId,
     exchangeOrderId: closeOrder.orderId,
     submittedAt: new Date(),
     executedAt: new Date(),
-    avgExecutionPrice: exitPrice,
+    avgExecutionPrice: closeFillPrice,
     fee: closeFee,
     feeCurrency: position.tradingPair.quoteAsset,
-    slippage: slippageCost,
+    slippage: spreadCostAttribution,
     metadata: {
       closeReason: input.reason,
       mode: input.mode,
       linkedPositionId: position.id,
+      slippagePct: slippageCostAttribution,
+      spreadCostQuote: spreadCostAttribution,
       ...variantTelemetryMeta,
     },
   });
@@ -958,23 +965,31 @@ export async function settleOpenPosition(input: {
   await addTradeExecution({
     tradeOrderId: createdCloseOrder.id,
     status: "SUCCESS",
-    executionPrice: exitPrice,
+    executionPrice: closeFillPrice,
     executedQty: finalCloseQty,
-    quoteQty: Number((finalCloseQty * exitPrice).toFixed(8)),
+    quoteQty: Number((finalCloseQty * closeFillPrice).toFixed(8)),
     fee: closeFee,
-    slippage: slippageCost,
+    slippage: spreadCostAttribution,
     executionRef: closeOrder.orderId,
-    metadata: { mode: input.mode, reason: input.reason, ...variantTelemetryMeta },
+    metadata: {
+      mode: input.mode,
+      reason: input.reason,
+      slippagePct: slippageCostAttribution,
+      spreadCostQuote: spreadCostAttribution,
+      ...variantTelemetryMeta,
+    },
   });
 
   await closePositionRecord({
     positionId: position.id,
-    closePrice: exitPrice,
+    closePrice: closeFillPrice,
     realizedPnl: pnl.realizedPnl,
     feeTotal: pnl.feeTotal,
     metadata: {
       closeReason: input.reason,
       roePercent: pnl.roePercent,
+      slippagePct: slippageCostAttribution,
+      spreadCostQuote: spreadCostAttribution,
       ...variantTelemetryMeta,
     },
   });
@@ -992,7 +1007,12 @@ export async function settleOpenPosition(input: {
     slippageCost: pnl.slippageCost,
     roePercent: pnl.roePercent,
     notes: `Position closed: ${input.reason}`,
-    metadata: { mode: input.mode, ...variantTelemetryMeta },
+    metadata: {
+      mode: input.mode,
+      slippagePct: slippageCostAttribution,
+      spreadCostQuote: spreadCostAttribution,
+      ...variantTelemetryMeta,
+    },
   });
 
   await logTradeEvent({

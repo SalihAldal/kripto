@@ -20,12 +20,20 @@ export type SocketFactory = (url: string) => MarketSocketLike;
 export type WsConnectionOptions = {
   url: string;
   name: string;
+  socketRole?: string;
   factory?: SocketFactory;
   staleMs?: number;
   maxBackoffMs?: number;
   onMessage: (raw: unknown, receiveTime: number) => void;
   onOpen?: (meta: { connectionId: string; at: number; reconnect: boolean }) => void;
-  onClose?: (meta: { connectionId: string; at: number; closeCode?: number; closeReason?: string; uptimeMs: number }) => void;
+  onClose?: (meta: {
+    connectionId: string;
+    socketRole: string;
+    at: number;
+    closeCode?: number;
+    closeReason?: string;
+    uptimeMs: number;
+  }) => void;
   onReconnectAttempt?: (meta: { attempt: number; delayMs: number }) => void;
   onReconnectSuccess?: (meta: { connectionId: string; at: number; reconnectCount: number }) => void;
   onPlannedRotation?: (meta: { connectionId: string; at: number; reason: string }) => void;
@@ -49,6 +57,7 @@ export class WsConnection {
   private readonly maxBackoffMs: number;
   private plannedReconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private connectionId: string | null = null;
+  private lastCloseCode: number | null = null;
 
   constructor(private readonly options: WsConnectionOptions) {
     this.staleMs = options.staleMs ?? 15_000;
@@ -129,11 +138,13 @@ export class WsConnection {
         const uptimeMs = this.connectedAt > 0 ? Date.now() - this.connectedAt : 0;
         this.options.onClose?.({
           connectionId: this.connectionId ?? `${this.options.name}-unknown`,
+          socketRole: this.options.socketRole ?? this.options.name,
           at: Date.now(),
           closeCode: (event as { code?: number }).code,
           closeReason: String((event as { reason?: string }).reason ?? ""),
           uptimeMs,
         });
+        this.lastCloseCode = Number((event as { code?: number }).code ?? 0) || null;
         this.connectedAt = 0;
         if (this.stopped) return;
         this.scheduleReconnect();
@@ -155,7 +166,8 @@ export class WsConnection {
     this.setState("RECONNECTING");
     const exp = Math.min(this.maxBackoffMs, 400 * 2 ** Math.min(this.attempt, 8));
     const jitter = Math.floor(Math.random() * Math.max(120, exp * 0.3));
-    const delayMs = exp + jitter;
+    const closeCodePenalty = this.lastCloseCode === 1008 ? 5000 : 0;
+    const delayMs = exp + jitter + closeCodePenalty;
     this.options.onReconnectAttempt?.({ attempt: this.attempt, delayMs });
     this.clearTimers();
     this.reconnectTimer = setTimeout(() => this.connect(), delayMs);
@@ -224,10 +236,10 @@ export class FakeMarketSocket implements MarketSocketLike {
     this.sent.push(data);
   }
 
-  close() {
+  close(code?: number, reason?: string) {
     this.closed = true;
     this.readyState = 3;
-    this.emit("close", {});
+    this.emit("close", { code, reason });
   }
 
   open() {
@@ -239,7 +251,7 @@ export class FakeMarketSocket implements MarketSocketLike {
     this.emit("message", { data: typeof data === "string" ? data : JSON.stringify(data) });
   }
 
-  private emit(type: string, event: { data?: unknown }) {
+  private emit(type: string, event: { data?: unknown; code?: number; reason?: string }) {
     for (const listener of this.listeners.get(type) ?? []) listener(event);
   }
 }

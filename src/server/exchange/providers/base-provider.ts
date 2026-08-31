@@ -51,5 +51,11 @@ export interface ExchangeProvider {
     networkCooldownActive: boolean;
     globalBanUntil: string | null;
     networkCooldownUntil: string | null;
+    metadataCache?: {
+      loadedAt: string | null;
+      ageMs: number | null;
+      expiresAt: string | null;
+      source: string;
+    };
   };
 }

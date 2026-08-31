@@ -3,9 +3,26 @@ import { getExecutionLogByIdempotencyKey } from "@/src/server/execution-engine-v
 
 const memoryKeys = new Map<string, { executionId: string; expiresAt: number }>();
 
-export function buildIdempotencyKey(input: { userId: string; symbol: string; side: string; windowMs?: number }) {
+export function buildIdempotencyKey(input: {
+  userId: string;
+  symbol: string;
+  side: string;
+  candidateId?: string;
+  executionIntentId?: string;
+  scope?: "ENTRY" | "EXIT";
+  windowMs?: number;
+}) {
+  const scope = input.scope ?? "ENTRY";
+  const candidateId = String(input.candidateId ?? "").trim();
+  if (candidateId) {
+    return `${input.userId}:${scope}:${candidateId}:${input.side}`;
+  }
+  const executionIntentId = String(input.executionIntentId ?? "").trim();
+  if (executionIntentId) {
+    return `${input.userId}:${scope}:intent:${executionIntentId}:${input.side}`;
+  }
   const bucket = Math.floor(Date.now() / (input.windowMs ?? env.EXECUTION_ENGINE_V2_IDEMPOTENCY_TTL_MS));
-  return `${input.userId}:${input.symbol.toUpperCase()}:${input.side}:${bucket}`;
+  return `${input.userId}:${scope}:${input.symbol.toUpperCase()}:${input.side}:${bucket}`;
 }
 
 export async function checkIdempotency(idempotencyKey: string) {

@@ -57,6 +57,8 @@ export class ExchangeExecutor {
     }
 
     const intent: ExecutionIntent = {
+      candidateId: `${signal.symbol.toUpperCase()}:${new Date(signal.generatedAt).getTime()}`,
+      executionIntentId: randomUUID(),
       symbol: signal.symbol,
       side: signal.side,
       score: signal.score,

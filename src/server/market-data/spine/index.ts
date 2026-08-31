@@ -2,6 +2,7 @@ export * from "@/src/server/market-data/spine/events";
 export * from "@/src/server/market-data/spine/ring-buffer";
 export * from "@/src/server/market-data/spine/payload-normalizer";
 export * from "@/src/server/market-data/spine/dynamic-subscription-manager";
+export * from "@/src/server/market-data/spine/subscription-command-queue";
 export * from "@/src/server/market-data/spine/universe";
 export * from "@/src/server/market-data/spine/distributed-rest-limiter";
 export * from "@/src/server/market-data/spine/rest-call-audit";

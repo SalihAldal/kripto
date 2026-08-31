@@ -2,6 +2,7 @@ import { env } from "@/lib/config";
 import { logger } from "@/lib/logger";
 import { markHeartbeat } from "@/src/server/observability/heartbeat";
 import { runRestartRecovery } from "@/src/server/recovery/failsafe-recovery.service";
+import { assertVenueConfigConsistency, resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 let validated = false;
 
@@ -30,6 +31,11 @@ export function validateStartupConfig() {
   }
   if (env.EXECUTION_MODE === "live" && (!env.BINANCE_API_KEY || !env.BINANCE_API_SECRET)) {
     issues.push("Live mode requires BINANCE_API_KEY and BINANCE_API_SECRET");
+  }
+  const venueConfig = resolveCanonicalVenueConfig();
+  const venueCheck = assertVenueConfigConsistency(venueConfig);
+  if (!venueCheck.ok) {
+    issues.push(...venueCheck.issues);
   }
 
   if (issues.length > 0 || warnings.length > 0) {

@@ -1,6 +1,7 @@
 export type DeepStreamKind = "aggTrade" | "bookTicker" | "kline_1m" | "depth";
 
 export type SubscriptionOwner = string;
+export type SubscriptionLifecycleState = "REQUESTED" | "ACTIVE" | "UNSUBSCRIBE_PENDING" | "INACTIVE";
 
 const STREAM_SUFFIX: Record<DeepStreamKind, string> = {
   aggTrade: "@aggTrade",
@@ -19,25 +20,34 @@ export function toBinanceStreamName(symbol: string, kind: DeepStreamKind) {
 type RefEntry = {
   count: number;
   owners: Map<SubscriptionOwner, number>;
+  state: SubscriptionLifecycleState;
+  holdUntil: number;
 };
 
 export class DynamicSubscriptionManager {
   readonly instanceId = `dynamic-sub-manager:${process.pid}:${Math.random().toString(36).slice(2, 8)}`;
   private readonly refs = new Map<string, RefEntry>();
   private readonly desired = new Set<string>();
+  private duplicateSuppressed = 0;
+  private readonly minHoldMs = 1_200;
 
   subscribe(symbol: string, kinds: DeepStreamKind[], owner: SubscriptionOwner): string[] {
     const added: string[] = [];
+    const now = Date.now();
     for (const kind of kinds) {
       const stream = toBinanceStreamName(symbol, kind);
-      const entry = this.refs.get(stream) ?? { count: 0, owners: new Map() };
+      const entry = this.refs.get(stream) ?? { count: 0, owners: new Map(), state: "INACTIVE", holdUntil: 0 };
       const ownerCount = entry.owners.get(owner) ?? 0;
       entry.owners.set(owner, ownerCount + 1);
       entry.count += 1;
+      entry.holdUntil = now + this.minHoldMs;
       this.refs.set(stream, entry);
-      if (entry.count === 1) {
+      if (entry.count === 1 && entry.state === "INACTIVE") {
+        entry.state = "REQUESTED";
         this.desired.add(stream);
         added.push(stream);
+      } else {
+        this.duplicateSuppressed += 1;
       }
     }
     return added;
@@ -45,6 +55,7 @@ export class DynamicSubscriptionManager {
 
   unsubscribe(symbol: string, kinds: DeepStreamKind[], owner: SubscriptionOwner): string[] {
     const removed: string[] = [];
+    const now = Date.now();
     for (const kind of kinds) {
       const stream = toBinanceStreamName(symbol, kind);
       const entry = this.refs.get(stream);
@@ -55,6 +66,14 @@ export class DynamicSubscriptionManager {
       else entry.owners.set(owner, ownerCount - 1);
       entry.count = Math.max(0, entry.count - 1);
       if (entry.count === 0) {
+        if (now < entry.holdUntil) {
+          // Prevent subscribe/unsubscribe storms around threshold oscillation.
+          entry.state = "ACTIVE";
+          this.refs.set(stream, entry);
+          this.duplicateSuppressed += 1;
+          continue;
+        }
+        entry.state = "UNSUBSCRIBE_PENDING";
         this.refs.delete(stream);
         this.desired.delete(stream);
         removed.push(stream);
@@ -63,6 +82,37 @@ export class DynamicSubscriptionManager {
       }
     }
     return removed;
+  }
+
+  markRequested(streams: string[]) {
+    for (const stream of streams) {
+      const entry = this.refs.get(stream);
+      if (!entry) continue;
+      entry.state = "REQUESTED";
+      this.refs.set(stream, entry);
+    }
+  }
+
+  markActive(streams: string[]) {
+    for (const stream of streams) {
+      const entry = this.refs.get(stream);
+      if (!entry) continue;
+      entry.state = "ACTIVE";
+      this.refs.set(stream, entry);
+    }
+  }
+
+  markInactive(streams: string[]) {
+    for (const stream of streams) {
+      const entry = this.refs.get(stream);
+      if (!entry) continue;
+      entry.state = "INACTIVE";
+      this.refs.set(stream, entry);
+    }
+  }
+
+  getState(symbol: string, kind: DeepStreamKind): SubscriptionLifecycleState {
+    return this.refs.get(toBinanceStreamName(symbol, kind))?.state ?? "INACTIVE";
   }
 
   refCount(symbol: string, kind: DeepStreamKind) {
@@ -77,8 +127,26 @@ export class DynamicSubscriptionManager {
     return this.desired.size + additional > BINANCE_MAX_STREAMS_PER_CONNECTION;
   }
 
+  telemetry() {
+    const stateCounts: Record<SubscriptionLifecycleState, number> = {
+      REQUESTED: 0,
+      ACTIVE: 0,
+      UNSUBSCRIBE_PENDING: 0,
+      INACTIVE: 0,
+    };
+    for (const row of this.refs.values()) {
+      stateCounts[row.state] += 1;
+    }
+    return {
+      desiredStreams: this.desired.size,
+      duplicateSubscriptionSuppressed: this.duplicateSuppressed,
+      stateCounts,
+    };
+  }
+
   reset() {
     this.refs.clear();
     this.desired.clear();
+    this.duplicateSuppressed = 0;
   }
 }

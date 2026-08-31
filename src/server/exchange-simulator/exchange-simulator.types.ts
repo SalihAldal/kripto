@@ -56,12 +56,19 @@ export type ExecutionComparisonResult = {
 
 export type MarketSimulationInput = {
   executionId?: string;
+  executionIntentId?: string;
   userId?: string;
+  candidateId?: string;
   symbol: string;
+  lane?: string;
   side: "BUY" | "SELL";
   quantity: number;
   quoteOrderQty?: number;
   priceHint: number;
+  decisionAt?: string;
+  riskAllowedAt?: string;
+  executionVenue?: string;
+  marketDataVenue?: string;
   orderType?: ActiveOrderType | FutureOrderType;
   exchange?: SupportedExchange;
   quoteAsset: string;

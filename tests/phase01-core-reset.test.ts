@@ -163,6 +163,7 @@ describe("Phase 1 core reset — AI advisory", () => {
 describe("Phase 1 core reset — risk / TDI / synthetic", () => {
   it("hard risk reject blocks with machine-readable reason codes", async () => {
     const decision = await evaluateCanonicalRiskDecision({
+      candidateId: "cand-risk-hard",
       userId: "u1",
       symbol: "BTCUSDT",
       confidencePercent: -1,
@@ -191,6 +192,7 @@ describe("Phase 1 core reset — risk / TDI / synthetic", () => {
 
   it("live synthetic market data cannot produce a trading ALLOW", async () => {
     const decision = await evaluateCanonicalRiskDecision({
+      candidateId: "cand-risk-synth",
       userId: "u1",
       symbol: "BTCUSDT",
       confidencePercent: 80,

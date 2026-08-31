@@ -98,6 +98,8 @@ export type RiskVerdict = {
 };
 
 export type ExecutionIntent = {
+  candidateId: string;
+  executionIntentId: string;
   symbol: string;
   side: Exclude<TradeSide, "HOLD">;
   score: number;

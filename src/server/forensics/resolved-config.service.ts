@@ -1,11 +1,39 @@
 import { env } from "@/lib/config";
 import { getRuntimeStrategyParams } from "@/src/server/config/strategy-runtime.service";
 import type { ResolvedConfigSnapshot } from "@/src/server/forensics/forensic.types";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
+import { hashCanonicalConfig } from "@/src/server/forensics/config-hash.service";
 
 export async function resolveRuntimeConfigSnapshot(userId?: string): Promise<ResolvedConfigSnapshot> {
   const runtime = userId ? await getRuntimeStrategyParams(userId).catch(() => null) : null;
+  const venue = resolveCanonicalVenueConfig();
+  const policy = {
+    ai: "ADVISORY",
+    tdi: "SHADOW",
+    learning: "ADVISORY",
+  } as const;
+  const configScope = {
+    opportunityConfig: runtime?.trade ?? {},
+    hotConfig: runtime?.trade ?? {},
+    microConfig: runtime?.trade ?? {},
+    finalRankConfig: runtime?.trade ?? {},
+    riskConfig: runtime?.risk ?? {
+      maxDailyLossPercent: env.RISK_MAX_DAILY_LOSS_PERCENT,
+      maxOpenPositions: env.EXECUTION_MAX_OPEN_POSITIONS,
+    },
+    paperExecutionConfig: {
+      mode: env.EXECUTION_MODE,
+      takerFeeRate: env.BINANCE_TAKER_FEE_RATE,
+      makerFeeRate: env.BINANCE_MAKER_FEE_RATE,
+      selectionBudgetSec: env.AUTO_ROUND_SELECTION_BUDGET_SEC,
+    },
+    venueConfig: venue,
+    effectivePolicy: policy,
+  };
+  const configHash = hashCanonicalConfig(configScope);
   return {
     generatedAt: new Date().toISOString(),
+    configHash,
     exchange: env.EXCHANGE_PROVIDER ?? "binance-tr",
     mode: env.EXECUTION_MODE,
     exchangeRouting: {
@@ -15,8 +43,21 @@ export async function resolveRuntimeConfigSnapshot(userId?: string): Promise<Res
       paperExecutionProvider: "PAPER_EXCHANGE_SIMULATOR",
       liveExecutionProvider: env.EXCHANGE_PROVIDER === "okx" ? "OKX_LIVE_ADAPTER" : "BINANCE_LIVE_ADAPTER",
     },
-    aiPolicy: env.EXECUTION_MODE === "paper" || env.EXECUTION_MODE === "dry-run" ? "ADVISORY" : env.EXECUTION_AI_GATE_POLICY,
-    tdiPolicy: env.TDI_RUNTIME_ROLE,
+    venueRouting: {
+      discoveryVenue: venue.discoveryVenue,
+      marketDataVenue: venue.marketDataVenue,
+      microstructureVenue: venue.microstructureVenue,
+      metadataVenue: venue.metadataVenue,
+      paperExecutionVenue: venue.paperExecutionVenue,
+      liveExecutionVenue: venue.liveExecutionVenue,
+      platform: venue.platform,
+      lightSocketRole: venue.lightSocketRole,
+      deepSocketRole: venue.deepSocketRole,
+      maxControlCommandsPerSec: venue.maxControlCommandsPerSec,
+      officialMaxControlCommandsPerSec: venue.officialMaxControlCommandsPerSec,
+    },
+    aiPolicy: policy.ai,
+    tdiPolicy: policy.tdi,
     riskMode: "CANONICAL_PRETRADE_RISK_GATE",
     universe: {
       scannerUniverse: env.SCANNER_UNIVERSE,

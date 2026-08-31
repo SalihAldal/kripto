@@ -15,6 +15,7 @@ import {
   placeMarketBuyByQuote,
   placeMarketSell,
   resolveExchangeSymbol,
+  getExecutionVenueEligibility,
 } from "@/services/binance.service";
 import {
   calculateGlobalValidQuantity,
@@ -135,6 +136,7 @@ import {
   evaluatePreSubmitExecution,
   resolveAdaptiveRetryPolicy,
 } from "@/src/server/execution/execution-intelligence.service";
+import { recordLearningEvaluation } from "@/src/server/execution/authority-counters.service";
 import { notifySystemEvent } from "@/src/server/notifications/notification.service";
 import { feedbackLoopEngine } from "@/src/server/trading-core/feedback-loop";
 import type { FeedbackRejectTradeInput } from "@/src/server/trading-core/feedback-loop";
@@ -1560,21 +1562,32 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     }
 
     const ai = selected.ai;
-    canonicalCandidateId = String(selected.context.metadata.opportunityCandidateId ?? "");
+    canonicalCandidateId = String(selected.context.metadata.opportunityCandidateId ?? "").trim();
     if (!canonicalCandidateId) {
-      const fallbackBySymbol = getCanonicalCandidateStore()
-        .getExecutionReadyCandidates()
-        .filter((row) => row.symbol.toUpperCase() === selected.context.symbol.toUpperCase())
-        .sort((a, b) => Number(b.finalScore ?? b.microScore ?? 0) - Number(a.finalScore ?? a.microScore ?? 0))[0];
-      if (fallbackBySymbol?.candidateId) {
-        canonicalCandidateId = fallbackBySymbol.candidateId;
-      }
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: "HANDOFF_IDENTITY_MISSING",
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+      });
     }
-    if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "FINAL_RANKED", [
-        "EXECUTION_PIPELINE_SELECTED",
-      ]);
+    if (!getCanonicalCandidateStore().getCandidate(canonicalCandidateId)) {
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: "HANDOFF_CANDIDATE_NOT_FOUND",
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+      });
     }
+    getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "FINAL_RANKED", [
+      "EXECUTION_PIPELINE_SELECTED",
+    ]);
     obsSelected = selected;
     obsAi = ai;
     recordDecisionTimelineEvent({
@@ -1766,6 +1779,10 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     const learningHardRejects = learningLane
       ? resolveLearningLaneHardRejects({ candidate: selected, liveDataHealthy, paperMode: true })
       : [];
+    recordLearningEvaluation({
+      advisoryRejected: learningHardRejects.length > 0,
+      hardVeto: false,
+    });
     if (learningHardRejects.length > 0) {
       publishExecutionEvent({
         executionId,
@@ -2148,11 +2165,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         },
       });
     }
-    const forensicCandidateId =
-      String(selected.context.metadata.decisionId ?? "").trim() ||
-      createCandidateId(symbol, "execution");
+    const forensicCandidateId = canonicalCandidateId || String(selected.context.metadata.decisionId ?? "").trim() || createCandidateId(symbol, "execution");
     const executionClaim = claimCanonicalExecutionAttempt({
-      candidateId: forensicCandidateId,
+      candidateId: canonicalCandidateId || forensicCandidateId,
       executionId,
     });
     if (!executionClaim.ok) {
@@ -2162,6 +2177,22 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         opened: false,
         rejected: true,
         rejectReason: `DUPLICATE_EXECUTION_PATH: ${executionClaim.existingExecutionId}`,
+        symbol,
+        decision: ai.finalDecision,
+      });
+    }
+    const intentIdentity = getCanonicalCandidateStore().registerExecutionIntent({
+      candidateId: canonicalCandidateId,
+      executionIntentId: executionId,
+      strategyContext: `${String(selected.context.metadata.marketRegimeStrategy ?? "default")}:${ai.finalDecision === "SELL" ? "SELL" : "BUY"}`,
+    });
+    if (!intentIdentity.ok) {
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: intentIdentity.code,
         symbol,
         decision: ai.finalDecision,
       });
@@ -2345,6 +2376,23 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       : 1;
     const useGlobalLeverageVenue = mode === "live" && requestedLeverageSafe > 1 && isGlobalLeverageEnabled();
     const executionSymbol = useGlobalLeverageVenue ? toGlobalLeverageSymbol(symbol) : symbol;
+    if (mode === "live") {
+      const venueEligibility = await getExecutionVenueEligibility(executionSymbol).catch(() => ({
+        executionVenueEligible: false,
+        reasonCode: "VENUE_NOT_EXECUTABLE",
+      }));
+      if (!venueEligibility.executionVenueEligible) {
+        return finishExecution({
+          executionId,
+          mode,
+          opened: false,
+          rejected: true,
+          rejectReason: "VENUE_NOT_EXECUTABLE",
+          symbol: executionSymbol,
+          decision: ai.finalDecision,
+        });
+      }
+    }
 
     if (selected.context.volatilityPercent >= env.EXECUTION_BLOCK_HIGH_VOLATILITY_PERCENT) {
       await logTradeEvent({
@@ -3162,12 +3210,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         stopLossPercent,
       },
     });
-    if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "RISK_PENDING_WITH_REASON", [
-        "RISK_EVALUATION_STARTED",
-      ]);
-    }
+    getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "RISK_PENDING", ["RISK_EVALUATION_STARTED"]);
     const riskGate = await evaluateCanonicalRiskDecision({
+      candidateId: canonicalCandidateId,
       userId: user.id,
       symbol: executionSymbol,
       confidencePercent: ai.finalConfidence,
@@ -3260,11 +3305,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
       });
     }
-    if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "RISK_ALLOWED", [
-        "RISK_GATE_ALLOW",
-      ]);
-    }
+    getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "RISK_ALLOWED", ["RISK_GATE_ALLOW"]);
 
     const feeEdgeMetrics = computeFeeEdgeMetrics({
       entryPrice,
@@ -3437,11 +3478,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         entryPrice,
       },
     });
-    if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_ATTEMPT", [
-        "PAPER_ORDER_SUBMIT_ATTEMPT",
-      ]);
-    }
+    getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_ATTEMPT", ["PAPER_ORDER_SUBMIT_ATTEMPT"]);
     pauseScannerWorker(25_000);
     const baseQty = preValidation.adjustedQuantity;
 
@@ -3546,10 +3583,19 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         const v2Result = await executeApprovedSpotOrder({
           executionId,
           userId: user.id,
+          candidateId: canonicalCandidateId,
+          executionIntentId: executionId,
           symbol: executionSymbol,
+          lane: String(selected.context.metadata.pumpEarlyCatcher ? "PUMP" : "SCANNER"),
           side,
           mode: mode === "dry-run" ? "dry-run" : mode === "paper" ? "paper" : "live",
           riskApproved: true,
+          riskDecisionId: `${executionId}:risk`,
+          decisionAt: new Date().toISOString(),
+          riskAllowedAt: new Date().toISOString(),
+          executionVenue: String(selected.context.metadata.executionVenue ?? selected.context.metadata.discoveryVenue ?? ""),
+          marketDataVenue: String(selected.context.metadata.marketDataVenue ?? ""),
+          configHash: String(selected.context.metadata.configHash ?? ""),
           urgency: "normal",
           entryAnalysisId,
           openPositionCount: openPositions.length,
@@ -3597,6 +3643,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         return executePaperOrderViaExchangeSimulator({
           userId: user.id,
           executionId,
+          candidateId: canonicalCandidateId,
+          executionIntentId: executionId,
+          marketDataVenue: String(selected.context.metadata.marketDataVenue ?? ""),
           symbol: executionSymbol,
           side,
           quantity: qty,
@@ -4210,11 +4259,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       positionId: position.id,
       updatedAt: new Date().toISOString(),
     });
-    if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_OPENED", [
-        "PAPER_POSITION_OPENED",
-      ]);
-    }
+    getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_OPENED", ["PAPER_POSITION_OPENED"]);
 
     observeTradeDecision({
       decisionId: executionId,
@@ -4371,9 +4416,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       },
     }).catch(() => null);
     if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_REJECTED_WITH_REASON", [
-        failure.reasonCode,
-      ]);
+      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_REJECTED", [failure.reasonCode]);
     }
     await logTradeLifecycle({
       executionId,

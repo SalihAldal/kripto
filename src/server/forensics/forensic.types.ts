@@ -665,6 +665,7 @@ export type NativePaperDiagnostics = {
 
 export type ResolvedConfigSnapshot = {
   generatedAt: string;
+  configHash?: string;
   exchange: string;
   mode?: string;
   exchangeRouting?: {
@@ -673,6 +674,19 @@ export type ResolvedConfigSnapshot = {
     metadataProvider?: string;
     paperExecutionProvider?: string;
     liveExecutionProvider?: string;
+  };
+  venueRouting?: {
+    discoveryVenue?: string;
+    marketDataVenue?: string;
+    microstructureVenue?: string;
+    metadataVenue?: string;
+    paperExecutionVenue?: string;
+    liveExecutionVenue?: string;
+    platform?: string;
+    lightSocketRole?: string;
+    deepSocketRole?: string;
+    maxControlCommandsPerSec?: number;
+    officialMaxControlCommandsPerSec?: number;
   };
   aiPolicy?: string;
   tdiPolicy?: string;

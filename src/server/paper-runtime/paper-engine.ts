@@ -69,7 +69,14 @@ export class PaperRuntimeEngine {
     if (live.allowed) {
       return this.reject(intent, "LIVE_LOCKED_FOR_PHASE6");
     }
-    if (this.intents.has(intent.candidateId) || this.intents.has(intent.intentId)) {
+    if (!intent.candidateId.trim() || !intent.executionIntentId.trim()) {
+      return this.reject(intent, "HANDOFF_IDENTITY_MISSING");
+    }
+    if (
+      this.intents.has(intent.candidateId) ||
+      this.intents.has(intent.intentId) ||
+      this.intents.has(intent.executionIntentId)
+    ) {
       return this.reject(intent, "REJECT_DUPLICATE_EXECUTION");
     }
     if (this.unknownOrders.has(intent.intentId)) {
@@ -109,11 +116,14 @@ export class PaperRuntimeEngine {
     }
     this.intents.set(intent.candidateId, intent.intentId);
     this.intents.set(intent.intentId, intent.intentId);
+    this.intents.set(intent.executionIntentId, intent.intentId);
     const stopPct = Math.max(0.4, intent.stopPct);
     const tpPct = Math.max(stopPct, intent.takeProfitPct);
     const position: PaperPosition = {
       positionId: randomUUID(),
       candidateId: intent.candidateId,
+      executionIntentId: intent.executionIntentId,
+      executionReference: intent.intentId,
       symbol: intent.symbol.toUpperCase(),
       lane: intent.lane,
       score: intent.score,

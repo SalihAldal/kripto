@@ -5,10 +5,17 @@ import { getPaperAccount } from "@/src/server/simulation/paper-trading.service";
 import { simulateMarketExecution } from "@/src/server/exchange-simulator/exchange-simulator.service";
 import { emitExchangeSimulatorEvent } from "@/src/server/exchange-simulator/exchange-simulator.events";
 import { bridgePaperFill } from "@/src/server/forensics/forensic-bridge.service";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 type PaperSimulatorOrderInput = {
   userId: string;
   executionId?: string;
+  lane?: string;
+  executionVenue?: string;
+  riskDecisionId?: string;
+  decisionAt?: string;
+  riskAllowedAt?: string;
+  configHash?: string;
   symbol: string;
   side: "BUY" | "SELL";
   quantity: number;
@@ -24,6 +31,9 @@ type PaperSimulatorOrderInput = {
   volumeQuote?: number;
   aggressiveBuyPct?: number;
   aggressiveSellPct?: number;
+  candidateId?: string;
+  executionIntentId?: string;
+  marketDataVenue?: string;
 };
 
 const PAPER_SETTING_PREFIX = "paper.account.";
@@ -69,6 +79,10 @@ function requireBalance(balances: Record<string, number>, asset: string, require
 export async function executePaperOrderViaExchangeSimulator(
   input: PaperSimulatorOrderInput,
 ): Promise<PlaceOrderResult & { fee: number; accountUpdatedAt: string; simulationId: string }> {
+  const venue = resolveCanonicalVenueConfig();
+  if (input.marketDataVenue && input.marketDataVenue !== venue.paperExecutionVenue) {
+    throw new Error("VENUE_MISMATCH_PAPER_EXECUTION");
+  }
   const simulation = await simulateMarketExecution({
     executionId: input.executionId,
     userId: input.userId,
@@ -87,6 +101,11 @@ export async function executePaperOrderViaExchangeSimulator(
     volumeQuote: input.volumeQuote,
     aggressiveBuyPct: input.aggressiveBuyPct,
     aggressiveSellPct: input.aggressiveSellPct,
+    decisionAt: input.decisionAt,
+    riskAllowedAt: input.riskAllowedAt,
+    executionIntentId: input.executionIntentId,
+    marketDataVenue: input.marketDataVenue,
+    executionVenue: input.executionVenue,
   });
 
   if (!simulation.ok || simulation.executedQty <= 0) {
@@ -128,6 +147,7 @@ export async function executePaperOrderViaExchangeSimulator(
   });
 
   bridgePaperFill({
+    candidateId: input.candidateId,
     symbol: input.symbol,
     side: input.side,
     entryPrice: avgPrice,
@@ -135,7 +155,7 @@ export async function executePaperOrderViaExchangeSimulator(
     fees: fee,
     orderId: simulation.orderId,
     fillId: simulation.simulationId,
-    sessionId: input.executionId,
+    sessionId: input.executionIntentId ?? input.executionId,
     reconciled: true,
   });
 
@@ -154,6 +174,18 @@ export async function executePaperOrderViaExchangeSimulator(
     simulationId: simulation.simulationId,
     metadata: {
       simulationId: simulation.simulationId,
+      candidateId: input.candidateId,
+      executionIntentId: input.executionIntentId ?? input.executionId,
+      lane: input.lane ?? null,
+      executionVenue: input.executionVenue ?? null,
+      marketDataVenue: input.marketDataVenue ?? null,
+      riskDecisionId: input.riskDecisionId ?? null,
+      decisionAt: input.decisionAt ?? null,
+      riskAllowedAt: input.riskAllowedAt ?? null,
+      firstFillAt: simulation.fills[0]?.filledAt ?? null,
+      filledAt: simulation.fills[simulation.fills.length - 1]?.filledAt ?? null,
+      orderLifecycle: simulation.metadata?.orderLifecycle ?? null,
+      spreadCostQuote: simulation.metadata?.spreadCostQuote ?? null,
       fillCount: simulation.fillCount,
       slippagePct: simulation.totalSlippagePct,
       executionDurationMs: simulation.executionDurationMs,

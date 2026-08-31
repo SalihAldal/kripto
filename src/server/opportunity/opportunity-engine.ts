@@ -26,6 +26,7 @@ import type {
 import type { MarketContext, ScannerCandidate, ScannerScore } from "@/src/types/scanner";
 import { createRuntimeInstanceId } from "@/src/server/runtime/instance-id";
 import { getCanonicalCandidateStore } from "@/src/server/candidate/candidate-store.service";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 const VOLUME_HISTORY_LIMIT = 24;
 const FILTER_SAMPLE_LIMIT = 24;
@@ -37,6 +38,7 @@ const HOT_PROMOTION_SCORE_BUFFER: Record<OpportunityLane, number> = {
 };
 const HOT_PROMOTION_MIN_AGE_MS = 15_000;
 const HOT_PROMOTION_MIN_EVIDENCE_STREAK = 3;
+const CANONICAL_VENUE = resolveCanonicalVenueConfig();
 
 export class OpportunityEngine {
   readonly config: OpportunityEngineConfig;
@@ -478,6 +480,13 @@ function toMarketContext(row: OpportunityCandidate): MarketContext {
       tradeVelocity: Math.max(0.05, Math.abs(row.features.velocity15s) + 0.1),
       shortFlowImbalance: Math.max(0.05, row.features.relativeStrengthMarket / 4 + 0.08),
       discoverySource: "OPPORTUNITY",
+      discoveryVenue: CANONICAL_VENUE.discoveryVenue,
+      marketDataVenue: CANONICAL_VENUE.marketDataVenue,
+      microstructureVenue: CANONICAL_VENUE.microstructureVenue,
+      paperExecutionVenue: CANONICAL_VENUE.paperExecutionVenue,
+      metadataVenue: CANONICAL_VENUE.metadataVenue,
+      executionVenueEligible: true,
+      metadataFresh: true,
       dataQualityOk: true,
       marketRegime: row.features.return5m >= 0.4 ? "MOMENTUM_EXPANSION" : "TRENDING_UP",
     },

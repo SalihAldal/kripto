@@ -27,6 +27,7 @@ import {
   parseUsedWeightHeader,
 } from "@/src/server/market-data/spine/distributed-rest-limiter";
 import { recordPublicMarketRestCall, type PublicMarketRestKind } from "@/src/server/market-data/spine/rest-call-audit";
+import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.service";
 
 function classifyPublicMarketPath(path: string): PublicMarketRestKind {
   const lower = path.toLowerCase();
@@ -83,6 +84,7 @@ export class BinanceExchangeProvider implements ExchangeProvider {
   private lastNetworkCooldownLogAt = 0;
   private readonly warnThrottle = new Map<string, number>();
   private readonly platform: "global" | "tr";
+  private readonly venueConfig = resolveCanonicalVenueConfig();
   private lastKnownBalances: ExchangeBalance[] = [];
   private lastKnownBalancesAt = 0;
   private readonly tickerCache = new Map<string, { value: { symbol: string; price: number; change24h: number; volume24h: number }; at: number }>();
@@ -781,12 +783,20 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     const now = Date.now();
     const globalBanActive = this.globalBanUntil > now;
     const networkCooldownActive = this.globalNetworkIssueUntil > now;
+    const cacheAgeMs = this.cacheAt > 0 ? now - this.cacheAt : null;
+    const cacheTtlMs = 60_000;
     return {
       fallbackActive: globalBanActive || networkCooldownActive,
       globalBanActive,
       networkCooldownActive,
       globalBanUntil: this.globalBanUntil > 0 ? new Date(this.globalBanUntil).toISOString() : null,
       networkCooldownUntil: this.globalNetworkIssueUntil > 0 ? new Date(this.globalNetworkIssueUntil).toISOString() : null,
+      metadataCache: {
+        loadedAt: this.cacheAt > 0 ? new Date(this.cacheAt).toISOString() : null,
+        ageMs: cacheAgeMs,
+        expiresAt: this.cacheAt > 0 ? new Date(this.cacheAt + cacheTtlMs).toISOString() : null,
+        source: this.cachedExchangeInfo ? "cache" : "runtime",
+      },
     };
   }
 
@@ -1250,29 +1260,31 @@ export class BinanceExchangeProvider implements ExchangeProvider {
         } catch {
           // continue
         }
-        try {
-          const globalSymbol = this.toGlobalSymbol(normalized);
-          const rawRows = await this.fetchGlobalPublicJson<unknown>(
-            "/api/v3/klines",
-            { symbol: globalSymbol, interval, limit },
-            TR_MARKETDATA_TIMEOUT_MS,
-          );
-          const rows = this.pickArray<unknown[]>(rawRows).filter((row) => Array.isArray(row) && row.length >= 6);
-          if (rows.length > 0) {
-            const parsed = rows.map((row) => ({
-              openTime: Number(row[0] ?? Date.now()),
-              closeTime: Number(row[6] ?? Date.now()),
-              open: Number(row[1]),
-              high: Number(row[2]),
-              low: Number(row[3]),
-              close: Number(row[4]),
-              volume: Number(row[5]),
-            }));
-            this.rememberKlines(cacheKey, parsed);
-            return parsed;
+        if (this.venueConfig.allowCrossVenueFallback) {
+          try {
+            const globalSymbol = this.toGlobalSymbol(normalized);
+            const rawRows = await this.fetchGlobalPublicJson<unknown>(
+              "/api/v3/klines",
+              { symbol: globalSymbol, interval, limit },
+              TR_MARKETDATA_TIMEOUT_MS,
+            );
+            const rows = this.pickArray<unknown[]>(rawRows).filter((row) => Array.isArray(row) && row.length >= 6);
+            if (rows.length > 0) {
+              const parsed = rows.map((row) => ({
+                openTime: Number(row[0] ?? Date.now()),
+                closeTime: Number(row[6] ?? Date.now()),
+                open: Number(row[1]),
+                high: Number(row[2]),
+                low: Number(row[3]),
+                close: Number(row[4]),
+                volume: Number(row[5]),
+              }));
+              this.rememberKlines(cacheKey, parsed);
+              return parsed;
+            }
+          } catch {
+            // fallback below
           }
-        } catch {
-          // fallback below
         }
         return this.fallbackKlines(normalized, limit);
       }
