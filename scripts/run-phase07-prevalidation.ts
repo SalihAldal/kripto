@@ -14,6 +14,7 @@ async function main() {
     wsHardeningReady: process.env.PHASE07_WS_READY === "true",
     breakerReady: process.env.PHASE07_BREAKER_READY === "true",
     paperExecutionReady: process.env.PHASE07_PAPER_READY === "true",
+    edgeValidationReady: process.env.PHASE07_EDGE_READY === "true",
     legacyExecutionInvocationCount: Number(process.env.PHASE07_LEGACY_EXECUTION_COUNT ?? "0"),
   });
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

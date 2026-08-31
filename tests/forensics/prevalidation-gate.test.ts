@@ -31,6 +31,7 @@ describe("prevalidation gate", () => {
       wsHardeningReady: true,
       breakerReady: true,
       paperExecutionReady: true,
+      edgeValidationReady: true,
       legacyExecutionInvocationCount: 0,
     });
     expect(result.status).toBe("READY");

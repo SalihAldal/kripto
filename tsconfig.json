@@ -38,15 +38,14 @@
     "lib/**/*.tsx",
     "services/**/*.ts",
     "services/**/*.tsx",
-    "tests/**/*.ts",
-    "tests/**/*.tsx",
     ".next/types/**/*.ts",
-    "*.mts"
+    "*.mts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    ".next/dev/types/**/*.ts",
     ".next/dev/dev/types/**/*.ts",
+    "tests/**",
     "scripts/**",
     "artifacts/**",
     "coverage/**",

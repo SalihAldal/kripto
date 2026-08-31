@@ -28,6 +28,7 @@ export type PreValidationGateInput = {
   wsHardeningReady?: boolean;
   breakerReady?: boolean;
   paperExecutionReady?: boolean;
+  edgeValidationReady?: boolean;
   legacyExecutionInvocationCount?: number;
 };
 
@@ -157,6 +158,11 @@ export async function runPreValidationGate(input: PreValidationGateInput = {}) {
     code: "PAPER_EXECUTION_READY",
     pass: input.paperExecutionReady === true,
     detail: input.paperExecutionReady ? "Paper execution invariants are active" : "Paper execution readiness not confirmed",
+  });
+  pushManualCheck(checks, {
+    code: "EDGE_VALIDATION_READY",
+    pass: input.edgeValidationReady === true,
+    detail: input.edgeValidationReady ? "Edge dataset/calculators are sufficient for meaningful long paper validation" : "Edge dataset/calculators are not yet sufficient",
   });
 
   const blockers = checks
