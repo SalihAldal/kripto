@@ -9359,6 +9359,7 @@ model LiveTradingJobState {
 
 model ShadowCandidateOutcome {
   id                   String   @id @default(cuid())
+  runId                String?
   candidateId          String   @unique
   symbol               String
   detectedAt           DateTime
@@ -9379,9 +9380,47 @@ model ShadowCandidateOutcome {
   updatedAt            DateTime @updatedAt
 
   @@index([symbol, detectedAt])
+  @@index([runId, detectedAt])
   @@index([lane, detectedAt])
   @@index([finalScore])
   @@index([detectedAt])
   @@index([moveKey])
   @@index([source, detectedAt])
+}
+
+model ShadowMoverEvent {
+  id                 String   @id @default(cuid())
+  moverId            String   @unique
+  runId              String?
+  symbol             String
+  venue              String
+  threshold          Int
+  horizonMin         Int
+  moveStartAt        DateTime
+  moveStartPrice     Float
+  thresholdReachedAt DateTime
+  thresholdPrice     Float
+  peakAt             DateTime
+  peakPrice          Float
+  peakMovePercent    Float
+  status             String
+  dedupeKey          String   @unique
+  systemDetected     Boolean  @default(false)
+  candidateId        String?
+  firstDetectedAt    DateTime?
+  firstDetectedPrice Float?
+  lane               String?
+  hot                Boolean  @default(false)
+  microAnalyzed      Boolean  @default(false)
+  microConfirmed     Boolean  @default(false)
+  finalRanked        Boolean  @default(false)
+  executionReady     Boolean  @default(false)
+  riskAllowed        Boolean  @default(false)
+  paperOpened        Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([runId, threshold])
+  @@index([symbol, thresholdReachedAt])
+  @@index([candidateId])
 }

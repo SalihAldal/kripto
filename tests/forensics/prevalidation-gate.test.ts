@@ -32,10 +32,26 @@ describe("prevalidation gate", () => {
       breakerReady: true,
       paperExecutionReady: true,
       edgeValidationReady: true,
+      edgeMeasurementPipelineReady: true,
+      edgeProvenStatus: "UNKNOWN",
+      outcomeFinalizerReady: true,
+      outcomeRestartRecoveryReady: true,
+      groundTruthPersistenceReady: true,
+      moverJoinReady: true,
+      missedOpportunityReady: true,
+      funnelViabilityReady: true,
+      canProduceHot: true,
+      canProduceMicroConfirmed: true,
+      canProduceFinalRanked: true,
+      canProduceExecutionReady: true,
+      canProduceRiskAllow: true,
+      canProducePaperOpen: true,
+      positionExitReady: true,
       legacyExecutionInvocationCount: 0,
     });
     expect(result.status).toBe("READY");
     expect(result.blockers.length).toBe(0);
+    expect(result.checks.find((row) => row.code === "LONG_PAPER_RUN_READY")?.status).toBe("PASS");
   });
 
   it("returns NOT_READY when build/typecheck fail", async () => {
@@ -47,5 +63,6 @@ describe("prevalidation gate", () => {
     expect(result.status).toBe("NOT_READY");
     expect(result.blockers.some((row) => row.includes("BUILD_PASS"))).toBe(true);
     expect(result.blockers.some((row) => row.includes("TYPECHECK_PASS"))).toBe(true);
+    expect(result.checks.find((row) => row.code === "LONG_PAPER_RUN_READY")?.status).toBe("FAIL");
   });
 });

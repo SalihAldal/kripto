@@ -5,6 +5,7 @@ import { getCircuitSnapshot } from "@/src/server/resilience/circuit-breaker";
 import { getCanonicalInstanceOwnership } from "@/src/server/candidate/instance-ownership.service";
 import { summarizeFunnelTraces } from "@/src/server/forensics/candidate-funnel-trace.service";
 import { sampleResourceTelemetry } from "@/src/server/forensics/resource-telemetry.service";
+import { getShadowOutcomeFinalizerState } from "@/src/server/shadow-outcome/finalizer.service";
 
 export function buildRuntimeTelemetrySnapshot(input: { runId: string; roundId: string; checkpointAt?: string }) {
   const market = getMarketDataDaemon().telemetry();
@@ -26,6 +27,7 @@ export function buildRuntimeTelemetrySnapshot(input: { runId: string; roundId: s
       microstructure: scanner.microstructure,
       candidateStore: scanner.candidateStore,
       shadowOutcome: scanner.shadowOutcome,
+      shadowOutcomeFinalizer: getShadowOutcomeFinalizerState(),
     },
     pipelineFunnel: funnel,
     authority,

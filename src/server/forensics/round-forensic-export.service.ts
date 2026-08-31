@@ -35,10 +35,20 @@ import {
   getMoverRecall,
   getScoreCalibration,
 } from "@/src/server/shadow-outcome/reports";
+import type { MoveClass } from "@/src/server/shadow-outcome/types";
 import { getCanonicalEventLog } from "@/src/server/forensics/canonical-event.service";
 import { summarizeFunnelTraces } from "@/src/server/forensics/candidate-funnel-trace.service";
 import { evaluateConfigDrift } from "@/src/server/forensics/config-hash.service";
 import { buildEdgeAccountingReport } from "@/src/server/forensics/edge-accounting-calculator.service";
+import { prisma } from "@/src/server/db/prisma";
+import { getSettlementStatus } from "@/src/server/shadow-outcome/finalizer.service";
+
+function toMoveClass(value: number): MoveClass {
+  if (value === 1 || value === 2 || value === 3 || value === 5 || value === 7 || value === 10 || value === 15 || value === 20) {
+    return value;
+  }
+  return 1;
+}
 
 export type RoundForensicExportInput = {
   session: ForensicSessionContext;
@@ -627,12 +637,40 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
   const runtimeTelemetry = buildRuntimeTelemetrySnapshot({ runId, roundId });
   safeWriteJson(path.join(rootDir, "runtime-telemetry.json"), runtimeTelemetry, tracker);
   const shadow = getShadowOutcomeEngine();
-  const movers = shadow.getMoverEvents();
+  const liveMovers = shadow.getMoverEvents();
+  const persistedMovers = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(
+    `SELECT
+      "moverId","runId","symbol","threshold","horizonMin","moveStartAt","moveStartPrice",
+      "thresholdReachedAt","thresholdPrice","peakAt","peakPrice","peakMovePercent","status"
+     FROM "ShadowMoverEvent"
+     WHERE "runId" = $1`,
+    runId,
+  ).catch(() => []);
+  const movers =
+    persistedMovers.length > 0
+      ? persistedMovers.map((row) => ({
+          moverId: String(row.moverId ?? ""),
+          runId: String(row.runId ?? ""),
+          symbol: String(row.symbol ?? ""),
+          moveClass: toMoveClass(Number(row.threshold ?? 0)),
+          horizonMin: Number(row.horizonMin ?? 0),
+          moveStartAt: new Date(String(row.moveStartAt ?? "")).getTime(),
+          moveStartPrice: Number(row.moveStartPrice ?? 0),
+          thresholdReachedAt: new Date(String(row.thresholdReachedAt ?? "")).getTime(),
+          thresholdPrice: Number(row.thresholdPrice ?? 0),
+          peakAt: new Date(String(row.peakAt ?? "")).getTime(),
+          peakPrice: Number(row.peakPrice ?? 0),
+          peakMovePct: Number(row.peakMovePercent ?? 0),
+          status: String(row.status ?? "THRESHOLD_REACHED") as "OPEN" | "THRESHOLD_REACHED" | "CLOSED",
+        }))
+      : liveMovers;
   const tracked = shadow.getTracked();
+  const settlementStatus = await getSettlementStatus(runId).catch(() => null);
   safeWriteJson(path.join(rootDir, "shadow-outcomes.json"), {
     runId,
     trackedCount: tracked.length,
     tracked,
+    settlementStatus,
   }, tracker);
   safeWriteJson(path.join(rootDir, "mover-ground-truth.json"), {
     runId,

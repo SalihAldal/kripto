@@ -23,6 +23,7 @@ const REQUIRED_VALIDATION_TABLES = [
   "AutoRoundJob",
   "AutoRoundRun",
   "ShadowCandidateOutcome",
+  "ShadowMoverEvent",
   "PaperTrade",
   "PaperExecution",
   "PaperPortfolio",

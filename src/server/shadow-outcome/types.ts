@@ -15,7 +15,9 @@ export type HorizonOutcome = {
   returnPct: number | null;
   timeToMfeMs: number | null;
   complete: boolean;
-  quality: "OK" | "OUTCOME_DATA_INCOMPLETE";
+  quality: "OK" | "OUTCOME_DATA_INCOMPLETE" | "HISTORY_UNAVAILABLE";
+  status: "PENDING" | "COMPLETE" | "INVALID_DATA" | "HISTORY_UNAVAILABLE";
+  invalidReason?: string | null;
 };
 
 export type DetectionSnapshot = {
@@ -81,15 +83,19 @@ export type TrackedCandidate = {
 };
 
 export type MoverEvent = {
+  moverId: string;
+  runId: string | null;
   symbol: string;
   moveClass: MoveClass;
   horizonMin: number;
   moveStartAt: number;
   moveStartPrice: number;
+  thresholdPrice: number;
   thresholdReachedAt: number;
   peakAt: number;
   peakPrice: number;
   peakMovePct: number;
+  status: "OPEN" | "THRESHOLD_REACHED" | "CLOSED";
 };
 
 export type MissReason =

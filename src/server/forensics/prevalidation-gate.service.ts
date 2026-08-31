@@ -29,6 +29,21 @@ export type PreValidationGateInput = {
   breakerReady?: boolean;
   paperExecutionReady?: boolean;
   edgeValidationReady?: boolean;
+  edgeMeasurementPipelineReady?: boolean;
+  edgeProvenStatus?: "UNKNOWN" | "NOT_TESTED" | "PROVEN" | "NOT_PROVEN";
+  outcomeFinalizerReady?: boolean;
+  outcomeRestartRecoveryReady?: boolean;
+  groundTruthPersistenceReady?: boolean;
+  moverJoinReady?: boolean;
+  missedOpportunityReady?: boolean;
+  funnelViabilityReady?: boolean;
+  canProduceHot?: boolean;
+  canProduceMicroConfirmed?: boolean;
+  canProduceFinalRanked?: boolean;
+  canProduceExecutionReady?: boolean;
+  canProduceRiskAllow?: boolean;
+  canProducePaperOpen?: boolean;
+  positionExitReady?: boolean;
   legacyExecutionInvocationCount?: number;
 };
 
@@ -159,15 +174,127 @@ export async function runPreValidationGate(input: PreValidationGateInput = {}) {
     pass: input.paperExecutionReady === true,
     detail: input.paperExecutionReady ? "Paper execution invariants are active" : "Paper execution readiness not confirmed",
   });
-  pushManualCheck(checks, {
+  checks.push({
     code: "EDGE_VALIDATION_READY",
-    pass: input.edgeValidationReady === true,
-    detail: input.edgeValidationReady ? "Edge dataset/calculators are sufficient for meaningful long paper validation" : "Edge dataset/calculators are not yet sufficient",
+    status: input.edgeValidationReady === true ? "PASS" : "WARN",
+    detail:
+      input.edgeValidationReady === true
+        ? "Historical edge dataset is sufficient for profitability validation"
+        : "Historical edge proof is not sufficient yet; this does not block long-run measurement",
+    metadata: { edgeProven: input.edgeProvenStatus ?? "UNKNOWN" },
+  });
+  pushManualCheck(checks, {
+    code: "OUTCOME_FINALIZER_READY",
+    pass: input.outcomeFinalizerReady === true,
+    detail: input.outcomeFinalizerReady ? "Outcome finalizer is active for pending horizon settlement" : "Outcome finalizer not confirmed",
+  });
+  pushManualCheck(checks, {
+    code: "OUTCOME_RESTART_RECOVERY_READY",
+    pass: input.outcomeRestartRecoveryReady === true,
+    detail: input.outcomeRestartRecoveryReady ? "Pending outcomes are recoverable after restart" : "Outcome restart recovery not confirmed",
+  });
+  pushManualCheck(checks, {
+    code: "GROUND_TRUTH_PERSISTENCE_READY",
+    pass: input.groundTruthPersistenceReady === true,
+    detail: input.groundTruthPersistenceReady ? "Ground truth movers are persisted in canonical storage" : "Ground truth mover persistence is incomplete",
+  });
+  pushManualCheck(checks, {
+    code: "MOVER_JOIN_READY",
+    pass: input.moverJoinReady === true,
+    detail: input.moverJoinReady ? "Mover to candidate join analytics are available" : "Mover join analytics are incomplete",
+  });
+  pushManualCheck(checks, {
+    code: "MISSED_OPPORTUNITY_READY",
+    pass: input.missedOpportunityReady === true,
+    detail: input.missedOpportunityReady ? "Missed profitable opportunity analytics are available" : "Missed opportunity analytics are incomplete",
+  });
+  pushManualCheck(checks, {
+    code: "EDGE_MEASUREMENT_PIPELINE_READY",
+    pass: input.edgeMeasurementPipelineReady === true,
+    detail: input.edgeMeasurementPipelineReady ? "Measurement stack is ready for long run evidence collection" : "Measurement stack is not ready",
+    metadata: { edgeProven: input.edgeProvenStatus ?? "UNKNOWN" },
+  });
+  pushManualCheck(checks, {
+    code: "FUNNEL_VIABILITY_READY",
+    pass: input.funnelViabilityReady === true,
+    detail: input.funnelViabilityReady ? "Known-good fixture confirms canonical end-to-end viability" : "Funnel viability fixture not confirmed",
+  });
+  pushManualCheck(checks, {
+    code: "CAN_PRODUCE_HOT",
+    pass: input.canProduceHot === true,
+    detail: input.canProduceHot ? "Known-good candidate reaches HOT" : "Known-good candidate cannot reach HOT",
+  });
+  pushManualCheck(checks, {
+    code: "CAN_PRODUCE_MICRO_CONFIRMED",
+    pass: input.canProduceMicroConfirmed === true,
+    detail: input.canProduceMicroConfirmed ? "Known-good candidate reaches MICRO_CONFIRMED" : "Known-good candidate cannot reach MICRO_CONFIRMED",
+  });
+  pushManualCheck(checks, {
+    code: "CAN_PRODUCE_FINAL_RANKED",
+    pass: input.canProduceFinalRanked === true,
+    detail: input.canProduceFinalRanked ? "Known-good candidate reaches FINAL_RANKED" : "Known-good candidate cannot reach FINAL_RANKED",
+  });
+  pushManualCheck(checks, {
+    code: "CAN_PRODUCE_EXECUTION_READY",
+    pass: input.canProduceExecutionReady === true,
+    detail: input.canProduceExecutionReady ? "Known-good candidate reaches EXECUTION_READY" : "Known-good candidate cannot reach EXECUTION_READY",
+  });
+  pushManualCheck(checks, {
+    code: "CAN_PRODUCE_RISK_ALLOW",
+    pass: input.canProduceRiskAllow === true,
+    detail: input.canProduceRiskAllow ? "Known-good candidate reaches RISK_ALLOWED" : "Known-good candidate cannot reach RISK_ALLOWED",
+  });
+  pushManualCheck(checks, {
+    code: "CAN_PRODUCE_PAPER_OPEN",
+    pass: input.canProducePaperOpen === true,
+    detail: input.canProducePaperOpen ? "Known-good candidate reaches PAPER_OPENED" : "Known-good candidate cannot reach PAPER_OPENED",
+  });
+  pushManualCheck(checks, {
+    code: "POSITION_EXIT_READY",
+    pass: input.positionExitReady === true,
+    detail: input.positionExitReady ? "Known-good paper position can close end-to-end" : "Position close path not confirmed",
   });
 
   const blockers = checks
     .filter((row) => row.status === "FAIL")
     .map((row) => `${row.code}: ${row.detail}`);
+  const longRunMustPass = new Set([
+    "DB_READY",
+    "MIGRATIONS_READY",
+    "BUILD_PASS",
+    "TYPECHECK_PASS",
+    "OUTCOME_FINALIZER_READY",
+    "OUTCOME_RESTART_RECOVERY_READY",
+    "GROUND_TRUTH_PERSISTENCE_READY",
+    "MOVER_JOIN_READY",
+    "MFE_CONVERSION_READY",
+    "MISSED_OPPORTUNITY_READY",
+    "REPORT_GENERATOR_READY",
+    "FUNNEL_VIABILITY_READY",
+    "CAN_PRODUCE_HOT",
+    "CAN_PRODUCE_MICRO_CONFIRMED",
+    "CAN_PRODUCE_FINAL_RANKED",
+    "CAN_PRODUCE_EXECUTION_READY",
+    "CAN_PRODUCE_RISK_ALLOW",
+    "CAN_PRODUCE_PAPER_OPEN",
+    "PAPER_EXECUTION_READY",
+    "POSITION_EXIT_READY",
+    "AI_HARD_VETO_ZERO",
+    "TDI_HARD_VETO_ZERO",
+    "LEARNING_HARD_VETO_ZERO",
+    "WS_HARDENING_READY",
+    "BREAKER_READY",
+    "LIVE_ORDER_LOCKED",
+  ]);
+  const longPaperRunReady =
+    checks.filter((row) => longRunMustPass.has(row.code)).every((row) => row.status === "PASS") &&
+    input.edgeMeasurementPipelineReady === true;
+  checks.push({
+    code: "LONG_PAPER_RUN_READY",
+    status: longPaperRunReady ? "PASS" : "FAIL",
+    detail: longPaperRunReady ? "All mandatory pre-long-run viability checks pass" : "One or more mandatory long-run checks failed",
+    metadata: { edgeProven: input.edgeProvenStatus ?? "UNKNOWN" },
+  });
   const result: PreValidationGateResult = {
     status: blockers.length === 0 ? "READY" : "NOT_READY",
     checkedAt: new Date().toISOString(),

@@ -30,6 +30,7 @@ export function computeOneHorizon(input: {
   lookaheadSafe?: boolean;
 }): HorizonOutcome {
   const end = input.detectedAt + input.horizonMin * 60_000;
+  const matured = input.now >= end;
   const window = input.points
     .filter((row) => {
       if (row.t < input.detectedAt) return false;
@@ -39,7 +40,18 @@ export function computeOneHorizon(input: {
     })
     .sort((a, b) => a.t - b.t);
   if (!window.length) {
-    return { horizonMin: input.horizonMin, mfePct: null, maePct: null, returnPct: null, timeToMfeMs: null, complete: false, quality: "OUTCOME_DATA_INCOMPLETE" };
+    const status = matured ? "HISTORY_UNAVAILABLE" : "PENDING";
+    return {
+      horizonMin: input.horizonMin,
+      mfePct: null,
+      maePct: null,
+      returnPct: null,
+      timeToMfeMs: null,
+      complete: status !== "PENDING",
+      quality: matured ? "HISTORY_UNAVAILABLE" : "OUTCOME_DATA_INCOMPLETE",
+      status,
+      invalidReason: matured ? "MARKET_HISTORY_MISSING" : null,
+    };
   }
   let high = window[0].high ?? window[0].price;
   let low = window[0].low ?? window[0].price;
@@ -58,10 +70,21 @@ export function computeOneHorizon(input: {
     if (l < low) low = l;
   }
   const last = window[window.length - 1];
-  const complete = last.t >= end - 1_000 || input.now >= end;
+  const complete = last.t >= end - 1_000 || matured;
   const quality = gapped ? "OUTCOME_DATA_INCOMPLETE" : "OK";
   if (quality === "OUTCOME_DATA_INCOMPLETE") {
-    return { horizonMin: input.horizonMin, mfePct: null, maePct: null, returnPct: null, timeToMfeMs: null, complete, quality };
+    const status = complete ? "INVALID_DATA" : "PENDING";
+    return {
+      horizonMin: input.horizonMin,
+      mfePct: null,
+      maePct: null,
+      returnPct: null,
+      timeToMfeMs: null,
+      complete: status !== "PENDING",
+      quality,
+      status,
+      invalidReason: complete ? "MARKET_DATA_GAP" : null,
+    };
   }
   return {
     horizonMin: input.horizonMin,
@@ -71,6 +94,8 @@ export function computeOneHorizon(input: {
     timeToMfeMs: highAt - input.detectedAt,
     complete,
     quality,
+    status: complete ? "COMPLETE" : "PENDING",
+    invalidReason: null,
   };
 }
 

@@ -280,6 +280,20 @@ describe("phase 05 shadow outcome engine", () => {
     expect(times.timeTo10Percent).toBeNull();
   });
 
+  it("5b matured horizon without history becomes HISTORY_UNAVAILABLE, not infinite pending", () => {
+    const out = computeHorizons({
+      detectedAt: T0,
+      detectionPrice: 1,
+      points: [],
+      now: T0 + 65 * 60_000,
+      gapMs: 120_000,
+    });
+    const m60 = out.find((row) => row.horizonMin === 60)!;
+    expect(m60.status).toBe("HISTORY_UNAVAILABLE");
+    expect(m60.complete).toBe(true);
+    expect(m60.quality).toBe("HISTORY_UNAVAILABLE");
+  });
+
   it("6 first-detection snapshot is immutable", () => {
     const engine = new ShadowOutcomeEngine({ minTrackScore: 50 });
     engine.observeOpportunity([opp("AAAUSDT", { score: 70, firstDetectionPrice: 1.0, state: "DISCOVERED" })], { now: T0, source: "replay" });
@@ -290,8 +304,9 @@ describe("phase 05 shadow outcome engine", () => {
     );
     const after = engine.getSnapshot("AAAUSDT:" + T0)!;
     expect(after.firstDetectionPrice).toBe(1.0);
-    expect(after.finalScore).toBe(before.finalScore);
-    expect(after.opportunityScore).toBe(70);
+    expect(after.firstDetectedAt).toBe(before.firstDetectedAt);
+    expect(after.finalScore).toBe(91);
+    expect(after.opportunityScore).toBe(91);
     expect(Object.isFrozen(after)).toBe(true);
   });
 

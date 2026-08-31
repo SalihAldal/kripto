@@ -38,6 +38,22 @@ function section(title: string, lines: string[]) {
   return [`## ${title}`, ...lines, ""].join("\n");
 }
 
+function status60(outcomes: unknown): "PENDING" | "COMPLETE" | "INVALID_DATA" | "HISTORY_UNAVAILABLE" {
+  if (!Array.isArray(outcomes)) return "PENDING";
+  const row = outcomes.find((item) => Number((item as JsonRecord).horizonMin) === 60) as JsonRecord | undefined;
+  if (!row) return "PENDING";
+  const status = String(row.status ?? "").toUpperCase();
+  if (status === "PENDING" || status === "COMPLETE" || status === "INVALID_DATA" || status === "HISTORY_UNAVAILABLE") {
+    return status;
+  }
+  const complete = row.complete === true;
+  const quality = String(row.quality ?? "");
+  if (!complete) return "PENDING";
+  if (quality === "OK") return "COMPLETE";
+  if (quality === "HISTORY_UNAVAILABLE") return "HISTORY_UNAVAILABLE";
+  return "INVALID_DATA";
+}
+
 export function generateValidationReport(runId: string, outputPath?: string) {
   const roundDir = resolveRoundDir(runId);
   if (!roundDir) {
@@ -54,14 +70,38 @@ export function generateValidationReport(runId: string, outputPath?: string) {
   const runtime = readJsonIfExists(path.join(roundDir, "runtime-telemetry.json")) ?? {};
   const edge = readJsonIfExists(path.join(roundDir, "edge-analytics.json")) ?? {};
   const edgeAccounting = readJsonIfExists(path.join(roundDir, "edge-accounting.json")) ?? {};
+  const shadowOutcomes = readJsonIfExists(path.join(roundDir, "shadow-outcomes.json")) ?? {};
   const scanner = readJsonIfExists(path.join(roundDir, "scanner-summary.json")) ?? {};
   const pnl = readJsonIfExists(path.join(roundDir, "pnl-ledger.json")) ?? {};
   const mfeConversion = (edgeAccounting.mfeConversion as Array<Record<string, unknown>> | undefined) ?? [];
   const profitableHist = (edgeAccounting.profitableRejectionHistogram as Array<Record<string, unknown>> | undefined) ?? [];
   const rankCal = (edgeAccounting.rankCalibration as Array<Record<string, unknown>> | undefined) ?? [];
+  const trackedRows = Array.isArray(shadowOutcomes.tracked) ? (shadowOutcomes.tracked as JsonRecord[]) : [];
+  const settlement = trackedRows.reduce<{ complete: number; pending: number; invalid: number; historyUnavailable: number }>(
+    (acc, rowObj) => {
+      const status = status60(rowObj.outcomes);
+      if (status === "COMPLETE") acc.complete += 1;
+      else if (status === "INVALID_DATA") acc.invalid += 1;
+      else if (status === "HISTORY_UNAVAILABLE") acc.historyUnavailable += 1;
+      else acc.pending += 1;
+      return acc;
+    },
+    { complete: 0, pending: 0, invalid: 0, historyUnavailable: 0 },
+  );
+  const settlementTerminal = settlement.complete + settlement.invalid + settlement.historyUnavailable;
+  const settlementProgress = trackedRows.length > 0 ? Number(((settlementTerminal / trackedRows.length) * 100).toFixed(2)) : 0;
+  const reportStatus = settlement.pending > 0 ? "PROVISIONAL" : "FINAL";
   const report = [
     "# Validation Report",
     "",
+    section("STATUS", [
+      row("reportState", reportStatus),
+      row("settlementProgressPercent", settlementProgress),
+      row("m60Complete", settlement.complete),
+      row("m60Pending", settlement.pending),
+      row("m60Invalid", settlement.invalid),
+      row("m60HistoryUnavailable", settlement.historyUnavailable),
+    ]),
     section("RUN INFO", [
       row("runId", runId),
       row("result", summary.result),

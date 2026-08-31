@@ -7,6 +7,7 @@ import { computeHorizons, computeReachTimes, moveKey, type PricePoint } from "@/
 import { detectMoverEvents } from "@/src/server/shadow-outcome/mover-truth";
 import type { DetectionSnapshot, JourneyEvent, PriceSource, TrackedCandidate } from "@/src/server/shadow-outcome/types";
 import { createRuntimeInstanceId } from "@/src/server/runtime/instance-id";
+import { getForensicSession } from "@/src/server/forensics/forensic-context";
 
 export const SHADOW_OUTCOME_ORDERS_DISABLED = true as const;
 
@@ -246,9 +247,10 @@ export class ShadowOutcomeEngine {
   }
 
   getMoverEvents(now = this.lastTickAt || Date.now()) {
+    const runId = getForensicSession()?.runId ?? null;
     const events = [];
     for (const [symbol, points] of this.prices) {
-      events.push(...detectMoverEvents({ symbol, points, now }));
+      events.push(...detectMoverEvents({ symbol, points, now, runId }));
     }
     return events;
   }

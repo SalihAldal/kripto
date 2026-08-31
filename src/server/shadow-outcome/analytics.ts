@@ -44,7 +44,7 @@ export function horizon(row: TrackedCandidate, min: number): HorizonOutcome | nu
 
 export function validMfe(row: TrackedCandidate, min = 60) {
   const item = horizon(row, min);
-  if (!item || item.quality !== "OK" || item.mfePct == null) return null;
+  if (!item || item.quality !== "OK" || item.status !== "COMPLETE" || item.mfePct == null) return null;
   return item.mfePct;
 }
 

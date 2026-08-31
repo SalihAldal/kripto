@@ -12,6 +12,10 @@ import {
   observeCanonicalShadowTick,
 } from "@/src/server/shadow-outcome/shadow-outcome-engine";
 import { persistShadowOutcomes } from "@/src/server/shadow-outcome/persist";
+import {
+  ensureShadowOutcomeFinalizerStarted,
+  getShadowOutcomeFinalizerState,
+} from "@/src/server/shadow-outcome/finalizer.service";
 import type { ScannerPipelineResult } from "@/src/types/scanner";
 import { getCanonicalCandidateStore } from "@/src/server/candidate/candidate-store.service";
 
@@ -126,6 +130,7 @@ export function ensureScannerWorkerStarted() {
   state.startedAt = new Date().toISOString();
   state.intervalMs = Math.max(3000, env.SCANNER_WORKER_INTERVAL_MS);
   pushLog("INFO", `Scanner worker baslatildi. interval=${state.intervalMs}ms`);
+  ensureShadowOutcomeFinalizerStarted();
   void tickOpportunity();
   opportunityTimer = setInterval(() => {
     void tickOpportunity();
@@ -151,6 +156,7 @@ export function getScannerWorkerSnapshot() {
     microstructure: getMicrostructureEngine().getTelemetry(),
     candidateStore: getCanonicalCandidateStore().getTelemetry(),
     shadowOutcome: getShadowOutcomeEngine().getTelemetry(),
+    shadowOutcomeFinalizer: getShadowOutcomeFinalizerState(),
     updatedAt: state.lastRunAt ?? null,
   };
 }

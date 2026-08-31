@@ -3,6 +3,7 @@ import { logger } from "@/lib/logger";
 import { pushLog } from "@/services/log.service";
 import { enqueueShadowValidationJob, startShadowValidationQueue } from "@/src/server/shadow-validation/shadow-validation-queue";
 import { ensureShadowEngineRegistrySeeded } from "@/src/server/shadow-validation/engine-registry.service";
+import { ensureShadowOutcomeFinalizerStarted } from "@/src/server/shadow-outcome/finalizer.service";
 
 type ShadowValidationWorkerState = {
   running: boolean;
@@ -27,6 +28,7 @@ export function ensureShadowValidationWorkersStarted() {
     ensureDecisionEngineV2WorkersStarted(),
   ).catch(() => null);
   startShadowValidationQueue();
+  ensureShadowOutcomeFinalizerStarted();
   state.running = true;
   state.startedAt = new Date().toISOString();
   pushLog("INFO", `Shadow validation workers baslatildi. interval=${state.intervalMs}ms`);

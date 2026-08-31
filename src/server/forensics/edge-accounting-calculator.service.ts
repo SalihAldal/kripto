@@ -62,11 +62,12 @@ function getOutcome60(candidate: AnyRecord) {
   const outcomes = Array.isArray(candidate.outcomes) ? (candidate.outcomes as AnyRecord[]) : [];
   const row = outcomes.find((item) => Number(item.horizonMin) === 60);
   if (!row) return null;
-  const complete = row.complete === true;
+  const status = String(row.status ?? "").toUpperCase();
+  const complete = row.complete === true || status === "COMPLETE" || status === "INVALID_DATA" || status === "HISTORY_UNAVAILABLE";
   const quality = String(row.quality ?? "");
   const mfe = asNumber(row.mfePct);
   const mae = asNumber(row.maePct);
-  if (!complete || quality !== "OK" || mfe == null) {
+  if (!complete || quality !== "OK" || mfe == null || status === "INVALID_DATA" || status === "HISTORY_UNAVAILABLE") {
     return null;
   }
   return { mfe, mae, returnPct: asNumber(row.returnPct) };
@@ -77,13 +78,13 @@ function hasEvent(state: CandidateStageState | undefined, event: string) {
 }
 
 function classifyRejection(state: CandidateStageState | undefined) {
-  if (!state || !hasEvent(state, "CANDIDATE_HOT")) return "NOT_HOT";
-  if (hasEvent(state, "MICRO_REJECTED")) return "MICRO_REJECTED";
-  if (hasEvent(state, "NOT_EXECUTION_READY")) return "NOT_EXECUTION_READY";
-  if (hasEvent(state, "RISK_REJECTED")) return "RISK_REJECTED";
-  if (hasEvent(state, "PAPER_REJECTED")) return "PAPER_REJECTED";
+  if (!state || !hasEvent(state, "CANDIDATE_HOT")) return "DETECTED_NOT_HOT";
+  if (hasEvent(state, "MICRO_REJECTED")) return "HOT_MICRO_REJECT";
+  if (hasEvent(state, "NOT_EXECUTION_READY")) return "MICRO_CONFIRMED_NOT_READY";
+  if (hasEvent(state, "RISK_REJECTED")) return "READY_RISK_REJECT";
+  if (hasEvent(state, "PAPER_REJECTED")) return "RISK_ALLOWED_PAPER_REJECT";
   if (hasEvent(state, "CANDIDATE_EXPIRED")) return "EXPIRED";
-  return "OTHER";
+  return "DATA_INVALID";
 }
 
 function median(values: number[]) {

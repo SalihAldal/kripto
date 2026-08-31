@@ -1,6 +1,7 @@
 import { apiOk } from "@/lib/api";
 import { getShadowOutcomeEngine } from "@/src/server/shadow-outcome/shadow-outcome-engine";
 import { getDailyEdgeReport, getEdgeAnalytics } from "@/src/server/shadow-outcome/reports";
+import { getShadowOutcomeFinalizerState } from "@/src/server/shadow-outcome/finalizer.service";
 
 export async function GET() {
   const engine = getShadowOutcomeEngine();
@@ -10,6 +11,7 @@ export async function GET() {
     owner: "shadow-outcome-engine",
     ordersDisabled: engine.ordersDisabled,
     telemetry: engine.getTelemetry(),
+    finalizer: getShadowOutcomeFinalizerState(),
     daily: getDailyEdgeReport({ rows, movers }),
     analytics: getEdgeAnalytics(rows, movers),
   });
