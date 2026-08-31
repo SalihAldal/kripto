@@ -1,0 +1,32 @@
+[
+  {
+    "experiment": "RESIDUAL_BLOCKER_SHADOW",
+    "hypothesis": "Confidence sonrası kalan ana bloklayıcıyı izole ederek false-release artmadan küçük iyileşme bulunabilir.",
+    "affectedCandidates": 30,
+    "historicalReleasedNetPnL": 0,
+    "falseReleaseRate": 0,
+    "oosStatus": "YES",
+    "risk": "LOW",
+    "successCriteria": "Released profitable > released losing and OOS direction same."
+  },
+  {
+    "experiment": "TDI_ORDERING_SHADOW",
+    "hypothesis": "Gate sıralaması ilk bloklayıcıyı değiştiriyorsa ordering sensitivity vardır.",
+    "affectedCandidates": 11,
+    "historicalReleasedNetPnL": 0,
+    "falseReleaseRate": 0,
+    "oosStatus": "YES",
+    "risk": "LOW",
+    "successCriteria": "ORDERING_MATTERS sinyali stabil kalır."
+  },
+  {
+    "experiment": "MASTER_DECISION_SHADOW",
+    "hypothesis": "Hybrid sonrası master WAIT zinciri asıl residual kilit olabilir.",
+    "affectedCandidates": 0,
+    "historicalReleasedNetPnL": 0,
+    "falseReleaseRate": 0,
+    "oosStatus": "YES",
+    "risk": "MEDIUM",
+    "successCriteria": "Counterfactual release net positive and false release controlled."
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "validationId": "p2-fee-aware-fix-shadow-2026-08-18T20-09-38-113Z",
+  "mode": "shadow",
+  "verdict": "ERROR",
+  "error": "\nInvalid `prisma.user.findFirst()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\execution.repository.ts:14:25\n\n  11 export async function getRuntimeExecutionContext(inputUserId?: string) {\n  12   let user = inputUserId\n  13     ? await prisma.user.findUnique({ where: { id: inputUserId } })\n→ 14     : await prisma.user.findFirst(\nCan't reach database server at `localhost:5432`\n\nPlease make sure your database server is running at `localhost:5432`."
+}

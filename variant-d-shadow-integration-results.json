@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-08-22T12:00:48.120Z",
+  "scenarios": [
+    {
+      "name": "baseline-before-variantd",
+      "passed": true
+    },
+    {
+      "name": "variantd-before-baseline",
+      "passed": true
+    },
+    {
+      "name": "system-timeout",
+      "passed": true
+    },
+    {
+      "name": "strategy-exit",
+      "passed": true
+    },
+    {
+      "name": "stop-loss",
+      "passed": true
+    },
+    {
+      "name": "take-profit",
+      "passed": true
+    },
+    {
+      "name": "no-exit-eligible",
+      "passed": true
+    },
+    {
+      "name": "repeated-market-updates",
+      "passed": true
+    },
+    {
+      "name": "duplicate-monitor-tick",
+      "passed": true
+    },
+    {
+      "name": "observer-error",
+      "passed": true
+    },
+    {
+      "name": "cancelled-position",
+      "passed": true
+    },
+    {
+      "name": "late-shadow-on-terminal",
+      "passed": true
+    }
+  ],
+  "passed": 12,
+  "total": 12,
+  "lookaheadViolation": 0,
+  "baselineBehaviorUnchanged": "YES",
+  "nonBlocking": "PASS",
+  "metrics": {
+    "shadowEvaluationCount": 16,
+    "shadowErrors": 1,
+    "shadowTimeouts": 0,
+    "lookaheadViolations": 0,
+    "shadowEvaluationLatencyP50": 0,
+    "shadowEvaluationLatencyP95": 0,
+    "shadowEvaluationLatencyP99": 0
+  }
+}

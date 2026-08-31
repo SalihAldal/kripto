@@ -1,0 +1,433 @@
+{
+  "generatedAt": "2026-08-22T14:40:05.480Z",
+  "constraints": {
+    "noPaperRun": true,
+    "noMarketData": true,
+    "noProductionChanges": true,
+    "noThresholdChangeImplemented": true
+  },
+  "canonicalDataset": {
+    "historicalCount": 248,
+    "currentCount": 2278,
+    "evidenceClassCounts": {
+      "INFERRED": 248
+    }
+  },
+  "distributionsByOutcome": {
+    "PROFITABLE": {
+      "momentumScore": {
+        "count": 42,
+        "mean": 6.51619,
+        "median": 1.94,
+        "p10": 0,
+        "p25": 0,
+        "p50": 1.94,
+        "p75": 18.78,
+        "p90": 18.78,
+        "min": 0,
+        "max": 18.78
+      },
+      "momentumGap": {
+        "count": 42,
+        "mean": -53.48381,
+        "median": -58.06,
+        "p10": -60,
+        "p25": -60,
+        "p50": -58.06,
+        "p75": -41.22,
+        "p90": -41.22,
+        "min": -60,
+        "max": -41.22
+      }
+    },
+    "LOSS": {
+      "momentumScore": {
+        "count": 206,
+        "mean": 5.167961,
+        "median": 1.94,
+        "p10": 0,
+        "p25": 0,
+        "p50": 1.94,
+        "p75": 4.745,
+        "p90": 18.78,
+        "min": 0,
+        "max": 18.78
+      },
+      "momentumGap": {
+        "count": 206,
+        "mean": -54.832039,
+        "median": -58.06,
+        "p10": -60,
+        "p25": -60,
+        "p50": -58.06,
+        "p75": -55.255,
+        "p90": -41.22,
+        "min": -60,
+        "max": -41.22
+      }
+    },
+    "BREAKEVEN": {
+      "momentumScore": {
+        "count": 0,
+        "mean": null,
+        "median": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null,
+        "min": null,
+        "max": null
+      },
+      "momentumGap": {
+        "count": 0,
+        "mean": null,
+        "median": null,
+        "p10": null,
+        "p25": null,
+        "p50": null,
+        "p75": null,
+        "p90": null,
+        "min": null,
+        "max": null
+      }
+    }
+  },
+  "scoreBuckets": [
+    {
+      "bucket": "Q1",
+      "lowerBound": 0,
+      "upperBound": 0,
+      "tradeCount": 105,
+      "wins": 16,
+      "losses": 89,
+      "winRate": 0.152381,
+      "grossPnL": 14.36090631,
+      "fees": 0.46969405,
+      "netPnL": -14.41608399,
+      "expectancy": -0.13729604,
+      "profitFactor": 0.06017106,
+      "avgHold": 496.857143,
+      "profitableTradeShare": 0.380952
+    },
+    {
+      "bucket": "Q2",
+      "lowerBound": 0,
+      "upperBound": 0,
+      "tradeCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": null,
+      "avgHold": null,
+      "profitableTradeShare": 0
+    },
+    {
+      "bucket": "Q3",
+      "lowerBound": 0,
+      "upperBound": 2.72,
+      "tradeCount": 45,
+      "wins": 9,
+      "losses": 36,
+      "winRate": 0.2,
+      "grossPnL": 1.93169,
+      "fees": 0.26324942,
+      "netPnL": -1.5015519,
+      "expectancy": -0.03336782,
+      "profitFactor": 0.25433057,
+      "avgHold": 425.755556,
+      "profitableTradeShare": 0.214286
+    },
+    {
+      "bucket": "Q4",
+      "lowerBound": 2.72,
+      "upperBound": 18.78,
+      "tradeCount": 98,
+      "wins": 17,
+      "losses": 81,
+      "winRate": 0.173469,
+      "grossPnL": 5.44719,
+      "fees": 0.63002944,
+      "netPnL": -4.96366998,
+      "expectancy": -0.05064969,
+      "profitFactor": 0.170273,
+      "avgHold": 659.55102,
+      "profitableTradeShare": 0.404762
+    },
+    {
+      "bucket": "Q5",
+      "lowerBound": 18.78,
+      "upperBound": 18.78,
+      "tradeCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": null,
+      "avgHold": null,
+      "profitableTradeShare": 0
+    }
+  ],
+  "bestScoreRegion": "Q3",
+  "worstScoreRegion": "Q1",
+  "monotonicity": {
+    "spearmanScoreVsNetPnl": -0.067687,
+    "increasingBucketSteps": 2,
+    "decreasingBucketSteps": 2,
+    "class": "NO_RELATIONSHIP"
+  },
+  "thresholdCurve": [
+    {
+      "threshold": 3.656,
+      "historicalProfitableRetained": 13,
+      "historicalLossRetained": 62,
+      "historicalBreakevenRetained": 0,
+      "netPnL": -4.13669846,
+      "expectancy": -0.05515598,
+      "winRate": 0.173333,
+      "profitFactor": 0.1601097,
+      "keptCount": 75,
+      "keptShare": 0.302419
+    },
+    {
+      "threshold": 18.78,
+      "historicalProfitableRetained": 13,
+      "historicalLossRetained": 43,
+      "historicalBreakevenRetained": 0,
+      "netPnL": -3.14311926,
+      "expectancy": -0.05612713,
+      "winRate": 0.232143,
+      "profitFactor": 0.20057095,
+      "keptCount": 56,
+      "keptShare": 0.225806
+    },
+    {
+      "threshold": 52,
+      "historicalProfitableRetained": 0,
+      "historicalLossRetained": 0,
+      "historicalBreakevenRetained": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "winRate": 0,
+      "profitFactor": null,
+      "keptCount": 0,
+      "keptShare": 0
+    },
+    {
+      "threshold": 56,
+      "historicalProfitableRetained": 0,
+      "historicalLossRetained": 0,
+      "historicalBreakevenRetained": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "winRate": 0,
+      "profitFactor": null,
+      "keptCount": 0,
+      "keptShare": 0
+    },
+    {
+      "threshold": 60,
+      "historicalProfitableRetained": 0,
+      "historicalLossRetained": 0,
+      "historicalBreakevenRetained": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "winRate": 0,
+      "profitFactor": null,
+      "keptCount": 0,
+      "keptShare": 0
+    },
+    {
+      "threshold": 64,
+      "historicalProfitableRetained": 0,
+      "historicalLossRetained": 0,
+      "historicalBreakevenRetained": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "winRate": 0,
+      "profitFactor": null,
+      "keptCount": 0,
+      "keptShare": 0
+    },
+    {
+      "threshold": 68,
+      "historicalProfitableRetained": 0,
+      "historicalLossRetained": 0,
+      "historicalBreakevenRetained": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "winRate": 0,
+      "profitFactor": null,
+      "keptCount": 0,
+      "keptShare": 0
+    }
+  ],
+  "profitable42Analysis": {
+    "count": 42,
+    "belowThresholdCount": 42,
+    "belowThresholdShare": 1,
+    "classes": {
+      "NEAR_THRESHOLD": 18,
+      "VERY_LOW_SCORE": 16,
+      "LOW_SCORE": 8
+    }
+  },
+  "falseNegativeAnalysis": {
+    "historicalMomentumFalseNegatives": 42,
+    "falseNegativeNetPnl": 2.45373448,
+    "falseNegativeAvgNetPnl": 0.05842225,
+    "falseNegativeShareOfProfitable": 1,
+    "historicalLossBelowThreshold": 206,
+    "lowScoreExpectancy": -0.08419881
+  },
+  "componentCalibration": {
+    "momentumScore_vs_netPnL": -0.067687,
+    "shortMomentum_vs_netPnL": 0.04549,
+    "shortFlow_vs_netPnL": 0.035674,
+    "sentiment_vs_netPnL": -0.014275
+  },
+  "strategyCalibration": [
+    {
+      "strategy": "Mean Reversion",
+      "count": 218,
+      "scoreMean": 4.828807,
+      "expectancy": -0.08795779,
+      "spearmanScoreNet": -0.00777,
+      "belowThresholdShare": 1
+    },
+    {
+      "strategy": "Volatility Breakout",
+      "count": 30,
+      "scoreMean": 9.52,
+      "expectancy": -0.05688361,
+      "spearmanScoreNet": -0.444959,
+      "belowThresholdShare": 1
+    },
+    {
+      "strategy": "Trend Following",
+      "count": 0,
+      "scoreMean": null,
+      "expectancy": 0,
+      "spearmanScoreNet": null,
+      "belowThresholdShare": 0
+    },
+    {
+      "strategy": "Other",
+      "count": 0,
+      "scoreMean": null,
+      "expectancy": 0,
+      "spearmanScoreNet": null,
+      "belowThresholdShare": 0
+    }
+  ],
+  "regimeCalibration": [
+    {
+      "regime": "RANGE",
+      "count": 162,
+      "scoreMean": 6.28216,
+      "scoreMedian": 2.42,
+      "expectancy": -0.0454148,
+      "belowThresholdShare": 1
+    },
+    {
+      "regime": "TREND",
+      "count": 0,
+      "scoreMean": null,
+      "scoreMedian": null,
+      "expectancy": 0,
+      "belowThresholdShare": 0
+    },
+    {
+      "regime": "HIGH_VOLATILITY",
+      "count": 6,
+      "scoreMean": 10.035,
+      "scoreMedian": 14,
+      "expectancy": -0.02776158,
+      "belowThresholdShare": 1
+    },
+    {
+      "regime": "LOW_VOLATILITY",
+      "count": 56,
+      "scoreMean": 0.624464,
+      "scoreMedian": 0,
+      "expectancy": -0.21102856,
+      "belowThresholdShare": 1
+    },
+    {
+      "regime": "CHAOS",
+      "count": 0,
+      "scoreMean": null,
+      "scoreMedian": null,
+      "expectancy": 0,
+      "belowThresholdShare": 0
+    },
+    {
+      "regime": "LOW_LIQUIDITY",
+      "count": 0,
+      "scoreMean": null,
+      "scoreMedian": null,
+      "expectancy": 0,
+      "belowThresholdShare": 0
+    },
+    {
+      "regime": "UNKNOWN",
+      "count": 24,
+      "scoreMean": 9.39125,
+      "scoreMedian": 5.825,
+      "expectancy": -0.06416412,
+      "belowThresholdShare": 1
+    }
+  ],
+  "currentVsHistorical": {
+    "currentLowScoreShare": 1,
+    "historicalProfitableLowScoreShare": 1,
+    "historicalLossLowScoreShare": 1
+  },
+  "temporalOos": {
+    "split": {
+      "TRAIN": {
+        "count": 148,
+        "scoreMean": 4.311959,
+        "winRate": 0.128378,
+        "expectancy": -0.10836444,
+        "spearmanScoreNet": -0.050637
+      },
+      "VALIDATION": {
+        "count": 50,
+        "scoreMean": 6.2052,
+        "winRate": 0.22,
+        "expectancy": -0.04705653,
+        "spearmanScoreNet": 0.055896
+      },
+      "OOS": {
+        "count": 50,
+        "scoreMean": 7.797,
+        "winRate": 0.24,
+        "expectancy": -0.04981084,
+        "spearmanScoreNet": -0.201015
+      }
+    },
+    "support": "NO"
+  },
+  "calibrationQuality": "BAD_CALIBRATION",
+  "safeNextExperiment": "MOMENTUM_SCORE_RECALIBRATION",
+  "finalVerdict": {
+    "MOMENTUM_SCORE_RELATIONSHIP": "NO_RELATIONSHIP",
+    "MOMENTUM_CALIBRATION": "BAD",
+    "HISTORICAL_PROFITABLE_BELOW_THRESHOLD": 42,
+    "HISTORICAL_LOSS_BELOW_THRESHOLD": 206,
+    "PROFITABLE_LOW_SCORE_NET_PNL": 2.45373448,
+    "LOW_SCORE_EXPECTANCY": -0.08419881,
+    "CURRENT_2278_LOW_SCORE_SHARE": 1,
+    "CURRENT_ZERO_APPROVAL_CAUSE": "SCORE_MISCalibration",
+    "SAFE_NEXT_EXPERIMENT": "MOMENTUM_SCORE_RECALIBRATION",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-08-28T17:07:21.656Z",
+  "testRunPass": true,
+  "suites": [
+    "tests/overnight-readiness-invariants.test.ts",
+    "tests/p2-scanner-ai-conflict.test.ts",
+    "tests/endurance/*",
+    "tests/zero-trade-correctness.test.ts",
+    "tests/ai-ev-telemetry.test.ts",
+    "tests/pnl-calculator.test.ts"
+  ],
+  "signatures": [
+    [
+      "AI_DECISION_CONFLICT",
+      "FIXED",
+      "mapMasterConsensusDecision + resolveConsensusForExecutionGate"
+    ],
+    [
+      "preservedHybridBuy misalignment",
+      "FIXED",
+      "master-decision-engine + decision-contract"
+    ],
+    [
+      "AI_NO_RESPONSE",
+      "FIXED",
+      "ai-runtime terminalize"
+    ],
+    [
+      "AI_PROVIDER_DEGRADED",
+      "EXPECTED",
+      "degraded excluded from vote"
+    ],
+    [
+      "MTF=0 missing coercion",
+      "FIXED",
+      "hybrid MTF unavailable guard"
+    ],
+    [
+      "pumpRisk=100 sentinel",
+      "FIXED",
+      "resolvePumpRiskContract degraded=UNAVAILABLE"
+    ],
+    [
+      "EV_REJECT>=threshold",
+      "FIXED",
+      "HYBRID_DECISION_MIRROR classification"
+    ],
+    [
+      "Paper 50/70 mismatch",
+      "FIXED",
+      "paper-lane-profile centralize"
+    ],
+    [
+      "NO_TRADE symbol bind",
+      "FIXED",
+      "auto-round-terminal-policy"
+    ],
+    [
+      "AI_STARTED orphan",
+      "FIXED",
+      "terminalizeOpenAiCandidates"
+    ],
+    [
+      "P2002 duplicate run",
+      "FIXED",
+      "idempotency key"
+    ],
+    [
+      "heartbeat timeout",
+      "FIXED",
+      "round-progress-state"
+    ],
+    [
+      "zombie EXECUTING",
+      "FIXED",
+      "registry reconcile"
+    ],
+    [
+      "0 trades overnight",
+      "POLICY_LIMITATION",
+      "SIM_TIGHT_FILTER + AI_VETO dominate"
+    ],
+    [
+      "37 cohort 0 execution-ready",
+      "POLICY_LIMITATION",
+      "multi-gate interaction"
+    ]
+  ]
+}

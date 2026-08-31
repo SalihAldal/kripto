@@ -14,6 +14,10 @@ export type MarketDataReadOptions = {
   priority?: MarketDataPriority;
   maxAgeMs?: number;
   allowStaleOnBackoff?: boolean;
+  signal?: AbortSignal;
+  timeoutMs?: number;
+  /** Explicit REST bootstrap/recovery only. Hot-path must omit this. */
+  recovery?: boolean;
 };
 
 export type MarketDataTicker = {

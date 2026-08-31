@@ -80,7 +80,10 @@ export function buildEntryTimingExperiment(input: {
     evidenceRefs: ["P1 entry timing forensics"],
   });
 
-  const lateEntryCount = input.rows.filter((row) => row.entryTiming?.classification === "POSSIBLY_LATE").length;
+  const lateEntryCount = input.rows.filter((row) => {
+    const classification = row.entryTiming?.classification;
+    return classification === "POSSIBLY_LATE" || classification === "CHASING" || classification === "EDGE_DECAY";
+  }).length;
 
   const promotion = evaluatePromotionGate({
     changeId: "entry-timing-protection-v1",

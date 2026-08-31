@@ -1,0 +1,19 @@
+{
+  "mode": "POLICY_LEVEL_OOS",
+  "train": {
+    "size": 25,
+    "primary": "MOMENTUM",
+    "share": 0.56
+  },
+  "validation": {
+    "size": 8,
+    "primary": "MOMENTUM",
+    "share": 1
+  },
+  "oos": {
+    "size": 9,
+    "primary": "MOMENTUM",
+    "share": 0.888889
+  },
+  "support": "YES"
+}

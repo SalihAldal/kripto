@@ -1,0 +1,21 @@
+{
+  "tests": [
+    "tests/endurance/50round-deterministic-stress.test.ts",
+    "tests/endurance/failure-injection.test.ts",
+    "tests/endurance/state-machine-lifecycle.test.ts",
+    "tests/endurance/recovery-idempotency.test.ts",
+    "tests/auto-round-integrity.test.ts",
+    "tests/auto-round-no-trade-execution.test.ts",
+    "tests/scheduler-ownership.test.ts",
+    "tests/scheduler-recovery.test.ts",
+    "tests/round-progress-recovery.test.ts",
+    "tests/round-runtime.test.ts",
+    "tests/forensics/p1-runtime-reliability.test.ts",
+    "tests/pnl-calculator.test.ts",
+    "tests/forensics/transaction-telemetry-scope.test.ts",
+    "tests/paper-round-gates-contract.test.ts",
+    "tests/market-context-pump-risk.test.ts"
+  ],
+  "result": "PASS",
+  "generatedAt": "2026-08-27T19:59:21.593Z"
+}

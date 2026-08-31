@@ -1,0 +1,26 @@
+{
+  "formula": "scoreMomentumImpulse-v1",
+  "expression": "clamp(abs(shortMomentumPercent)*28 + abs(change5m)*10 + abs(change15m)*4, 0, 100)",
+  "cases": [
+    {
+      "shortMomentum": 0.42,
+      "change5m": 0.8,
+      "change15m": 1.2,
+      "expected": 24.56
+    },
+    {
+      "shortMomentum": null,
+      "change5m": null,
+      "change15m": null,
+      "expectedState": "MISSING"
+    }
+  ],
+  "missingSemantics": {
+    "value": null,
+    "state": "MISSING",
+    "source": "test",
+    "timestamp": null,
+    "freshnessMs": null,
+    "unit": "x"
+  }
+}

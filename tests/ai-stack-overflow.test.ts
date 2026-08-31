@@ -14,7 +14,7 @@ import {
   startSelectionBudgetEnforcer,
 } from "@/src/server/execution/round-runtime.service";
 import { linkAbortSignal } from "@/src/server/execution/cancellable-work.service";
-import { runLegacyAIConsensusFromInput } from "@/src/server/ai/analysis-orchestrator";
+import { runAIConsensusFromInput, runLegacyAIConsensusFromInput } from "@/src/server/ai/analysis-orchestrator";
 import { createProviderAdapter } from "@/src/server/ai/provider-factory";
 import { resolveIndicatorSnapshot } from "@/src/server/ai/indicator-suite";
 import { failAiCandidate, resetAiRuntimeState, beginAiBatch, startAiCandidate, getAiBatchProgress } from "@/src/server/forensics/ai-runtime.service";
@@ -108,9 +108,11 @@ vi.mock("@/src/server/forensics/ai-runtime.service", async (importOriginal) => {
 });
 
 const decisionTimelineCreateMany = vi.fn(() => Promise.resolve({ count: 0 }));
+const upsertDecisionLogRecord = vi.fn(() => Promise.resolve(null));
 
 vi.mock("@/src/server/repositories/decision-log.repository", () => ({
   appendDecisionTimelineEvents: vi.fn(() => Promise.resolve()),
+  upsertDecisionLogRecord: (...args: unknown[]) => upsertDecisionLogRecord(...args),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -182,6 +184,8 @@ describe("P0 AI stack overflow regression", () => {
     mockFastProviders();
     buildSnapshotSpy = vi.spyOn(indicatorSuite, "buildIndicatorSnapshot");
     decisionTimelineCreateMany.mockClear();
+    upsertDecisionLogRecord.mockReset();
+    upsertDecisionLogRecord.mockImplementation(() => Promise.resolve(null));
   });
 
   afterEach(() => {
@@ -240,7 +244,9 @@ describe("P0 AI stack overflow regression", () => {
     const hybridSpy = vi.spyOn(hybridModule, "buildHybridDecision").mockImplementation(() => {
       throw new RangeError("Maximum call stack size exceeded");
     });
-    await expect(runLegacyAIConsensusFromInput(freshAiInput("FILTRY"))).rejects.toThrow(RangeError);
+    await expect(runLegacyAIConsensusFromInput(freshAiInput("FILTRY"))).rejects.toThrow(
+      /AI_STACK_DEPTH_GUARD:hybrid_decision/i,
+    );
     expect(hybridSpy).toHaveBeenCalledTimes(1);
     hybridSpy.mockRestore();
   });
@@ -310,6 +316,8 @@ describe("P0 AI stack overflow regression", () => {
     expect(result.consensusTelemetry?.indicatorSnapshotBuildMs).toBeGreaterThanOrEqual(0);
     expect(result.consensusTelemetry?.hybridDecisionMs).toBeGreaterThanOrEqual(0);
     expect(result.consensusTelemetry?.consensusAssemblyMs).toBeGreaterThanOrEqual(0);
+    expect((result.consensusTelemetry?.phaseTraces ?? []).length).toBeGreaterThan(0);
+    expect((result.consensusTelemetry?.phaseTraces ?? []).some((row) => row.phase === "hybrid_decision")).toBe(true);
   });
 
   it("11. worker catches synthetic RangeError and terminalizes candidate without retry loop", async () => {
@@ -342,6 +350,30 @@ describe("P0 AI stack overflow regression", () => {
     expect(getAiBatchProgress("r-stack")?.candidates[0]?.status).toBe("AI_FAILED");
   });
 
+  it("11b. one guarded candidate does not block next candidate at concurrency=2", async () => {
+    const hybridModule = await import("@/src/server/ai/hybrid-decision-engine");
+    const original = hybridModule.buildHybridDecision;
+    const hybridSpy = vi.spyOn(hybridModule, "buildHybridDecision").mockImplementation((payload: Parameters<typeof original>[0]) => {
+      if (payload.analysisInput.symbol === "FAILTRY") {
+        throw new RangeError("Maximum call stack size exceeded");
+      }
+      return original(payload);
+    });
+    const results = await runCooperativePool(
+      ["FAILTRY", "OKTRY"],
+      async (symbol, _index, signal) => {
+        try {
+          return await runLegacyAIConsensusFromInput(freshAiInput(symbol), { signal });
+        } catch {
+          return null;
+        }
+      },
+      { label: "stack-guard-isolation", concurrency: 2, workerTimeoutMs: 15_000 },
+    );
+    expect(results.filter((row) => row !== null).length).toBeGreaterThanOrEqual(1);
+    hybridSpy.mockRestore();
+  });
+
   it("12. stack-overflow remediation does not amplify decisionTimelineEvent.createMany calls", async () => {
     const before = decisionTimelineCreateMany.mock.calls.length;
     await runLegacyAIConsensusFromInput(freshAiInput("FILTRY"));
@@ -364,4 +396,13 @@ describe("P0 AI stack overflow regression", () => {
     setTimeout(() => parent.abort("cancel"), 30);
     await expect(pending).rejects.toBeInstanceOf(CooperativeAsyncCancelledError);
   }, 10_000);
+
+  it("14. observeAiDecision RangeError does not fail consensus result", async () => {
+    upsertDecisionLogRecord.mockImplementationOnce(() => {
+      throw new RangeError("Maximum call stack size exceeded");
+    });
+    const result = await runAIConsensusFromInput(freshAiInput("STACKTRY"));
+    expect(result.generatedAt).toBeTruthy();
+    expect(result.finalDecision).toBeTruthy();
+  });
 });

@@ -24,6 +24,15 @@ import {
   buildLossPatternReport,
   buildWinningPatternReport,
 } from "@/src/server/forensics/trade-pattern-analysis.service";
+import { buildEntryTimingAggregateReport } from "@/src/server/forensics/entry-timing-forensics.service";
+import {
+  buildExitFeeInteraction,
+  buildExitForensicsReport,
+  buildFeeByHoldTime,
+  buildFeeByStrategy,
+  buildGrossPositiveNetNegative,
+  buildReplayExitDiagnostics,
+} from "@/src/server/forensics/exit-fee-forensics.service";
 import type { MarketContext, ScannerScore } from "@/src/types/scanner";
 import type { NotDiscoveredAnalysisRecord, ScannerQualificationRejection } from "@/src/server/forensics/forensic.types";
 
@@ -186,6 +195,8 @@ export function buildP1ForensicReports(session: ForensicSessionContext): P1Foren
     scannerQualificationRejections: session.scannerQualificationRejections ?? [],
     notDiscoveredRecords: session.notDiscoveredRecords ?? [],
     entryTimingRecords: session.entryTimingRecords ?? [],
+    entryTimingAggregates: buildEntryTimingAggregateReport(session.entryTimingRecords ?? []),
+    scannerCoverage: session.scannerCoverageSnapshots ?? [],
     evCalibration,
     evComponentAttribution,
     strategyPerformance,
@@ -196,6 +207,15 @@ export function buildP1ForensicReports(session: ForensicSessionContext): P1Foren
     winningPatterns,
     feeAwareEdgeResearch,
     promotionGate,
+    exitForensicsReport: buildExitForensicsReport({ pnlEntries: session.pnlEntries }),
+    replayExitDiagnostics: buildReplayExitDiagnostics({ pnlEntries: session.pnlEntries }),
+    grossPositiveNetNegative: buildGrossPositiveNetNegative({
+      pnlEntries: session.pnlEntries,
+      strategyByTradeId,
+    }),
+    feeByStrategy: buildFeeByStrategy({ pnlEntries: session.pnlEntries, strategyByTradeId }),
+    feeByHoldTime: buildFeeByHoldTime({ pnlEntries: session.pnlEntries }),
+    exitFeeInteraction: buildExitFeeInteraction({ pnlEntries: session.pnlEntries }),
   };
 }
 

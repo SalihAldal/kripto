@@ -1,0 +1,17 @@
+{
+  "validationId": "overnight-30round-2026-08-22T23-23-52-425Z",
+  "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+  "sessionId": "cmt4zxkbm001gun8ghz4qsb0w",
+  "timestamp": "2026-08-22T23:23:57.878Z",
+  "gitFingerprint": "4b8d5cc3890c1d454d483aabe2f70f0f12f824de",
+  "configFingerprint": "fe35def2890af674",
+  "executionMode": "paper",
+  "exchange": "tr",
+  "aiPolicy": "VETO",
+  "variantDEnabled": true,
+  "variantDShadowEnabled": false,
+  "totalRounds": 30,
+  "jobStartedAt": "2026-08-22T23:15:15.083Z",
+  "attachMode": "EXISTING_RUNNING_JOB",
+  "watchdogStartedAt": "2026-08-22T23:23:57.985Z"
+}

@@ -1,0 +1,316 @@
+{
+  "generatedAt": "2026-08-28T16:45:53.670Z",
+  "methodology": "READ_ONLY_OFFLINE_FORENSIC",
+  "noPaperRun": true,
+  "noCodeChange": true,
+  "runtimeWindow": {
+    "jobId": "cmtd396jg0009un7c8im4dggo",
+    "runId": "cmtd396q5000pun7c4ax7rltg",
+    "roundId": "1",
+    "edenWindowStartUTC": "2026-08-28T15:00:00.000Z",
+    "edenWindowEndUTC": "2026-08-28T16:00:00.000Z",
+    "edenWindowStartIstanbul": "2026-08-28 18:00:00 +03",
+    "edenWindowEndIstanbul": "2026-08-28 19:00:00 +03",
+    "engineStartUTC": "2026-08-28T15:10:25.000Z",
+    "engineEndUTC": "2026-08-28T15:31:03.000Z",
+    "engineStartIstanbul": "2026-08-28 18:10:25 +03",
+    "engineEndIstanbul": "2026-08-28 18:31:03 +03",
+    "engineActiveDuringMoveWindow": true,
+    "engineCoveredFullHour": false,
+    "engineNotActiveFullHour": "ENGINE_NOT_ACTIVE_DURING_FULL_EDEN_MOVE",
+    "activeRuntimeMinutes": 20.63,
+    "gapBeforeEngineMin": 10.42,
+    "gapAfterEngineMin": 28.95
+  },
+  "edenMarket": {
+    "open": 3.322,
+    "close": 3.477,
+    "high": 3.565,
+    "low": 3.311,
+    "return5m": -0.5150214592274746,
+    "return15m": -1.0810810810810882,
+    "return30m": -2.0287404902789534,
+    "return60m": null,
+    "openToHigh": 7.314870559903669,
+    "closeToClose": 4.66586393738711,
+    "maximumIntrawindowGain": 7.314870559903669,
+    "maximumAdverseMove": -0.33112582781457317,
+    "atDecisionTime": {
+      "open": 3.322,
+      "close": 3.513,
+      "high": 3.565,
+      "low": 3.311,
+      "return5m": 0.14253135689851465,
+      "return15m": 2.990325417766047,
+      "return30m": 5.590622182146076,
+      "return60m": null,
+      "openToHigh": 7.314870559903669,
+      "closeToClose": 5.749548464780248,
+      "maximumIntrawindowGain": 7.314870559903669,
+      "maximumAdverseMove": -0.33112582781457317
+    },
+    "klineCount": 60,
+    "outcomeLabelOnly": "+4.79% user-observed (not used as decision input)"
+  },
+  "edenExecutability": {
+    "couldHaveOpenedTrade": "NO",
+    "firstTrueBlocker": "SCANNER_AI",
+    "routingFailure": "AI_ROUTING_FAILURE",
+    "rationale": "BUY at confidence 78 blocked by provider consensus conflict (BUY vs NO-TRADE) before TDI/execution path",
+    "discoveryVerdict": "SUCCESS",
+    "profitConversionVerdict": "FAILURE"
+  },
+  "edenTimeline": [
+    {
+      "stage": "MARKET_FIRST_OBSERVABLE",
+      "timestamp": "2026-08-28T15:00:00.000Z",
+      "verdict": "OBSERVABLE",
+      "reasonCode": "KLINES",
+      "reasonDetail": "1m Binance TR data"
+    },
+    {
+      "stage": "ENGINE_RUNTIME_START",
+      "timestamp": "2026-08-28T15:10:25.000Z",
+      "verdict": "ACTIVE",
+      "reasonCode": "ROUND_START",
+      "reasonDetail": "Tur 1/5 paper validation"
+    },
+    {
+      "stage": "FIRST_SCANNER_OBSERVATION",
+      "timestamp": "2026-08-28T15:10:25.000Z",
+      "verdict": "YES",
+      "reasonCode": "PUMP_LIVE_SCAN",
+      "reasonDetail": "~62 pump candidates scanned"
+    },
+    {
+      "stage": "FIRST_CANDIDATE",
+      "timestamp": "2026-08-28T15:10:25.000Z",
+      "verdict": "YES",
+      "reasonCode": "PAPER_LANE",
+      "reasonDetail": "88 scanner AI batch"
+    },
+    {
+      "stage": "PAPER_LANE",
+      "timestamp": "2026-08-28T15:10:25.000Z",
+      "verdict": "ADMITTED",
+      "reasonCode": "PAPER_ADMISSION",
+      "reasonDetail": "usePaperProfile active"
+    },
+    {
+      "stage": "SCANNER_AI",
+      "timestamp": "2026-08-28T15:31:03.000Z",
+      "verdict": "BLOCKED",
+      "reasonCode": "AI_DECISION_CONFLICT",
+      "reasonDetail": "aiFinalDecision=BUY, aiConsensusDecision=NO-TRADE, confidence=78"
+    },
+    {
+      "stage": "TDI",
+      "timestamp": "UNKNOWN",
+      "verdict": "SKIPPED",
+      "reasonCode": "PRE_TDI_SCANNER_AI_BLOCK",
+      "reasonDetail": "Architecturally skipped — scanner AI blocked before TDI"
+    },
+    {
+      "stage": "CONSENSUS",
+      "timestamp": "UNKNOWN",
+      "verdict": "NOT_REACHED",
+      "reasonCode": "UPSTREAM_BLOCK",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "MASTER",
+      "timestamp": "UNKNOWN",
+      "verdict": "NOT_REACHED",
+      "reasonCode": "UPSTREAM_BLOCK",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "EV",
+      "timestamp": "UNKNOWN",
+      "verdict": "NOT_REACHED",
+      "reasonCode": "UPSTREAM_BLOCK",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "RISK",
+      "timestamp": "UNKNOWN",
+      "verdict": "NOT_REACHED",
+      "reasonCode": "UPSTREAM_BLOCK",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "SIZING",
+      "timestamp": "UNKNOWN",
+      "verdict": "NOT_REACHED",
+      "reasonCode": "UPSTREAM_BLOCK",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "EXECUTION_READY",
+      "timestamp": "UNKNOWN",
+      "verdict": "NO",
+      "reasonCode": "NEVER_REACHED",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "ORDER",
+      "timestamp": "UNKNOWN",
+      "verdict": "NO",
+      "reasonCode": "NEVER_REACHED",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "FILL",
+      "timestamp": "UNKNOWN",
+      "verdict": "NO",
+      "reasonCode": "NEVER_REACHED",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "EXIT",
+      "timestamp": "UNKNOWN",
+      "verdict": "NO",
+      "reasonCode": "NEVER_REACHED",
+      "reasonDetail": ""
+    },
+    {
+      "stage": "ENGINE_RUNTIME_END",
+      "timestamp": "2026-08-28T15:31:03.000Z",
+      "verdict": "TERMINAL",
+      "reasonCode": "AI_GATE_BLOCK",
+      "reasonDetail": "tur_basarisiz"
+    }
+  ],
+  "top50Summary": {
+    "total": 50,
+    "discovered": 49,
+    "discoveredBeforeMove": 16,
+    "executionReady": 0
+  },
+  "cohort37Summary": {
+    "rounds": 10,
+    "trades": 0,
+    "cohortSeen": 37,
+    "cohortBlocked": 37,
+    "cohortAiReached": 35,
+    "cohortEvReached": 28,
+    "executionReady": 0
+  },
+  "waterfall": {
+    "top50": {
+      "TOP_GAINER_TOTAL": 50,
+      "DISCOVERED": 49,
+      "DISCOVERED_BEFORE_MOVE": 16,
+      "VALID_DECISION_DATA": 48,
+      "CANDIDATE": 48,
+      "PAPER_ADMITTED": 49,
+      "AI": 47,
+      "TDI": 23,
+      "CONSENSUS": 43,
+      "EV": 43,
+      "RISK": 0,
+      "SIZING": 0,
+      "EXECUTION_READY": 0,
+      "TRADE": 0,
+      "CLOSED_TRADE": 0
+    },
+    "cohort37": {
+      "TOP_GAINER_TOTAL": 50,
+      "DISCOVERED": 49,
+      "DISCOVERED_BEFORE_MOVE": 37,
+      "VALID_DECISION_DATA": 37,
+      "CANDIDATE": 37,
+      "PAPER_ADMITTED": 37,
+      "AI": 35,
+      "TDI": 0,
+      "CONSENSUS": 32,
+      "EV": 28,
+      "RISK": 0,
+      "SIZING": 0,
+      "EXECUTION_READY": 0,
+      "TRADE": 0,
+      "CLOSED_TRADE": 0
+    }
+  },
+  "lossControl": {
+    "profitable42Total": 42,
+    "profitableBlockedByTDI": 42,
+    "paired173Total": 173,
+    "funnel2278Total": 2278,
+    "newlyApprovedIfFixed": 0,
+    "execReadyIfScannerRemoved37": 5,
+    "profitableReleasedByPrimaryFix": 0,
+    "losingReleasedByPrimaryFix": 0,
+    "note": "42 profitable all blocked at TDI TECHNICAL in baseline; primary scanner fix releases 0 historical profitable without TDI change"
+  },
+  "highConfidenceNonExecution": [
+    {
+      "symbol": "EDENTRY",
+      "roundId": 1,
+      "confidence": 78,
+      "aiRawDecision": "BUY",
+      "consensus": "NO-TRADE",
+      "tdi": "SKIPPED",
+      "ev": "NOT_REACHED",
+      "risk": "NOT_REACHED",
+      "sizing": "NOT_REACHED",
+      "finalBlocker": "SCANNER_AI",
+      "classification": "AI_DECISION_CONFLICT"
+    }
+  ],
+  "lowConfidenceCount": 2029,
+  "aiConflicts": [
+    {
+      "symbol": "EDENTRY",
+      "round": 1,
+      "aiRaw": "BUY",
+      "consensus": "NO-TRADE",
+      "confidence": 78,
+      "classification": "CONSENSUS_AGGREGATION",
+      "conflictType": "BUY_vs_NO_TRADE"
+    }
+  ],
+  "verdict": {
+    "EDEN_DISCOVERED": "YES",
+    "EDEN_DISCOVERED_BEFORE_MOVE": "YES",
+    "EDEN_VALID_DECISION_DATA": "YES",
+    "EDEN_EXECUTION_POSSIBLE": "NO",
+    "EDEN_FIRST_TRUE_BLOCKER": "SCANNER_AI",
+    "EDEN_FINAL_BLOCKER": "SCANNER_AI",
+    "TOP50": 50,
+    "TOP50_DISCOVERED": 49,
+    "TOP50_DISCOVERED_BEFORE_MOVE": 16,
+    "ACTIONABLE_OPPORTUNITIES": 37,
+    "ACTIONABLE_REACHING_EXECUTION_READY": 0,
+    "ACTIONABLE_EXECUTED": 0,
+    "DISCOVERY_RATE": 98,
+    "EXECUTION_CONVERSION_RATE": 0,
+    "EXECUTION_READY_RATE": 0,
+    "HIGH_CONFIDENCE_NONEXECUTION": 1,
+    "AI_CONFLICT_CASES": 1,
+    "PRIMARY_EXECUTABLE_OPPORTUNITY_BLOCKER": "SCANNER_AI",
+    "PRIMARY_EXECUTABLE_OPPORTUNITY_BLOCKER_SHARE": 28.9,
+    "PRIMARY_FALSE_NEGATIVE_COUNT": 20,
+    "PRIMARY_LEGITIMATE_COUNT": 17,
+    "PROFITABLE_RELEASED_BY_PRIMARY_FIX": 0,
+    "LOSING_RELEASED_BY_PRIMARY_FIX": 0,
+    "OOS_SUPPORT": "PARTIAL",
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "RUNTIME_REGRESSION": "NO",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO",
+    "NEXT_ENGINEERING_TARGET": "SCANNER_STAGE_AI_CONSENSUS_CONFLICT_RESOLUTION"
+  },
+  "nextEngineeringTarget": {
+    "target": "SCANNER_STAGE_AI_CONSENSUS_CONFLICT_RESOLUTION",
+    "description": "Audit and fix scanner-stage AI consensus aggregation so high-confidence BUY paths with provider disagreement (e.g. EDENTRY conf=78 BUY vs NO-TRADE) route to TDI for technical validation instead of hard-blocking before downstream gates. Add per-provider conflict telemetry.",
+    "rationale": [
+      "EDEN: discovered YES, paper admitted YES, confidence 78 BUY — blocked only by AI conflict",
+      "37 cohort: 0 execution-ready; scanner/AI dominate first blocker",
+      "42 profitable historical: all TDI-blocked — scanner fix alone releases 0 without TDI path",
+      "Counterfactual: only 2/37 reach exec-ready if scanner removed — multi-gate interaction"
+    ],
+    "implementNow": false,
+    "paperRequired": true,
+    "productionChangeRecommended": false
+  }
+}

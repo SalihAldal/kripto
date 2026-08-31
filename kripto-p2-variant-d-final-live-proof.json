@@ -1,0 +1,74 @@
+{
+  "runWindow": "FINAL_BOUNDED_SINGLE_WINDOW",
+  "validationId": "5round-2026-08-22T16-19-29-790Z",
+  "sessionId": "cmt4l30ct0009un60kyipsrxt",
+  "variantD": {
+    "implemented": true,
+    "enabledForThisWindow": true,
+    "shadowEnabled": false,
+    "productionDefault": "BASELINE"
+  },
+  "preflightResult": {
+    "db": "PASS",
+    "binance": "PASS",
+    "ai": "PASS",
+    "clock": "PASS",
+    "emergencyStop": "PASS",
+    "activeJobs": "PASS",
+    "duplicateJobs": "PASS",
+    "zombieRounds": "PASS_WITH_RECONCILE",
+    "workerLocks": "PASS",
+    "resolvedConfig": "PASS"
+  },
+  "rounds": {
+    "total": 5,
+    "terminalRounds": 5,
+    "status": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 5
+  },
+  "trades": {
+    "liveTrades": 0,
+    "closedTrades": 0,
+    "systemTimeoutLiveCount": 0,
+    "actualVariantDExitEvidence": "NOT_EXERCISED"
+  },
+  "pnl": {
+    "grossPnl": 0,
+    "fees": 0,
+    "netPnl": 0,
+    "expectancy": null,
+    "profitFactor": null,
+    "maxDrawdown": 0,
+    "grossPositiveNetNegative": 0,
+    "reconciliation": "PASS"
+  },
+  "runtimeSafety": {
+    "runtimeStable": "YES",
+    "aiParity": "PASS",
+    "rangeError": 0,
+    "aiOrphan": 0,
+    "zombieRound": 0,
+    "manualStopSignal": 1,
+    "schedulerCrash": 0,
+    "patchJobActiveRoundTimeout": 0,
+    "dbTransientFailures": 0
+  },
+  "verdict": {
+    "FIVE_ROUNDS_COMPLETED": "YES",
+    "LIVE_TRADES": 0,
+    "CLOSED_TRADES": 0,
+    "LIVE_VARIANT_D_EXECUTION": "NOT_PROVEN",
+    "SYSTEM_TIMEOUT_LIVE_COUNT": 0,
+    "LIVE_GROSS_PNL": 0,
+    "LIVE_FEES": 0,
+    "LIVE_NET_PNL": 0,
+    "LIVE_EXPECTANCY": "N/A",
+    "LIVE_PROFITABILITY": "NOT_PROVEN",
+    "RUNTIME_STABLE": "YES",
+    "AI_PARITY": "PASS",
+    "PNL_RECONCILIATION": "PASS",
+    "PRODUCTION_DEFAULT": "BASELINE",
+    "NEXT_STEP": "VARIANT_D_LIVE_NOT_EXERCISED olarak kaydet; yeni pencereyi sadece explicit komutla ve tekrar tek bounded window olarak başlat."
+  }
+}

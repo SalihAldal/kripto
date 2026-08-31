@@ -64,6 +64,11 @@ function num(value: unknown, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function numOrNull(value: unknown) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export function isStrongHourPumpContext(input: {
   change24h?: number;
   hourMomentum?: number;
@@ -156,7 +161,8 @@ export function evaluatePaperEntryQuality(input: {
   const ema200 = num(meta.ema200);
   const dump15mPercent = num(meta.dump15mPercent);
   const redCandleCount5 = num(meta.redCandleCount5);
-  const volumeRatio20 = num(meta.volumeRatio20, 1);
+  const volumeRatio20 = numOrNull(meta.volumeRatio20);
+  const hasVolumeRatio20 = volumeRatio20 !== null;
   const atrPercent = num(meta.atrPercent, context.volatilityPercent);
   const tapeMomentum = input.tapeMomentum ?? num(meta.shortMomentumPercent);
   const hourMomentum = input.hourMomentum ?? num(meta.hourMomentumPercent);
@@ -169,6 +175,7 @@ export function evaluatePaperEntryQuality(input: {
   const strongHourPump = isStrongHourPumpContext({ change24h, hourMomentum, tapeMomentum, shortFlow });
   const dataDegraded =
     Boolean(input.dataDegraded) ||
+    !hasVolumeRatio20 ||
     (Math.abs(tapeMomentum) < 0.001 && Math.abs(shortFlow) < 0.01 && hourMomentum >= 0.5);
   const minScore = Math.max(
     35,
@@ -213,7 +220,7 @@ export function evaluatePaperEntryQuality(input: {
           reasons.push(`EMA trend uyumsuz (EMA50=${ema50.toFixed(4)}, EMA200=${ema200.toFixed(4)})`);
         }
       }
-      if (volumeRatio20 > 0 && volumeRatio20 < 1.05 && !momentumOverride) {
+      if (hasVolumeRatio20 && volumeRatio20 > 0 && volumeRatio20 < 1.05 && !momentumOverride) {
         rejectBuckets.push("HACIM_YETERSIZ");
         reasons.push(`Hacim yetersiz (${volumeRatio20.toFixed(2)}x < 1.05x)`);
       }
@@ -242,8 +249,9 @@ export function evaluatePaperEntryQuality(input: {
         : 0;
   const emaStructure = emaBullStructure ? 20 : ema50 > ema200 ? 10 : strongHourPump ? 8 : 0;
   const btcPositive = btc?.bullish ? 15 : btc && btc.price >= btc.ema20 ? 8 : pumpLane ? 6 : 0;
-  const highVolume =
-    volumeRatio20 >= 2 ? 15 : volumeRatio20 >= 1.5 ? 12 : volumeRatio20 >= 1.1 ? 8 : strongHourPump ? 6 : 0;
+  const highVolume = !hasVolumeRatio20
+    ? 8
+    : volumeRatio20 >= 2 ? 15 : volumeRatio20 >= 1.5 ? 12 : volumeRatio20 >= 1.1 ? 8 : strongHourPump ? 6 : 0;
   const rsiHealthy = rsi14 >= 45 && rsi14 <= 72 ? 10 : rsi14 >= 38 && rsi14 <= 80 ? 6 : 0;
   const momentumConfirmedScore = (() => {
     if (strongHourPump) return 15;

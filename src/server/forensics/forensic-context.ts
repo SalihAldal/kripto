@@ -17,6 +17,7 @@ import type {
   ScannerQualificationRejection,
   NotDiscoveredAnalysisRecord,
   EntryTimingRecord,
+  ScannerCoverageSnapshot,
   TdiDecisionRecord,
   FeeAwareEntryPolicyEvaluation,
 } from "@/src/server/forensics/forensic.types";
@@ -42,6 +43,7 @@ export type ForensicSessionContext = {
   scannerQualificationRejections?: ScannerQualificationRejection[];
   notDiscoveredRecords?: NotDiscoveredAnalysisRecord[];
   entryTimingRecords?: EntryTimingRecord[];
+  scannerCoverageSnapshots?: ScannerCoverageSnapshot[];
   tdiDecisions?: TdiDecisionRecord[];
   feePolicyEvaluations?: FeeAwareEntryPolicyEvaluation[];
   scannerUniverseSnapshot?: {
@@ -101,6 +103,7 @@ export function ensureForensicSession(input?: Partial<ForensicSessionContext>): 
     scannerQualificationRejections: [],
     notDiscoveredRecords: [],
     entryTimingRecords: [],
+    scannerCoverageSnapshots: [],
     tdiDecisions: [],
     feePolicyEvaluations: [],
     rejectionCountsByStage: {},

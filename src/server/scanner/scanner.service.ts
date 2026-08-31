@@ -10,6 +10,7 @@ import {
   createDecisionId,
   finalizeDecisionLog,
   observeScannerDecision,
+  recordDecisionTimelineEvent,
 } from "@/src/server/observability/decision-observability.service";
 import { runWithDecisionTrace } from "@/src/server/observability/decision-trace-context";
 import {
@@ -25,11 +26,24 @@ import { formatAIRequest } from "@/src/server/scanner/ai-request-formatter";
 import { buildMarketContext } from "@/src/server/scanner/market-context-builder";
 import { scoreContext } from "@/src/server/scanner/signal-scoring.engine";
 import { persistCandidateSignal } from "@/src/server/scanner/signal-persistence.service";
-import { discoverTopGainerSymbols } from "@/src/server/scanner/top-gainer-discovery.service";
+import { recordLegacyScannerInvocation } from "@/src/server/scanner/legacy-scanner-telemetry.service";
+import { getOpportunityEngine } from "@/src/server/opportunity/opportunity-engine";
+import type { TopGainerMarketDataEvent } from "@/src/server/scanner/top-gainer-discovery.service";
 import { resolveWatchlist } from "@/src/server/scanner/watchlist.service";
 import { getRuntimeStrategyParams } from "@/src/server/config/strategy-runtime.service";
 import { evaluateMomentumBreakout } from "@/src/server/scanner/momentum-breakout.service";
-import type { ScannerApiRow, ScannerPipelineResult } from "@/src/types/scanner";
+import {
+  buildScannerRejectTelemetryBundle,
+  evaluateScannerSpreadMomentumShadow,
+} from "@/src/server/scanner/scanner-reject-telemetry.service";
+import type {
+  DiscoverySource,
+  MarketContext,
+  ScannerApiRow,
+  ScannerCoverageMetrics,
+  ScannerPipelineResult,
+  ScannerScore,
+} from "@/src/types/scanner";
 import {
   createAsyncTelemetry,
   resolveAiConsensusTimeoutMs,
@@ -46,6 +60,7 @@ import { throwIfAborted } from "@/src/server/execution/cancellable-work.service"
 import { CooperativeAsyncCancelledError } from "@/src/server/execution/cooperative-async.types";
 import {
   beginAiBatch,
+  cancelAiCandidate,
   completeAiCandidate,
   failAiCandidate,
   startAiCandidate,
@@ -56,6 +71,7 @@ import { STALL_ERROR_CODES } from "@/src/server/forensics/stall-error-taxonomy";
 import { getForensicSession } from "@/src/server/forensics/forensic-context";
 import {
   bridgeScannerQualificationForensics,
+  bridgeScannerCoverageSnapshot,
   bridgeScannerUniverseSnapshot,
 } from "@/src/server/forensics/forensic-bridge.service";
 
@@ -120,6 +136,82 @@ function getPreferredSymbols() {
     .slice(0, 12);
 }
 
+function buildScannerObservabilityInput(
+  row: { context: MarketContext; score: ScannerScore },
+  maxPreAiSpreadPercent: number,
+  decisionId: string,
+) {
+  const bundle = buildScannerRejectTelemetryBundle({
+    context: row.context,
+    score: row.score,
+    maxPreAiSpreadPercent,
+    candidateId: decisionId,
+  });
+  return {
+    decisionId,
+    symbol: row.context.symbol,
+    scannerScore: row.score.score,
+    scannerConfidence: row.score.confidence,
+    status: row.score.status,
+    reasons: row.score.reasons.length > 0 ? row.score.reasons : row.context.rejectReasons,
+    metrics: {
+      spreadPercent: row.context.spreadPercent,
+      volume24h: row.context.volume24h,
+      tradable: row.context.tradable,
+      lastPrice: row.context.lastPrice,
+      change24h: row.context.change24h,
+      liquidityScore: row.context.metadata.liquidityScore,
+    },
+    contextMetadata: row.context.metadata as Record<string, unknown>,
+    rejectTelemetry: bundle.telemetry,
+    spreadMomentumShadow: bundle.shadow,
+  };
+}
+
+type ScannerCyclePlan = {
+  rotationSymbols: string[];
+  prioritySymbols: string[];
+  evaluationSymbols: string[];
+  duplicatesRemoved: number;
+  notDiscoveredCount: number;
+};
+
+export function buildScannerCyclePlan(input: {
+  watchlist: string[];
+  cursor: number;
+  cycleLimit: number;
+  prioritySymbols: Array<{ symbol: string; priorityScore: number; reason: string }>;
+  priorityMaxPerCycle: number;
+}): ScannerCyclePlan {
+  const upperWatchlist = input.watchlist.map((symbol) => symbol.toUpperCase());
+  const start = Math.max(0, input.cursor % Math.max(upperWatchlist.length, 1));
+  const rotationSymbols =
+    upperWatchlist.length <= input.cycleLimit
+      ? upperWatchlist
+      : Array.from({ length: input.cycleLimit }).map((_, idx) => upperWatchlist[(start + idx) % upperWatchlist.length]);
+
+  const rotationSet = new Set(rotationSymbols);
+  const dedupPriority: Array<{ symbol: string; priorityScore: number; reason: string }> = [];
+  for (const row of input.prioritySymbols) {
+    const symbol = row.symbol.toUpperCase();
+    if (rotationSet.has(symbol)) continue;
+    if (!upperWatchlist.includes(symbol)) continue;
+    if (dedupPriority.some((item) => item.symbol === symbol)) continue;
+    dedupPriority.push({ symbol, priorityScore: row.priorityScore, reason: row.reason });
+    if (dedupPriority.length >= input.priorityMaxPerCycle) break;
+  }
+
+  const rawMerged = [...dedupPriority.map((row) => row.symbol), ...rotationSymbols];
+  const evaluationSymbols = Array.from(new Set(rawMerged));
+  return {
+    rotationSymbols,
+    prioritySymbols: dedupPriority.map((row) => row.symbol),
+    evaluationSymbols,
+    duplicatesRemoved: rawMerged.length - evaluationSymbols.length,
+    notDiscoveredCount: Math.max(0, upperWatchlist.length - evaluationSymbols.length),
+  };
+}
+
 export type ScannerPipelineRuntimeOptions = {
   attachIfRunning?: boolean;
   attachMaxWaitMs?: number;
@@ -131,12 +223,25 @@ export type ScannerPipelineRuntimeOptions = {
   abortSignal?: AbortSignal;
   roundId?: string;
   runId?: string;
+  forbidLegacyScanner?: boolean;
   shouldAbort?: () => void;
   abortSignal?: AbortSignal;
   selectionDeadlineMs?: number;
   selectionBudgetMs?: number;
   onHeartbeat?: () => void | Promise<void>;
   onProgress?: () => void | Promise<void>;
+  onRuntimeProgress?: (patch: {
+    lastScannerProgressAt?: string;
+    lastMarketDataProgressAt?: string;
+    lastAIProgressAt?: string;
+    scannerSymbolsProcessed?: number;
+    marketDataRequests?: number;
+    marketDataFailures?: number;
+    fallbackCount?: number;
+    degradedCandidates?: number;
+    aiProcessed?: number;
+  }) => void | Promise<void>;
+  onMarketDataEvent?: (event: TopGainerMarketDataEvent) => void | Promise<void>;
   telemetry?: AsyncRuntimeTelemetry;
   onCheckpoint?: (info: {
     phase: "context" | "discovery" | "ranking" | "ai" | "consensus";
@@ -247,6 +352,14 @@ export async function runScannerPipeline(
 ): Promise<ScannerPipelineResult> {
   const runState = getScanRunState();
   const runtime = options?.runtime;
+  if (runtime?.forbidLegacyScanner) {
+    throw new Error("LEGACY_SCANNER_FORBIDDEN_IN_CANONICAL_RUNTIME");
+  }
+  recordLegacyScannerInvocation({
+    runId: runtime?.runId,
+    roundId: runtime?.roundId,
+    source: "runScannerPipeline",
+  });
   if (runState.running) {
     if (runtime?.attachIfRunning) {
       const maxWaitMs = Math.max(1000, runtime.attachMaxWaitMs ?? env.AUTO_ROUND_SCANNER_ATTACH_MAX_WAIT_MS);
@@ -305,44 +418,97 @@ export async function runScannerPipeline(
     const runtimeStrategy = await getRuntimeStrategyParams();
     const executionMode = options?.executionMode ?? env.EXECUTION_MODE;
     const watchlist = await resolveWatchlist(userId);
-    const topGainers = await discoverTopGainerSymbols(36).catch(() => []);
+    const marketDataRuntime = {
+      marketDataRequests: 0,
+      marketDataFailures: 0,
+      fallbackCount: 0,
+      scannerSymbolsProcessed: 0,
+      aiProcessed: 0,
+    };
+    const opportunity = getOpportunityEngine().scan();
+    const opportunitySymbols = opportunity.ranked.map((row) => row.symbol);
+    const topGainers: Array<{ symbol: string; priorityScore: number; reason: string; change24h?: number }> = opportunity.ranked.map(
+      (row) => ({
+        symbol: row.symbol,
+        priorityScore: row.score,
+        reason: row.primaryLane,
+        change24h: row.features.change24h,
+      }),
+    );
     const topGainerMap = new Map(topGainers.map((row) => [row.symbol, row]));
+    const priorityMaxPerCycleRaw = Number(process.env.SCANNER_PRIORITY_MAX_PER_CYCLE ?? 8);
+    const priorityMaxPerCycle = Number.isFinite(priorityMaxPerCycleRaw)
+      ? Math.max(1, Math.min(24, Math.floor(priorityMaxPerCycleRaw)))
+      : 8;
 
-  // Scan all symbols sequentially in fixed-size batches (e.g. 50 by 50).
-  const cycleLimit = Math.max(1, Math.min(env.SCANNER_CYCLE_SYMBOL_LIMIT, watchlist.length));
-  const baseUniverse = watchlist;
+  const cycleLimit = Math.max(1, Math.min(env.SCANNER_CYCLE_SYMBOL_LIMIT, Math.max(watchlist.length, 1)));
   const cursorState = await ensureScanCursorLoaded();
-  const cursor = Math.max(0, cursorState.value % Math.max(baseUniverse.length, 1));
-  const cycleSymbols =
-    baseUniverse.length <= cycleLimit
-      ? baseUniverse
-      : Array.from({ length: cycleLimit }).map((_, idx) => baseUniverse[(cursor + idx) % baseUniverse.length]);
+  const cursor = Math.max(0, cursorState.value % Math.max(watchlist.length, 1));
+  const cyclePlan = opportunitySymbols.length
+    ? {
+        rotationSymbols: opportunitySymbols,
+        prioritySymbols: opportunity.ranked
+          .filter((row) => row.state === "HOT" || row.state === "PROMOTED")
+          .map((row) => row.symbol),
+        evaluationSymbols: opportunitySymbols,
+      }
+    : buildScannerCyclePlan({
+        watchlist,
+        cursor,
+        cycleLimit,
+        prioritySymbols: [],
+        priorityMaxPerCycle,
+      });
+  const cycleSymbols = cyclePlan.rotationSymbols;
+  const prioritySymbols = cyclePlan.prioritySymbols;
+  const evaluationSymbols = cyclePlan.evaluationSymbols;
   cursorState.value = (cursor + cycleLimit) % Math.max(watchlist.length, 1);
   await persistScanCursor(cursorState.value);
   if (persist) {
     bridgeScannerUniverseSnapshot({ watchlist, cycleSymbols });
   }
+  const rotationSet = new Set(cycleSymbols.map((row) => row.toUpperCase()));
+  const prioritySet = new Set(prioritySymbols.map((row) => row.toUpperCase()));
 
   const contexts = await mapWithConcurrency(
-    cycleSymbols,
+    evaluationSymbols,
     env.SCANNER_CONTEXT_CONCURRENCY,
     async (symbol, _index, signal) => {
       try {
         activeRuntime.shouldAbort?.();
         const context = await withBoundedAwait(
           `context-lite:${symbol}`,
-          buildMarketContext(symbol, { lite: true }),
+          (innerSignal) =>
+            buildMarketContext(symbol, {
+              lite: true,
+              signal: innerSignal,
+              timeoutMs: resolveMarketContextTimeoutMs(),
+              allowBackgroundIntelCapture: false,
+            }),
           resolveMarketContextTimeoutMs(),
           activeRuntime.telemetry,
           undefined,
           { signal },
         );
+        if (typeof context.metadata.candidateTimestamp !== "string") {
+          context.metadata.candidateTimestamp = new Date().toISOString();
+        }
         const topGainer = topGainerMap.get(context.symbol) ?? topGainerMap.get(symbol);
+        const source: DiscoverySource = prioritySet.has(context.symbol.toUpperCase())
+          ? "PRIORITY"
+          : rotationSet.has(context.symbol.toUpperCase())
+            ? "ROTATION"
+            : "OTHER";
+        context.metadata.discoverySource = source;
         if (topGainer) {
           context.metadata.topGainerDiscovery = true;
           context.metadata.topGainerChange24h = topGainer.change24h;
           context.metadata.topGainerPriorityScore = topGainer.priorityScore;
           context.metadata.topGainerReason = topGainer.reason;
+          if (source === "PRIORITY") {
+            context.metadata.priorityReason = topGainer.reason;
+            context.metadata.priorityScore = Number(topGainer.priorityScore ?? 0);
+          }
         }
         const score = scoreContext(context);
         return { context, score };
@@ -356,6 +522,11 @@ export async function runScannerPipeline(
           ...cooperativeOptions,
           label: "scanner-context",
           onItemComplete: async (processed, total) => {
+            marketDataRuntime.scannerSymbolsProcessed = processed;
+            await activeRuntime.onRuntimeProgress?.({
+              scannerSymbolsProcessed: processed,
+              lastScannerProgressAt: new Date().toISOString(),
+            });
             await activeRuntime?.onCheckpoint?.({ phase: "context", processed, total });
           },
         }
@@ -366,12 +537,54 @@ export async function runScannerPipeline(
           workerTimeoutMs: resolveMarketContextTimeoutMs(),
           label: "scanner-context",
           onItemComplete: async (processed, total) => {
+            marketDataRuntime.scannerSymbolsProcessed = processed;
+            await activeRuntime.onRuntimeProgress?.({
+              scannerSymbolsProcessed: processed,
+              lastScannerProgressAt: new Date().toISOString(),
+            });
             await activeRuntime?.onCheckpoint?.({ phase: "context", processed, total });
           },
         },
   );
 
   const validRows = contexts.filter((x): x is NonNullable<typeof x> => Boolean(x));
+  const evaluatedSymbolSet = new Set(evaluationSymbols.map((row) => row.toUpperCase()));
+  const notEvaluatedSymbols = watchlist.map((row) => row.toUpperCase()).filter((symbol) => !evaluatedSymbolSet.has(symbol));
+  const discoverySources = validRows.map((row) => ({
+    symbol: row.context.symbol.toUpperCase(),
+    discoverySource: String(row.context.metadata.discoverySource ?? "OTHER") as DiscoverySource,
+    prioritySource:
+      typeof row.context.metadata.topGainerDiscovery !== "undefined"
+        ? "TOP_GAINER"
+        : typeof row.context.metadata.pumpEarlyCatcher !== "undefined"
+          ? "PUMP_CATCHER"
+          : undefined,
+    priorityReason:
+      typeof row.context.metadata.priorityReason === "string"
+        ? String(row.context.metadata.priorityReason)
+        : undefined,
+    priorityScore:
+      Number.isFinite(Number(row.context.metadata.priorityScore ?? Number.NaN))
+        ? Number(row.context.metadata.priorityScore)
+        : undefined,
+  }));
+  const scannerCoverage: ScannerCoverageMetrics = {
+    scannerUniverse: watchlist.length,
+    priorityMaxPerCycle,
+    rotationCandidates: cycleSymbols.length,
+    priorityCandidates: prioritySymbols.length,
+    rotationCount: cycleSymbols.length,
+    priorityCount: prioritySymbols.length,
+    duplicatesRemoved: cyclePlan.duplicatesRemoved,
+    duplicateCount: cyclePlan.duplicatesRemoved,
+    totalEvaluated: evaluationSymbols.length,
+    totalEvaluationCount: evaluationSymbols.length,
+    notDiscoveredCount: cyclePlan.notDiscoveredCount,
+    priorityRescuedCount: validRows.filter(
+      (row) => String(row.context.metadata.discoverySource ?? "OTHER") === "PRIORITY",
+    ).length,
+    discoverySources,
+  };
   const aiScopeSymbols = new Set<string>();
   for (const row of validRows) {
     const decisionId = createDecisionId();
@@ -435,9 +648,21 @@ export async function runScannerPipeline(
       const fallbackRows = await mapWithConcurrency(
         fallbackSymbols,
         Math.max(1, Math.min(env.SCANNER_CONTEXT_CONCURRENCY, 4)),
-        async (symbol, _index, _signal) => {
+        async (symbol, _index, signal) => {
           try {
-            const context = await buildMarketContext(symbol);
+            const context = await withBoundedAwait(
+              `context-fallback:${symbol}`,
+              (innerSignal) =>
+                buildMarketContext(symbol, {
+                  signal: innerSignal,
+                  timeoutMs: resolveMarketContextTimeoutMs(),
+                  allowBackgroundIntelCapture: false,
+                }),
+              resolveMarketContextTimeoutMs(),
+              activeRuntime.telemetry,
+              undefined,
+              { signal },
+            );
             const score = scoreContext(context);
             return { context, score };
           } catch {
@@ -466,10 +691,18 @@ export async function runScannerPipeline(
     total: rankedAll.length,
   });
   const configuredTop = Math.max(1, Math.min(env.SCANNER_TOP_CANDIDATES, rankedAll.length));
-  const fullCycleTarget = Math.max(1, Math.min(cycleSymbols.length, rankedAll.length));
+  const fullCycleTarget = Math.max(1, Math.min(evaluationSymbols.length, rankedAll.length));
+  const canonicalSymbols = new Set(
+    opportunity.ranked
+      .filter((row) => row.state === "HOT" || row.state === "PROMOTED")
+      .map((row) => row.symbol.toUpperCase()),
+  );
+  const aiScopeBase = canonicalSymbols.size > 0
+    ? rankedAll.filter((row) => canonicalSymbols.has(row.context.symbol.toUpperCase()))
+    : rankedAll;
   const aiScope = env.SCANNER_AI_EVALUATE_ALL
-    ? rankedAll.slice(0, fullCycleTarget)
-    : rankedAll.slice(0, configuredTop);
+    ? aiScopeBase.slice(0, fullCycleTarget)
+    : aiScopeBase.slice(0, configuredTop);
   for (const candidate of aiScope) {
     aiScopeSymbols.add(candidate.context.symbol.toUpperCase());
   }
@@ -477,14 +710,68 @@ export async function runScannerPipeline(
   const rankedSymbolSet = new Set(rankingBaseRows.map((row) => row.context.symbol.toUpperCase()));
 
   if (persist) {
+    bridgeScannerCoverageSnapshot({
+      timestamp: new Date().toISOString(),
+      ...scannerCoverage,
+    });
     for (const row of validRows) {
       bridgeScannerQualificationForensics({
         context: row.context,
         score: row.score,
-        inCycle: true,
+        inCycle: rotationSet.has(row.context.symbol.toUpperCase()),
         inUniverse: true,
         ranked: rankedSymbolSet.has(row.context.symbol.toUpperCase()),
         aiScope: aiScopeSymbols.has(row.context.symbol.toUpperCase()),
+      });
+    }
+    for (const symbol of notEvaluatedSymbols.slice(0, 200)) {
+      bridgeScannerQualificationForensics({
+        context: {
+          symbol,
+          lastPrice: 0,
+          change24h: 0,
+          volume24h: 0,
+          volumeSpikePercent: 0,
+          spreadPercent: 0,
+          volatilityPercent: 0,
+          momentumPercent: 0,
+          orderBookImbalance: 0,
+          buyPressure: 0,
+          shortCandleSignal: 0,
+          fakeSpikeScore: 0,
+          pumpIntensity: 0,
+          pumpRisk: 0,
+          tradable: false,
+          rejectReasons: [],
+          metadata: { discoverySource: "OTHER" },
+        },
+        score: {
+          symbol,
+          score: 0,
+          confidence: 0,
+          status: "REJECTED",
+          reasons: [],
+          metrics: {
+            momentum: 0,
+            microMomentum: 0,
+            volume: 0,
+            spread: 0,
+            volatility: 0,
+            orderBook: 0,
+            pressure: 0,
+            microFlow: 0,
+            velocity: 0,
+            candle: 0,
+            fakeSpikePenalty: 0,
+            liquidityPenalty: 0,
+            pumpBoost: 0,
+            pumpRiskPenalty: 0,
+          },
+        },
+        inCycle: false,
+        inUniverse: true,
+        ranked: false,
+        aiScope: false,
       });
     }
   }
@@ -493,20 +780,7 @@ export async function runScannerPipeline(
     for (const row of validRows) {
       const decisionId = String(row.context.metadata.decisionId ?? createDecisionId());
       if (aiScopeSymbols.has(row.context.symbol.toUpperCase())) continue;
-      observeScannerDecision({
-        decisionId,
-        symbol: row.context.symbol,
-        scannerScore: row.score.score,
-        scannerConfidence: row.score.confidence,
-        status: row.score.status,
-        reasons: row.context.rejectReasons,
-        metrics: {
-          spreadPercent: row.context.spreadPercent,
-          volume24h: row.context.volume24h,
-          tradable: row.context.tradable,
-        },
-        contextMetadata: row.context.metadata as Record<string, unknown>,
-      });
+      observeScannerDecision(buildScannerObservabilityInput(row, maxPreAiSpreadPercent, decisionId));
     }
   }
 
@@ -585,11 +859,16 @@ export async function runScannerPipeline(
       },
       onItemComplete: async (processed: number, total: number) => {
         aiEvaluated = processed;
+        marketDataRuntime.aiProcessed = processed;
         await activeRuntime?.onCheckpoint?.({
           phase: "ai",
           processed,
           total,
           symbol: aiScope[Math.max(0, processed - 1)]?.context.symbol,
+        });
+        await activeRuntime.onRuntimeProgress?.({
+          aiProcessed: processed,
+          lastAIProgressAt: new Date().toISOString(),
         });
         await activeRuntime?.onProgress?.();
         if (forensicSession?.sessionId) {
@@ -624,30 +903,63 @@ export async function runScannerPipeline(
               source: "scanner",
             }),
             async () => {
-              observeScannerDecision({
-                decisionId,
-                symbol: candidate.context.symbol,
-                scannerScore: candidate.score.score,
-                scannerConfidence: candidate.score.confidence,
-                status: candidate.score.status,
-                reasons: candidate.context.rejectReasons,
-                metrics: {
-                  spreadPercent: candidate.context.spreadPercent,
-                  volume24h: candidate.context.volume24h,
-                  tradable: candidate.context.tradable,
-                },
-                contextMetadata: candidate.context.metadata as Record<string, unknown>,
-              });
+              observeScannerDecision(
+                buildScannerObservabilityInput(candidate, maxPreAiSpreadPercent, decisionId),
+              );
               throwIfAborted(signal, "AI pipeline aborted before market context");
-              const fullContext = await buildMarketContext(candidate.context.symbol, {
-                lite: false,
-                priority: "high",
-              });
+              const fullContext = await withBoundedAwait(
+                `context-full:${candidate.context.symbol}`,
+                (innerSignal) =>
+                  buildMarketContext(candidate.context.symbol, {
+                    lite: false,
+                    priority: "high",
+                    signal: innerSignal,
+                    timeoutMs: resolveMarketContextTimeoutMs(),
+                    allowBackgroundIntelCapture: false,
+                  }),
+                resolveMarketContextTimeoutMs(),
+                activeRuntime?.telemetry,
+                undefined,
+                { signal },
+              );
               candidate.context = fullContext;
               const momentumBreakout = evaluateMomentumBreakout(fullContext);
               if (fullContext.spreadPercent > maxPreAiSpreadPercent && !momentumBreakout.ok) {
+                const spreadShadow = evaluateScannerSpreadMomentumShadow({
+                  context: fullContext,
+                  score: candidate.score,
+                  maxPreAiSpreadPercent,
+                });
+                recordDecisionTimelineEvent({
+                  stage: "SCANNER",
+                  outcome: "REJECTED",
+                  message: "PRE_AI_SPREAD_REJECT",
+                  details: {
+                    rejectReasonCode: "PRE_AI_SPREAD_REJECT",
+                    rejectReasonDetail: `spread ${fullContext.spreadPercent.toFixed(4)}% > ${maxPreAiSpreadPercent} && momentumBreakout.ok=false`,
+                    spreadPercent: fullContext.spreadPercent,
+                    maxPreAiSpreadPercent,
+                    momentumBreakoutOk: momentumBreakout.ok,
+                    spreadMomentumShadow: spreadShadow,
+                  },
+                });
+                cancelAiCandidate({
+                  roundId,
+                  runId,
+                  symbol,
+                  reasonCode: "PRE_AI_SPREAD_REJECT",
+                  reasonDetail: "Candidate rejected before AI due to spread gate",
+                  signalPropagated: true,
+                  provider: providerLabel,
+                  model: modelLabel,
+                });
                 fullContext.rejectReasons = Array.from(new Set([...fullContext.rejectReasons, "SPREAD_TOO_WIDE"]));
-                if (persist) await persistCandidateSignal(candidate, undefined, userId);
+                if (persist) {
+                  await persistCandidateSignal(candidate, undefined, userId, {
+                    runId: activeRuntime.runId,
+                    roundId: activeRuntime.roundId,
+                  });
+                }
                 await finalizeDecisionLog({
                   decisionId,
                   symbol: candidate.context.symbol,
@@ -696,7 +1008,12 @@ export async function runScannerPipeline(
                 provider: providerLabel,
                 model: modelLabel,
               });
-              if (persist) await persistCandidateSignal(candidate, ai, userId);
+              if (persist) {
+                await persistCandidateSignal(candidate, ai, userId, {
+                  runId: activeRuntime.runId,
+                  roundId: activeRuntime.roundId,
+                });
+              }
               await finalizeDecisionLog({
                 decisionId,
                 symbol: candidate.context.symbol,
@@ -708,33 +1025,52 @@ export async function runScannerPipeline(
           );
         } catch (error) {
           const message = (error as Error).message;
+          const stack = (error as Error).stack;
           const isTimeout =
             error instanceof CooperativeAsyncTimeoutError ||
             message.toLowerCase().includes("timed out") ||
             message.includes(STALL_ERROR_CODES.CONSENSUS_TIMEOUT);
           const isCancelled =
             error instanceof CooperativeAsyncCancelledError || signal.aborted;
-          failAiCandidate({
-            roundId,
-            runId,
-            symbol,
-            reasonCode: isTimeout
-              ? message.includes("consensus")
-                ? STALL_ERROR_CODES.CONSENSUS_TIMEOUT
-                : STALL_ERROR_CODES.AI_TIMEOUT
-              : isCancelled
-                ? STALL_ERROR_CODES.AI_TIMEOUT
-                : STALL_ERROR_CODES.AI_FAILED,
-            errorType: (error as Error).name,
-            reasonDetail: message,
-            timeout: isTimeout || isCancelled,
-            timeoutAt: isTimeout || isCancelled ? new Date().toISOString() : undefined,
-            aborted: isTimeout || isCancelled,
-            abortReason: message,
-            signalPropagated: isCancelled || isTimeout,
-            provider: providerLabel,
-            model: modelLabel,
-          });
+          const isStackDepthGuard =
+            message.includes(STALL_ERROR_CODES.AI_STACK_DEPTH_GUARD) ||
+            (error as Error).name === "AIStackDepthGuardError" ||
+            message.includes("Maximum call stack size exceeded");
+          if (isCancelled && !isTimeout) {
+            cancelAiCandidate({
+              roundId,
+              runId,
+              symbol,
+              reasonCode: "AI_CANCELLED",
+              reasonDetail: message,
+              signalPropagated: true,
+              abortReason: message,
+              provider: providerLabel,
+              model: modelLabel,
+            });
+          } else {
+            failAiCandidate({
+              roundId,
+              runId,
+              symbol,
+              reasonCode: isStackDepthGuard
+                ? STALL_ERROR_CODES.AI_STACK_DEPTH_GUARD
+                : isTimeout
+                  ? message.includes("consensus")
+                    ? STALL_ERROR_CODES.CONSENSUS_TIMEOUT
+                    : STALL_ERROR_CODES.AI_TIMEOUT
+                  : STALL_ERROR_CODES.AI_FAILED,
+              errorType: (error as Error).name,
+              reasonDetail: message,
+              timeout: isTimeout,
+              timeoutAt: isTimeout ? new Date().toISOString() : undefined,
+              aborted: isTimeout,
+              abortReason: message,
+              signalPropagated: isTimeout,
+              provider: providerLabel,
+              model: modelLabel,
+            });
+          }
           if ((isTimeout || isCancelled) && forensicSession?.sessionId) {
             writeMinimumAiStallArtifacts({
               sessionId: forensicSession.sessionId,
@@ -744,10 +1080,20 @@ export async function runScannerPipeline(
             });
           }
           logger.warn(
-            { symbol: candidate.context.symbol, error: message, candidateId: aiRecord.candidateId },
+            {
+              symbol: candidate.context.symbol,
+              error: message,
+              stackTop: stack?.split("\n").slice(0, 6).join(" | "),
+              candidateId: aiRecord.candidateId,
+            },
             "AI evaluation skipped for candidate",
           );
-          if (persist) await persistCandidateSignal(candidate, undefined, userId);
+          if (persist) {
+            await persistCandidateSignal(candidate, undefined, userId, {
+              runId: activeRuntime.runId,
+              roundId: activeRuntime.roundId,
+            });
+          }
           await finalizeDecisionLog({
             decisionId,
             symbol: candidate.context.symbol,
@@ -770,7 +1116,10 @@ export async function runScannerPipeline(
       aiScope,
       env.SCANNER_AI_CONCURRENCY,
       async (candidate, _index, _signal) => {
-        await persistCandidateSignal(candidate, undefined, userId);
+        await persistCandidateSignal(candidate, undefined, userId, {
+          runId: activeRuntime.runId,
+          roundId: activeRuntime.roundId,
+        });
         return null;
       },
       cycleDeadlineMs
@@ -794,21 +1143,26 @@ export async function runScannerPipeline(
         },
         undefined,
         userId,
+        {
+          runId: activeRuntime.runId,
+          roundId: activeRuntime.roundId,
+        },
       );
     }
   }
 
     const result: ScannerPipelineResult = {
       scannedAt: new Date().toISOString(),
-      totalSymbols: cycleSymbols.length,
+      totalSymbols: evaluationSymbols.length,
       qualifiedSymbols: discoveryBatch.profiles.length,
       aiEvaluatedSymbols: aiEvaluated,
       candidates: topCandidates,
+      coverage: scannerCoverage,
     };
 
   pushLog(
     "INFO",
-    `Scanner tamamlandi. scanned=${result.totalSymbols}, universeTotal=${watchlist.length}, qualified=${result.qualifiedSymbols}, ai=${result.aiEvaluatedSymbols}, universe=${env.SCANNER_UNIVERSE}, cursor=${cursorState.value}`,
+    `Scanner tamamlandi. scanned=${result.totalSymbols}, universeTotal=${watchlist.length}, rotation=${scannerCoverage.rotationCandidates}, priority=${scannerCoverage.priorityCandidates}, notDiscovered=${scannerCoverage.notDiscoveredCount}, qualified=${result.qualifiedSymbols}, ai=${result.aiEvaluatedSymbols}, universe=${env.SCANNER_UNIVERSE}, cursor=${cursorState.value}`,
   );
   markHeartbeat({
     service: "scanner",

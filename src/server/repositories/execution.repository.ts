@@ -2,6 +2,10 @@ import { ExchangeType, Prisma, SignalSide, SignalSource, SignalStatus } from "@p
 import { env } from "@/lib/config";
 import { prisma } from "@/src/server/db/prisma";
 import { maskSecret, upsertExchangeApiSecret } from "@/src/server/security/secrets";
+import {
+  attachPositionIdToSnapshot,
+  type DecisionFeatureSnapshot,
+} from "@/src/server/forensics/decision-time-tdi-telemetry.service";
 
 function maskApiKey(key?: string) {
   if (!key) return "not-configured";
@@ -320,12 +324,33 @@ export async function updatePositionMarkPrice(positionId: string, markPrice: num
   });
 }
 
+export async function bindDecisionFeatureSnapshotPositionId(positionId: string) {
+  const current = await prisma.position.findUnique({ where: { id: positionId } });
+  if (!current) return null;
+  const metadata = (current.metadata as Record<string, unknown> | null) ?? {};
+  const snapshot = metadata.decisionFeatureSnapshot as DecisionFeatureSnapshot | undefined;
+  if (!snapshot || snapshot.positionId) return current;
+  const bound = attachPositionIdToSnapshot(snapshot, positionId);
+  return prisma.position.update({
+    where: { id: positionId },
+    data: {
+      metadata: {
+        ...(metadata as Prisma.InputJsonObject),
+        decisionFeatureSnapshot: bound,
+      },
+    },
+  });
+}
+
 export async function updatePositionMetadata(positionId: string, update: Record<string, unknown>) {
   const current = await prisma.position.findUnique({ where: { id: positionId } });
   const metadata = (current?.metadata as Record<string, unknown> | null) ?? {};
+  const { decisionFeatureSnapshot: _ignoredSnapshot, ...safeUpdate } = update;
+  const preservedSnapshot = metadata.decisionFeatureSnapshot;
   const nextMetadata = {
     ...(metadata as Prisma.InputJsonObject),
-    ...(update as Prisma.InputJsonObject),
+    ...(safeUpdate as Prisma.InputJsonObject),
+    ...(preservedSnapshot !== undefined ? { decisionFeatureSnapshot: preservedSnapshot } : {}),
   } as Prisma.InputJsonObject;
   return prisma.position.update({
     where: { id: positionId },
@@ -343,6 +368,16 @@ export async function closePositionRecord(input: {
   errorMessage?: string;
   metadata?: Record<string, unknown>;
 }) {
+  const current = await prisma.position.findUnique({ where: { id: input.positionId } });
+  const existing = (current?.metadata as Record<string, unknown> | null) ?? {};
+  const preservedSnapshot = existing.decisionFeatureSnapshot;
+  const mergedMetadata = input.metadata
+    ? {
+        ...existing,
+        ...input.metadata,
+        ...(preservedSnapshot !== undefined ? { decisionFeatureSnapshot: preservedSnapshot } : {}),
+      }
+    : existing;
   return prisma.position.update({
     where: { id: input.positionId },
     data: {
@@ -352,9 +387,7 @@ export async function closePositionRecord(input: {
       feeTotal: input.feeTotal,
       closedAt: new Date(),
       errorMessage: input.errorMessage,
-      metadata: input.metadata
-        ? { ...(input.metadata as Prisma.InputJsonObject) }
-        : undefined,
+      metadata: mergedMetadata as Prisma.InputJsonObject,
     },
   });
 }

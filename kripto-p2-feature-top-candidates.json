@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "type": "FEATURE_REWEIGHTING_CANDIDATE",
+      "feature": "momentumScore",
+      "hypothesis": "Top raw feature percentile captures relatively better net region than baseline score ordering.",
+      "affectedPopulation": "Current top30% ~ 688",
+      "historicalNetImpact": -1.26903964,
+      "oosImpact": 0.02061415,
+      "falsePositiveRate": 0.580645,
+      "strategyDependence": "PARTIAL",
+      "regimeDependence": "PARTIAL",
+      "implementationComplexity": "LOW",
+      "risk": "MEDIUM",
+      "successCriterion": "OOS positive expectancy with loss capture not exceeding baseline loss rate"
+    },
+    {
+      "type": "FEATURE_INTERACTION_CANDIDATE",
+      "feature": "EV×liquidity",
+      "hypothesis": "Bounded interaction may separate edge where single score fails.",
+      "affectedPopulation": "OOS interaction sample 1",
+      "historicalNetImpact": 0.094689,
+      "oosImpact": 0.094689,
+      "falsePositiveRate": "see interaction table",
+      "strategyDependence": "UNKNOWN",
+      "regimeDependence": "UNKNOWN",
+      "implementationComplexity": "MEDIUM",
+      "risk": "MEDIUM_HIGH",
+      "successCriterion": "Validation and OOS both positive with sufficient sample"
+    },
+    {
+      "type": "NO_VALID_FEATURE_CANDIDATE",
+      "feature": "NONE",
+      "hypothesis": "If no positive OOS net region remains after controls, do not change production policy.",
+      "affectedPopulation": "ALL",
+      "historicalNetImpact": -20.88130587,
+      "oosImpact": null,
+      "falsePositiveRate": null,
+      "strategyDependence": "N/A",
+      "regimeDependence": "N/A",
+      "implementationComplexity": "NONE",
+      "risk": "LOW",
+      "successCriterion": "Keep safeguards unchanged"
+    }
+  ]
+}

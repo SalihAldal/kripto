@@ -1,0 +1,54 @@
+{
+  "filterId": "SIM_TIGHT_FILTER_15m",
+  "implementation": {
+    "file": "src/server/execution/auto-round-engine.service.ts",
+    "function": "evaluateAutoRoundLearningCandidate",
+    "caller": "runRoundJob -> learningFit evaluation",
+    "failPath": "lastRejectReason = `SIM_TIGHT_FILTER_${profile.label}: ${learningFit.reason}`",
+    "profile15mThresholds": {
+      "minConfidence": 58,
+      "minScannerScore": 52,
+      "minScannerConfidence": 54,
+      "minMtfAlignment": 48,
+      "minShortMomentum": 0.02,
+      "minShortFlow": 0,
+      "maxRiskScore": 66
+    },
+    "paperRelaxed15mThresholds": {
+      "minConfidence": 38,
+      "minScannerScore": 38,
+      "minScannerConfidence": 40,
+      "minMtfAlignment": 0,
+      "minShortMomentum": 0,
+      "minShortFlow": -1,
+      "maxRiskScore": 82
+    },
+    "inputs": [
+      "scannerScore",
+      "scannerConfidence",
+      "ai.analysisScorecard.confidenceScore",
+      "ai.roleScores technical/sentiment/risk",
+      "context.metadata.shortMomentumPercent",
+      "context.metadata.shortFlowImbalance",
+      "context.metadata.mtfAlignmentScore",
+      "context.metadata.regime*",
+      "context.metadata.ema50/ema200",
+      "context.metadata.volumeRatio20",
+      "btcSnapshot"
+    ],
+    "booleanPath": [
+      "candidate selected",
+      "build adaptive thresholds + profile",
+      "compute risky flags (non-pump quality, role consensus, regime, spread/risk)",
+      "evaluatePaperEntryQuality + optional evaluatePumpEntrySafety",
+      "resolveAdaptiveEntryDecision(reasons)",
+      "if !ok => SIM_TIGHT_FILTER_15m fail"
+    ],
+    "outputs": [
+      "ok",
+      "reason",
+      "metrics",
+      "entryDecision"
+    ]
+  }
+}

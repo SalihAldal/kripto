@@ -1,0 +1,142 @@
+{
+  "generatedAt": "2026-08-22T14:17:40.354Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionBehaviorChange": true
+  },
+  "inventory": {
+    "profitableHistoricalTrades": 42,
+    "lossTrades": 206,
+    "breakevenTrades": 0,
+    "currentPaperCandidates": 500,
+    "validPairs": 748,
+    "invalidPairs": 0
+  },
+  "interactionTrace": {
+    "class": "LEARNING_OVERWEIGHT",
+    "classCounts": {
+      "MOMENTUM_DUPLICATION": 159,
+      "SHARED_SIGNAL_DOUBLE_COUNT": 159,
+      "UNKNOWN": 89,
+      "LEARNING_OVERWEIGHT": 339,
+      "DOWNSTREAM_PENALTY": 2
+    },
+    "note": "Interaction class determined by deterministic rule on LEARNING+MOMENTUM+confidence state."
+  },
+  "outcomes": {
+    "baselineApproved": 0,
+    "correctionApproved": 0,
+    "releasedHistorical": 0,
+    "profitableReleased": 0,
+    "losingReleased": 0,
+    "breakevenReleased": 0,
+    "unknownReleased": 0,
+    "releasedNetPnl": 0,
+    "releasedExpectancy": 0,
+    "falseApprovalRate": "UNKNOWN"
+  },
+  "momentumEffect": {
+    "changedCandidates": 84,
+    "changedWithWeakMomentum": 68,
+    "classification": "MIXED"
+  },
+  "regimeBreakdown": {},
+  "strategyBreakdown": {},
+  "oos": {
+    "mode": "POLICY_LEVEL_OOS",
+    "train": {
+      "size": 148,
+      "released": 0,
+      "releasedNetPnl": 0,
+      "releasedExpectancy": 0,
+      "baselineApproved": 0,
+      "correctionApproved": 0
+    },
+    "validation": {
+      "size": 50,
+      "released": 0,
+      "releasedNetPnl": 0,
+      "releasedExpectancy": 0,
+      "baselineApproved": 0,
+      "correctionApproved": 0
+    },
+    "oos": {
+      "size": 50,
+      "released": 0,
+      "releasedNetPnl": 0,
+      "releasedExpectancy": 0,
+      "baselineApproved": 0,
+      "correctionApproved": 0
+    },
+    "support": "YES"
+  },
+  "robustness": [
+    {
+      "slice": "overall",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "exclude_top_1",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "exclude_top_3",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "exclude_top_5",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "MR",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "non_MR",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "LOW_VOL",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "non_LOW_VOL",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "HIGH_VOL",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    },
+    {
+      "slice": "TREND",
+      "releasedCount": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0
+    }
+  ],
+  "invariants": {
+    "thresholdsChanged": "NO",
+    "aiParityPreserved": "YES",
+    "riskSizingPreserved": "YES",
+    "executionGuardsPreserved": "YES"
+  }
+}

@@ -20,6 +20,36 @@ import type {
 import { SimpleRateLimiter, withRetry } from "@/src/server/exchange/utils";
 import type { ExchangeProvider } from "@/src/server/exchange/providers/base-provider";
 import { resolveBinanceMakerFeeRate, resolveBinanceTakerFeeRate } from "@/src/server/execution/fee-profile";
+import { MarketDataUnavailableError } from "@/src/server/market-data/market-data-unavailable.error";
+import { getSharedRestLimiter } from "@/src/server/market-data/spine/shared-rest-limiter";
+import {
+  parseRetryAfterMsFromHeaders,
+  parseUsedWeightHeader,
+} from "@/src/server/market-data/spine/distributed-rest-limiter";
+import { recordPublicMarketRestCall, type PublicMarketRestKind } from "@/src/server/market-data/spine/rest-call-audit";
+
+function classifyPublicMarketPath(path: string): PublicMarketRestKind {
+  const lower = path.toLowerCase();
+  if (lower.includes("ticker/price") || lower.includes("/ticker/price")) return "prices";
+  if (lower.includes("ticker/24hr") || lower.includes("daily")) return "dailyStats";
+  if (lower.includes("klines")) return "klines";
+  if (lower.includes("depth")) return "orderBook";
+  if (lower.includes("trades")) return "recentTrades";
+  if (lower.includes("exchangeinfo")) return "exchangeInfo";
+  if (lower.includes("ticker")) return "ticker";
+  return "other";
+}
+
+function isRestRecoveryStack(stack?: string) {
+  if (!stack) return false;
+  return (
+    stack.includes("refreshUniverse") ||
+    stack.includes("bootstrapKlines") ||
+    stack.includes("bootstrapDepth") ||
+    stack.includes("fetchFromExchange") ||
+    stack.includes("MarketDataOrchestrator")
+  );
+}
 
 type BinanceCtor = ReturnType<typeof Binance>;
 type EndpointHealthState = {
@@ -149,9 +179,10 @@ export class BinanceExchangeProvider implements ExchangeProvider {
 
   private parseBanUntilFromMessage(message: string) {
     const lower = message.toLowerCase();
-    if (
-      !lower.includes("ip banned until")
-    ) {
+    if (lower.includes("http 418")) {
+      return Date.now() + 15 * 60_000;
+    }
+    if (!lower.includes("ip banned until")) {
       return 0;
     }
     const numeric = message.match(/\b(\d{13})\b/);
@@ -321,15 +352,27 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     );
   }
 
+  private syntheticAllowed() {
+    return env.MARKET_DATA_ALLOW_SYNTHETIC === true;
+  }
+
+  private refuseSynthetic(kind: string, symbol: string): never {
+    throw new MarketDataUnavailableError(`Real ${kind} data unavailable for ${symbol}`, {
+      code: "DATA_UNAVAILABLE",
+      symbol,
+      kind,
+    });
+  }
+
   private fallbackTicker(symbol: string) {
     const cached = this.getCachedTicker(symbol);
     if (cached) return cached;
+    if (!this.syntheticAllowed()) this.refuseSynthetic("ticker", symbol);
     const price = this.toFallbackPrice(symbol);
     return {
       symbol,
       price,
       change24h: 0,
-      // Keep fallback liquidity very low so risk/scanner can reject synthetic data.
       volume24h: 0,
     };
   }
@@ -396,6 +439,10 @@ export class BinanceExchangeProvider implements ExchangeProvider {
   }
 
   private fallbackKlines(symbol: string, limit: number): KlineItem[] {
+    const cachedKey = `${symbol.toUpperCase()}:1m:${limit}`;
+    const cached = this.getCachedKlines(cachedKey, 15 * 60 * 1000);
+    if (cached?.length) return cached;
+    if (!this.syntheticAllowed()) this.refuseSynthetic("klines", symbol);
     const base = this.toFallbackPrice(symbol);
     const now = Date.now();
     return Array.from({ length: limit }).map((_, index) => {
@@ -417,6 +464,9 @@ export class BinanceExchangeProvider implements ExchangeProvider {
   }
 
   private fallbackOrderBook(symbol: string, limit: number): OrderBookSnapshot {
+    const cached = this.getCachedOrderBook(`${symbol.toUpperCase()}:${limit}`, 15 * 60 * 1000);
+    if (cached) return cached;
+    if (!this.syntheticAllowed()) this.refuseSynthetic("orderBook", symbol);
     const mid = this.toFallbackPrice(symbol);
     const depth = Math.min(limit, 20);
     return {
@@ -432,6 +482,9 @@ export class BinanceExchangeProvider implements ExchangeProvider {
   }
 
   private fallbackRecentTrades(symbol: string, limit: number): RecentTrade[] {
+    const cached = this.getCachedRecentTrades(`${symbol.toUpperCase()}:${limit}`, 15 * 60 * 1000);
+    if (cached?.length) return cached;
+    if (!this.syntheticAllowed()) this.refuseSynthetic("recentTrades", symbol);
     const price = this.toFallbackPrice(symbol);
     const now = Date.now();
     return Array.from({ length: Math.min(limit, 20) }).map((_, i) => ({
@@ -842,6 +895,23 @@ export class BinanceExchangeProvider implements ExchangeProvider {
           signal: controller.signal,
           headers,
         });
+        const usedWeight = parseUsedWeightHeader(response.headers);
+        if (usedWeight != null) {
+          void getSharedRestLimiter().reconcileActualWeight(usedWeight);
+        }
+        const retryAfterMs = parseRetryAfterMsFromHeaders(response.headers);
+        if (response.status === 429) {
+          void getSharedRestLimiter().register429({ retryAfterMs });
+        }
+        if (response.status === 418) {
+          void getSharedRestLimiter().register418({ retryAfterMs });
+        }
+        recordPublicMarketRestCall({
+          kind: classifyPublicMarketPath(path),
+          path,
+          source: "binance.provider.fetchPublicJson",
+          recovery: isRestRecoveryStack(new Error().stack),
+        });
         if (!response.ok) {
           let detail = "";
           try {
@@ -851,7 +921,8 @@ export class BinanceExchangeProvider implements ExchangeProvider {
           } catch {
             detail = "";
           }
-          throw new Error(`HTTP ${response.status} @ ${url}${detail}`);
+          const retrySuffix = retryAfterMs > 0 ? ` Retry-After: ${Math.ceil(retryAfterMs / 1000)}` : "";
+          throw new Error(`HTTP ${response.status} @ ${url}${detail}${retrySuffix}`);
         }
         const raw = (await response.json()) as unknown;
         if (raw && typeof raw === "object" && !Array.isArray(raw)) {

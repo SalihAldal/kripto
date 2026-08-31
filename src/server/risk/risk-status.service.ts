@@ -1,6 +1,7 @@
 import { getRuntimeExecutionContext } from "@/src/server/repositories/execution.repository";
 import {
   getApiFailureState,
+  getApiFailureStateByDomain,
   getConsecutiveLossCount,
   getDailyPnlSummary,
   getWeeklyPnlSummary,
@@ -12,7 +13,7 @@ import { getEffectiveRiskConfig, RISK_GATE_POLICY } from "@/src/server/risk/risk
 
 export async function getRiskStatus(userId?: string) {
   const { user } = await getRuntimeExecutionContext(userId);
-  const [config, effective, paused, daily, weekly, openPositions, consecutiveLosses, apiFailures] = await Promise.all([
+  const [config, effective, paused, daily, weekly, openPositions, consecutiveLosses, apiFailures, apiFailuresByDomain] = await Promise.all([
     getRiskConfigByUser(user.id),
     getEffectiveRiskConfig(user.id),
     getPausedState(user.id),
@@ -21,6 +22,12 @@ export async function getRiskStatus(userId?: string) {
     listOpenPositionsCount(user.id),
     getConsecutiveLossCount(user.id),
     getApiFailureState(user.id),
+    Promise.all([
+      getApiFailureStateByDomain(user.id, "EXECUTION"),
+      getApiFailureStateByDomain(user.id, "ACCOUNT"),
+      getApiFailureStateByDomain(user.id, "MARKET_DATA"),
+      getApiFailureStateByDomain(user.id, "METADATA"),
+    ]),
   ]);
 
   return {
@@ -31,6 +38,12 @@ export async function getRiskStatus(userId?: string) {
     weekly,
     consecutiveLosses,
     apiFailures,
+    apiFailuresByDomain: {
+      EXECUTION: apiFailuresByDomain[0],
+      ACCOUNT: apiFailuresByDomain[1],
+      MARKET_DATA: apiFailuresByDomain[2],
+      METADATA: apiFailuresByDomain[3],
+    },
     config,
     effective,
     gatePolicy: RISK_GATE_POLICY,

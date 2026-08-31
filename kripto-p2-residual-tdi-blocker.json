@@ -1,0 +1,216 @@
+{
+  "generatedAt": "2026-08-22T14:21:52.627Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionChanges": true
+  },
+  "inventory": {
+    "profitableTrades": 42,
+    "lossTrades": 206,
+    "breakevenTrades": 0,
+    "currentPaperCandidates": 2278,
+    "profitableEvidenceClass": {
+      "INFERRED": 42
+    }
+  },
+  "baseline": {
+    "approved": 0,
+    "wait": 31,
+    "rejected": 11
+  },
+  "confidenceCorrected": {
+    "approved": 0,
+    "wait": 31,
+    "rejected": 11
+  },
+  "transitionCounts": {
+    "MOMENTUM->MOMENTUM": 30,
+    "TECHNICAL->TECHNICAL": 11,
+    "DATA_QUALITY->DATA_QUALITY": 1
+  },
+  "residualDetail": [
+    {
+      "blocker": "MOMENTUM",
+      "count": 30,
+      "share": 0.714286,
+      "medianScoreGap": -10.42,
+      "p25": -18.46,
+      "p75": -6.53,
+      "averageHistoricalNetPnL": 0.055655,
+      "averageConfidence": 27.061667,
+      "averageMomentum": 8.166333,
+      "averageTechnical": 59.638
+    },
+    {
+      "blocker": "TECHNICAL",
+      "count": 11,
+      "share": 0.261905,
+      "medianScoreGap": -23.52,
+      "p25": -28.79,
+      "p75": -22.54,
+      "averageHistoricalNetPnL": 0.06437,
+      "averageConfidence": 14.676364,
+      "averageMomentum": 0.900909,
+      "averageTechnical": 50.451818
+    },
+    {
+      "blocker": "DATA_QUALITY",
+      "count": 1,
+      "share": 0.02381,
+      "medianScoreGap": null,
+      "p25": null,
+      "p75": null,
+      "averageHistoricalNetPnL": 0.076019,
+      "averageConfidence": null,
+      "averageMomentum": null,
+      "averageTechnical": null
+    }
+  ],
+  "primaryResidual": {
+    "blocker": "MOMENTUM",
+    "count": 30,
+    "share": 0.714286
+  },
+  "ordering": {
+    "changedCount": 11,
+    "changedShare": 0.261905,
+    "classification": "ORDERING_MATTERS"
+  },
+  "masterDecisionEffect": {
+    "share": 0,
+    "class": "SECONDARY"
+  },
+  "momentumEffect": {
+    "share": 0.714286
+  },
+  "technicalEffect": {
+    "share": 0.261905
+  },
+  "currentPaper": {
+    "primaryResidual": "MOMENTUM",
+    "counts": {
+      "MOMENTUM": 1462,
+      "TECHNICAL": 816
+    },
+    "sharedWithHistorical": "YES"
+  },
+  "counterfactual": {
+    "branches": [
+      {
+        "mode": "remove_technical",
+        "approved": 0,
+        "wait": 248,
+        "rejected": 0,
+        "releasedCount": 0,
+        "releasedProfitable": 0,
+        "releasedLosing": 0,
+        "releasedNetPnL": 0,
+        "releasedExpectancy": 0,
+        "label": "COUNTERFACTUAL_ONLY"
+      },
+      {
+        "mode": "remove_momentum",
+        "approved": 0,
+        "wait": 189,
+        "rejected": 59,
+        "releasedCount": 0,
+        "releasedProfitable": 0,
+        "releasedLosing": 0,
+        "releasedNetPnL": 0,
+        "releasedExpectancy": 0,
+        "label": "COUNTERFACTUAL_ONLY"
+      },
+      {
+        "mode": "remove_master",
+        "approved": 0,
+        "wait": 189,
+        "rejected": 59,
+        "releasedCount": 0,
+        "releasedProfitable": 0,
+        "releasedLosing": 0,
+        "releasedNetPnL": 0,
+        "releasedExpectancy": 0,
+        "label": "COUNTERFACTUAL_ONLY"
+      },
+      {
+        "mode": "remove_ordering",
+        "approved": 0,
+        "wait": 248,
+        "rejected": 0,
+        "releasedCount": 0,
+        "releasedProfitable": 0,
+        "releasedLosing": 0,
+        "releasedNetPnL": 0,
+        "releasedExpectancy": 0,
+        "label": "COUNTERFACTUAL_ONLY"
+      }
+    ],
+    "best": {
+      "mode": "remove_technical",
+      "approved": 0,
+      "wait": 248,
+      "rejected": 0,
+      "releasedCount": 0,
+      "releasedProfitable": 0,
+      "releasedLosing": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "label": "COUNTERFACTUAL_ONLY"
+    },
+    "releasedProfitable": 0,
+    "releasedLosing": 0,
+    "releasedNetPnl": 0
+  },
+  "oos": {
+    "mode": "POLICY_LEVEL_OOS",
+    "train": {
+      "size": 25,
+      "primary": "MOMENTUM",
+      "share": 0.56
+    },
+    "validation": {
+      "size": 8,
+      "primary": "MOMENTUM",
+      "share": 1
+    },
+    "oos": {
+      "size": 9,
+      "primary": "MOMENTUM",
+      "share": 0.888889
+    },
+    "support": "YES"
+  },
+  "experiments": [
+    {
+      "experiment": "RESIDUAL_BLOCKER_SHADOW",
+      "hypothesis": "Confidence sonrası kalan ana bloklayıcıyı izole ederek false-release artmadan küçük iyileşme bulunabilir.",
+      "affectedCandidates": 30,
+      "historicalReleasedNetPnL": 0,
+      "falseReleaseRate": 0,
+      "oosStatus": "YES",
+      "risk": "LOW",
+      "successCriteria": "Released profitable > released losing and OOS direction same."
+    },
+    {
+      "experiment": "TDI_ORDERING_SHADOW",
+      "hypothesis": "Gate sıralaması ilk bloklayıcıyı değiştiriyorsa ordering sensitivity vardır.",
+      "affectedCandidates": 11,
+      "historicalReleasedNetPnL": 0,
+      "falseReleaseRate": 0,
+      "oosStatus": "YES",
+      "risk": "LOW",
+      "successCriteria": "ORDERING_MATTERS sinyali stabil kalır."
+    },
+    {
+      "experiment": "MASTER_DECISION_SHADOW",
+      "hypothesis": "Hybrid sonrası master WAIT zinciri asıl residual kilit olabilir.",
+      "affectedCandidates": 0,
+      "historicalReleasedNetPnL": 0,
+      "falseReleaseRate": 0,
+      "oosStatus": "YES",
+      "risk": "MEDIUM",
+      "successCriteria": "Counterfactual release net positive and false release controlled."
+    }
+  ]
+}

@@ -1,0 +1,674 @@
+{
+  "generatedAt": "2026-08-22T14:34:07.575Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionChanges": true
+  },
+  "counts": {
+    "profitableTrades": 42,
+    "currentCandidates": 2278,
+    "historicalLosses": 206,
+    "historicalBreakeven": 0
+  },
+  "evidenceQuality": {
+    "profitable": {
+      "INFERRED": 42
+    },
+    "current": {
+      "EXACT_RUNTIME_REPLAY": 2278
+    }
+  },
+  "distributions": {
+    "profitable42": {
+      "cohort": "HISTORICAL_PROFITABLE_42",
+      "momentumScore": {
+        "count": 41,
+        "mean": 6.217073,
+        "median": 1.94,
+        "p10": 0,
+        "p25": 0,
+        "p50": 1.94,
+        "p75": 18.78,
+        "p90": 18.78,
+        "min": 0,
+        "max": 18.78
+      },
+      "shortMomentum": {
+        "count": 41,
+        "mean": 0.010115,
+        "median": 0,
+        "p10": 0,
+        "p25": 0,
+        "p50": 0,
+        "p75": 0,
+        "p90": 0,
+        "min": -0.0769,
+        "max": 0.1252
+      },
+      "shortFlow": {
+        "count": 41,
+        "mean": 0.000044,
+        "median": 0,
+        "p10": 0,
+        "p25": 0,
+        "p50": 0,
+        "p75": 0,
+        "p90": 0.5165,
+        "min": -1,
+        "max": 0.9433
+      },
+      "sentiment": {
+        "count": 41,
+        "mean": 48.31439,
+        "median": 48.58,
+        "p10": 41.47,
+        "p25": 42.56,
+        "p50": 48.58,
+        "p75": 48.58,
+        "p90": 60.6,
+        "min": 36.43,
+        "max": 74.97
+      },
+      "momentumScoreGap": {
+        "count": 41,
+        "mean": -53.782927,
+        "median": -58.06,
+        "p10": -60,
+        "p25": -60,
+        "p50": -58.06,
+        "p75": -41.22,
+        "p90": -41.22,
+        "min": -60,
+        "max": -41.22
+      },
+      "shortMomentumGap": {
+        "count": 41,
+        "mean": -0.066134,
+        "median": -0.08,
+        "p10": -0.08,
+        "p25": -0.08,
+        "p50": -0.08,
+        "p75": -0.08,
+        "p90": -0.0031000000000000055,
+        "min": -0.08,
+        "max": 0.045200000000000004
+      },
+      "shortFlowGap": {
+        "count": 41,
+        "mean": 0.137834,
+        "median": -0.03,
+        "p10": -0.03,
+        "p25": -0.03,
+        "p50": -0.03,
+        "p75": -0.03,
+        "p90": 0.7026,
+        "min": -0.03,
+        "max": 0.97
+      },
+      "sentimentGap": {
+        "count": 41,
+        "mean": -3.68561,
+        "median": -3.4200000000000017,
+        "p10": -10.530000000000001,
+        "p25": -9.439999999999998,
+        "p50": -3.4200000000000017,
+        "p75": -3.4200000000000017,
+        "p90": 8.600000000000001,
+        "min": -15.57,
+        "max": 22.97
+      }
+    },
+    "current2278": {
+      "cohort": "CURRENT_PAPER_2278",
+      "momentumScore": {
+        "count": 2278,
+        "mean": 16.664271,
+        "median": 18.78,
+        "p10": 0,
+        "p25": 0,
+        "p50": 18.78,
+        "p75": 32.77,
+        "p90": 35.58,
+        "min": 0,
+        "max": 40.61
+      },
+      "shortMomentum": {
+        "count": 2278,
+        "mean": 0.001081,
+        "median": 0,
+        "p10": -0.01,
+        "p25": 0,
+        "p50": 0,
+        "p75": 0,
+        "p90": 0.02,
+        "min": -0.6707,
+        "max": 0.5
+      },
+      "shortFlow": {
+        "count": 2278,
+        "mean": 0.001203,
+        "median": 0,
+        "p10": -0.6072,
+        "p25": 0,
+        "p50": 0,
+        "p75": 0,
+        "p90": 0.7758,
+        "min": -1,
+        "max": 1
+      },
+      "sentiment": {
+        "count": 2278,
+        "mean": 50.214846,
+        "median": 47.01,
+        "p10": 39.69,
+        "p25": 44.31,
+        "p50": 47.01,
+        "p75": 59.16,
+        "p90": 63.05,
+        "min": 17.92,
+        "max": 82.31
+      },
+      "momentumScoreGap": {
+        "count": 2278,
+        "mean": -43.335729,
+        "median": -41.22,
+        "p10": -60,
+        "p25": -60,
+        "p50": -41.22,
+        "p75": -27.229999999999997,
+        "p90": -24.42,
+        "min": -60,
+        "max": -19.39
+      },
+      "shortMomentumGap": {
+        "count": 2278,
+        "mean": -0.050057,
+        "median": -0.08,
+        "p10": -0.08,
+        "p25": -0.08,
+        "p50": -0.08,
+        "p75": -0.08,
+        "p90": 0.034,
+        "min": -0.08,
+        "max": 0.5907
+      },
+      "shortFlowGap": {
+        "count": 2278,
+        "mean": 0.231941,
+        "median": -0.03,
+        "p10": -0.03,
+        "p25": -0.03,
+        "p50": -0.03,
+        "p75": 0.4898,
+        "p90": 0.97,
+        "min": -0.03,
+        "max": 0.97
+      },
+      "sentimentGap": {
+        "count": 2278,
+        "mean": -1.785154,
+        "median": -4.990000000000002,
+        "p10": -12.310000000000002,
+        "p25": -7.689999999999998,
+        "p50": -4.990000000000002,
+        "p75": 7.159999999999997,
+        "p90": 11.049999999999997,
+        "min": -34.08,
+        "max": 30.310000000000002
+      }
+    },
+    "historicalLosses": {
+      "cohort": "HISTORICAL_LOSSES",
+      "momentumScore": {
+        "count": 197,
+        "mean": 4.546091,
+        "median": 1.83,
+        "p10": 0,
+        "p25": 0,
+        "p50": 1.83,
+        "p75": 3.67,
+        "p90": 18.78,
+        "min": 0,
+        "max": 18.78
+      },
+      "shortMomentum": {
+        "count": 197,
+        "mean": 0.002951,
+        "median": 0,
+        "p10": -0.002,
+        "p25": 0,
+        "p50": 0,
+        "p75": 0,
+        "p90": 0.0971,
+        "min": -0.2749,
+        "max": 0.1958
+      },
+      "shortFlow": {
+        "count": 197,
+        "mean": 0.07429,
+        "median": 0,
+        "p10": -0.1838,
+        "p25": 0,
+        "p50": 0,
+        "p75": 0,
+        "p90": 0.5198,
+        "min": -1,
+        "max": 1
+      },
+      "sentiment": {
+        "count": 197,
+        "mean": 50.077462,
+        "median": 48.58,
+        "p10": 41.95,
+        "p25": 46.12,
+        "p50": 48.58,
+        "p75": 52.2,
+        "p90": 61.01,
+        "min": 31.1,
+        "max": 70.39
+      },
+      "momentumScoreGap": {
+        "count": 197,
+        "mean": -55.453909,
+        "median": -58.17,
+        "p10": -60,
+        "p25": -60,
+        "p50": -58.17,
+        "p75": -56.33,
+        "p90": -41.22,
+        "min": -60,
+        "max": -41.22
+      },
+      "shortMomentumGap": {
+        "count": 197,
+        "mean": -0.055159,
+        "median": -0.08,
+        "p10": -0.08,
+        "p25": -0.08,
+        "p50": -0.08,
+        "p75": -0.08,
+        "p90": 0.045200000000000004,
+        "min": -0.08,
+        "max": 0.19489999999999996
+      },
+      "shortFlowGap": {
+        "count": 197,
+        "mean": 0.145033,
+        "median": -0.03,
+        "p10": -0.03,
+        "p25": -0.03,
+        "p50": -0.03,
+        "p75": 0.1538,
+        "p90": 0.7458,
+        "min": -0.03,
+        "max": 0.97
+      },
+      "sentimentGap": {
+        "count": 197,
+        "mean": -1.922538,
+        "median": -3.4200000000000017,
+        "p10": -10.049999999999997,
+        "p25": -5.880000000000003,
+        "p50": -3.4200000000000017,
+        "p75": 0.20000000000000284,
+        "p90": 9.009999999999998,
+        "min": -20.9,
+        "max": 18.39
+      }
+    }
+  },
+  "gapMatrix": {
+    "momentumScoreGap": {
+      "count": 41,
+      "mean": -53.782927,
+      "median": -58.06,
+      "p10": -60,
+      "p25": -60,
+      "p50": -58.06,
+      "p75": -41.22,
+      "p90": -41.22,
+      "min": -60,
+      "max": -41.22
+    },
+    "shortMomentumGap": {
+      "count": 41,
+      "mean": -0.066134,
+      "median": -0.08,
+      "p10": -0.08,
+      "p25": -0.08,
+      "p50": -0.08,
+      "p75": -0.08,
+      "p90": -0.0031,
+      "min": -0.08,
+      "max": 0.0452
+    },
+    "shortFlowGap": {
+      "count": 41,
+      "mean": 0.137834,
+      "median": -0.03,
+      "p10": -0.03,
+      "p25": -0.03,
+      "p50": -0.03,
+      "p75": -0.03,
+      "p90": 0.7026,
+      "min": -0.03,
+      "max": 0.97
+    },
+    "sentimentGap": {
+      "count": 41,
+      "mean": -4.246585,
+      "median": -5.99,
+      "p10": -11.44,
+      "p25": -9.44,
+      "p50": -5.99,
+      "p75": -3.42,
+      "p90": 8.57,
+      "min": -15.57,
+      "max": 20.97
+    },
+    "technicalGap": {
+      "count": 41,
+      "mean": 9.173415,
+      "median": 10.939999999999998,
+      "p10": 0.5399999999999991,
+      "p25": 5.619999999999997,
+      "p50": 10.939999999999998,
+      "p75": 12.119999999999997,
+      "p90": 19.099999999999994,
+      "min": -20.67,
+      "max": 26.83
+    },
+    "confidenceGap": {
+      "count": 41,
+      "mean": -16.26122,
+      "median": -13.100000000000001,
+      "p10": -28.79,
+      "p25": -23.52,
+      "p50": -13.100000000000001,
+      "p75": -6.530000000000001,
+      "p90": -6.530000000000001,
+      "min": -30.689999999999998,
+      "max": -6.530000000000001
+    }
+  },
+  "topSuppressor": {
+    "component": "MOMENTUM_SCORE",
+    "share": 0.714286,
+    "counts": {
+      "MOMENTUM_SCORE": 30,
+      "TECHNICAL": 11,
+      "DATA_QUALITY": 1
+    }
+  },
+  "ordering": {
+    "effect": "YES",
+    "table": [
+      {
+        "ordering": "ORDER_A",
+        "definition": "technical -> momentum -> confidence -> master",
+        "approved42": 0,
+        "wait42": 31,
+        "reject42": 11,
+        "approvedHistorical": 0,
+        "waitHistorical": 189,
+        "rejectHistorical": 59,
+        "approvedCurrent": 0,
+        "waitCurrent": 1462,
+        "rejectCurrent": 816
+      },
+      {
+        "ordering": "ORDER_B",
+        "definition": "momentum -> technical -> confidence -> master",
+        "approved42": 0,
+        "wait42": 42,
+        "reject42": 0,
+        "approvedHistorical": 0,
+        "waitHistorical": 248,
+        "rejectHistorical": 0,
+        "approvedCurrent": 0,
+        "waitCurrent": 2278,
+        "rejectCurrent": 0
+      },
+      {
+        "ordering": "ORDER_C",
+        "definition": "momentum -> confidence -> technical -> master",
+        "approved42": 0,
+        "wait42": 42,
+        "reject42": 0,
+        "approvedHistorical": 0,
+        "waitHistorical": 248,
+        "rejectHistorical": 0,
+        "approvedCurrent": 0,
+        "waitCurrent": 2278,
+        "rejectCurrent": 0
+      }
+    ]
+  },
+  "masterDecisionAnalysis": {
+    "passingLowerButFailingFinal": 0,
+    "effect": "UNKNOWN"
+  },
+  "counterfactuals": [
+    {
+      "branch": "A_remove_shortMomentum_penalty",
+      "approved42": 0,
+      "wait42": 31,
+      "reject42": 11,
+      "approvedHistorical": 0,
+      "waitHistorical": 189,
+      "rejectHistorical": 59,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "B_remove_shortFlow_penalty",
+      "approved42": 0,
+      "wait42": 31,
+      "reject42": 11,
+      "approvedHistorical": 0,
+      "waitHistorical": 189,
+      "rejectHistorical": 59,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "C_remove_sentiment_interaction",
+      "approved42": 0,
+      "wait42": 31,
+      "reject42": 11,
+      "approvedHistorical": 0,
+      "waitHistorical": 189,
+      "rejectHistorical": 59,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "D_remove_momentum_confidence_interaction",
+      "approved42": 0,
+      "wait42": 31,
+      "reject42": 11,
+      "approvedHistorical": 0,
+      "waitHistorical": 189,
+      "rejectHistorical": 59,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "E_remove_momentum_learning_interaction",
+      "approved42": 0,
+      "wait42": 31,
+      "reject42": 11,
+      "approvedHistorical": 0,
+      "waitHistorical": 189,
+      "rejectHistorical": 59,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "F_remove_momentum_regime_adjustment",
+      "approved42": 0,
+      "wait42": 31,
+      "reject42": 11,
+      "approvedHistorical": 0,
+      "waitHistorical": 189,
+      "rejectHistorical": 59,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "G_change_ordering_only",
+      "approved42": 0,
+      "wait42": 42,
+      "reject42": 0,
+      "approvedHistorical": 0,
+      "waitHistorical": 248,
+      "rejectHistorical": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    },
+    {
+      "branch": "H_remove_technical_interaction",
+      "approved42": 0,
+      "wait42": 42,
+      "reject42": 0,
+      "approvedHistorical": 0,
+      "waitHistorical": 248,
+      "rejectHistorical": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "releasedNetPnL": 0,
+      "releasedExpectancy": 0,
+      "falseReleaseRate": 0,
+      "label": "HISTORICAL_COUNTERFACTUAL"
+    }
+  ],
+  "bestCounterfactual": {
+    "branch": "A_remove_shortMomentum_penalty",
+    "approved42": 0,
+    "wait42": 31,
+    "reject42": 11,
+    "approvedHistorical": 0,
+    "waitHistorical": 189,
+    "rejectHistorical": 59,
+    "profitableReleased": 0,
+    "losingReleased": 0,
+    "breakevenReleased": 0,
+    "releasedNetPnL": 0,
+    "releasedExpectancy": 0,
+    "falseReleaseRate": 0,
+    "label": "HISTORICAL_COUNTERFACTUAL"
+  },
+  "oos": {
+    "mode": "POLICY_LEVEL_OOS",
+    "train": {
+      "size": 25,
+      "primaryBlocker": "MOMENTUM",
+      "primaryShare": 0.56
+    },
+    "validation": {
+      "size": 8,
+      "primaryBlocker": "MOMENTUM",
+      "primaryShare": 1
+    },
+    "oos": {
+      "size": 9,
+      "primaryBlocker": "MOMENTUM",
+      "primaryShare": 0.888889
+    },
+    "support": "YES"
+  },
+  "robustness": "INSUFFICIENT_SAMPLE",
+  "currentZeroApprovalShared": "YES",
+  "experiments": [
+    {
+      "experiment": "MOMENTUM_CONFIDENCE_INTERACTION",
+      "expectedNetImpact": 1,
+      "evidenceStrength": "MEDIUM",
+      "causality": "clean bounded gate-level",
+      "oos": "YES",
+      "safetyRisk": "LOW",
+      "implementationComplexity": "LOW",
+      "hypothesis": "Momentum weakness and confidence floor combination over-suppresses candidates."
+    },
+    {
+      "experiment": "SHORT_MOMENTUM_CORRECTION",
+      "expectedNetImpact": 2,
+      "evidenceStrength": "MEDIUM",
+      "causality": "moderate",
+      "oos": "YES",
+      "safetyRisk": "LOW",
+      "implementationComplexity": "LOW",
+      "hypothesis": "shortMomentum low-input gating is stricter than needed in current regime mix."
+    },
+    {
+      "experiment": "TDI_ORDERING_CORRECTION",
+      "expectedNetImpact": 3,
+      "evidenceStrength": "LOW",
+      "causality": "ordering sensitivity only",
+      "oos": "YES",
+      "safetyRisk": "LOW",
+      "implementationComplexity": "MEDIUM",
+      "hypothesis": "Gate order drives first-blocker attribution and may alter wait/reject composition."
+    }
+  ],
+  "finalVerdict": {
+    "PROFITABLE_TRADES": 42,
+    "CURRENT_CANDIDATES": 2278,
+    "PRIMARY_MOMENTUM_SUPPRESSOR": "MOMENTUM_SCORE",
+    "PRIMARY_SUPPRESSOR_SHARE": 0.714286,
+    "LARGEST_NUMERIC_GAP": "momentumScoreGap",
+    "MOMENTUM_UNIT_BUG": "NO",
+    "DOUBLE_COUNTING": "PARTIAL",
+    "LEARNING_INTERACTION": "PARTIAL",
+    "CONFIDENCE_INTERACTION": "PARTIAL",
+    "ORDERING_EFFECT": "YES",
+    "MASTER_SUPPRESSION": "UNKNOWN",
+    "BEST_COUNTERFACTUAL": "A_remove_shortMomentum_penalty",
+    "RELEASED_PROFITABLE_TRADES": 0,
+    "RELEASED_LOSING_TRADES": 0,
+    "RELEASED_NET_PNL": 0,
+    "RELEASED_EXPECTANCY": 0,
+    "OOS_SUPPORTED": "YES",
+    "ROBUSTNESS": "INSUFFICIENT_SAMPLE",
+    "CURRENT_ZERO_APPROVAL_SHARED": "YES",
+    "FIRST_EXPERIMENT": "MOMENTUM_CONFIDENCE_INTERACTION",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+  }
+}

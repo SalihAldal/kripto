@@ -1,0 +1,84 @@
+{
+  "evidenceSource": {
+    "masterMetrics": "src/server/decision-engine/conflict-detection.service.ts",
+    "masterBlend": "src/server/decision-engine/master-decision-engine.service.ts",
+    "hybridConfidence": "src/server/ai/hybrid-decision-engine.ts"
+  },
+  "confidenceFormula": {
+    "masterMetricsConfidence": "clamp(consensusScore*0.55 + agreementScore*0.35 - conflictScore*0.15, 0, 100)",
+    "blendedConfidence": "clamp(hybridConfidence*0.55 + metrics.confidence*0.45 - metrics.conflictScore*0.08, 0, 100)",
+    "hybridRawDecisionConfidence": "clamp(technical.confidence*0.34 + sentiment.confidence*0.22 + (100-riskProviderRisk)*0.26 + tradeQualityScore*0.18 - conflictingFactors*4, 0, 100)",
+    "hybridAdjustedDecisionConfidence": "clamp(rawDecisionConfidence - criticSeverity*0.45 + criticOverrideTerm - regimeTransitionProbability*0.08 - regimeFlipRisk*0.06 - regimeChaosProbability*0.05 + stabilityBonus, 0, 100)"
+  },
+  "components": [
+    {
+      "name": "consensusScore",
+      "source": "computeConsensusMetrics",
+      "weight": 0.55,
+      "range": "0..100",
+      "normalization": "avg(actionable expert scores)",
+      "positiveContribution": "higher expert average raises confidence",
+      "negativeContribution": "lower expert scores reduce confidence",
+      "missingBehavior": "if all NO_OPINION, fallback to all opinions",
+      "noOpinionBehavior": "NO_OPINION excluded from actionable set",
+      "regimeInteraction": "indirect via MARKET expert",
+      "learningInteraction": "indirect via LEARNING expert",
+      "momentumInteraction": "indirect via MOMENTUM expert",
+      "sentimentInteraction": "indirect via expert outputs",
+      "technicalInteraction": "indirect via expert outputs"
+    },
+    {
+      "name": "agreementScore",
+      "source": "computeConsensusMetrics",
+      "weight": 0.35,
+      "range": "0..100",
+      "normalization": "derived from opinion polarity spread/stddev",
+      "positiveContribution": "higher agreement raises confidence",
+      "negativeContribution": "opinion dispersion lowers confidence",
+      "missingBehavior": "0 when no actionable polarity",
+      "noOpinionBehavior": "excluded before polarity build",
+      "regimeInteraction": "indirect",
+      "learningInteraction": "indirect",
+      "momentumInteraction": "indirect",
+      "sentimentInteraction": "indirect",
+      "technicalInteraction": "indirect"
+    },
+    {
+      "name": "conflictScore",
+      "source": "computeConsensusMetrics + blendedConfidence",
+      "weight": -0.15,
+      "range": "0..100",
+      "normalization": "conflicts.length*12 + severity sum*20, capped 100",
+      "positiveContribution": "none",
+      "negativeContribution": "direct subtraction from confidence",
+      "missingBehavior": "0 if no conflict",
+      "noOpinionBehavior": "NO_OPINION pairs skipped",
+      "regimeInteraction": "indirect",
+      "learningInteraction": "indirect",
+      "momentumInteraction": "indirect",
+      "sentimentInteraction": "indirect",
+      "technicalInteraction": "indirect"
+    },
+    {
+      "name": "hybridConfidence",
+      "source": "hybrid-decision-engine",
+      "weight": 0.55,
+      "range": "0..100",
+      "normalization": "role confidence blend + risk/regime/critic penalties",
+      "positiveContribution": "technical/sentiment quality and tradeQuality",
+      "negativeContribution": "critic severity + conflict factors + regime risk penalties",
+      "missingBehavior": "provider confidence defaults near neutral",
+      "noOpinionBehavior": "handled as neutral defaults in role pipeline",
+      "regimeInteraction": "explicit penalties/bonus",
+      "learningInteraction": "mostly downstream via master",
+      "momentumInteraction": "shortMomentum/shortFlow via conflicting factors and gating",
+      "sentimentInteraction": "direct weighted input",
+      "technicalInteraction": "direct weighted input"
+    }
+  ],
+  "thresholds": {
+    "minMasterConfidenceToPreserve": 40,
+    "minMasterBuyConfidence": 62,
+    "minHybridConfidenceToPreserve": 65
+  }
+}

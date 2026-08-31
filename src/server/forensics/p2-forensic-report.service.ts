@@ -1,8 +1,12 @@
 import type { ForensicRegimeClass, ForensicSessionContext, P2ForensicSessionBundle } from "@/src/server/forensics/forensic.types";
 import { buildAiStrategyInteractionReport } from "@/src/server/forensics/ai-strategy-interaction.service";
+import { buildCanonicalBaseline } from "@/src/server/forensics/baseline-metrics.service";
+import { buildCandidateQualityFactorAnalysis } from "@/src/server/forensics/candidate-quality-factor-analysis.service";
 import { buildExperimentRegistry } from "@/src/server/forensics/experiment-registry.service";
 import { evaluateFeeAwareEntryPolicy } from "@/src/server/forensics/fee-aware-entry-policy.service";
+import { buildFeeMetricsBySymbol } from "@/src/server/forensics/fee-aware-edge-research.service";
 import { buildOpportunityValueReport } from "@/src/server/forensics/opportunity-value.service";
+import { buildOutOfSampleEvaluation } from "@/src/server/forensics/oos-split.service";
 import {
   buildEntryTimingExperiment,
   buildFeeAwareEntryExperiment,
@@ -19,7 +23,9 @@ import {
   filterRowsWithoutLookAhead,
 } from "@/src/server/forensics/strategy-comparison-harness.service";
 import { buildTdiSensitivityReport } from "@/src/server/forensics/tdi-sensitivity.service";
+import { buildTrendFollowingValidation } from "@/src/server/forensics/trend-following-analysis.service";
 import { buildVolatilityBreakoutValidationReport } from "@/src/server/forensics/volatility-breakout-validation.service";
+import { buildProfitConcentrationReport } from "@/src/server/forensics/profit-concentration.service";
 
 const ACCEPTANCE_TEST = "tests/forensics/p2-profitability-optimization.test.ts";
 
@@ -53,6 +59,7 @@ function resolveTradeMaps(session: ForensicSessionContext) {
 export function buildP2ForensicReports(session: ForensicSessionContext): P2ForensicSessionBundle {
   const p1 = buildP1ForensicReports(session);
   const { strategyByTradeId, regimeByTradeId, entryTimingBySymbol, tdiBySymbol } = resolveTradeMaps(session);
+  const feeMetricsBySymbol = buildFeeMetricsBySymbol(session.decisions);
 
   const postEntryMoves: Record<string, number> = {};
   for (const row of session.notDiscoveredRecords ?? []) {
@@ -72,6 +79,7 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
       strategyByTradeId,
       regimeByTradeId,
       tdiBySymbol,
+      feeMetricsBySymbol,
       entryTimingBySymbol,
     }),
   );
@@ -85,6 +93,7 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
     },
     evidenceRefs: ["P2 combined research bundle — not for production promotion"],
   });
+  const baselineMetrics = buildCanonicalBaseline({ pnlEntries: session.pnlEntries });
 
   const mrRegimeExperiment = buildSingleChangeExperiment({
     rows: comparisonRows,
@@ -126,15 +135,33 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
   });
 
   const feePolicySamples = (session.feePolicyEvaluations ?? []).slice(0, 50);
+  const candidateQualityFactors = buildCandidateQualityFactorAnalysis({
+    rows: comparisonRows,
+    tdiBySymbol,
+    entryTimingBySymbol,
+    feeMetricsBySymbol,
+  });
+  const trendFollowingValidation = buildTrendFollowingValidation({
+    strategyPerformance: p1.strategyPerformance,
+  });
+  const outOfSampleEvaluation = buildOutOfSampleEvaluation({
+    rows: comparisonRows,
+    baseline: { label: "BASELINE", policyFlags: {} },
+    candidate: { label: mrRegimeExperiment.candidate.label, policyFlags: mrRegimeExperiment.candidate.policyFlags },
+  });
+  const profitConcentration = buildProfitConcentrationReport({ rows: comparisonRows });
 
   const promotionGate = evaluatePromotionGate({
-    changeId: "p2-combined-research-bundle",
-    description: "Combined P2 research experiments — no auto-promotion",
-    before: strategyComparison.baseline.metrics,
-    after: strategyComparison.candidate.metrics,
-    sampleSize: strategyComparison.baseline.metrics.sampleSize,
+    changeId: "p2-single-change-mr-regime-filter",
+    description: "Single-change P2 candidate (MR regime filter) — no auto-promotion",
+    before: mrRegimeExperiment.baseline.metrics,
+    after: mrRegimeExperiment.candidate.metrics,
+    sampleSize: mrRegimeExperiment.baseline.metrics.sampleSize,
     minSampleSize: 20,
     acceptanceTest: ACCEPTANCE_TEST,
+    outOfSampleSupport: outOfSampleEvaluation.available ? outOfSampleEvaluation.support : null,
+    topSymbolContributionPct: profitConcentration.available ? profitConcentration.topSymbolContributionPct : undefined,
+    top1TradeContributionPct: profitConcentration.available ? profitConcentration.top1TradeContributionPct : undefined,
   });
 
   const promotionDecisions = [
@@ -188,6 +215,16 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
         acceptanceTest: ACCEPTANCE_TEST,
       },
       {
+        experimentId: "breakout-regime-preference",
+        baseline: "BASELINE",
+        variant: "BREAKOUT_REGIME_FILTER",
+        hypothesis: "Breakout candidates may require regime compatibility",
+        parameters: { regimeGating: true, strategySubset: "BREAKOUT|MOMENTUM" },
+        report: breakoutRegimeExperiment,
+        promotionStatus: "RESEARCH_ONLY",
+        acceptanceTest: ACCEPTANCE_TEST,
+      },
+      {
         experimentId: "fee-aware-entry",
         baseline: "no-fee-floor",
         variant: "fee-floor",
@@ -228,6 +265,11 @@ export function buildP2ForensicReports(session: ForensicSessionContext): P2Foren
     experimentRegistry,
     promotionGate,
     promotionDecisions,
+    baselineMetrics,
+    outOfSampleEvaluation,
+    profitConcentration,
+    candidateQualityFactors,
+    trendFollowingValidation,
   };
 }
 

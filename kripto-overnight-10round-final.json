@@ -1,0 +1,433 @@
+{
+  "generatedAt": "2026-08-23T10:10:20.415Z",
+  "reportScope": "MULTI_CAMPAIGN_OVERNIGHT",
+  "campaigns": [
+    {
+      "label": "CAMPAIGN_A_FIRST_10",
+      "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+      "roundTarget": 10,
+      "roundsReported": 10,
+      "terminalRounds": 10,
+      "job": {
+        "id": "cmt4zxkbm001gun8ghz4qsb0w",
+        "status": "FAILED",
+        "startedAt": "2026-08-22T23:15:15.083Z",
+        "finishedAt": "2026-08-23T01:22:17.709Z",
+        "lastError": "scanner-ai pool aborted: Tur secim suresi doldu (1200s)",
+        "totalRoundsPlanned": 30
+      },
+      "aggregate": {
+        "scannerCandidates": 500,
+        "tdiApprovals": 0,
+        "tdiWait": 34,
+        "tdiRejects": 466,
+        "aiCalls": 753,
+        "aiFailed": 0,
+        "aiNoResponse": 0,
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "trades": 0,
+        "closedTrades": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "blockerCounts": {
+        "AI_VETO": 8,
+        "SIM_TIGHT_FILTER": 2
+      },
+      "funnelByStage": {
+        "scanner": 1019,
+        "decision": 483,
+        "ai": 1012,
+        "ev": 823,
+        "consensus": 1007,
+        "candidate": 350,
+        "execution": 2
+      },
+      "rounds": [
+        {
+          "roundNo": 1,
+          "roundId": "cmt4zxl9f001tun8gz2x8h86o",
+          "symbol": "CITYTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-22T23:15:16.324Z",
+          "endedAt": "2026-08-22T23:33:31.541Z",
+          "durationMin": 18,
+          "selectionAttempt": 3,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 205,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 23,
+            "tdiRejects": 292
+          },
+          "ai": {
+            "aiInvokedCount": 27,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 2,
+          "roundId": "cmt50l41x09iuun8gmkl9y7qi",
+          "symbol": "INJTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-22T23:33:33.766Z",
+          "endedAt": "2026-08-22T23:48:12.920Z",
+          "durationMin": 15,
+          "selectionAttempt": 3,
+          "lastStep": "SYMBOL_SELECTED",
+          "failReason": "SIM_TIGHT_FILTER_30m: non-pump kalite dusuk (composite=43.8, sentiment=31.7, mtf=73.5) | AI role consensus zayif (tech=37.8, sentiment=31.7, risk=62.0) | momentum/flow zayif (-0.0850, -1.0000) | regime chop warning | regime lifecycle risk (CHOP) | EMA trend uyumsuz (EMA50=235.9905, EMA200=236.3686) | Kalite skoru dusuk (30/100 < 52)",
+          "firstBlockingStage": "SIM_TIGHT_FILTER",
+          "candidateCount": 247,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 11,
+            "tdiRejects": 174
+          },
+          "ai": {
+            "aiInvokedCount": 85,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 3,
+          "roundId": "cmt513ymm0k3vun8gqsd07fkp",
+          "symbol": "PEOPLETRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-22T23:48:13.198Z",
+          "endedAt": "2026-08-22T23:52:43.420Z",
+          "durationMin": 5,
+          "selectionAttempt": 1,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 48,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 85,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 4,
+          "roundId": "cmt519ram0nmvun8gk7m02l8r",
+          "symbol": "TRBTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-22T23:52:43.630Z",
+          "endedAt": "2026-08-22T23:56:32.645Z",
+          "durationMin": 4,
+          "selectionAttempt": 1,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 84,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 5,
+          "roundId": "cmt51eo5m0rajun8gvb31uy4l",
+          "symbol": "RENDERTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-22T23:56:32.843Z",
+          "endedAt": "2026-08-23T00:07:11.774Z",
+          "durationMin": 11,
+          "selectionAttempt": 2,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 74,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 6,
+          "roundId": "cmt51sifa0y05un8g57mzms4r",
+          "symbol": "LUNCTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-23T00:07:18.597Z",
+          "endedAt": "2026-08-23T00:24:04.203Z",
+          "durationMin": 17,
+          "selectionAttempt": 3,
+          "lastStep": "SYMBOL_SELECTED",
+          "failReason": "SIM_TIGHT_FILTER_30m: non-pump kalite dusuk (composite=54.5, sentiment=71.7, mtf=45.5) | AI role consensus zayif (tech=32.1, sentiment=71.7, risk=59.5) | momentum/flow zayif (-0.0002, 1.0000) | Sahte hour-only pump (tape=-0.000%, hour=-0.228%) | EMA trend uyumsuz (EMA50=0.0026, EMA200=0.0026) | Hacim yetersiz (0.46x < 1.05x) | Kalite skoru dusuk (39/100 < 52)",
+          "firstBlockingStage": "SIM_TIGHT_FILTER",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 81,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 7,
+          "roundId": "cmt52e2kl189lun8gc1z2xj2q",
+          "symbol": "PORTALTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-23T00:24:04.485Z",
+          "endedAt": "2026-08-23T00:29:16.680Z",
+          "durationMin": 5,
+          "selectionAttempt": 1,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 46,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 8,
+          "roundId": "cmt52ksck1aogun8gyfzo1i42",
+          "symbol": "CHZTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-23T00:29:17.829Z",
+          "endedAt": "2026-08-23T00:42:06.242Z",
+          "durationMin": 13,
+          "selectionAttempt": 1,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 83,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 9,
+          "roundId": "cmt5319zf1f0gun8g7co4oiii",
+          "symbol": "MEGATRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-23T00:42:07.179Z",
+          "endedAt": "2026-08-23T00:51:07.788Z",
+          "durationMin": 9,
+          "selectionAttempt": 1,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 95,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        },
+        {
+          "roundNo": 10,
+          "roundId": "cmt53cvq21jiuun8g4237c6h1",
+          "symbol": "SUPERTRY",
+          "state": "tur_basarisiz",
+          "terminal": true,
+          "startedAt": "2026-08-23T00:51:08.570Z",
+          "endedAt": "2026-08-23T01:02:12.915Z",
+          "durationMin": 11,
+          "selectionAttempt": 1,
+          "lastStep": "EXECUTING",
+          "failReason": "AI_GATE_BLOCK: AI_VETO",
+          "firstBlockingStage": "AI_VETO",
+          "candidateCount": 0,
+          "tdi": {
+            "tdiApprovals": 0,
+            "tdiWait": 0,
+            "tdiRejects": 0
+          },
+          "ai": {
+            "aiInvokedCount": 93,
+            "aiFailedCount": 0,
+            "aiNoResponseCount": 0
+          },
+          "execution": {
+            "ordersCreatedCount": 0,
+            "fillsCount": 0
+          },
+          "pnl": {
+            "tradeCount": 0,
+            "grossPnL": 0,
+            "fees": 0,
+            "netPnL": 0
+          },
+          "artifactsExist": true
+        }
+      ],
+      "safety": {
+        "aiVetoBypass": 0,
+        "zombieRounds": 1,
+        "policyChanges": false
+      },
+      "verdict": {
+        "ROUND_TARGET": 10,
+        "ROUNDS_COMPLETED": 0,
+        "ROUNDS_FAILED": 10,
+        "TRADES": 0,
+        "CLOSED_TRADES": 0,
+        "NET_PNL": 0,
+        "AI_VETO_BYPASS": 0,
+        "ZOMBIE_ROUNDS": 1,
+        "VARIANT_D_LIVE_TRADES": 0,
+        "PROFITABILITY_STATUS": "NOT_PROVEN",
+        "POLICY_CHANGES_DURING_CAMPAIGN": "NO",
+        "PRIMARY_RUNTIME_INCIDENT": "scanner-ai pool aborted: Tur secim suresi doldu (1200s)",
+        "PRIMARY_LOSS_DRIVER": "ZERO_TRADES_FUNNEL_BLOCK"
+      }
+    }
+  ]
+}

@@ -1,5 +1,10 @@
 import { env } from "@/lib/config";
 import type { AIConsensusResult, AIDecision, AIProviderResult } from "@/src/types/ai";
+import {
+  classifyProviderHealthState,
+  isConsensusEligibleHealth,
+  type AiProviderHealthState,
+} from "@/src/server/ai/ai-provider-health.service";
 
 /** Stable AI consensus policy contract for API/status consumers. */
 export const AI_CONSENSUS_POLICY = {
@@ -16,7 +21,11 @@ function decisionToScore(decision: AIDecision) {
 }
 
 export function scoreTradeOpportunity(outputs: AIProviderResult[]) {
-  const valid = outputs.filter((x) => x.ok && x.output);
+  const valid = outputs.filter((x) => {
+    if (!x.ok || !x.output) return false;
+    const state = x.healthState ?? classifyProviderHealthState(x);
+    return isConsensusEligibleHealth(state as AiProviderHealthState);
+  });
   if (valid.length === 0) return 0;
   const weighted = valid.reduce((acc, row) => {
     const weight = Number.isFinite(row.weight) ? Math.max(0.2, Math.min(row.weight as number, 2)) : 1;
@@ -30,7 +39,13 @@ export function scoreTradeOpportunity(outputs: AIProviderResult[]) {
 }
 
 export function rejectUnsafeTrade(outputs: AIProviderResult[]) {
-  const valid = outputs.filter((x) => x.ok && x.output).map((x) => x.output!);
+  const valid = outputs
+    .filter((x) => {
+      if (!x.ok || !x.output) return false;
+      const state = x.healthState ?? classifyProviderHealthState(x);
+      return isConsensusEligibleHealth(state as AiProviderHealthState);
+    })
+    .map((x) => x.output!);
   if (valid.length === 0) {
     return { reject: true, reason: "No healthy provider result" };
   }
@@ -53,7 +68,12 @@ export function rejectUnsafeTrade(outputs: AIProviderResult[]) {
 
 export function summarizeConsensus(outputs: AIProviderResult[]): AIConsensusResult {
   const isEliteQuality = env.AI_QUALITY_PROFILE === "elite";
-  const healthy = outputs.filter((x) => x.ok && x.output);
+  const eligible = outputs.filter((row) => {
+    if (!row.ok || !row.output) return false;
+    const state = row.healthState ?? classifyProviderHealthState(row);
+    return isConsensusEligibleHealth(state as AiProviderHealthState);
+  });
+  const healthy = eligible;
   const remoteHealthy = healthy.filter((row) => {
     const meta = row.output?.metadata as Record<string, unknown> | undefined;
     const coverage = Number(meta?.remoteCoverage ?? (meta?.remote === true ? 1 : 0));

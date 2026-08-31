@@ -1,0 +1,6 @@
+{
+  "EV_FOLLOWUP_REQUIRED": true,
+  "reason": "689 EV ordering anomalies (EV_REJECT with expectedValue >= threshold) remain out of scope for this task",
+  "action": "Separate EV ordering forensic + telemetry-only audit after controlled paper",
+  "EV_LOGIC_CHANGED": false
+}

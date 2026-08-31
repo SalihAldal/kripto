@@ -17,6 +17,7 @@ import { buildP1ForensicReports } from "@/src/server/forensics/p1-forensic-repor
 import { classifyForensicRegime } from "@/src/server/forensics/regime-classifier.service";
 import { buildScannerQualificationRejections } from "@/src/server/forensics/scanner-qualification-forensics.service";
 import { createPnlLedgerEntry } from "@/src/server/forensics/pnl-ledger.service";
+import { buildScannerCyclePlan } from "@/src/server/scanner/scanner.service";
 import {
   beginSimulationIntegrityGuard,
   SimulationIntegrityViolation,
@@ -222,6 +223,41 @@ describe("P1-2 scanner NOT_DISCOVERED forensics", () => {
     });
     expect(regime === "CHAOS" || regime === "HIGH_VOLATILITY").toBe(true);
   });
+
+  it("reproduces COW cursor miss and rescues through bounded priority lane", () => {
+    const watchlist = Array.from({ length: 304 }).map((_, idx) => `S${idx}TRY`);
+    watchlist[0] = "COWTRY";
+    const plan = buildScannerCyclePlan({
+      watchlist,
+      cursor: 224,
+      cycleLimit: 79,
+      prioritySymbols: [{ symbol: "COWTRY", priorityScore: 99, reason: "TOP_GAINER" }],
+      priorityMaxPerCycle: 4,
+    });
+    expect(plan.rotationSymbols.includes("COWTRY")).toBe(false);
+    expect(plan.prioritySymbols).toContain("COWTRY");
+    expect(plan.evaluationSymbols).toContain("COWTRY");
+    expect(plan.prioritySymbols.length).toBeLessThanOrEqual(4);
+  });
+
+  it("deduplicates priority symbols and keeps rotation fairness", () => {
+    const watchlist = ["A", "B", "C", "D", "E"].map((row) => `${row}TRY`);
+    const plan = buildScannerCyclePlan({
+      watchlist,
+      cursor: 1,
+      cycleLimit: 3,
+      prioritySymbols: [
+        { symbol: "BTRY", priorityScore: 10, reason: "TOP_GAINER" },
+        { symbol: "ATRY", priorityScore: 9, reason: "TOP_GAINER" },
+        { symbol: "ATRY", priorityScore: 9, reason: "TOP_GAINER" },
+      ],
+      priorityMaxPerCycle: 2,
+    });
+    expect(plan.rotationSymbols).toEqual(["BTRY", "CTRY", "DTRY"]);
+    expect(plan.prioritySymbols).toEqual(["ATRY"]);
+    expect(plan.evaluationSymbols.slice(-3)).toEqual(plan.rotationSymbols);
+    expect(plan.duplicatesRemoved).toBeGreaterThanOrEqual(0);
+  });
 });
 
 describe("P1-3 EV calibration", () => {
@@ -325,13 +361,19 @@ describe("P1-4 entry timing forensics", () => {
       priceAtEntry: 5.12,
     });
     expect(record.entryDelayMs).toBe(180_000);
-    expect(record.classification).toBe("POSSIBLY_LATE");
+    expect(record.classification).toBe("EDGE_DECAY");
     const good = classifyEntryTiming({
       side: "LONG",
       entryDelayMs: 20_000,
       movementToEntryPercent: 0.05,
     });
     expect(good.classification).toBe("GOOD_ENTRY");
+    const chasing = classifyEntryTiming({
+      side: "LONG",
+      entryDelayMs: 180_000,
+      movementToEntryPercent: 0.1,
+    });
+    expect(chasing.classification).toBe("CHASING");
   });
 });
 

@@ -357,7 +357,7 @@ export async function compareAndSetSchedulerLease(input: {
   return prisma.$transaction(async (tx) => {
     const job = await tx.autoRoundJob.findUnique({
       where: { id: input.jobId },
-      select: { metadata: true },
+      select: { metadata: true, persistVersion: true },
     });
     if (!job) return { ok: false as const, lease: null };
     const meta = ((job.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>;
@@ -370,17 +370,28 @@ export async function compareAndSetSchedulerLease(input: {
       ...input.lease,
       version: currentVersion + 1,
     };
-    await tx.autoRoundJob.update({
-      where: { id: input.jobId },
+    const updated = await tx.autoRoundJob.updateMany({
+      where: { id: input.jobId, persistVersion: job.persistVersion },
       data: {
+        persistVersion: { increment: 1 },
         metadata: {
           ...meta,
           [SCHEDULER_LEASE_KEY]: nextLease,
         } as never,
       },
     });
+    if (updated.count !== 1) {
+      const latest = await tx.autoRoundJob.findUnique({
+        where: { id: input.jobId },
+        select: { metadata: true },
+      });
+      return {
+        ok: false as const,
+        lease: latest ? readSchedulerLeaseFromMetadata(latest.metadata) : null,
+      };
+    }
     return { ok: true as const, lease: nextLease };
-  });
+  }, { timeout: 25_000, maxWait: 12_000 });
 }
 
 const ROUND_REGISTRY_KEY = "roundRegistry";

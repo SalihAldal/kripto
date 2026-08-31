@@ -1,0 +1,170 @@
+{
+  "reportId": "kripto-final-blocker-closure-2round-2026-08-19",
+  "generatedAt": "2026-08-19T00:40:00+03:00",
+  "objective": "Close remaining runtime blockers and validate with exactly 2 controlled paper rounds.",
+  "initialBlockers": [
+    "selection-timeout at 1200s budget",
+    "transactionallyBeginRound job version conflict",
+    "high fee drag on historical sample",
+    "exit model mostly end-of-replay in historical windows"
+  ],
+  "auditStatus": {
+    "p0AiExecutionParity": "PASS",
+    "p0RuntimePersistence": "PARTIAL",
+    "p0RoundCreationVersioning": "PARTIAL",
+    "p1Scanner": "PARTIAL",
+    "p1PumpScan": "PARTIAL",
+    "p1PriorityLane": "PASS",
+    "p1EntryTiming": "PARTIAL",
+    "p1TdiDataQuality": "PASS",
+    "p1TdiPolicy": "PASS",
+    "p1ExitLifecycle": "NOT_PROVEN",
+    "p1FeePipeline": "NOT_PROVEN",
+    "p2FeeAwareGuard": "PARTIAL",
+    "p2PromotedProfitabilityChanges": "NOT_PROVEN"
+  },
+  "fixesApplied": [
+    {
+      "id": "TXN_BEGIN_ROUND_RETRY",
+      "area": "auto-round integrity",
+      "change": "Added bounded retry for transient OptimisticConcurrencyError in transactionallyBeginRound.",
+      "files": [
+        "src/server/repositories/auto-round-integrity.repository.ts"
+      ],
+      "safety": [
+        "version checks preserved",
+        "idempotency key preserved",
+        "no duplicate run creation path added",
+        "bounded retry only on explicit begin-round version conflict"
+      ]
+    },
+    {
+      "id": "TXN_BEGIN_ROUND_TEST",
+      "area": "test coverage",
+      "change": "Added test scenario that injects one transient job-version CAS conflict and verifies recovery.",
+      "files": [
+        "tests/auto-round-integrity.test.ts"
+      ]
+    }
+  ],
+  "transactionVersioningAnalysis": {
+    "error": "transactionallyBeginRound job version conflict",
+    "classification": "TRANSACTION_CONTENTION",
+    "concurrentWriters": [
+      "beginRound mutation",
+      "scheduler lease CAS heartbeat/update"
+    ],
+    "rootCause": "Single-shot CAS on autoRoundJob.persistVersion could lose race with concurrent lease metadata updates and fail the whole round bootstrap.",
+    "resolution": "Safe bounded retry around begin-round transaction for transient CAS conflicts.",
+    "liveStatusAfterFix": "NOT_PROVEN"
+  },
+  "selectionTimeoutAnalysis": {
+    "status": "FAIL",
+    "firstBlockingStage": "SCANNER",
+    "evidence": [
+      "reports/p2-final-paper-baseline-shadow.json (Tur secim suresi doldu 1200s)",
+      "artifacts/forensics/cmsyyp5xv000bunp4lhexsx0z/rounds/2/round-summary.json",
+      "runtime log: binance.tr /api/v3/ticker/24hr intermittent auth-envelope/network failures",
+      "runtime crash path: Prisma P1001 in ai-performance snapshot read"
+    ],
+    "stageLatencyMs": {
+      "scannerEventGap": {
+        "p50": 11526,
+        "p95": 39086,
+        "p99": 167426,
+        "max": 217188
+      },
+      "aiCandidateDuration": {
+        "p50": 10903,
+        "p95": 27715,
+        "p99": 27715,
+        "max": 27715
+      },
+      "dbPersistencePatchJob": {
+        "p50": 9,
+        "p95": 28,
+        "p99": 69,
+        "max": 69
+      },
+      "dbPersistenceMergeRun": {
+        "p50": 59,
+        "p95": 96,
+        "p99": 105,
+        "max": 105
+      }
+    },
+    "conclusion": "Scanner-side latency and provider instability dominate; DB write latency is not the primary bottleneck."
+  },
+  "tests": {
+    "passedSuites": [
+      "tests/auto-round-integrity.test.ts",
+      "tests/scheduler-ownership.test.ts",
+      "tests/round-runtime.test.ts",
+      "tests/forensics/p0-execution-correctness.test.ts",
+      "tests/forensics/tdi-data-quality.test.ts",
+      "tests/forensics/tdi-policy-forensic.test.ts",
+      "tests/scanner.test.ts"
+    ],
+    "knownFailingSuite": [
+      "tests/auto-round-engine.integration.test.ts (timeout, pre-existing long-run fragility)"
+    ]
+  },
+  "preSmokeGate": {
+    "database": "PASS",
+    "binance": "PASS",
+    "aiProviders": "PASS",
+    "clock": "PASS",
+    "workerLocks": "PASS",
+    "duplicatePaperJobs": "PASS",
+    "source": "paper-preflight attempt final-2round-preflight-*"
+  },
+  "paperValidation": {
+    "requestedRounds": 2,
+    "sessionId": "cmsz5uuwt0009un4kql4mlvim",
+    "attemptedRounds": 1,
+    "completedRounds": 0,
+    "failedRounds": 0,
+    "hardStopTriggered": true,
+    "hardStopReason": "Runtime DB disconnect (Prisma P1001) during round pipeline; second round could not start.",
+    "roundEvidence": [
+      {
+        "roundNo": 1,
+        "status": "ABORTED_BY_RUNTIME_ERROR",
+        "tradeCount": 0,
+        "aiProgress": {
+          "processed": 9,
+          "successCount": 4,
+          "failedCount": 5
+        },
+        "error": "Can't reach database server at localhost:5432 (ai-performance snapshot read)"
+      }
+    ]
+  },
+  "finalVerdicts": {
+    "BLOCKERS_CLOSED": "PARTIAL",
+    "RUNTIME_STABLE": "NO",
+    "AI_PARITY": "PASS",
+    "TDI_CORRECT": "YES",
+    "SCANNER_STABLE": "PARTIAL",
+    "EXIT_RUNTIME_PROVEN": "NO",
+    "FEE_PIPELINE_PROVEN": "NO",
+    "PROFITABILITY_SIGNAL": "NOT_PROVEN",
+    "READY_FOR_5_ROUNDS": "NO",
+    "READY_FOR_30_50_ROUNDS": "NO",
+    "PROFITABILITY_CONFIRMED": "NOT_PROVEN"
+  },
+  "nextRequiredFix": {
+    "FIRST_BLOCKING_STAGE": "SCANNER_RUNTIME_STABILITY",
+    "ROOT_CAUSE": "Unstable market-data acquisition path and intermittent DB connectivity under long-running selection pipeline.",
+    "EVIDENCE": [
+      "TR API auth-envelope/permission failures on ticker endpoint",
+      "round reached selection budget repeatedly",
+      "Prisma P1001 crash before second round"
+    ],
+    "ACTION": [
+      "Harden market-data provider fallback and cache use for scanner universe fetch",
+      "Prevent AI performance-memory snapshot reads from hard-failing round loop when DB is transiently unavailable",
+      "Re-run exact 2-round gate only after stability patch"
+    ]
+  }
+}

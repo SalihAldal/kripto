@@ -1,0 +1,1577 @@
+{
+  "generatedAt": "2026-08-22T00:09:29.122Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionPolicyChange": true
+  },
+  "inventory": {
+    "historicalTrades": 346,
+    "learningTrades": 248,
+    "paperTrades": 98,
+    "recoverableDecisionSnapshots": 268,
+    "exactMatches": 0,
+    "highConfidenceMatches": 268,
+    "lowConfidenceMatches": 0,
+    "unmatched": 78
+  },
+  "qualitySummary": {
+    "includedForProfitability": 173,
+    "excluded": 173,
+    "exclusions": [
+      {
+        "tradeId": "cmpsejxor017eunww45luw5ja",
+        "symbol": "ALGOTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsey568008quntokttxq2b8",
+        "symbol": "SEITRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpseatk000cgunwwlgazqovp",
+        "symbol": "NILTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpscyb6j009aunmcsnb9ayni",
+        "symbol": "XAUTTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsfdmb0008tun74hqnq7zu9",
+        "symbol": "GENIUSTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsh334x01vsunds2g6j4grf",
+        "symbol": "OGTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsgm0rz008lunds8clnz5ul",
+        "symbol": "LINEATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsfu839012wun744t6qkfib",
+        "symbol": "RARETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsdb4zx017eunmc015g1a2d",
+        "symbol": "ENATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpso0lje01idunp44vrbzbhf",
+        "symbol": "BERATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsmvpuq0553uno8kuk8e75l",
+        "symbol": "XVGTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsiumlr03b7uno89dlv1ojf",
+        "symbol": "COSTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsimfza02oluno8rehpgisc",
+        "symbol": "USUALTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsi2wj5013uuno83fegvlld",
+        "symbol": "OGTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsq8zfj06avunp4in38r89x",
+        "symbol": "PLUMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpspzgu005i9unp4micwz38m",
+        "symbol": "INJTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpspv4oh056eunp4gf0ih34h",
+        "symbol": "ARKMTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpspen4504bfunp4o2gi6f7a",
+        "symbol": "WLDTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsoxvz403e8unp4vortgdnq",
+        "symbol": "LINKTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpss42km0cequnp4ulnvmpip",
+        "symbol": "SCRTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsryoxc0bxuunp4rchp7780",
+        "symbol": "LUMIATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsru03a0bkyunp4sbdoqn3q",
+        "symbol": "ALLOTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsr4om60929unp42uotba0y",
+        "symbol": "NOTTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsqxz6o08h0unp4gjcjell8",
+        "symbol": "GPSTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsujqxp0im2unp4noh5b38u",
+        "symbol": "PLUMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsu3bmv0hmnunp4lax0n5v2",
+        "symbol": "GUNTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpstmuxt0gr8unp4oy6q4l7c",
+        "symbol": "GUNTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpst6apb0fs7unp4q28fzuyn",
+        "symbol": "TOWNSTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsqj85b074runp41xmyi5j9",
+        "symbol": "VIRTUALTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpsohjqa02grunp444ei7fvl",
+        "symbol": "ENJTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpshme2c0088uno8rplk96iq",
+        "symbol": "DTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpszhhzx039aungksmvi6vds",
+        "symbol": "SHIBTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpt15wbr05dcungkr9lwfhck",
+        "symbol": "BIOTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpt4a0id02k3un98myl56tyg",
+        "symbol": "BOMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpt6fe8w056oun9873t6chu5",
+        "symbol": "ASTERTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpt7npkr06ssun98z0oiak11",
+        "symbol": "BMTTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpt9k5rc0963un985d55xzfo",
+        "symbol": "DYMTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptaow3q0ap6un98oz4jlhsg",
+        "symbol": "ARKMTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptbxm950cbtun989mnzb4hz",
+        "symbol": "GIGGLETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptd62ga0dyyun98jfrj7mkp",
+        "symbol": "INJTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpteev4l0flzun986apyf4ur",
+        "symbol": "SANTOSTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptk7zky00ikunjw8gxqjstf",
+        "symbol": "HEITRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptkofag0175unjwz85g8i8d",
+        "symbol": "INJTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptlbuf302yeunjwgmtp0pmx",
+        "symbol": "PLUMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptlmciz03nsunjw647gposy",
+        "symbol": "USUALTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptmq0j405u0unjwi5kvaqde",
+        "symbol": "ALLOTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpto2ct907m9unjwij2tmp2w",
+        "symbol": "NEARTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptqiosz0aqxunjwo24h18yy",
+        "symbol": "ETHFITRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptqz0ro0bgounjwli7r4vyg",
+        "symbol": "DYMTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptrr5a70cljunjw07rtpy3t",
+        "symbol": "BIOTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptsnaqt0dw5unjwc2lxyccr",
+        "symbol": "CHZTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptu38vb0fsmunjwcha3dgjg",
+        "symbol": "HOMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmptv7w200hgjunjwn0gn1uu5",
+        "symbol": "ALLOTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpu7ex24022huntou3m8eefm",
+        "symbol": "ROSETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpu7veo002r9unto5rus0u2a",
+        "symbol": "BERATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpu8h00703k4untokxxvdxeg",
+        "symbol": "THETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpu9773a04wvuntotkmk7m44",
+        "symbol": "BOMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpu9rz9g064muntonvxllxnr",
+        "symbol": "CAKETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuczxpm0bj1unto9ub0tbu4",
+        "symbol": "XLMTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuebb6g0dy9unto5xv9fk8d",
+        "symbol": "HMSTRTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuevw1u0f3bunto5vz7y4ji",
+        "symbol": "KATTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpufasaj0g0runtog6m4nxj5",
+        "symbol": "ROSETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuh9srj0jccuntopyeyr6rg",
+        "symbol": "MBOXTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuj106p0md0untol3dnse9v",
+        "symbol": "WLDTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpujeot40n8lunto0dro44hv",
+        "symbol": "SAHARATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpujsi7o0o4luntoih58mnq8",
+        "symbol": "XLMTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuklusf0pq1untoiy15lba9",
+        "symbol": "WLDTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpuln2mv0rpruntogp61ni26",
+        "symbol": "FFTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpulvt280sgjunto2mxa1o1p",
+        "symbol": "ETHTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpumjkx50tukuntoeabq15br",
+        "symbol": "HEITRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpunfvpo0vgsunto4efrybu6",
+        "symbol": "HBARTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpup5bbv0yq9untozeuyqkvn",
+        "symbol": "SAHARATRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpupupud102guntoxxgdy50t",
+        "symbol": "WLDTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpwoz0m900kyunk04hgrdgda",
+        "symbol": "GPSTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "cmpwpjhm401v9unk0jxs7ug5z",
+        "symbol": "MBOXTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "none",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "analysis_msndco5r_2elqm9:scan-rez-long:BUY",
+        "symbol": "REZTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msndco5r_2elqm9:scan-mega-long:BUY",
+        "symbol": "MEGATRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msndco5r_2elqm9:scan-opn-long:BUY",
+        "symbol": "OPNTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msndco5r_2elqm9:scan-chip-long:BUY",
+        "symbol": "CHIPTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msndco5r_2elqm9:scan-edu-long:BUY",
+        "symbol": "EDUTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msndco5r_2elqm9:scan-eul-long:BUY",
+        "symbol": "EULTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msp4w43a_tuoj4a:scan-cetus-long:BUY",
+        "symbol": "CETUSTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msp4w43a_tuoj4a:scan-mito-long:BUY",
+        "symbol": "MITOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msqnpbh3_hfe3ob:scan-sol-long:BUY",
+        "symbol": "SOLTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msqnpbh3_hfe3ob:scan-paxg-long:BUY",
+        "symbol": "PAXGTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msqnpbh3_hfe3ob:scan-mmt-breakout:BUY",
+        "symbol": "MMTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-red-breakout:BUY",
+        "symbol": "REDTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msrmsh5i_9fv0aj:scan-hmstr-short:SELL",
+        "symbol": "HMSTRTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msrmsh5i_9fv0aj:scan-dodo-short:SELL",
+        "symbol": "DODOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msrmsh5i_9fv0aj:scan-hei-short:SELL",
+        "symbol": "HEITRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msrnvs8d_tofnlq:scan-bar-long:BUY",
+        "symbol": "BARTRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "analysis_msrnvs8d_tofnlq:scan-floki-long:BUY",
+        "symbol": "FLOKITRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "UNMATCHED"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-pengu-short:SELL",
+        "symbol": "PENGUTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-open-short:SELL",
+        "symbol": "OPENTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-bard-short:SELL",
+        "symbol": "BARDTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-xvg-short:SELL",
+        "symbol": "XVGTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-bome-short:SELL",
+        "symbol": "BOMETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-at-short:SELL",
+        "symbol": "ATTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-the-short:SELL",
+        "symbol": "THETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-enso-breakout:BUY",
+        "symbol": "ENSOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-solv-short:SELL",
+        "symbol": "SOLVTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-one-short:SELL",
+        "symbol": "ONETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-nil-short:SELL",
+        "symbol": "NILTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-atm-breakout:BUY",
+        "symbol": "ATMTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msruy3dw_um6avq:scan-avnt-breakout:BUY",
+        "symbol": "AVNTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-pump-short:SELL",
+        "symbol": "PUMPTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-zbt-short:SELL",
+        "symbol": "ZBTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-re-short:SELL",
+        "symbol": "RETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-pump-long:BUY",
+        "symbol": "PUMPTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-re-short:SELL",
+        "symbol": "RETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-ethfi-breakout:BUY",
+        "symbol": "ETHFITRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-chip-long:BUY",
+        "symbol": "CHIPTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-bank-breakout:BUY",
+        "symbol": "BANKTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-pnut-short:SELL",
+        "symbol": "PNUTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-eul-long:BUY",
+        "symbol": "EULTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-enso-breakout:BUY",
+        "symbol": "ENSOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-edu-long:BUY",
+        "symbol": "EDUTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-holo-short:SELL",
+        "symbol": "HOLOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-rad-short:SELL",
+        "symbol": "RADTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-not-short:SELL",
+        "symbol": "NOTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-aigensyn-short:SELL",
+        "symbol": "AIGENSYNTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-acx-long:BUY",
+        "symbol": "ACXTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-2z-short:SELL",
+        "symbol": "2ZTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mssorf6t_e66eyw:scan-avnt-short:SELL",
+        "symbol": "AVNTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-cyber-short:SELL",
+        "symbol": "CYBERTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-pnut-short:SELL",
+        "symbol": "PNUTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-movr-short:SELL",
+        "symbol": "MOVRTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-robo-breakout:BUY",
+        "symbol": "ROBOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-vic-breakout:BUY",
+        "symbol": "VICTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-zil-short:SELL",
+        "symbol": "ZILTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-re-short:SELL",
+        "symbol": "RETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-1000sats-short:SELL",
+        "symbol": "1000SATSTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-avax-short:SELL",
+        "symbol": "AVAXTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-bb-short:SELL",
+        "symbol": "BBTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-bank-short:SELL",
+        "symbol": "BANKTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-esp-short:SELL",
+        "symbol": "ESPTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-lunc-short:SELL",
+        "symbol": "LUNCTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-luna-short:SELL",
+        "symbol": "LUNATRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_msw3stjg_00g3pg:scan-shib-short:SELL",
+        "symbol": "SHIBTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-eigen-short:SELL",
+        "symbol": "EIGENTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-kat-long:BUY",
+        "symbol": "KATTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-pendle-short:SELL",
+        "symbol": "PENDLETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-porto-short:SELL",
+        "symbol": "PORTOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-usual-short:SELL",
+        "symbol": "USUALTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-dodo-breakout:BUY",
+        "symbol": "DODOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-alice-breakout:BUY",
+        "symbol": "ALICETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-ena-short:SELL",
+        "symbol": "ENATRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-chz-short:SELL",
+        "symbol": "CHZTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-bb-short:SELL",
+        "symbol": "BBTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-pixel-short:SELL",
+        "symbol": "PIXELTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-kaito-short:SELL",
+        "symbol": "KAITOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-mubarak-breakout:BUY",
+        "symbol": "MUBARAKTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-aigensyn-short:SELL",
+        "symbol": "AIGENSYNTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-dydx-breakout:BUY",
+        "symbol": "DYDXTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-luna-short:SELL",
+        "symbol": "LUNATRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-bank-short:SELL",
+        "symbol": "BANKTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-ordi-short:SELL",
+        "symbol": "ORDITRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-shib-short:SELL",
+        "symbol": "SHIBTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-pengu-short:SELL",
+        "symbol": "PENGUTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-0g-short:SELL",
+        "symbol": "0GTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-bio-short:SELL",
+        "symbol": "BIOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-edu-short:SELL",
+        "symbol": "EDUTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-cow-breakout:BUY",
+        "symbol": "COWTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-eul-short:SELL",
+        "symbol": "EULTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-s-long:BUY",
+        "symbol": "STRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-not-short:SELL",
+        "symbol": "NOTTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-ondo-long:BUY",
+        "symbol": "ONDOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-ace-short:SELL",
+        "symbol": "ACETRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-dydx-short:SELL",
+        "symbol": "DYDXTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-bera-short:SELL",
+        "symbol": "BERATRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-holo-breakout:BUY",
+        "symbol": "HOLOTRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-coti-short:SELL",
+        "symbol": "COTITRY",
+        "status": "EXCLUDED",
+        "reason": "EXPECTED_EDGE_NOT_RECONSTRUCTABLE",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "HIGH_CONFIDENCE",
+        "snapshotSource": "db.decisionLog"
+      },
+      {
+        "tradeId": "analysis_mswcbny8_lzrh2u:scan-home-breakout:BUY",
+        "symbol": "HOMETRY",
+        "status": "EXCLUDED",
+        "reason": "NO_DECISION_SNAPSHOT",
+        "joinMethod": "symbol+nearest_decision_before_entry",
+        "joinConfidence": "UNMATCHED"
+      }
+    ],
+    "conflicts": []
+  },
+  "baselineMetrics": {
+    "tradeCount": 173,
+    "wins": 33,
+    "losses": 140,
+    "winRate": 0.1907514450867052,
+    "grossPnL": -18.595201229999994,
+    "fees": 0,
+    "netPnL": -18.595201229999994,
+    "expectancy": -0.10748671231213869,
+    "profitFactor": 0.09959942432627265,
+    "grossPositiveNetNegative": 0
+  },
+  "feeAwareCounterfactual": {
+    "blockedTradeCount": 9,
+    "avoidedGrossPnL": -0.22495703,
+    "avoidedFees": 0,
+    "avoidedNetPnL": -0.22495703,
+    "avoidedNetLoss": 0.33816403,
+    "grossPositiveNetNegativeAvoided": 0,
+    "feeDragReduction": 0
+  },
+  "opportunity": {
+    "baselineExecuted": 173,
+    "feeAwareExecuted": 164,
+    "opportunityRetention": 0.9479768786127167,
+    "tradeReductionRate": 0.05202312138728324
+  },
+  "reference51": {
+    "trades": 51,
+    "grossPnL": -0.33651532,
+    "fees": 5.09837823,
+    "netPnL": -5.43489355,
+    "matched": 0,
+    "unmatched": 51,
+    "paired": 0,
+    "note": "Aggregate-only historical reference has no canonical per-trade ids in stored record."
+  },
+  "lookAheadAudit": {
+    "status": "YES",
+    "rule": "Decision timestamp must be <= entry timestamp for included records."
+  },
+  "temporalOos": {
+    "available": true,
+    "reason": null,
+    "split": {
+      "train": 103,
+      "validation": 34,
+      "oos": 36
+    },
+    "metrics": {
+      "trainBaselineExpectancy": -0.1450842183495146,
+      "trainFeeAwareExpectancy": -0.1429001695145631,
+      "validationBaselineExpectancy": -0.052077698529411756,
+      "validationFeeAwareExpectancy": -0.052077698529411756,
+      "oosBaselineExpectancy": -0.05224680527777778,
+      "oosFeeAwareExpectancy": -0.05224680527777778
+    }
+  },
+  "finalAnswers": {
+    "HISTORICAL_TRADES": 346,
+    "RECOVERABLE_DECISION_SNAPSHOTS": 268,
+    "VALID_EXECUTED_PAIRED_TRADES": 173,
+    "BASELINE_NET_PNL": -18.59520123,
+    "BASELINE_NET_EXPECTANCY": -0.10748671,
+    "FEE_AWARE_COUNTERFACTUAL_BLOCKS": 9,
+    "AVOIDED_NET_LOSS": 0.33816403,
+    "GROSS_POSITIVE_NET_NEGATIVE": 0,
+    "FEE_DRAG_AVOIDED": 0,
+    "LOOKAHEAD_FREE": "YES",
+    "OOS_SUPPORTED": "PARTIAL",
+    "FEE_AWARE_STATUS": "RESEARCH_ONLY",
+    "NEXT_STEP": "Prioritize artifact-level persistence of candidateId+decision fee metrics on every executed trade to raise exact paired sample and enable OOS validation."
+  }
+}

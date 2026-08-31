@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-08-17T17:00:00.000Z",
+  "task": "KRIPTO P0 — AI NO_TRADE -> EXECUTION PARITY FIX",
+  "backlogId": "KRIPTO-EXEC-001",
+  "rootCause": {
+    "summary": "Paper/learning path could mutate AI finalDecision to BUY while consensus remained NO_TRADE/HOLD, and gate logic did not block decision-source conflicts.",
+    "bypassClasses": [
+      "DECISION_LAYER_OVERRIDE",
+      "CONFLICTING_DECISION_SOURCE",
+      "MISSING_VERDICT"
+    ],
+    "paths": [
+      {
+        "class": "DECISION_LAYER_OVERRIDE",
+        "file": "src/server/scanner/fast-entry.service.ts",
+        "function": "selectPaperLearningMicroCandidates",
+        "condition": "learning micro lane remaps finalDecision to BUY",
+        "decisionSource": "ai.finalDecision",
+        "executionSource": "execution-orchestrator evaluateAiExecutionReadiness",
+        "reason": "finalDecision can be BUY while consensus payload still NO_TRADE/HOLD"
+      },
+      {
+        "class": "CONFLICTING_DECISION_SOURCE",
+        "file": "src/server/execution/ai-execution-gate.service.ts",
+        "function": "evaluateAiExecutionReadiness",
+        "condition": "consensus existed but conflict check was missing",
+        "decisionSource": "ai.finalDecision + finalConsensusDecision",
+        "executionSource": "ai gate result",
+        "reason": "BUY/SELL could pass even when consensus was blocking"
+      },
+      {
+        "class": "MISSING_VERDICT",
+        "file": "src/server/execution-engine-v2/execution-flow.service.ts",
+        "function": "executeApprovedSpotOrder",
+        "condition": "direct order execution lacked explicit AI gate proof",
+        "decisionSource": "caller payload",
+        "executionSource": "executeApprovedSpotOrder",
+        "reason": "order flow accepted riskApproved without requiring aiGateVerdict"
+      }
+    ]
+  },
+  "canonicalGate": {
+    "name": "evaluateAiExecutionReadiness",
+    "file": "src/server/execution/ai-execution-gate.service.ts",
+    "policy": "VETO",
+    "semantics": {
+      "NO_TRADE": "BLOCK",
+      "HOLD": "BLOCK",
+      "REJECT": "BLOCK",
+      "WAIT": "BLOCK",
+      "BUY": "ALLOW (subject to downstream gates)",
+      "SELL": "ALLOW (subject to downstream gates)"
+    },
+    "reasonCodes": [
+      "AI_VERDICT_MISSING",
+      "AI_CONSENSUS_MISSING",
+      "AI_DECISION_CONFLICT",
+      "AI_EVIDENCE_MISSING",
+      "AI_GATE_BLOCK",
+      "AI_VETO"
+    ]
+  },
+  "changes": [
+    {
+      "file": "src/server/execution/ai-execution-gate.service.ts",
+      "details": [
+        "Decision normalization for NO-TRADE/NO TRADE variants",
+        "Default runtime policy hardened to VETO",
+        "Conflict block: ai final decision vs consensus mismatch => AI_DECISION_CONFLICT",
+        "Consensus missing code standardized to AI_CONSENSUS_MISSING",
+        "Advisory path requires explicit audited override payload; no silent advisory bypass",
+        "Blocking verdict reason standardized to AI_VETO"
+      ]
+    },
+    {
+      "file": "src/server/execution-engine-v2/execution-flow.service.ts",
+      "details": [
+        "Order execution now requires aiGateVerdict=AI_GATE_PASS",
+        "Missing/non-pass AI gate evidence returns REJECTED before placement"
+      ]
+    },
+    {
+      "file": "src/server/execution/execution-orchestrator.service.ts",
+      "details": [
+        "Passes aiGate verdict/policy/reason into V2 execution call",
+        "Order metadata now stores AI decision + AI gate + risk/sizing/fee decision references",
+        "TDI bridge evBelowThreshold aligned with AI_VETO reason code"
+      ]
+    },
+    {
+      "file": "tests/forensics/p0-execution-correctness.test.ts",
+      "details": [
+        "Updated veto expectations to AI_VETO",
+        "Added AI_DECISION_CONFLICT regression",
+        "Added NO-TRADE normalization regression",
+        "Added explicit audited override requirement test"
+      ]
+    },
+    {
+      "file": "scripts/_p0-execution-parity-replay.ts",
+      "details": [
+        "Offline 45-case replay through canonical VETO gate",
+        "Produces reports/p0-execution-parity-replay.json"
+      ]
+    },
+    {
+      "file": "scripts/_p0-execution-parity-2round-validation.ts",
+      "details": [
+        "Controlled runtime validation harness (2 rounds target)",
+        "Produces reports/p0-execution-parity-2round-validation.json"
+      ]
+    }
+  ],
+  "paperOverrideBehavior": {
+    "silentOverrideAllowed": false,
+    "defaultPolicy": "VETO",
+    "advisoryOverride": "Requires explicit overridePolicy/overrideReason/overrideSource/overrideAudit payload"
+  },
+  "historicalReplay": {
+    "sourceReport": "reports/p0-execution-parity-replay.json",
+    "replayedCases": 45,
+    "blocked": 45,
+    "executed": 0,
+    "historicalNoTradeExecutedBefore": 45,
+    "historicalNoTradeExecutedAfter": 0
+  },
+  "tests": {
+    "command": "npx vitest run tests/forensics/p0-execution-correctness.test.ts tests/p0-tdi-buy-bottleneck.test.ts tests/master-decision-engine.test.ts tests/forensics/tdi-sensitivity-reconciliation.test.ts",
+    "result": "PASS",
+    "filesPassed": 4,
+    "testsPassed": 53
+  },
+  "controlledValidation": {
+    "sourceReport": "reports/p0-execution-parity-2round-validation.json",
+    "sessionId": "cmsxgoteo000jun34o8rz4lym",
+    "jobStatus": "STOPPED",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "roundsObserved": 1,
+    "ordersCreated": 0,
+    "aiVetoBypassObserved": 0,
+    "note": "Runtime run was stopped after prolonged scanner/network instability; no NO_TRADE/HOLD/WAIT/REJECT execution bypass observed."
+  },
+  "beforeAfterDivergence": {
+    "historicalNoTradeExecutedBefore": 45,
+    "historicalNoTradeExecutedAfter": 0
+  },
+  "remainingBlockers": [
+    "Controlled runtime validation did not complete full 2 rounds due prolonged network/scanner instability in paper environment.",
+    "reports/p0-execution-parity-2round-validation.json includes very large live status payload (operational noise)."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "mode": "POLICY_LEVEL_OOS",
+  "branch": "NONE",
+  "train": {
+    "size": 25,
+    "approved": 0,
+    "releasedNetPnL": 0,
+    "releasedExpectancy": 0,
+    "falseReleaseRate": 0
+  },
+  "validation": {
+    "size": 8,
+    "approved": 0,
+    "releasedNetPnL": 0,
+    "releasedExpectancy": 0,
+    "falseReleaseRate": 0
+  },
+  "oos": {
+    "size": 9,
+    "approved": 1,
+    "releasedNetPnL": 0.0760188,
+    "releasedExpectancy": 0.0760188,
+    "falseReleaseRate": 0
+  },
+  "support": "NO"
+}

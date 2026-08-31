@@ -7,6 +7,17 @@ export async function resolveRuntimeConfigSnapshot(userId?: string): Promise<Res
   return {
     generatedAt: new Date().toISOString(),
     exchange: env.EXCHANGE_PROVIDER ?? "binance-tr",
+    mode: env.EXECUTION_MODE,
+    exchangeRouting: {
+      platform: env.BINANCE_PLATFORM,
+      marketDataProvider: env.EXCHANGE_PROVIDER === "okx" ? "OKX_PUBLIC" : "BINANCE_PUBLIC",
+      metadataProvider: env.EXCHANGE_PROVIDER === "okx" ? "OKX_EXCHANGE_INFO" : "BINANCE_EXCHANGE_INFO",
+      paperExecutionProvider: "PAPER_EXCHANGE_SIMULATOR",
+      liveExecutionProvider: env.EXCHANGE_PROVIDER === "okx" ? "OKX_LIVE_ADAPTER" : "BINANCE_LIVE_ADAPTER",
+    },
+    aiPolicy: env.EXECUTION_MODE === "paper" || env.EXECUTION_MODE === "dry-run" ? "ADVISORY" : env.EXECUTION_AI_GATE_POLICY,
+    tdiPolicy: env.TDI_RUNTIME_ROLE,
+    riskMode: "CANONICAL_PRETRADE_RISK_GATE",
     universe: {
       scannerUniverse: env.SCANNER_UNIVERSE,
       maxSymbols: env.SCANNER_MAX_SYMBOLS,

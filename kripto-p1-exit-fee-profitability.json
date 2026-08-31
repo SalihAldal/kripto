@@ -1,0 +1,128 @@
+{
+  "reportId": "KRIPTO_P1_EXIT_FEE_PROFITABILITY",
+  "generatedAt": "2026-08-18T00:05:00+03:00",
+  "scope": "native_kripto_only",
+  "status": "PARTIAL",
+  "objectiveAnswers": {
+    "lossesCausedByBadExits": "UNRESOLVED_IN_1ROUND_SAMPLE",
+    "lossesCausedByFees": "YES_HISTORICAL_FEE_DOMINANT",
+    "feesDestroyingPositiveGrossEdge": "YES_HISTORICAL_EVIDENCE",
+    "endOfReplayHidingTrueBehavior": "YES_HISTORICAL_REPLAY_WINDOW_PATH",
+    "paperCanExercisePositionMonitorExits": "ARCHITECTURALLY_YES_RUNTIME_NOT_EXERCISED_IN_1ROUND",
+    "expectedNetEdgeMeasurablePreTrade": "YES"
+  },
+  "exitLifecycle": {
+    "nativePath": [
+      "execution-orchestrator.attachPositionMonitor",
+      "position-monitor.tick",
+      "post-trade-settlement.settleOpenPosition",
+      "exit-forensics.mapPositionMonitorExit",
+      "forensic-bridge.bridgeClosedTradePnl",
+      "pnl-ledger.createPnlLedgerEntry"
+    ],
+    "rootCauseHistoricalEndOfReplay": "historical_replay_window_attribution_path",
+    "positionMonitorBootRecovery": "enabled_at_job_start_via_ensureOpenPositionMonitors",
+    "exitPrecedenceExported": true
+  },
+  "exitModels": {
+    "allowed": [
+      "POSITION_MONITOR",
+      "REPLAY_WINDOW",
+      "MANUAL_TIMEOUT"
+    ],
+    "allowedReasons": [
+      "TAKE_PROFIT",
+      "STOP_LOSS",
+      "STRATEGY_EXIT",
+      "TIME_EXIT",
+      "END_OF_REPLAY"
+    ]
+  },
+  "feePipeline": {
+    "formula": {
+      "totalFee": "entryFee + exitFee + slippage(if_present)",
+      "netPnL": "grossPnL - totalFee"
+    },
+    "preTradeMetricsExposed": [
+      "estimatedEntryFee",
+      "estimatedExitFee",
+      "estimatedRoundTripFee",
+      "expectedGrossEdge",
+      "expectedNetEdge",
+      "feeToGrossEdgeRatio",
+      "minimumGrossMoveToCoverFees",
+      "edgeAfterFees",
+      "feeClassification"
+    ],
+    "feeClasses": [
+      "FEE_SAFE",
+      "FEE_BORDERLINE",
+      "FEE_EROSION",
+      "UNKNOWN"
+    ],
+    "blockingMode": "OBSERVE_ONLY"
+  },
+  "historicalEvidence": {
+    "trades": 51,
+    "grossPnL": -0.33651532,
+    "fees": 5.09837823,
+    "netPnL": -5.43489355,
+    "grossPositiveNetNegative": 11,
+    "feeDominanceClass": "FEE_DOMINANT"
+  },
+  "runtimeValidation1Round": {
+    "script": "scripts/_p1-exit-fee-1round-validation.ts",
+    "report": "reports/p1-exit-fee-1round-validation.json",
+    "sessionId": "cmsxpchd50009un34ekvojvgq",
+    "result": "EXIT_RUNTIME_NOT_EXERCISED",
+    "roundState": "tur_basarisiz",
+    "failureReason": "SIM_TIGHT_FILTER_15m",
+    "ordersCreated": 0,
+    "closedTrades": 0,
+    "aiBypassCount": 0,
+    "feeMismatchCount": 0,
+    "artifactsPresent": {
+      "exitForensics": true,
+      "replayExitDiagnostics": true,
+      "feeAwareEntryPolicy": true,
+      "pnlLedger": true
+    }
+  },
+  "tests": {
+    "executed": [
+      {
+        "file": "tests/execution-settlement.integration.test.ts",
+        "passed": 7,
+        "total": 7
+      },
+      {
+        "file": "tests/forensics/p1-profitability-engineering.test.ts",
+        "passed": 12,
+        "total": 12
+      },
+      {
+        "file": "tests/forensics/p0-execution-correctness.test.ts",
+        "passed": 28,
+        "total": 28
+      }
+    ]
+  },
+  "changedFiles": [
+    "src/server/execution/post-trade-settlement.service.ts",
+    "src/server/execution/auto-round-engine.service.ts",
+    "src/server/forensics/exit-fee-forensics.service.ts",
+    "src/server/forensics/fee-edge-metrics.service.ts",
+    "src/server/forensics/forensic-bridge.service.ts",
+    "src/server/forensics/forensic.types.ts",
+    "src/server/forensics/pnl-ledger.service.ts",
+    "scripts/run-5round-paper-validation.ts",
+    "scripts/_p1-exit-fee-1round-validation.ts",
+    "tests/execution-settlement.integration.test.ts",
+    "tests/forensics/p1-profitability-engineering.test.ts"
+  ],
+  "readiness": {
+    "finalVerdict": "PARTIAL",
+    "readyFor30_50Rounds": "CONDITIONAL",
+    "condition": "Need at least one closed trade in controlled run to prove runtime TP/SL/strategy/time exit evidence."
+  }
+}

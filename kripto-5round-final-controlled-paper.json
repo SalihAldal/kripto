@@ -1,0 +1,229 @@
+{
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY",
+    "checks": {
+      "postgresPrisma": "PASS",
+      "binanceTr": "PASS",
+      "clockSync": {
+        "status": "PASS",
+        "clockSkewMs": 28,
+        "apiLatencyMs": 128
+      },
+      "realAiProviders": {
+        "status": "PASS",
+        "providers": 3
+      },
+      "emergencyStop": "PASS",
+      "activeJobs": "PASS",
+      "zombieRounds": "PASS",
+      "workerLock": "PASS",
+      "resolvedConfig": {
+        "status": "PASS",
+        "executionMode": "paper",
+        "exchange": "binance"
+      },
+      "codeWorkerFingerprint": "NOT_EXPOSED_IN_PREFLIGHT_PAYLOAD"
+    }
+  },
+  "roundByRoundSummary": [
+    {
+      "roundNo": 1,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=71.1, sentiment=0.0, mtf=0.0) | risk 100.00 > 82",
+      "durationMin": 8.78,
+      "scannerCandidates": 6,
+      "tdi": {
+        "approved": 0,
+        "wait": 1,
+        "rejected": 0
+      },
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "simulatedTrades": 0,
+      "entryTimingRecords": 0,
+      "exitReasons": [],
+      "exitModels": [],
+      "fees": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0
+      },
+      "artifactsComplete": true
+    },
+    {
+      "roundNo": 2,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "Tur secim suresi doldu (1200s)",
+      "durationMin": 20.22,
+      "scannerCandidates": 31,
+      "tdi": {
+        "approved": 0,
+        "wait": 6,
+        "rejected": 0
+      },
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "simulatedTrades": 0,
+      "entryTimingRecords": 0,
+      "exitReasons": [],
+      "exitModels": [],
+      "fees": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0
+      },
+      "artifactsComplete": true
+    },
+    {
+      "roundNo": 3,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "Tur secim suresi doldu (1200s)",
+      "durationMin": 21.9,
+      "scannerCandidates": 35,
+      "tdi": {
+        "approved": 0,
+        "wait": 11,
+        "rejected": 0
+      },
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "simulatedTrades": 0,
+      "entryTimingRecords": 0,
+      "exitReasons": [],
+      "exitModels": [],
+      "fees": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0
+      },
+      "artifactsComplete": true
+    },
+    {
+      "roundNo": 4,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)",
+      "durationMin": 18.53,
+      "scannerCandidates": 29,
+      "tdi": {
+        "approved": 0,
+        "wait": 14,
+        "rejected": 0
+      },
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "simulatedTrades": 0,
+      "entryTimingRecords": 0,
+      "exitReasons": [],
+      "exitModels": [],
+      "fees": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0
+      },
+      "artifactsComplete": true
+    },
+    {
+      "roundNo": 5,
+      "state": "NOT_STARTED",
+      "result": "not_run",
+      "failReason": "JOB_FAILED_BEFORE_ROUND_5_START",
+      "durationMin": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "approved": 0,
+        "wait": 0,
+        "rejected": 0
+      },
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "simulatedTrades": 0,
+      "entryTimingRecords": 0,
+      "exitReasons": [],
+      "exitModels": [],
+      "fees": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0
+      },
+      "artifactsComplete": false
+    }
+  ],
+  "funnelTotals": {
+    "scannerCandidates": 101,
+    "tdiApproved": 0,
+    "tdiWait": 32,
+    "tdiRejected": 0,
+    "executionReady": 0,
+    "orders": 0,
+    "fills": 0,
+    "simulatedTrades": 0
+  },
+  "aiParityResult": {
+    "aiGatePolicy": "VETO",
+    "criticalAiExecutionBypass": false,
+    "criticalAiExecutionBypassCount": 0,
+    "status": "PASS"
+  },
+  "scannerPriorityLaneResult": {
+    "rotationCandidates": 0,
+    "priorityCandidates": 0,
+    "priorityRescuedCount": 0,
+    "notDiscoveredCount": 0,
+    "discoverySourceObserved": [],
+    "verdict": "NOT_PROVEN"
+  },
+  "entryTimingResult": {
+    "records": 0,
+    "chasingCount": 0,
+    "edgeDecayCount": 0,
+    "verdict": "NOT_PROVEN"
+  },
+  "exitResult": {
+    "takeProfitCount": 0,
+    "stopLossCount": 0,
+    "strategyExitCount": 0,
+    "timeExitCount": 0,
+    "endOfReplayCount": 0,
+    "positionMonitorCount": 0,
+    "replayWindowCount": 0,
+    "verdict": "EXIT_RUNTIME_NOT_PROVEN"
+  },
+  "feePnlReconciliation": {
+    "grossPnL": 0,
+    "totalFees": 0,
+    "netPnL": 0,
+    "formulaCheck": "PASS",
+    "mismatchCount": 0
+  },
+  "runtimeHealth": {
+    "jobStatus": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 4,
+    "terminalRounds": 4,
+    "zombieCount": 0,
+    "criticalFailures": [],
+    "blockingFailure": "PUMP_SCAN_FAILED",
+    "lastError": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)"
+  },
+  "remainingGaps": [
+    "5_ROUNDS_NOT_COMPLETED",
+    "FIRST_BLOCKING_STAGE=SCANNER_PUMP_DISCOVERY_TIMEOUT",
+    "SCANNER_PRIORITY_LANE_NOT_PROVEN",
+    "ENTRY_TIMING_NOT_PROVEN",
+    "EXIT_RUNTIME_NOT_PROVEN",
+    "NO_TRADES_OBSERVED",
+    "RUN_CONFIG_DEVIATION_MAXWAITSEC_600_IN_RUNTIME_PAYLOAD"
+  ],
+  "finalReadinessVerdict": "PARTIAL",
+  "READY_FOR_30_50_ROUNDS": "NO"
+}

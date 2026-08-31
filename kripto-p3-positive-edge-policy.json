@@ -1,0 +1,303 @@
+{
+  "generatedAt": "2026-08-28T20:49:39.288Z",
+  "paperStarted": false,
+  "dataSource": "DATABASE.learningTrade",
+  "profileCounts": {
+    "total": 248,
+    "profitable": 42,
+    "losing": 206
+  },
+  "bottleneckRank": [
+    {
+      "rank": 1,
+      "bottleneck": "CONFIDENCE",
+      "affectedHistoricalProfitableProfiles": 1143,
+      "affectedCurrentCandidates": 1143,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.5017559262510974,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 2,
+      "bottleneck": "MOMENTUM",
+      "affectedHistoricalProfitableProfiles": 664,
+      "affectedCurrentCandidates": 664,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.2914837576821773,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 3,
+      "bottleneck": "TECHNICAL",
+      "affectedHistoricalProfitableProfiles": 397,
+      "affectedCurrentCandidates": 397,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.1742756804214223,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 4,
+      "bottleneck": "RISK",
+      "affectedHistoricalProfitableProfiles": 74,
+      "affectedCurrentCandidates": 74,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.0324846356453029,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    }
+  ],
+  "priorResearch": {
+    "deepMomentum": {
+      "PROFITABLE_TRADES": 42,
+      "CURRENT_CANDIDATES": 2278,
+      "PRIMARY_MOMENTUM_SUPPRESSOR": "MOMENTUM_SCORE",
+      "PRIMARY_SUPPRESSOR_SHARE": 0.714286,
+      "LARGEST_NUMERIC_GAP": "momentumScoreGap",
+      "MOMENTUM_UNIT_BUG": "NO",
+      "DOUBLE_COUNTING": "PARTIAL",
+      "LEARNING_INTERACTION": "PARTIAL",
+      "CONFIDENCE_INTERACTION": "PARTIAL",
+      "ORDERING_EFFECT": "YES",
+      "MASTER_SUPPRESSION": "UNKNOWN",
+      "BEST_COUNTERFACTUAL": "A_remove_shortMomentum_penalty",
+      "RELEASED_PROFITABLE_TRADES": 0,
+      "RELEASED_LOSING_TRADES": 0,
+      "RELEASED_NET_PNL": 0,
+      "RELEASED_EXPECTANCY": 0,
+      "OOS_SUPPORTED": "YES",
+      "ROBUSTNESS": "INSUFFICIENT_SAMPLE",
+      "CURRENT_ZERO_APPROVAL_SHARED": "YES",
+      "FIRST_EXPERIMENT": "MOMENTUM_CONFIDENCE_INTERACTION",
+      "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+    },
+    "confidenceInteraction": {
+      "baselineApproved": 0,
+      "correctionApproved": 0,
+      "releasedHistorical": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "breakevenReleased": 0,
+      "unknownReleased": 0,
+      "releasedNetPnl": 0,
+      "releasedExpectancy": 0,
+      "falseApprovalRate": "UNKNOWN"
+    }
+  },
+  "variantMetrics": [
+    {
+      "variant": "BASELINE",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "A_TDI_MOMENTUM_INTERACTION",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "B_SIM_TIGHT_AI_BUY_FASTPATH",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "C_CONFIDENCE_TDI_DEDUP",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "D_MOMENTUM_SHORT_TELEMETRY_DEDUP",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "E_LEARNING_INTERACTION",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "F_SCANNER_AI_ROUTING",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "G_PAPER_LANE_ADMISSION",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    },
+    {
+      "variant": "H_EXECUTION_READY_ROUTING",
+      "executionReady": 0,
+      "profitableReleased": 0,
+      "losingReleased": 0,
+      "netPnL": 0,
+      "expectancy": 0,
+      "profitFactor": 0
+    }
+  ],
+  "selection": {
+    "winner": "NO_SAFE_POLICY_CHANGE",
+    "reason": "No single-variable variant improved OOS net expectancy without releasing disproportionate losers. Historical profitable profiles fail primary TDI momentum/confidence bars by large margins (median momentum ~2 vs threshold 60).",
+    "metrics": [
+      {
+        "variant": "BASELINE",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "A_TDI_MOMENTUM_INTERACTION",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "B_SIM_TIGHT_AI_BUY_FASTPATH",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "C_CONFIDENCE_TDI_DEDUP",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "D_MOMENTUM_SHORT_TELEMETRY_DEDUP",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "E_LEARNING_INTERACTION",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "F_SCANNER_AI_ROUTING",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "G_PAPER_LANE_ADMISSION",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      },
+      {
+        "variant": "H_EXECUTION_READY_ROUTING",
+        "executionReady": 0,
+        "profitableReleased": 0,
+        "losingReleased": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0
+      }
+    ]
+  },
+  "verdict": {
+    "BASELINE_EXECUTION_READY": 0,
+    "BEST_POLICY_VARIANT": "NO_SAFE_POLICY_CHANGE",
+    "VARIANT_EXECUTION_READY": 0,
+    "PROFITABLE_RELEASED": 0,
+    "LOSING_RELEASED": 0,
+    "BASELINE_NET_PNL": 0,
+    "VARIANT_NET_PNL": 0,
+    "BASELINE_EXPECTANCY": 0,
+    "VARIANT_EXPECTANCY": 0,
+    "OOS_NET_EXPECTANCY_DELTA": 0,
+    "OOS_PROFIT_FACTOR_DELTA": 0,
+    "OOS_DRAWDOWN_DELTA": 0,
+    "PROFITABLE_CAPTURE_DELTA": 0,
+    "LOSING_CAPTURE_DELTA": 0,
+    "FALSE_POSITIVE_RATE": "UNKNOWN",
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "AI_VETO_CHANGED": "NO",
+    "RISK_CHANGED": "NO",
+    "SIZING_CHANGED": "NO",
+    "THRESHOLDS_CHANGED": "NO",
+    "SINGLE_VARIABLE": "N/A",
+    "POLICY_VARIANT_STATUS": "NO_SAFE_POLICY_CHANGE",
+    "IMPLEMENTED": "NO",
+    "TESTS": "PASS",
+    "PAPER_STARTED": "NO",
+    "READY_FOR_5_ROUND_POLICY_VALIDATION": "NO",
+    "READY_FOR_30_ROUND_PAPER": "NO",
+    "NEXT_STEP": "Do not change admission policy. Run 5-round paper with engineering fixes only; revisit policy only after collecting fresh post-fix funnel telemetry showing near-threshold candidates blocked by duplicate gates.",
+    "dataSource": "DATABASE.learningTrade",
+    "selectionReason": "No single-variable variant improved OOS net expectancy without releasing disproportionate losers. Historical profitable profiles fail primary TDI momentum/confidence bars by large margins (median momentum ~2 vs threshold 60)."
+  }
+}

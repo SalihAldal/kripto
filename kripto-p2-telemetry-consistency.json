@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-08-22T23:08:25.210Z",
+  "scopeRule": "job/run/round scoped counters enforced in round-forensic-export filterByRun",
+  "consistency": "PASS",
+  "declaredScopes": {
+    "candidateCount": "same-round",
+    "scannerCandidates": "same-round",
+    "tdiApproved": "same-round",
+    "tdiWait": "same-round",
+    "tdiReject": "same-round",
+    "aiCalls": "same-round",
+    "executionReady": "same-round"
+  },
+  "note": "Legacy artifacts may still show historical inconsistency before patch; new exports use scoped counters."
+}

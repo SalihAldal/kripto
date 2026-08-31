@@ -9356,3 +9356,32 @@ model LiveTradingJobState {
   updatedAt       DateTime           @updatedAt
   createdAt       DateTime           @default(now())
 }
+
+model ShadowCandidateOutcome {
+  id                   String   @id @default(cuid())
+  candidateId          String   @unique
+  symbol               String
+  detectedAt           DateTime
+  firstDetectionPrice  Float
+  lane                 String
+  finalScore           Float
+  moveKey              String
+  latestStage          String?
+  latestScore          Float?
+  latestRank           Int?
+  snapshot             Json
+  journey              Json
+  outcomes             Json
+  reachTimes           Json
+  invalidReason        String?
+  source               String   @default("live")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([symbol, detectedAt])
+  @@index([lane, detectedAt])
+  @@index([finalScore])
+  @@index([detectedAt])
+  @@index([moveKey])
+  @@index([source, detectedAt])
+}

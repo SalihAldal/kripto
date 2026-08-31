@@ -1,0 +1,20 @@
+{
+  "selectedFix": "FIX_EV_DUPLICATE_GATE",
+  "file": "src/server/ai/hybrid-decision-engine.ts",
+  "function": "buildHybridDecision → bridgeHybridEv",
+  "condition": "finalDecision !== BUY/HOLD sets reasonCode EV_REJECT regardless of composite expectedValue vs runtimeMinCompositeScore threshold",
+  "currentBehavior": "EV audit records composite score as expectedValue; verdict/reasonCode derive from hybrid finalDecision (NO_TRADE/REJECT), not independent EV threshold comparison",
+  "expectedBehavior": "EV telemetry must not label hybrid composite rejections as EV_REJECT when composite>=threshold; use HYBRID_REJECT or separate upstream reasonCode; independent EV gate only when true EV formula fails",
+  "minimalSafeFix": "Telemetry-only: map hybrid rejects with composite>=threshold to reasonCode HYBRID_REJECT or UPSTREAM_BLOCK; do not change thresholds",
+  "mustNotChange": [
+    "EV thresholds",
+    "composite thresholds",
+    "AI VETO",
+    "risk",
+    "sizing"
+  ],
+  "implementInThisTask": false,
+  "classificationBreakdown": {
+    "DUPLICATE_GATE": 856
+  }
+}

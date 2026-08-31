@@ -11,6 +11,7 @@ export type RoundRuntimeStep =
   | "CANDIDATE_REJECTED"
   | "NEXT_CANDIDATE"
   | "FULL_SCAN"
+  | "NO_CANDIDATE"
   | "SYMBOL_SELECTED"
   | "EXECUTING"
   | "POSITION_OPEN"
@@ -80,11 +81,42 @@ export type RoundRuntimeSnapshot = {
   progressBreakdown?: RoundProgressBreakdown;
   elapsedMs: number;
   estimatedRemainingMs?: number;
+  estimatedRemainingCandidates?: number;
+  projectedCompletionMs?: number | null;
   selectionBudgetMs: number;
   heartbeatAt: string;
   lastProgressAt?: string;
+  lastMeaningfulProgressAt?: string;
+  lastScannerProgressAt?: string;
+  lastMarketDataProgressAt?: string;
+  lastPumpProgressAt?: string;
+  lastAIProgressAt?: string;
+  lastTDIProgressAt?: string;
+  lastPersistAt?: string;
+  scannerSymbolsProcessed?: number;
+  pumpSymbolsProcessed?: number;
+  marketDataRequests?: number;
+  marketDataFailures?: number;
+  fallbackCount?: number;
+  aiStarted?: number;
+  aiFailed?: number;
+  tdiProcessed?: number;
+  executionReady?: number;
+  dbTransientFailures?: number;
+  degradedCandidates?: number;
+  roundFatalFailures?: number;
   cancelled?: boolean;
   cancelReason?: string;
+  persistenceMetrics?: {
+    persistQueueDepth: number;
+    persistQueueWaitMs: number;
+    dbQueryMs: number;
+    dbTransactionMs: number;
+    retryCount: number;
+    timeoutCount: number;
+    writer: "transition" | "heartbeat" | "sync";
+    coalescedWrites: number;
+  };
   timeline: RoundTimelineEntry[];
 };
 
@@ -122,7 +154,7 @@ export type CompositeProgressInput = {
 };
 
 export class RoundSelectionAbortError extends Error {
-  readonly code: "BUDGET_EXPIRED" | "CANCELLED" | "JOB_STOPPED";
+  readonly code: "BUDGET_EXPIRED" | "CANCELLED" | "JOB_STOPPED" | "PERSIST_TIMEOUT";
 
   constructor(code: RoundSelectionAbortError["code"], message: string) {
     super(message);
@@ -150,6 +182,7 @@ const STEP_PHASE_RANK: Record<RoundRuntimeStep, number> = {
   CANDIDATE_REJECTED: 3,
   NEXT_CANDIDATE: 3,
   FULL_SCAN: 4,
+  NO_CANDIDATE: 5,
   SCANNING: 4,
   SYMBOL_SELECTED: 5,
   EXECUTING: 6,

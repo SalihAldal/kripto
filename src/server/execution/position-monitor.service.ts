@@ -7,6 +7,7 @@ import { evaluateTakeProfitStopLoss } from "@/src/server/execution/tp-sl-evaluat
 import { isExecutionTimedOut } from "@/src/server/execution/timeout-closer";
 import type { PositionCloseReason, TradingMode } from "@/src/server/execution/types";
 import { evaluateSmartExitEngine, type SmartExitEngineState } from "@/src/server/execution/smart-exit-engine.service";
+import { observeVariantDShadowNonBlocking } from "@/src/server/forensics/variant-d-shadow-observer.service";
 import {
   evaluateExitForOpenPosition,
   shouldExecuteExit,
@@ -71,6 +72,13 @@ type MonitorPayload = {
   onTick?: (input: { positionId: string; markPrice: number }) => Promise<void>;
   mode?: TradingMode;
   isPumpTrade?: boolean;
+  tradeId?: string;
+  roundId?: string;
+  strategy?: string;
+  regime?: string;
+  quantity?: number;
+  variantDShadowEnabled?: boolean;
+  variantDEnabled?: boolean;
 };
 
 const monitors = new Map<string, NodeJS.Timeout>();
@@ -175,6 +183,29 @@ function isSuspiciousMonitorPrice(input: {
   return deviationPercent >= Math.max(35, maxPlannedDeviation);
 }
 
+function resolveExitPrecedenceState(reason: PositionCloseReason | "NONE") {
+  switch (reason) {
+    case "TAKE_PROFIT":
+    case "STOP_LOSS":
+      return "TP_SL";
+    case "TIMEOUT":
+      return "SYSTEM_TIMEOUT";
+    case "MOMENTUM_FADE":
+    case "REVERSE_SIGNAL":
+      return "STRATEGY_EXIT";
+    case "EARLY_PROFIT_PROTECT":
+    case "TRAILING_PROFIT_LOCK":
+      return "PROFIT_PROTECTION";
+    case "RISK_BREAKER":
+    case "EMERGENCY_STOP":
+      return "SAFETY_EXIT";
+    case "CANCELED":
+      return "TERMINAL";
+    default:
+      return "NO_EXIT";
+  }
+}
+
 export function startPositionMonitor(payload: MonitorPayload) {
   stopPositionMonitor(payload.positionId);
   let dynamicMaxDurationSec = payload.maxDurationSec;
@@ -196,6 +227,128 @@ export function startPositionMonitor(payload: MonitorPayload) {
   const openedAtMs = Date.parse(payload.openedAt);
   const minPaperSoftExitHoldSec = Math.max(0, env.EXECUTION_PAPER_MIN_SOFT_EXIT_HOLD_SEC);
   const requiredPaperSoftExitConfirmations = Math.max(1, env.EXECUTION_PAPER_SOFT_EXIT_CONFIRMATIONS);
+  const variantDShadowEnabled = payload.variantDShadowEnabled ?? env.EXECUTION_VARIANT_D_SHADOW_ENABLED;
+  const variantDEnabled = payload.variantDEnabled ?? env.EXECUTION_VARIANT_D_ENABLED;
+  let lastObservedMarkPrice = Number(payload.entryPrice ?? 0);
+  let lastObservedAt = Date.now();
+
+  const emitVariantDShadow = (input: {
+    baselineExitEligible: boolean;
+    baselineReason: PositionCloseReason | "NONE";
+    currentExitPrecedenceState: string;
+    terminalPosition?: boolean;
+  }) => {
+    if (!variantDShadowEnabled) return;
+    const observationTs = lastObservedAt;
+    const holdDurationSec = Number.isFinite(openedAtMs) ? Math.max(0, (observationTs - openedAtMs) / 1000) : 0;
+    const baselineInput = {
+      side: payload.side,
+      entryPrice: Number(payload.entryPrice ?? 0),
+      currentPrice: Number(lastObservedMarkPrice),
+      holdDurationSec: Number(holdDurationSec.toFixed(3)),
+      maxDurationSec: dynamicMaxDurationSec,
+      baselineReason: input.baselineReason,
+      baselineExitEligible: input.baselineExitEligible,
+    };
+    observeVariantDShadowNonBlocking({
+      timestamp: observationTs,
+      positionId: payload.positionId,
+      tradeId: payload.tradeId ?? payload.positionId,
+      roundId: payload.roundId,
+      symbol: payload.symbol,
+      side: payload.side,
+      strategy: payload.strategy,
+      regime: payload.regime,
+      entryTimestamp: payload.openedAt,
+      entryPrice: Number(payload.entryPrice ?? 0),
+      quantity: Number(payload.quantity ?? 0),
+      currentPrice: Number(lastObservedMarkPrice),
+      maxDurationSec: dynamicMaxDurationSec,
+      baselineExitEligible: input.baselineExitEligible,
+      baselineReason: input.baselineReason,
+      currentExitPrecedenceState: input.currentExitPrecedenceState,
+      terminalPosition: input.terminalPosition,
+      baselineInput,
+      shadowInput: baselineInput,
+    });
+  };
+
+  const baseOnClose = payload.onClose;
+  payload.onClose = async (input) => {
+    emitVariantDShadow({
+      baselineExitEligible: true,
+      baselineReason: input.reason,
+      currentExitPrecedenceState: resolveExitPrecedenceState(input.reason),
+      terminalPosition: input.reason === "CANCELED",
+    });
+    return baseOnClose(input);
+  };
+
+  const closeByTimeoutWithExtension = async (markPrice: number) => {
+    if (!isExecutionTimedOut(payload.openedAt, dynamicMaxDurationSec)) return false;
+    const canExtend =
+      env.EXECUTION_TIMEOUT_EXTENSION_ENABLED &&
+      Boolean(payload.onShouldExtend) &&
+      (payload.extensionMaxSec ?? env.EXECUTION_TIMEOUT_EXTENSION_MAX_SEC) > extendedSec;
+    if (canExtend) {
+      const shouldExtend = await payload.onShouldExtend!({
+        positionId: payload.positionId,
+        symbol: payload.symbol,
+        side: payload.side,
+        markPrice,
+      }).catch(() => false);
+      if (shouldExtend) {
+        const step = payload.extensionStepSec ?? env.EXECUTION_TIMEOUT_EXTENSION_STEP_SEC;
+        const max = payload.extensionMaxSec ?? env.EXECUTION_TIMEOUT_EXTENSION_MAX_SEC;
+        const applied = Math.min(step, max - extendedSec);
+        if (applied > 0) {
+          dynamicMaxDurationSec += applied;
+          extendedSec += applied;
+          publishExecutionEvent({
+            executionId: payload.executionId,
+            symbol: payload.symbol,
+            stage: "position-monitor",
+            status: "RUNNING",
+            message: `Timeout extension applied (+${applied}s, total=${extendedSec}s)`,
+            level: "INFO",
+            context: {
+              positionId: payload.positionId,
+              markPrice,
+              openedAt: payload.openedAt,
+              maxDurationSec: dynamicMaxDurationSec,
+              extendedSec,
+              variantDEnabled,
+            },
+          });
+          return false;
+        }
+      }
+    }
+    const closeResult = await payload.onClose({
+      executionId: payload.executionId,
+      positionId: payload.positionId,
+      reason: "TIMEOUT",
+    });
+    if (shouldStopMonitorAfterCloseAttempt(closeResult)) {
+      stopPositionMonitor(payload.positionId);
+      return true;
+    }
+    publishExecutionEvent({
+      executionId: payload.executionId,
+      symbol: payload.symbol,
+      stage: "position-monitor",
+      status: "RUNNING",
+      message: "Timeout kapatma denemesi basarisiz, monitor aktif kaldi",
+      level: "WARN",
+      context: {
+        positionId: payload.positionId,
+        reason: "TIMEOUT",
+        variantDEnabled,
+      },
+    });
+    return true;
+  };
+
   const shouldDeferPaperSoftExit = async (
     reason: PositionCloseReason,
     markPrice: number,
@@ -245,6 +398,8 @@ export function startPositionMonitor(payload: MonitorPayload) {
     busy.add(payload.positionId);
     try {
       const ticker = await getTicker(payload.symbol);
+      lastObservedMarkPrice = Number(ticker.price);
+      lastObservedAt = Date.now();
       if (isSuspiciousMonitorPrice({
         entryPrice: payload.entryPrice,
         currentPrice: ticker.price,
@@ -283,9 +438,25 @@ export function startPositionMonitor(payload: MonitorPayload) {
             },
           });
         }
+        emitVariantDShadow({
+          baselineExitEligible: false,
+          baselineReason: "NONE",
+          currentExitPrecedenceState: "PRICE_GUARD_BLOCKED",
+        });
         return;
       }
       await payload.onTick?.({ positionId: payload.positionId, markPrice: ticker.price });
+      emitVariantDShadow({
+        baselineExitEligible: false,
+        baselineReason: "NONE",
+        currentExitPrecedenceState: "BASELINE_EVALUATION",
+      });
+
+      // Variant_D precedence: enforce system timeout semantics before soft strategy exits.
+      if (variantDEnabled) {
+        const timeoutHandled = await closeByTimeoutWithExtension(ticker.price);
+        if (timeoutHandled) return;
+      }
 
       if (env.EXECUTION_ENGINE_V2_ENABLED && env.EXECUTION_ENGINE_V2_EXIT_AI_ENABLED) {
         try {
@@ -1043,66 +1214,9 @@ export function startPositionMonitor(payload: MonitorPayload) {
         }
       }
 
-      if (isExecutionTimedOut(payload.openedAt, dynamicMaxDurationSec)) {
-        const canExtend =
-          env.EXECUTION_TIMEOUT_EXTENSION_ENABLED &&
-          Boolean(payload.onShouldExtend) &&
-          (payload.extensionMaxSec ?? env.EXECUTION_TIMEOUT_EXTENSION_MAX_SEC) > extendedSec;
-        if (canExtend) {
-          const shouldExtend = await payload.onShouldExtend!({
-            positionId: payload.positionId,
-            symbol: payload.symbol,
-            side: payload.side,
-            markPrice: ticker.price,
-          }).catch(() => false);
-          if (shouldExtend) {
-            const step = payload.extensionStepSec ?? env.EXECUTION_TIMEOUT_EXTENSION_STEP_SEC;
-            const max = payload.extensionMaxSec ?? env.EXECUTION_TIMEOUT_EXTENSION_MAX_SEC;
-            const applied = Math.min(step, max - extendedSec);
-            if (applied > 0) {
-              dynamicMaxDurationSec += applied;
-              extendedSec += applied;
-              publishExecutionEvent({
-                executionId: payload.executionId,
-                symbol: payload.symbol,
-                stage: "position-monitor",
-                status: "RUNNING",
-                message: `Timeout extension applied (+${applied}s, total=${extendedSec}s)`,
-                level: "INFO",
-                context: {
-                  positionId: payload.positionId,
-                  markPrice: ticker.price,
-                  openedAt: payload.openedAt,
-                  maxDurationSec: dynamicMaxDurationSec,
-                  extendedSec,
-                },
-              });
-              return;
-            }
-          }
-        }
-        const closeResult = await payload.onClose({
-          executionId: payload.executionId,
-          positionId: payload.positionId,
-          reason: "TIMEOUT",
-        });
-        if (shouldStopMonitorAfterCloseAttempt(closeResult)) {
-          stopPositionMonitor(payload.positionId);
-          return;
-        }
-        publishExecutionEvent({
-          executionId: payload.executionId,
-          symbol: payload.symbol,
-          stage: "position-monitor",
-          status: "RUNNING",
-          message: "Timeout kapatma denemesi basarisiz, monitor aktif kaldi",
-          level: "WARN",
-          context: {
-            positionId: payload.positionId,
-            reason: "TIMEOUT",
-          },
-        });
-        return;
+      if (!variantDEnabled) {
+        const timeoutHandled = await closeByTimeoutWithExtension(ticker.price);
+        if (timeoutHandled) return;
       }
       if (Number.isFinite(openedAtMs)) {
         const elapsedSec = Math.max(0, Math.floor((Date.now() - openedAtMs) / 1000));

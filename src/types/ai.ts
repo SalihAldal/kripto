@@ -85,6 +85,25 @@ export type AIConsensusTelemetry = {
   indicatorSnapshotBuildCount?: number;
   hybridDecisionMs?: number;
   consensusAssemblyMs?: number;
+  stackDepthGuardTriggered?: boolean;
+  stackDepthGuardReason?: string;
+  stackOverflowPhase?: string;
+  aiProviderHealth?: string;
+  aiProviderHealthCounts?: Record<string, number>;
+  aiDegradedCount?: number;
+  aiTimeoutCount?: number;
+  aiUnavailableCount?: number;
+  aiInvalidResponseCount?: number;
+  aiRetryCount?: number;
+  aiAllProvidersDegradedCount?: number;
+  aiPath?: string;
+  phaseTraces?: Array<{
+    phase: string;
+    freshStackUsed: boolean;
+    phaseDurationMs: number;
+    depthRiskStatus: "OK" | "RISKY" | "GUARDED";
+    stackDepth: number;
+  }>;
 };
 
 export type AIAnalysisInput = {
@@ -124,6 +143,7 @@ export type AIAnalysisInput = {
     change15m?: number;
     shortMomentumPercent?: number;
     shortFlowImbalance?: number;
+    shortTradeCount?: number;
     tradeVelocity?: number;
     volumeSpikeRatio?: number;
     btcDominanceBias?: number;
@@ -433,6 +453,7 @@ export type AIProviderResult = {
   ok: boolean;
   remoteOk?: boolean;
   degraded?: boolean;
+  healthState?: string;
   failureCategory?: string;
   model?: string;
   output?: AIModelOutput;

@@ -9,7 +9,7 @@ import {
   idempotentMergeRunMetadata,
   idempotentPatchJobActiveRound,
 } from "@/src/server/repositories/auto-round-integrity.repository";
-import { withBoundedPrisma } from "@/src/server/execution/bounded-prisma.service";
+import { BoundedPrismaError, withBoundedPrisma } from "@/src/server/execution/bounded-prisma.service";
 import { publishExecutionEvent } from "@/src/server/execution/execution-event-bus";
 import { writeStructuredLog } from "@/src/server/observability/structured-log";
 import {
@@ -26,6 +26,7 @@ import {
 
 const cancelControllers = new Map<string, AbortController>();
 const MAX_TIMELINE = 120;
+const TERMINAL_RUNTIME_STEPS = new Set(["ROUND_COMPLETED", "ROUND_FAILED", "TIMEOUT"]);
 
 function resolveHeartbeatIntervalMs() {
   return Math.max(1000, Math.min(10_000, env.AUTO_ROUND_HEARTBEAT_INTERVAL_MS ?? 2000));
@@ -82,6 +83,12 @@ export class RoundRuntimeController {
   private lastHeartbeatAt = 0;
   private lastProgressAt = 0;
   private readonly maxSelectionAttempts: number;
+  private persistQueue: Promise<void> = Promise.resolve();
+  private pendingPersistCount = 0;
+  private persistTimeoutCount = 0;
+  private persistCoalescedWrites = 0;
+  private lightweightHeartbeatInFlight = false;
+  private lastLightweightHeartbeatPersistAt = 0;
 
   constructor(
     private readonly options: RoundSelectionRuntimeOptions,
@@ -100,6 +107,7 @@ export class RoundRuntimeController {
       selectionBudgetMs: options.selectionBudgetMs,
       heartbeatAt: new Date().toISOString(),
       lastProgressAt: new Date().toISOString(),
+      lastMeaningfulProgressAt: new Date().toISOString(),
       timeline: [],
     };
     this.lastProgressAt = Date.now();
@@ -109,7 +117,23 @@ export class RoundRuntimeController {
     return this.snapshot.lastProgressAt;
   }
 
+  private isTerminalStep(step = this.snapshot.step) {
+    return TERMINAL_RUNTIME_STEPS.has(step);
+  }
+
   noteProgress(message?: string, patch?: Partial<RoundRuntimeSnapshot>) {
+    if (this.isTerminalStep()) return;
+    const now = Date.now();
+    this.lastProgressAt = now;
+    this.snapshot.lastProgressAt = new Date(now).toISOString();
+    this.snapshot.lastMeaningfulProgressAt = new Date(now).toISOString();
+    if (message) this.snapshot.message = message;
+    if (patch) Object.assign(this.snapshot, patch);
+    this.refreshProgress();
+  }
+
+  noteActivity(message?: string, patch?: Partial<RoundRuntimeSnapshot>) {
+    if (this.isTerminalStep()) return;
     const now = Date.now();
     this.lastProgressAt = now;
     this.snapshot.lastProgressAt = new Date(now).toISOString();
@@ -155,9 +179,19 @@ export class RoundRuntimeController {
     this.snapshot.progressBreakdown = breakdown;
     this.snapshot.intraRoundPct = breakdown.intraRound;
     this.snapshot.roundProgressPct = breakdown.overall;
+    const remainingCandidates = Math.max(0, Number(this.snapshot.candidatesRemaining ?? 0));
+    this.snapshot.estimatedRemainingCandidates = remainingCandidates;
+    const processed = Math.max(0, Number(this.snapshot.candidatesProcessed ?? 0));
+    const elapsedMs = Math.max(1, Number(this.snapshot.elapsedMs ?? 0));
+    const candidateThroughputPerMs = processed > 0 ? processed / elapsedMs : 0;
+    this.snapshot.projectedCompletionMs =
+      candidateThroughputPerMs > 0 ? Math.max(0, Math.round(remainingCandidates / candidateThroughputPerMs)) : null;
   }
 
   async transition(step: RoundRuntimeStep, message: string, patch?: Partial<RoundRuntimeSnapshot>) {
+    if (this.isTerminalStep() && !this.isTerminalStep(step)) {
+      return;
+    }
     this.snapshot.step = step;
     this.snapshot.message = message;
     this.snapshot.coarseState = mapRuntimeStepToCoarseState(step);
@@ -166,10 +200,93 @@ export class RoundRuntimeController {
     this.snapshot.estimatedRemainingMs = Math.max(0, this.options.selectionBudgetMs - this.snapshot.elapsedMs);
     this.lastProgressAt = Date.now();
     this.snapshot.lastProgressAt = new Date(this.lastProgressAt).toISOString();
+    this.snapshot.lastMeaningfulProgressAt = new Date(this.lastProgressAt).toISOString();
     this.touchHeartbeatClock();
     this.refreshProgress();
     this.pushTimeline("step", message);
-    await this.persist(true);
+    try {
+      await this.persist(true, "transition");
+    } catch (error) {
+      if (error instanceof BoundedPrismaError) {
+        throw new RoundSelectionAbortError("PERSIST_TIMEOUT", `PERSIST_TIMEOUT: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  private async flushLightweightHeartbeat() {
+    const now = Date.now();
+    if (now - this.lastLightweightHeartbeatPersistAt < resolveHeartbeatIntervalMs()) return;
+    if (this.lightweightHeartbeatInFlight) return;
+    if (this.isTerminalStep()) return;
+
+    this.lightweightHeartbeatInFlight = true;
+    this.lastLightweightHeartbeatPersistAt = now;
+    const heartbeatAt = this.snapshot.heartbeatAt;
+    const lightweightRuntime = {
+      heartbeatAt,
+      lastProgressAt: this.snapshot.lastProgressAt,
+      lastMeaningfulProgressAt: this.snapshot.lastMeaningfulProgressAt,
+      step: this.snapshot.step,
+      message: this.snapshot.message,
+      aiProcessed: this.snapshot.aiProcessed,
+      aiTotal: this.snapshot.aiTotal,
+      candidatesProcessed: this.snapshot.candidatesProcessed,
+      scannerTotal: this.snapshot.scannerTotal,
+      elapsedMs: this.snapshot.elapsedMs,
+      intraRoundPct: this.snapshot.intraRoundPct,
+      currentCandidate: this.snapshot.currentCandidate,
+      currentSymbol: this.snapshot.currentSymbol,
+      currentPipeline: this.snapshot.currentPipeline,
+    };
+
+    try {
+      await this.withPersistenceRetry("round-runtime.lightHeartbeat.patch", () =>
+        idempotentPatchJobActiveRound({
+          jobId: this.options.jobId,
+          runId: this.options.runId,
+          roundNo: this.options.roundNo,
+          heartbeatAt,
+          step: this.snapshot.step,
+          message: this.snapshot.message,
+        }),
+      );
+      await this.withPersistenceRetry("round-runtime.lightHeartbeat.merge", () =>
+        idempotentMergeRunMetadata({
+          jobId: this.options.jobId,
+          roundNo: this.options.roundNo,
+          runId: this.options.runId,
+          heartbeatAt,
+          runtime: lightweightRuntime,
+        }),
+      );
+    } catch (error) {
+      if (error instanceof BoundedPrismaError) {
+        this.persistTimeoutCount += 1;
+        this.snapshot.dbTransientFailures = (this.snapshot.dbTransientFailures ?? 0) + 1;
+        logger.warn(
+          {
+            jobId: this.options.jobId,
+            runId: this.options.runId,
+            roundNo: this.options.roundNo,
+            error: error.message,
+          },
+          "Lightweight heartbeat persistence timed out; in-memory liveness continues",
+        );
+      } else {
+        logger.warn(
+          {
+            jobId: this.options.jobId,
+            runId: this.options.runId,
+            roundNo: this.options.roundNo,
+            error: (error as Error).message,
+          },
+          "Lightweight heartbeat persistence failed",
+        );
+      }
+    } finally {
+      this.lightweightHeartbeatInFlight = false;
+    }
   }
 
   async heartbeat(message?: string) {
@@ -181,10 +298,61 @@ export class RoundRuntimeController {
     this.touchHeartbeatClock();
     this.snapshot.elapsedMs = now - this.options.selectionStartedAt;
     this.snapshot.estimatedRemainingMs = Math.max(0, this.options.selectionBudgetMs - this.snapshot.elapsedMs);
-    if (message) this.snapshot.message = message;
+    if (message && !this.isTerminalStep()) this.snapshot.message = message;
     this.refreshProgress();
     this.pushTimeline("heartbeat", message ?? this.snapshot.message);
-    await this.persist(false);
+    if (this.pendingPersistCount > 0) {
+      this.persistCoalescedWrites += 1;
+      this.snapshot.persistenceMetrics = {
+        persistQueueDepth: this.pendingPersistCount,
+        persistQueueWaitMs: 0,
+        dbQueryMs: 0,
+        dbTransactionMs: 0,
+        retryCount: 0,
+        timeoutCount: this.persistTimeoutCount,
+        writer: "heartbeat",
+        coalescedWrites: this.persistCoalescedWrites,
+      };
+      void this.flushLightweightHeartbeat();
+      this.checkBudget(true);
+      return;
+    }
+    try {
+      await this.persist(false, "heartbeat");
+    } catch (error) {
+      if (error instanceof BoundedPrismaError) {
+        this.persistTimeoutCount += 1;
+        logger.warn(
+          {
+            jobId: this.options.jobId,
+            runId: this.options.runId,
+            roundNo: this.options.roundNo,
+            step: this.snapshot.step,
+            message: this.snapshot.message,
+            error: error.message,
+          },
+          "Round runtime heartbeat persistence timed out; continuing in degraded mode",
+        );
+        this.pushTimeline("timeout", `PERSIST_TIMEOUT: ${error.message}`);
+        this.snapshot.dbTransientFailures = (this.snapshot.dbTransientFailures ?? 0) + 1;
+        publishExecutionEvent({
+          executionId: `round-job-${this.options.jobId}`,
+          symbol: this.snapshot.currentSymbol,
+          stage: "round-runtime",
+          status: "RUNNING",
+          level: "WARN",
+          message: `PERSIST_TIMEOUT: ${error.message}`,
+          context: {
+            jobId: this.options.jobId,
+            runId: this.options.runId,
+            roundNo: this.options.roundNo,
+            runtimeStep: this.snapshot.step,
+          },
+        });
+      } else {
+        throw error;
+      }
+    }
     this.checkBudget(true);
   }
 
@@ -230,75 +398,148 @@ export class RoundRuntimeController {
     await this.transition("NEXT_CANDIDATE", "Sonraki aday deneniyor");
   }
 
-  async persist(forceCoarseStateUpdate: boolean) {
-    const snapshot = this.getSnapshot();
-    if (this.options.onPersist) {
-      await this.options.onPersist(snapshot);
-      return;
+  private async withPersistenceRetry<T>(
+    label: string,
+    work: () => Promise<T>,
+    attempts = 2,
+  ): Promise<{ value: T; elapsedMs: number; retryCount: number }> {
+    let lastError: unknown = null;
+    const startedAt = Date.now();
+    let retryCount = 0;
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      try {
+        const value = await withBoundedPrisma(label, work);
+        return {
+          value,
+          elapsedMs: Date.now() - startedAt,
+          retryCount,
+        };
+      } catch (error) {
+        lastError = error;
+        if (!(error instanceof BoundedPrismaError) || attempt + 1 >= attempts) {
+          throw error;
+        }
+        retryCount += 1;
+        await new Promise((resolve) => setTimeout(resolve, 75 * (attempt + 1)));
+      }
     }
-    await withBoundedPrisma("round-runtime.patchJobActiveRound", () =>
-      idempotentPatchJobActiveRound({
-        jobId: this.options.jobId,
-        runId: this.options.runId,
-        roundNo: this.options.roundNo,
-        heartbeatAt: snapshot.heartbeatAt,
-        step: snapshot.step,
-        message: snapshot.message,
-        activeState: forceCoarseStateUpdate ? snapshot.coarseState : undefined,
-      }),
-    );
-    await withBoundedPrisma("round-runtime.mergeRunMetadata", () =>
-      idempotentMergeRunMetadata({
-        runId: this.options.runId,
-        runtime: snapshot as unknown as Record<string, unknown>,
-        heartbeatAt: snapshot.heartbeatAt,
-        state: forceCoarseStateUpdate ? snapshot.coarseState : undefined,
+    throw lastError instanceof Error ? lastError : new Error(`${label} failed`);
+  }
+
+  private queuePersist(work: (queueWaitMs: number) => Promise<void>) {
+    const enqueuedAt = Date.now();
+    const run = async () => {
+      this.pendingPersistCount += 1;
+      try {
+        await work(Date.now() - enqueuedAt);
+      } finally {
+        this.pendingPersistCount = Math.max(0, this.pendingPersistCount - 1);
+      }
+    };
+    const chained = this.persistQueue.then(run, run);
+    this.persistQueue = chained.catch(() => undefined);
+    return chained;
+  }
+
+  async persist(forceCoarseStateUpdate: boolean, writer: "transition" | "heartbeat" | "sync" = "transition") {
+    return this.queuePersist(async (queueWaitMs) => {
+      const snapshot = this.getSnapshot();
+      if (this.options.onPersist) {
+        await this.options.onPersist(snapshot);
+        return;
+      }
+      const patchResult = await this.withPersistenceRetry("round-runtime.patchJobActiveRound", () =>
+        idempotentPatchJobActiveRound({
+          jobId: this.options.jobId,
+          runId: this.options.runId,
+          roundNo: this.options.roundNo,
+          heartbeatAt: snapshot.heartbeatAt,
+          step: snapshot.step,
+          message: snapshot.message,
+          activeState: forceCoarseStateUpdate ? snapshot.coarseState : undefined,
+        }),
+      );
+      const mergeResult = await this.withPersistenceRetry("round-runtime.mergeRunMetadata", () =>
+        idempotentMergeRunMetadata({
+          jobId: this.options.jobId,
+          roundNo: this.options.roundNo,
+          runId: this.options.runId,
+          runtime: (forceCoarseStateUpdate
+            ? snapshot
+            : {
+                ...snapshot,
+                timeline: snapshot.timeline.slice(-20),
+                progressBreakdown: snapshot.progressBreakdown,
+              }) as unknown as Record<string, unknown>,
+          heartbeatAt: snapshot.heartbeatAt,
+          state: forceCoarseStateUpdate ? snapshot.coarseState : undefined,
+          symbol: snapshot.currentSymbol,
+          patch: {
+            selectionAttempt: snapshot.selectionAttempt,
+            roundProgressPct: snapshot.roundProgressPct,
+            intraRoundPct: snapshot.intraRoundPct,
+            progressBreakdown: snapshot.progressBreakdown,
+          },
+        }),
+      );
+      const dbTransactionMs = patchResult.elapsedMs + mergeResult.elapsedMs;
+      snapshot.persistenceMetrics = {
+        persistQueueDepth: this.pendingPersistCount,
+        persistQueueWaitMs: Math.max(0, queueWaitMs),
+        dbQueryMs: dbTransactionMs,
+        dbTransactionMs,
+        retryCount: patchResult.retryCount + mergeResult.retryCount,
+        timeoutCount: this.persistTimeoutCount,
+        writer,
+        coalescedWrites: this.persistCoalescedWrites,
+      };
+      snapshot.lastPersistAt = new Date().toISOString();
+      publishExecutionEvent({
+        executionId: `round-job-${this.options.jobId}`,
         symbol: snapshot.currentSymbol,
-        patch: {
-          selectionAttempt: snapshot.selectionAttempt,
-          roundProgressPct: snapshot.roundProgressPct,
-          intraRoundPct: snapshot.intraRoundPct,
-          progressBreakdown: snapshot.progressBreakdown,
+        stage: "round-runtime",
+        status: snapshot.step === "ROUND_FAILED" || snapshot.step === "TIMEOUT" ? "FAILED" : "RUNNING",
+        level: "INFO",
+        message: snapshot.message,
+        context: {
+          jobId: this.options.jobId,
+          runId: this.options.runId,
+          roundNo: this.options.roundNo,
+          runtime: forceCoarseStateUpdate
+            ? snapshot
+            : {
+                ...snapshot,
+                timeline: snapshot.timeline.slice(-20),
+              },
         },
-      }),
-    );
-    publishExecutionEvent({
-      executionId: `round-job-${this.options.jobId}`,
-      symbol: snapshot.currentSymbol,
-      stage: "round-runtime",
-      status: snapshot.step === "ROUND_FAILED" || snapshot.step === "TIMEOUT" ? "FAILED" : "RUNNING",
-      level: "INFO",
-      message: snapshot.message,
-      context: {
-        jobId: this.options.jobId,
-        runId: this.options.runId,
-        roundNo: this.options.roundNo,
-        runtime: snapshot,
-      },
+      });
+      if (forceCoarseStateUpdate) {
+        await writeStructuredLog({
+          level: "INFO",
+          source: "auto-round-runtime",
+          message: snapshot.message,
+          actionType: "round_runtime_heartbeat",
+          status: "RUNNING",
+          transactionId: this.options.jobId,
+          context: {
+            runId: this.options.runId,
+            roundNo: this.options.roundNo,
+            step: snapshot.step,
+            roundProgressPct: snapshot.roundProgressPct,
+            intraRoundPct: snapshot.intraRoundPct,
+            progressBreakdown: snapshot.progressBreakdown,
+            elapsedMs: snapshot.elapsedMs,
+            persistenceMetrics: snapshot.persistenceMetrics,
+          },
+        }).catch(() => null);
+      }
     });
-    await writeStructuredLog({
-      level: "INFO",
-      source: "auto-round-runtime",
-      message: snapshot.message,
-      actionType: "round_runtime_heartbeat",
-      status: "RUNNING",
-      transactionId: this.options.jobId,
-      context: {
-        runId: this.options.runId,
-        roundNo: this.options.roundNo,
-        step: snapshot.step,
-        roundProgressPct: snapshot.roundProgressPct,
-        intraRoundPct: snapshot.intraRoundPct,
-        progressBreakdown: snapshot.progressBreakdown,
-        elapsedMs: snapshot.elapsedMs,
-      },
-    }).catch(() => null);
   }
 
   async failTimeout(reason: string) {
     await this.transition("TIMEOUT", reason);
     this.pushTimeline("timeout", reason);
-    await this.persist(true);
+    await this.persist(true, "transition");
   }
 }
 
@@ -344,6 +585,16 @@ export async function patchRoundRuntimeProgress(input: {
   snapshot.roundProgressPct = breakdown.overall;
   snapshot.heartbeatAt = new Date().toISOString();
 
+  const meaningfulCountersChanged =
+    input.patch?.aiProcessed !== undefined ||
+    input.patch?.candidatesProcessed !== undefined ||
+    input.patch?.pumpProcessed !== undefined ||
+    input.patch?.scannerTotal !== undefined;
+  if (meaningfulCountersChanged) {
+    snapshot.lastMeaningfulProgressAt = snapshot.heartbeatAt;
+    snapshot.lastProgressAt = snapshot.heartbeatAt;
+  }
+
   await idempotentPatchJobActiveRound({
     jobId: input.jobId,
     runId: input.runId,
@@ -353,6 +604,8 @@ export async function patchRoundRuntimeProgress(input: {
     message: snapshot.message,
   });
   await idempotentMergeRunMetadata({
+    jobId: input.jobId,
+    roundNo: input.roundNo,
     runId: input.runId,
     runtime: snapshot as unknown as Record<string, unknown>,
     heartbeatAt: snapshot.heartbeatAt,

@@ -1,0 +1,358 @@
+{
+  "jobId": "cmtasbdi60029unbwdxrckdxb",
+  "status": "STOPPED",
+  "stopRequested": true,
+  "lastError": "Recovery escalation limit reached",
+  "currentRound": 19,
+  "failedRounds": 19,
+  "byCategory": {
+    "POLICY_AI_VETO": 3,
+    "POLICY_SIM_TIGHT": 2,
+    "POLICY_NO_TRADE": 8,
+    "P0_RUNTIME_STALL": 2,
+    "P0_DB_TX_TIMEOUT": 1,
+    "OPERATOR_STOP": 1
+  },
+  "rounds": [
+    {
+      "roundNo": 1,
+      "state": "tur_basarisiz",
+      "symbol": "XLMTRY",
+      "startedAt": "2026-08-27T00:28:40.008Z",
+      "endedAt": "2026-08-27T00:38:47.117Z",
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "category": "POLICY_AI_VETO",
+      "durationSec": 607
+    },
+    {
+      "roundNo": 2,
+      "state": "tur_basarisiz",
+      "symbol": "PLUMETRY",
+      "startedAt": "2026-08-27T00:38:48.570Z",
+      "endedAt": "2026-08-27T00:49:23.621Z",
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "category": "POLICY_AI_VETO",
+      "durationSec": 635
+    },
+    {
+      "roundNo": 3,
+      "state": "tur_basarisiz",
+      "symbol": "PLUMETRY",
+      "startedAt": "2026-08-27T00:49:24.569Z",
+      "endedAt": "2026-08-27T00:54:14.637Z",
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "category": "POLICY_AI_VETO",
+      "durationSec": 290
+    },
+    {
+      "roundNo": 4,
+      "state": "tur_basarisiz",
+      "symbol": "MIRATRY",
+      "startedAt": "2026-08-27T00:54:14.885Z",
+      "endedAt": "2026-08-27T01:05:01.010Z",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=44.8, sentiment=33.7, mtf=0.0) | AI role consensus zayif (tech=37.2, sentiment=33.7, risk=63.5) | Kalite skoru cok dusuk (0/100 < 40)",
+      "category": "POLICY_SIM_TIGHT",
+      "durationSec": 646
+    },
+    {
+      "roundNo": 5,
+      "state": "tur_basarisiz",
+      "symbol": "AUDIOTRY",
+      "startedAt": "2026-08-27T01:05:01.239Z",
+      "endedAt": "2026-08-27T01:08:44.762Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 224
+    },
+    {
+      "roundNo": 6,
+      "state": "tur_basarisiz",
+      "symbol": "",
+      "startedAt": "2026-08-27T01:08:45.898Z",
+      "endedAt": "2026-08-27T01:11:39.835Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 174
+    },
+    {
+      "roundNo": 7,
+      "state": "tur_basarisiz",
+      "symbol": "PENGUTRY",
+      "startedAt": "2026-08-27T01:11:40.261Z",
+      "endedAt": "2026-08-27T01:14:19.809Z",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=46.0, sentiment=38.0, mtf=0.0) | scanner 32.88 < 34 | scanner confidence 19.59 < 36 | pump risk 100.00 > 96 (raw=1808.49, capped) | Kalite skoru cok dusuk (26/100 < 32)",
+      "category": "POLICY_SIM_TIGHT",
+      "durationSec": 160
+    },
+    {
+      "roundNo": 8,
+      "state": "tur_basarisiz",
+      "symbol": "TSTTRY",
+      "startedAt": "2026-08-27T01:14:20.209Z",
+      "endedAt": "2026-08-27T01:18:50.135Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 270
+    },
+    {
+      "roundNo": 9,
+      "state": "tur_basarisiz",
+      "symbol": "DODOTRY",
+      "startedAt": "2026-08-27T01:18:50.500Z",
+      "endedAt": "2026-08-27T01:24:06.139Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 316
+    },
+    {
+      "roundNo": 10,
+      "state": "tur_basarisiz",
+      "symbol": "SOLTRY",
+      "startedAt": "2026-08-27T01:24:06.466Z",
+      "endedAt": "2026-08-27T01:30:38.706Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 392
+    },
+    {
+      "roundNo": 11,
+      "state": "tur_basarisiz",
+      "symbol": "1000CATTRY",
+      "startedAt": "2026-08-27T01:30:39.050Z",
+      "endedAt": "2026-08-27T01:37:03.420Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 384
+    },
+    {
+      "roundNo": 13,
+      "state": "tur_basarisiz",
+      "symbol": "DYDXTRY",
+      "startedAt": "2026-08-27T01:37:07.438Z",
+      "endedAt": "2026-08-27T01:41:59.818Z",
+      "failReason": "No heartbeat/progress within stall threshold (180s)",
+      "category": "P0_RUNTIME_STALL",
+      "durationSec": 292
+    },
+    {
+      "roundNo": 14,
+      "state": "tur_basarisiz",
+      "symbol": "",
+      "startedAt": "2026-08-27T01:42:00.201Z",
+      "endedAt": "2026-08-27T01:52:44.028Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 644
+    },
+    {
+      "roundNo": 15,
+      "state": "tur_basarisiz",
+      "symbol": "DODOTRY",
+      "startedAt": "2026-08-27T01:52:44.409Z",
+      "endedAt": "2026-08-27T01:54:30.613Z",
+      "failReason": "Paper NO_TRADE: pump ve steady-gain adayi yok (tur 1/1, scanned=100, candidates=20).",
+      "category": "POLICY_NO_TRADE",
+      "durationSec": 106
+    },
+    {
+      "roundNo": 16,
+      "state": "tur_basarisiz",
+      "symbol": null,
+      "startedAt": "2026-08-27T01:54:31.972Z",
+      "endedAt": "2026-08-27T02:00:53.294Z",
+      "failReason": "Tur heartbeat zaman asimi (state=tariyor, heartbeatAge=181s)",
+      "category": "P0_RUNTIME_STALL",
+      "durationSec": 381
+    },
+    {
+      "roundNo": 17,
+      "state": "tur_basarisiz",
+      "symbol": "HOTTRY",
+      "startedAt": "2026-08-27T02:01:02.322Z",
+      "endedAt": "2026-08-27T02:01:55.178Z",
+      "failReason": "\nInvalid `prisma.autoRoundJob.findUnique()` invocation:\n\n\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 25000 ms, however 30210 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.",
+      "category": "P0_DB_TX_TIMEOUT",
+      "durationSec": 53
+    },
+    {
+      "roundNo": 18,
+      "state": "tur_basarisiz",
+      "symbol": "",
+      "startedAt": "2026-08-27T02:02:16.236Z",
+      "endedAt": "2026-08-27T02:08:36.714Z",
+      "failReason": "Tur motoru durduruldu",
+      "category": "OPERATOR_STOP",
+      "durationSec": 380
+    }
+  ],
+  "recoveryAuditTail": [
+    {
+      "id": "e2ae227f-397d-4ff7-a218-b71f373bfd48",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T10:05:26.383Z",
+      "durationMs": 1003
+    },
+    {
+      "id": "238b48d5-3bfa-47f2-9384-31464101b8c0",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T10:04:22.813Z",
+      "durationMs": 1230
+    },
+    {
+      "id": "65c3856d-eaf8-4265-a7cc-3266f8e5cd30",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T10:03:21.632Z",
+      "durationMs": 4245
+    },
+    {
+      "id": "0e0114d7-f725-4977-b662-cadb8b85d2e6",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T10:02:21.564Z",
+      "durationMs": 3189
+    },
+    {
+      "id": "93498233-d749-419e-9b9b-d13be77b9c73",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T10:01:11.143Z",
+      "durationMs": 3292
+    },
+    {
+      "id": "5491502b-3595-4aff-94df-15699d34ef6c",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T10:00:07.777Z",
+      "durationMs": 2587
+    },
+    {
+      "id": "39b4c73a-dc2a-475c-8914-a3d61c24fcb3",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T09:59:06.958Z",
+      "durationMs": 79
+    },
+    {
+      "id": "8781fd8a-55fa-4610-a596-9e32cf6fe677",
+      "jobId": "cmtasbdi60029unbwdxrckdxb",
+      "action": "NO_ACTION",
+      "result": "skipped",
+      "failure": "REGISTRY_INTEGRITY",
+      "message": "Recovery blocked by policy limits or peer lease",
+      "trigger": "watchdog",
+      "decision": {
+        "action": "STOP_JOB",
+        "reason": "Recovery escalation limit reached",
+        "failure": "REGISTRY_INTEGRITY",
+        "component": "round_ownership",
+        "safeResume": false,
+        "escalationLevel": 5
+      },
+      "operator": "automatic",
+      "component": "round_ownership",
+      "timestamp": "2026-08-27T09:58:06.224Z",
+      "durationMs": 1287
+    }
+  ]
+}

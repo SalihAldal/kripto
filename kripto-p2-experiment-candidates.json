@@ -1,0 +1,54 @@
+[
+  {
+    "experiment": "CONFIDENCE_INTERACTION_CORRECTION",
+    "hypothesis": "Confidence suppression is mainly interaction-driven (learning+momentum/technical coupling), not pure threshold issue.",
+    "evidence": {
+      "currentBlockers": {
+        "MOMENTUM": 664,
+        "LEARNING": 1135,
+        "TECHNICAL": 397,
+        "RISK": 74,
+        "CONFIDENCE": 8
+      },
+      "confidenceFailures": 2029,
+      "momentumTrio": 1448
+    },
+    "affectedTrades": 42,
+    "expectedImpact": "Recover correctness in candidate routing without lowering thresholds.",
+    "risk": "LOW (shadow/forensic only)",
+    "successCriterion": "Reduced WAIT share in offline replay by removing only proven duplicate/interaction penalty.",
+    "OOSStatus": "YES",
+    "rank": 1
+  },
+  {
+    "experiment": "DUPLICATE_PENALTY_CORRECTION",
+    "hypothesis": "Momentum is counted multiple times (momentumScore + shortMomentum + shortFlow) and compounds confidence suppression.",
+    "evidence": {
+      "momentumTrio": 1448
+    },
+    "affectedTrades": 42,
+    "expectedImpact": "Lower false WAIT while preserving risk controls.",
+    "risk": "LOW-MEDIUM",
+    "successCriterion": "Duplicate-penalty candidates show confidence gap reduction with unchanged threshold.",
+    "OOSStatus": "YES",
+    "rank": 2
+  },
+  {
+    "experiment": "REGIME_CONFIDENCE_SHADOW",
+    "hypothesis": "Regime-sensitive penalty terms reduce confidence disproportionately in specific regimes.",
+    "evidence": {
+      "regimeCounts": {
+        "RANGE": 834,
+        "LOW_VOLATILITY": 530,
+        "HIGH_VOLATILITY": 904,
+        "TREND": 10
+      }
+    },
+    "affectedTrades": 42,
+    "expectedImpact": "Explain regime-linked suppression mechanism before any policy changes.",
+    "risk": "LOW",
+    "successCriterion": "Interaction survives validation/OOS subsets.",
+    "OOSStatus": "YES",
+    "rank": 3
+  }
+]

@@ -3,8 +3,16 @@ import type { RoundRuntimeSnapshot } from "@/src/server/execution/round-runtime.
 
 export type RoundProgressState =
   | "ACTIVE_PROGRESS"
+  | "SCANNER_ACTIVE"
+  | "AI_ACTIVE"
+  | "TDI_ACTIVE"
   | "HEARTBEAT_ONLY"
-  | "POSSIBLY_HUNG"
+  | "DEPENDENCY_DEGRADED"
+  | "WAITING_FOR_RETRY"
+  | "WAITING_FOR_PROVIDER"
+  | "WAITING_FOR_DB"
+  | "TERMINALIZING"
+  | "BUDGET_EXCEEDED"
   | "STALLED"
   | "FAILED";
 
@@ -86,11 +94,20 @@ export function assessRoundProgressState(input: {
   const possiblyHungGraceMs = resolvePossiblyHungGraceMs(stallThresholdMs, selectionBudgetMs);
 
   const heartbeatAt = runtime?.heartbeatAt ?? null;
-  const lastProgressAt = runtime?.lastProgressAt ?? heartbeatAt;
+  const lastProgressAt =
+    runtime?.lastMeaningfulProgressAt ??
+    runtime?.lastProgressAt ??
+    heartbeatAt;
   const heartbeatAgeMs = heartbeatAt ? Math.max(0, nowMs - (parseIsoMs(heartbeatAt) ?? nowMs)) : Number.POSITIVE_INFINITY;
   const progressAgeMs = lastProgressAt ? Math.max(0, nowMs - (parseIsoMs(lastProgressAt) ?? nowMs)) : heartbeatAgeMs;
   const stallElapsedMs = Math.max(heartbeatAgeMs, progressAgeMs);
   const meaningfulProgress = runtime ? hasMeaningfulProgressSignals(runtime) : false;
+  const dependencyDegraded =
+    Number(runtime?.marketDataFailures ?? 0) > 0 ||
+    Number(runtime?.dbTransientFailures ?? 0) > 0 ||
+    Number(runtime?.fallbackCount ?? 0) > 0;
+  const step = String(runtime?.step ?? "");
+  const message = String(runtime?.message ?? "").toLowerCase();
 
   const evidence = {
     step: runtime?.step ?? null,
@@ -102,11 +119,14 @@ export function assessRoundProgressState(input: {
     intraRoundPct: runtime?.intraRoundPct ?? null,
     currentPipeline: runtime?.currentPipeline ?? null,
     meaningfulProgress,
+    dependencyDegraded,
+    lastMeaningfulProgressAt: runtime?.lastMeaningfulProgressAt ?? null,
+    lastRawProgressAt: runtime?.lastProgressAt ?? null,
   };
 
   if (elapsedMs >= selectionBudgetMs) {
     return {
-      progressState: "FAILED",
+      progressState: "BUDGET_EXCEEDED",
       reasonCode: "SELECTION_BUDGET_EXCEEDED",
       reasonDetail: `Selection budget elapsed (${Math.floor(elapsedMs / 1000)}s >= ${Math.floor(selectionBudgetMs / 1000)}s)`,
       heartbeatAt,
@@ -124,9 +144,110 @@ export function assessRoundProgressState(input: {
     };
   }
 
-  if (progressAgeMs < stallThresholdMs && (meaningfulProgress || runtime?.step)) {
+  if (step === "ROUND_COMPLETED" || step === "ROUND_FAILED" || step === "TIMEOUT") {
     return {
-      progressState: "ACTIVE_PROGRESS",
+      progressState: "TERMINALIZING",
+      reasonCode: "ROUND_TERMINALIZING",
+      reasonDetail: `Round terminal transition in progress (${step})`,
+      heartbeatAt,
+      lastProgressAt,
+      heartbeatAgeMs,
+      progressAgeMs,
+      stallElapsedMs,
+      elapsedMs,
+      selectionBudgetMs,
+      selectionBudgetRemainingMs,
+      stallThresholdMs,
+      progressStaleThresholdMs,
+      possiblyHungGraceMs,
+      evidence,
+    };
+  }
+
+  if (
+    message.includes("retry") &&
+    heartbeatAgeMs < stallThresholdMs &&
+    progressAgeMs < progressStaleThresholdMs + possiblyHungGraceMs
+  ) {
+    return {
+      progressState: "WAITING_FOR_RETRY",
+      reasonCode: "DEPENDENCY_RETRY_IN_PROGRESS",
+      reasonDetail: "Bounded retry loop is active and still within watchdog threshold",
+      heartbeatAt,
+      lastProgressAt,
+      heartbeatAgeMs,
+      progressAgeMs,
+      stallElapsedMs,
+      elapsedMs,
+      selectionBudgetMs,
+      selectionBudgetRemainingMs,
+      stallThresholdMs,
+      progressStaleThresholdMs,
+      possiblyHungGraceMs,
+      evidence,
+    };
+  }
+
+  if (
+    (message.includes("provider") || message.includes("consensus")) &&
+    step === "AI_ANALYSIS" &&
+    heartbeatAgeMs < stallThresholdMs &&
+    progressAgeMs < progressStaleThresholdMs + possiblyHungGraceMs
+  ) {
+    return {
+      progressState: "WAITING_FOR_PROVIDER",
+      reasonCode: "PROVIDER_WAIT_IN_PROGRESS",
+      reasonDetail: "AI provider wait in progress with fresh heartbeat",
+      heartbeatAt,
+      lastProgressAt,
+      heartbeatAgeMs,
+      progressAgeMs,
+      stallElapsedMs,
+      elapsedMs,
+      selectionBudgetMs,
+      selectionBudgetRemainingMs,
+      stallThresholdMs,
+      progressStaleThresholdMs,
+      possiblyHungGraceMs,
+      evidence,
+    };
+  }
+
+  if (
+    Number(runtime?.dbTransientFailures ?? 0) > 0 &&
+    heartbeatAgeMs < stallThresholdMs &&
+    progressAgeMs < progressStaleThresholdMs + possiblyHungGraceMs
+  ) {
+    return {
+      progressState: "WAITING_FOR_DB",
+      reasonCode: "DB_WAIT_DEGRADED",
+      reasonDetail: "DB degraded path is active with bounded retries",
+      heartbeatAt,
+      lastProgressAt,
+      heartbeatAgeMs,
+      progressAgeMs,
+      stallElapsedMs,
+      elapsedMs,
+      selectionBudgetMs,
+      selectionBudgetRemainingMs,
+      stallThresholdMs,
+      progressStaleThresholdMs,
+      possiblyHungGraceMs,
+      evidence,
+    };
+  }
+
+  if (progressAgeMs < stallThresholdMs && (meaningfulProgress || runtime?.step)) {
+    const state =
+      step === "AI_ANALYSIS"
+        ? "AI_ACTIVE"
+        : step === "SCANNING" || step === "FULL_SCAN" || step === "PUMP_SCAN" || step === "PUMP_CONFIRMATION"
+          ? "SCANNER_ACTIVE"
+          : step === "SYMBOL_SELECTED"
+            ? "TDI_ACTIVE"
+            : "ACTIVE_PROGRESS";
+    return {
+      progressState: state,
       reasonCode: "PROGRESS_ADVANCING",
       reasonDetail: "Recent progress within stall threshold while selection budget remains",
       heartbeatAt,
@@ -144,11 +265,16 @@ export function assessRoundProgressState(input: {
     };
   }
 
-  if (heartbeatAgeMs < stallThresholdMs && progressAgeMs >= progressStaleThresholdMs) {
+  if (
+    dependencyDegraded &&
+    heartbeatAgeMs < stallThresholdMs &&
+    progressAgeMs >= progressStaleThresholdMs &&
+    progressAgeMs < progressStaleThresholdMs + possiblyHungGraceMs
+  ) {
     return {
-      progressState: "HEARTBEAT_ONLY",
-      reasonCode: "HEARTBEAT_WITHOUT_RECENT_PROGRESS",
-      reasonDetail: "Heartbeat fresh but forward progress has not advanced recently",
+      progressState: "DEPENDENCY_DEGRADED",
+      reasonCode: "DEPENDENCY_DEGRADED_RETRYING",
+      reasonDetail: "External dependency degraded; bounded retries/fallback still active",
       heartbeatAt,
       lastProgressAt,
       heartbeatAgeMs,
@@ -164,15 +290,30 @@ export function assessRoundProgressState(input: {
     };
   }
 
-  if (
-    stallElapsedMs >= progressStaleThresholdMs &&
-    stallElapsedMs < progressStaleThresholdMs + possiblyHungGraceMs &&
-    selectionBudgetRemainingMs > 0
-  ) {
+  if (heartbeatAgeMs < stallThresholdMs && progressAgeMs >= progressStaleThresholdMs) {
+    if (progressAgeMs >= progressStaleThresholdMs + possiblyHungGraceMs) {
+      return {
+        progressState: "STALLED",
+        reasonCode: "MEANINGFUL_PROGRESS_STALE",
+        reasonDetail: `Heartbeat stayed fresh but meaningful progress exceeded grace window (${Math.floor(progressAgeMs / 1000)}s)`,
+        heartbeatAt,
+        lastProgressAt,
+        heartbeatAgeMs,
+        progressAgeMs,
+        stallElapsedMs,
+        elapsedMs,
+        selectionBudgetMs,
+        selectionBudgetRemainingMs,
+        stallThresholdMs,
+        progressStaleThresholdMs,
+        possiblyHungGraceMs,
+        evidence,
+      };
+    }
     return {
-      progressState: "POSSIBLY_HUNG",
-      reasonCode: "PROGRESS_STALL_GRACE",
-      reasonDetail: "Progress stalled but still inside bounded grace window before recovery restart",
+      progressState: "HEARTBEAT_ONLY",
+      reasonCode: "HEARTBEAT_WITHOUT_RECENT_PROGRESS",
+      reasonDetail: "Heartbeat fresh but forward progress has not advanced recently",
       heartbeatAt,
       lastProgressAt,
       heartbeatAgeMs,
@@ -230,8 +371,15 @@ export function assessRoundProgressState(input: {
 export function shouldBlockRecoveryRestart(assessment: RoundProgressAssessment) {
   return (
     assessment.progressState === "ACTIVE_PROGRESS" ||
+    assessment.progressState === "SCANNER_ACTIVE" ||
+    assessment.progressState === "AI_ACTIVE" ||
+    assessment.progressState === "TDI_ACTIVE" ||
     assessment.progressState === "HEARTBEAT_ONLY" ||
-    assessment.progressState === "POSSIBLY_HUNG"
+    assessment.progressState === "DEPENDENCY_DEGRADED" ||
+    assessment.progressState === "WAITING_FOR_RETRY" ||
+    assessment.progressState === "WAITING_FOR_PROVIDER" ||
+    assessment.progressState === "WAITING_FOR_DB" ||
+    assessment.progressState === "TERMINALIZING"
   );
 }
 

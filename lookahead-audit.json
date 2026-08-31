@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-08-22T11:41:27.449Z",
+  "status": "YES",
+  "runtimeAvailableInformation": [
+    "position monitor mark price / current tick",
+    "elapsed holding time vs maxDurationSec",
+    "current TP/SL and strategy-exit conditions"
+  ],
+  "replayInformation": [
+    "historical post-entry path points were used only for offline counterfactual scoring"
+  ],
+  "forbiddenInRuntime": [
+    "future candles after hypothetical exit",
+    "future realized pnl labels",
+    "future regime/AI decisions"
+  ],
+  "finding": "No runtime recommendation depends on future-only information."
+}

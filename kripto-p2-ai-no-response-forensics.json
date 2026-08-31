@@ -1,0 +1,58 @@
+{
+  "sessionId": "cmt4wd5rg0009unq0p8hdx3su",
+  "aiNoResponseRounds": 1,
+  "rounds": [
+    {
+      "roundId": "1",
+      "runId": "cmt4wd5yc000punq092rt5j57",
+      "failReason": "AI_NO_RESPONSE",
+      "aiNoResponse": true,
+      "candidateCount": 274,
+      "runtimeTdiApproved": 0,
+      "runtimeTdiWait": 26,
+      "runtimeTdiRejected": 346
+    },
+    {
+      "roundId": "2",
+      "runId": "cmt4wwltw0b18unq0124vv5qq",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=48.1, sentiment=48.3, mtf=45.5) | AI role consensus zayif (tech=49.2, sentiment=48.3, risk=46.8) | Kalite skoru dusuk (30/100 < 52)",
+      "aiNoResponse": false,
+      "candidateCount": 226,
+      "runtimeTdiApproved": 0,
+      "runtimeTdiWait": 37,
+      "runtimeTdiRejected": 463
+    },
+    {
+      "roundId": "3",
+      "runId": "cmt4xeqmj0lk4unq0pr5l2bfu",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=43.7, sentiment=35.4, mtf=45.5) | AI role consensus zayif (tech=31.9, sentiment=35.4, risk=63.8) | regime chop warning | regime lifecycle risk (CHOP) | EMA trend uyumsuz (EMA50=4.4417, EMA200=4.4498) | Hacim yetersiz (0.00x < 1.05x) | Kalite skoru dusuk (43/100 < 44)",
+      "aiNoResponse": false,
+      "candidateCount": 0,
+      "runtimeTdiApproved": 0,
+      "runtimeTdiWait": 37,
+      "runtimeTdiRejected": 463
+    },
+    {
+      "roundId": "4",
+      "runId": "cmt4y0wnu0wj0unq0r3wrvotv",
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "aiNoResponse": false,
+      "candidateCount": 0,
+      "runtimeTdiApproved": 0,
+      "runtimeTdiWait": 37,
+      "runtimeTdiRejected": 463
+    },
+    {
+      "roundId": "5",
+      "runId": "cmt4y8fsz10h0unq0nb6s9fdn",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=48.5, sentiment=39.2, mtf=54.6) | EMA trend uyumsuz (EMA50=0.5924, EMA200=0.5929) | Hacim yetersiz (0.11x < 1.05x) | BTC EMA20 altinda (BTCTRY) | Kalite skoru dusuk (24/100 < 52)",
+      "aiNoResponse": false,
+      "candidateCount": 0,
+      "runtimeTdiApproved": 0,
+      "runtimeTdiWait": 37,
+      "runtimeTdiRejected": 463
+    }
+  ],
+  "boundedRecoveryFix": "AUTO_ROUND_CONTINUE_ON_AI_NO_RESPONSE",
+  "reliabilityAssessment": "REQUIRES_RECOVERY"
+}

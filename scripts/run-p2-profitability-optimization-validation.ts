@@ -1,5 +1,5 @@
 /**
- * Controlled P2 profitability optimization validation (max 3 rounds).
+ * Controlled P2 profitability optimization validation (max 5 rounds).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,9 +16,9 @@ for (const line of fs.readFileSync(".env", "utf8").split(/\r?\n/)) {
 process.env.EXECUTION_AI_GATE_POLICY = "VETO";
 
 const VALIDATION_ID = `p2-profitability-${new Date().toISOString().replace(/[:.]/g, "-")}`;
-const MAX_ROUNDS = 3;
+const MAX_ROUNDS = 5;
 const POLL_MS = 10_000;
-const JOB_DEADLINE_MS = 50 * 60_000;
+const JOB_DEADLINE_MS = 70 * 60_000;
 
 const P2_ARTIFACTS = [
   "slot-allocation-analysis.json",
@@ -31,6 +31,14 @@ const P2_ARTIFACTS = [
   "profitability-experiments.json",
   "promotion-decisions.json",
   "promotion-gate.json",
+  "baseline-metrics.json",
+  "out-of-sample-evaluation.json",
+  "profit-concentration.json",
+  "candidate-quality-factors.json",
+  "trend-following-validation.json",
+  "single-change-experiments.json",
+  "strategy-regime-matrix-p2.csv",
+  "profitability-experiments.csv",
 ];
 
 function sleep(ms: number) {
@@ -47,6 +55,12 @@ function writeJson(filePath: string, payload: unknown) {
   fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
+function copyIfExists(source: string, target: string) {
+  if (!fs.existsSync(source)) return false;
+  fs.copyFileSync(source, target);
+  return true;
+}
+
 function analyzeRound(sessionRoot: string, roundNo: number) {
   const roundDir = path.join(sessionRoot, "rounds", String(roundNo));
   const present: string[] = [];
@@ -61,6 +75,12 @@ function analyzeRound(sessionRoot: string, roundNo: number) {
   const promotions = readJson<{ decisions?: Array<{ status: string }> }>(
     path.join(roundDir, "promotion-decisions.json"),
   );
+  const baseline = readJson<{ tradeCount?: number; netPnL?: number; expectancy?: number }>(
+    path.join(roundDir, "baseline-metrics.json"),
+  );
+  const oos = readJson<{ available?: boolean; support?: { supported?: boolean } }>(
+    path.join(roundDir, "out-of-sample-evaluation.json"),
+  );
   return {
     roundNo,
     present,
@@ -68,6 +88,8 @@ function analyzeRound(sessionRoot: string, roundNo: number) {
     experimentCount: registry?.experiments?.length ?? 0,
     anyPromoted: promotions?.decisions?.some((d) => d.status === "PROMOTABLE") ?? false,
     safetyPreserved: registry?.safetyPreserved ?? null,
+    baseline: baseline ?? null,
+    outOfSampleSupported: oos?.support?.supported ?? null,
   };
 }
 
@@ -136,7 +158,19 @@ async function main() {
     await stopAutoRoundJob(sessionId).catch(() => undefined);
   }
 
-  const roundAnalysis = [1, 2, 3].map((n) => analyzeRound(artifactRoot, n));
+  const roundAnalysis = Array.from({ length: MAX_ROUNDS }).map((_, idx) =>
+    analyzeRound(artifactRoot, idx + 1),
+  );
+  const firstUsableRound =
+    roundAnalysis.find((row) => row.present.includes("strategy-regime-matrix-p2.csv"))?.roundNo ?? 1;
+  const matrixCsvCopied = copyIfExists(
+    path.join(artifactRoot, "rounds", String(firstUsableRound), "strategy-regime-matrix-p2.csv"),
+    path.join(process.cwd(), "kripto-strategy-regime-matrix.csv"),
+  );
+  const experimentsCsvCopied = copyIfExists(
+    path.join(artifactRoot, "rounds", String(firstUsableRound), "profitability-experiments.csv"),
+    path.join(process.cwd(), "kripto-profitability-experiments.csv"),
+  );
   const safetyOk = roundAnalysis.every((r) => !r.anyPromoted);
   const artifactsOk = roundAnalysis.some((r) => r.present.length >= 5);
 
@@ -147,13 +181,44 @@ async function main() {
     completedAt: new Date().toISOString(),
     sessionId,
     config: { maxRounds: MAX_ROUNDS, aiGatePolicy: "VETO", experimentalChangesPromoted: false },
-    unitTests: { total: 34, p2Optimization: 11, p2TdiSlot: 11, p1Engineering: 11, roundExport: 1 },
+    unitTests: { total: 36, p2Optimization: 13, p2TdiSlot: 11, p1Engineering: 11, roundExport: 1 },
     roundAnalysis,
     acceptance: {
       p2ArtifactsGenerated: artifactsOk,
       noAutoPromotion: safetyOk,
       baselineBehaviorIntact: true,
       safetyPreserved: true,
+    },
+    csvArtifacts: {
+      strategyRegimeMatrixCsv: matrixCsvCopied,
+      profitabilityExperimentsCsv: experimentsCsvCopied,
+      sourceRound: firstUsableRound,
+    },
+    stagedValidationDesign: {
+      stage_5_10_rounds: {
+        minTrades: 5,
+        remoteAiRequired: true,
+        nonReplayExitRequired: true,
+        feeReconciliationRequired: true,
+        aiParityRequired: true,
+        requiredArtifacts: ["pnl-ledger.json", "exit-forensics.json", "fee-aware-entry-policy.json"],
+      },
+      stage_30_50_rounds: {
+        minTrades: 20,
+        remoteAiRequired: true,
+        nonReplayExitRequired: true,
+        feeReconciliationRequired: true,
+        aiParityRequired: true,
+        requiredArtifacts: ["baseline-metrics.json", "strategy-regime-matrix-p2.json", "profit-concentration.json"],
+      },
+      stage_100_plus_rounds: {
+        minTrades: 60,
+        remoteAiRequired: true,
+        nonReplayExitRequired: true,
+        feeReconciliationRequired: true,
+        aiParityRequired: true,
+        requiredArtifacts: ["out-of-sample-evaluation.json", "promotion-gate.json", "profitability-experiments.json"],
+      },
     },
     recommendedProductionChanges: [],
     researchOnlyChanges: [

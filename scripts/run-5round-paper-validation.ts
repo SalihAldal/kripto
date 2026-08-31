@@ -1,9 +1,13 @@
 /**
- * Controlled 5-round paper validation (P0/P1/P2 runtime proof).
+ * Controlled 10-round paper validation (P0/P1/P2 runtime proof).
  * Does NOT modify strategy, thresholds, or safety gates.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
+import { classifyRoundTerminalReason } from "@/src/server/forensics/round-terminal-classification.service";
+import { buildMicroBottleneckForensic } from "@/src/server/forensics/micro-bottleneck-forensic.service";
+import type { CandidateLifecycleState } from "@/src/server/candidate/candidate-store.service";
 
 for (const line of fs.readFileSync(".env", "utf8").split(/\r?\n/)) {
   if (!line || line.startsWith("#")) continue;
@@ -13,15 +17,36 @@ for (const line of fs.readFileSync(".env", "utf8").split(/\r?\n/)) {
   const v = line.slice(i + 1);
   if (!(k in process.env)) process.env[k] = v;
 }
+process.env.CANONICAL_RUNTIME_ENFORCE_NO_LEGACY_PERSIST = "true";
+process.env.SCANNER_WORKER_USE_LEGACY_PIPELINE = "false";
 
-const VALIDATION_ID = `5round-${new Date().toISOString().replace(/[:.]/g, "-")}`;
-const TOTAL_ROUNDS = 5;
-const MAX_WAIT_SEC = 600;
+const cli = Object.fromEntries(
+  process.argv
+    .slice(2)
+    .map((arg) => arg.trim())
+    .filter((arg) => arg.startsWith("--"))
+    .map((arg) => {
+      const [k, ...rest] = arg.slice(2).split("=");
+      return [k, rest.length ? rest.join("=") : "true"];
+    }),
+);
+
+const TOTAL_ROUNDS = Number(cli.rounds ?? 10);
+const VALIDATION_KIND = String(cli.kind ?? `${TOTAL_ROUNDS}round`);
+const VALIDATION_ID = `${VALIDATION_KIND}-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+const RESULT_FILE = String(cli.out ?? `kripto-${TOTAL_ROUNDS}round-paper-validation.json`);
+const MAX_WAIT_SEC = Number(cli.maxWaitSec ?? 600);
 const POLL_MS = 15_000;
-const JOB_DEADLINE_MS = 75 * 60_000;
+const MAX_ROUND_MINUTES = Number(cli.maxRoundMinutes ?? 30);
+const ENGINE_TERMINALIZATION_GRACE_MS = 180_000;
+const JOB_DEADLINE_MS = TOTAL_ROUNDS * MAX_ROUND_MINUTES * 60_000 + ENGINE_TERMINALIZATION_GRACE_MS;
+const HANDOFF_DIAGNOSTIC_MS = 15 * 60_000;
+const HANDOFF_TICK_MS = 5_000;
 
 const EXPECTED_ARTIFACTS = [
   "round-summary.json",
+  "round-liveness.json",
+  "selectionTimeBudgetBreakdown.json",
   "candidate-lifecycle.json",
   "ai-trace.json",
   "decision-trace.json",
@@ -64,6 +89,22 @@ function writeJson(filePath: string, payload: unknown) {
   fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
+async function waitForJobTerminalization(input: {
+  prisma: typeof import("@/src/server/db/prisma").prisma;
+  sessionId: string;
+  timeoutMs: number;
+}) {
+  const deadline = Date.now() + Math.max(1_000, input.timeoutMs);
+  while (Date.now() < deadline) {
+    const row = await input.prisma.autoRoundJob.findUnique({
+      where: { id: input.sessionId },
+      select: { status: true },
+    });
+    if (row && row.status !== "RUNNING") break;
+    await sleep(Math.min(POLL_MS, 5_000));
+  }
+}
+
 function roundDir(sessionId: string, roundId: string) {
   return path.join(process.cwd(), "artifacts", "forensics", sessionId, "rounds", roundId);
 }
@@ -74,6 +115,27 @@ type CriticalFailure = {
   roundId?: string;
   details?: Record<string, unknown>;
 };
+
+type CandidateTransitionEvent = {
+  at: number;
+  candidateId: string;
+  symbol: string;
+  lane: string;
+  state: CandidateLifecycleState;
+  reasons: string[];
+};
+
+function countStates(events: CandidateTransitionEvent[]) {
+  const byState: Record<string, number> = {};
+  const byLane: Record<string, Record<string, number>> = {};
+  for (const row of events) {
+    byState[row.state] = (byState[row.state] ?? 0) + 1;
+    const lane = row.lane || "UNKNOWN";
+    byLane[lane] = byLane[lane] ?? {};
+    byLane[lane][row.state] = (byLane[lane][row.state] ?? 0) + 1;
+  }
+  return { byState, byLane };
+}
 
 function validateAiGate(input: {
   roundId: string;
@@ -87,7 +149,10 @@ function validateAiGate(input: {
   const gateBlocks = input.decisions.filter(
     (row) =>
       row.stage === "execution" &&
-      (row.verdict === "REJECT" || row.reasonCode === "NO_TRADE" || String(row.executionVerdict) === "AI_GATE_BLOCK"),
+      (row.verdict === "REJECT" ||
+        row.verdict === "REJECTED" ||
+        row.reasonCode === "NO_TRADE" ||
+        String(row.executionVerdict) === "AI_GATE_BLOCK"),
   );
 
   for (const order of input.orders) {
@@ -95,7 +160,7 @@ function validateAiGate(input: {
     if (side !== "BUY" && side !== "SELL") continue;
     const aiVerdict = String(order.aiVerdict ?? "").toUpperCase();
     const execVerdict = String(order.executionVerdict ?? "");
-    if (BLOCKING_AI.has(aiVerdict) && execVerdict !== "AI_ADVISORY_ONLY") {
+    if (BLOCKING_AI.has(aiVerdict)) {
       failures.push({
         code: "AI_VETO_BYPASS",
         message: "Order created despite blocking AI verdict under VETO policy",
@@ -175,6 +240,7 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
   const root = roundDir(sessionId, rid);
   const exists = fs.existsSync(root);
   const missingArtifacts = EXPECTED_ARTIFACTS.filter((f) => !fs.existsSync(path.join(root, f)));
+  const hangSnapshotExists = fs.existsSync(path.join(root, "round-hang-snapshot.json"));
 
   const summary = readJson<Record<string, unknown>>(path.join(root, "round-summary.json"));
   const decisions = readJson<{ decisions?: Array<Record<string, unknown>> }>(path.join(root, "decision-trace.json"));
@@ -230,19 +296,27 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
   const aiInvoked = aiCandidates.length || (aiTrace?.aiCalls?.length ?? 0);
   const aiSuccess = aiCandidates.filter((r) => r.status === "COMPLETED").length;
   const aiFailed = aiCandidates.filter((r) => r.status === "AI_FAILED").length;
-  const remoteCount = (aiTrace?.aiCalls ?? []).filter((r) => r.remote === true).length;
+  const remoteCount = (aiTrace?.aiCalls ?? []).filter((r) => r.remote === true || r.executionMode === "REMOTE").length;
   const degradedCount = (aiTrace?.aiCalls ?? []).filter((r) => r.degraded === true).length;
 
   const riskPassed = riskRows.filter((r) => r.verdict === "PASS" || r.verdict === "APPROVED").length;
-  const riskRejected = riskRows.filter((r) => r.verdict === "REJECT" || r.verdict === "FAILED").length;
+  const riskRejected = riskRows.filter((r) => r.verdict === "REJECT" || r.verdict === "REJECTED" || r.verdict === "FAILED").length;
   const sizingPassed = riskRows.filter((r) => r.stage === "sizing" && (r.verdict === "PASS" || r.verdict === "APPROVED")).length;
-  const sizingRejected = riskRows.filter((r) => r.stage === "sizing" && (r.verdict === "REJECT" || r.verdict === "FAILED")).length;
+  const sizingRejected = riskRows.filter(
+    (r) => r.stage === "sizing" && (r.verdict === "REJECT" || r.verdict === "REJECTED" || r.verdict === "FAILED"),
+  ).length;
 
   const tdiApprovals = tdiRecords.filter((r) => r.verdict === "APPROVED").length;
   const tdiWaitCount = tdiRecords.filter((r) => r.verdict === "WAIT").length;
-  const tdiRejects = tdiRecords.filter((r) => r.verdict === "REJECT").length;
+  const tdiRejects = tdiRecords.filter((r) => r.verdict === "REJECT" || r.verdict === "REJECTED").length;
 
   const terminal = TERMINAL_ROUND_STATES.includes(String(roundMeta.state));
+  const terminalClassification = classifyRoundTerminalReason({
+    reason: String(roundMeta.failReason ?? summary?.failReason ?? ""),
+    reasonCode: String((watchdog?.reasonCode as string | undefined) ?? ""),
+    currentStage: String(roundMeta.state ?? summary?.currentStage ?? ""),
+  });
+  const hangSnapshotRequired = terminalClassification.terminalClass === "ABNORMAL_RUNTIME_TERMINAL";
   const durationMs =
     roundMeta.startedAt && roundMeta.endedAt
       ? new Date(String(roundMeta.endedAt)).getTime() - new Date(String(roundMeta.startedAt)).getTime()
@@ -253,6 +327,8 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
     roundId: rid,
     dbRunId: roundMeta.id,
     state: roundMeta.state,
+    startedAt: roundMeta.startedAt,
+    endedAt: roundMeta.endedAt,
     symbol: roundMeta.symbol,
     result: roundMeta.result,
     failReason: roundMeta.failReason,
@@ -263,6 +339,10 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
     artifactRoot: root,
     artifactsExist: exists,
     missingArtifacts,
+    hangSnapshotExists,
+    hangSnapshotRequired,
+    terminalClass: terminalClassification.terminalClass,
+    terminalClassRule: terminalClassification.matchedRule,
     roundManifestExists: fs.existsSync(path.join(root, "round-manifest.json")),
     candidateCount: Number(summary?.candidateCount ?? 0),
     tdi: { tdiApprovals, tdiWait: tdiWaitCount, tdiRejects, waitReasonDistribution: tdiWait.distribution, tdiWarnings: tdiWait.warnings },
@@ -286,7 +366,13 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
       positionsClosed: pnlEntries.length,
       openPositionsAtEnd: Math.max(0, orderRows.filter((r) => String(r.side).toUpperCase() === "BUY").length - pnlEntries.length),
     },
-    exit: { exitReasons, exitModels, exitEdgeNotProven: Object.keys(exitReasons).every((k) => k === "END_OF_REPLAY") && pnlEntries.length > 0 },
+    exit: {
+      exitReasons,
+      exitModels,
+      exitEdgeNotProven:
+        pnlEntries.length > 0 &&
+        Object.keys(exitReasons).every((k) => k === "TIME_EXIT" || k === "END_OF_REPLAY"),
+    },
     pnl: {
       grossPnL: Number(pnl?.summary?.grossPnL ?? summary?.grossPnL ?? 0),
       totalFees: Number(pnl?.summary?.totalFees ?? summary?.fees ?? 0),
@@ -370,11 +456,39 @@ async function main() {
     "@/src/server/execution/auto-round-engine.service"
   );
   const { runPaperSessionPreflight } = await import("@/src/server/forensics/paper-preflight.service");
+  const { getLegacyScannerTelemetry, resetLegacyScannerTelemetry } = await import(
+    "@/src/server/scanner/legacy-scanner-telemetry.service"
+  );
+  const { getCanonicalCandidateStore } = await import("@/src/server/candidate/candidate-store.service");
+  const { getCanonicalInstanceOwnership } = await import("@/src/server/candidate/instance-ownership.service");
+  const { getShadowOutcomeEngine } = await import("@/src/server/shadow-outcome/shadow-outcome-engine");
+  const { ensureMarketDataDaemonStarted } = await import("@/src/server/market-data/spine/daemon-worker");
+  const { getMarketDataDaemon } = await import("@/src/server/market-data/spine/market-data-daemon");
+  const { getOpportunityEngine } = await import("@/src/server/opportunity/opportunity-engine");
+  const { getMicrostructureEngine } = await import("@/src/server/microstructure/microstructure-engine");
+  const { observeCanonicalShadowTick } = await import("@/src/server/shadow-outcome/shadow-outcome-engine");
+  const { persistShadowOutcomes } = await import("@/src/server/shadow-outcome/persist");
   const { prisma } = await import("@/src/server/db/prisma");
   const { user } = await getRuntimeExecutionContext();
+  resetLegacyScannerTelemetry();
 
   const criticalFailures: CriticalFailure[] = [];
   const startedAt = new Date().toISOString();
+  const configSnapshot = {
+    EXECUTION_MODE: process.env.EXECUTION_MODE ?? null,
+    LIVE_TRADING_ENABLED: process.env.LIVE_TRADING_ENABLED ?? null,
+    LIVE_TRADING_ACK: process.env.LIVE_TRADING_ACK ?? null,
+    OPPORTUNITY_HOT_THRESHOLD: process.env.OPPORTUNITY_HOT_THRESHOLD ?? null,
+    OPPORTUNITY_WATCH_THRESHOLD: process.env.OPPORTUNITY_WATCH_THRESHOLD ?? null,
+    MICRO_WARMUP_MS: process.env.MICRO_WARMUP_MS ?? null,
+    MICRO_WARMUP_TRADES: process.env.MICRO_WARMUP_TRADES ?? null,
+    MICRO_DEEP_LIMIT: process.env.MICRO_DEEP_LIMIT ?? null,
+    EXECUTION_AI_GATE_POLICY: process.env.EXECUTION_AI_GATE_POLICY ?? null,
+    MAX_WAIT_SEC,
+    TOTAL_ROUNDS,
+    MAX_ROUND_MINUTES,
+  };
+  const configHash = createHash("sha256").update(JSON.stringify(configSnapshot)).digest("hex");
 
   const preflight = await runPaperSessionPreflight({
     userId: user.id,
@@ -388,10 +502,75 @@ async function main() {
       preflight,
       productionReadiness: "NOT_READY",
     };
-    writeJson(path.join(process.cwd(), "kripto-5round-paper-validation.json"), blocked);
+    writeJson(path.join(process.cwd(), RESULT_FILE), blocked);
     console.log(JSON.stringify(blocked, null, 2));
     await prisma.$disconnect();
     process.exit(2);
+  }
+
+  ensureMarketDataDaemonStarted();
+  const daemonAtStart = getMarketDataDaemon().telemetry();
+  const diagnosticStartedAt = Date.now();
+  const diagnosticCounters = {
+    opportunityEvaluations: 0,
+    discovered: 0,
+    hot: 0,
+    microAnalyzed: 0,
+    microConfirmed: 0,
+    deepActiveMax: 0,
+  };
+  while (Date.now() - diagnosticStartedAt < HANDOFF_DIAGNOSTIC_MS) {
+    const daemon = getMarketDataDaemon();
+    const opportunity = getOpportunityEngine().scan();
+    const micro = getMicrostructureEngine().evaluate(opportunity.ranked);
+    observeCanonicalShadowTick({
+      opportunity: opportunity.ranked,
+      micro: micro.ranked,
+      snapshots: daemon.getMarketSnapshot(),
+    });
+    await persistShadowOutcomes().catch(() => null);
+    diagnosticCounters.opportunityEvaluations += Number(opportunity.evaluated ?? 0);
+    diagnosticCounters.discovered += Number(opportunity.ranked.length ?? 0);
+    diagnosticCounters.hot += opportunity.ranked.filter((row) => row.state === "HOT" || row.state === "PROMOTED").length;
+    diagnosticCounters.microAnalyzed += Number(micro.hotCount ?? 0);
+    diagnosticCounters.microConfirmed += Number(micro.confirmedCount ?? 0);
+    diagnosticCounters.deepActiveMax = Math.max(
+      diagnosticCounters.deepActiveMax,
+      Number(daemon.telemetry().deepSubscriptions ?? 0),
+    );
+    await sleep(HANDOFF_TICK_MS);
+  }
+  const preRoundStore = getCanonicalCandidateStore().getTelemetry();
+  const preRoundShadow = getShadowOutcomeEngine().getTelemetry();
+  const preRoundMovers = getShadowOutcomeEngine().getMoverEvents().length;
+  const diagnosticPass = {
+    opportunityEvaluations: diagnosticCounters.opportunityEvaluations > 0,
+    discovered: diagnosticCounters.discovered > 0 || Number(preRoundStore.byState.DISCOVERED ?? 0) > 0,
+    hot: diagnosticCounters.hot > 0 || Number(preRoundStore.byState.HOT ?? 0) > 0,
+    microInput: diagnosticCounters.microAnalyzed > 0,
+    legacyInvocationZero: getLegacyScannerTelemetry().invocationTotal === 0,
+    legacyPersistZero: getLegacyScannerTelemetry().persistenceTotal === 0,
+    shadowTracked: Number(preRoundShadow.tracked ?? 0) > 0,
+    moverActive: Number(preRoundShadow.symbols ?? 0) > 0 && Number(preRoundShadow.lastTickAt ?? 0) > 0,
+  };
+  if (!Object.values(diagnosticPass).every(Boolean)) {
+    const blocked = {
+      validationId: VALIDATION_ID,
+      phase: "HANDOFF_DIAGNOSTIC_BLOCKED",
+      preflight,
+      diagnostic: {
+        pass: diagnosticPass,
+        counters: diagnosticCounters,
+        candidateStore: preRoundStore,
+        shadow: preRoundShadow,
+        moverEvents: preRoundMovers,
+      },
+      productionReadiness: "NOT_READY",
+    };
+    writeJson(path.join(process.cwd(), RESULT_FILE), blocked);
+    console.log(JSON.stringify(blocked, null, 2));
+    await prisma.$disconnect();
+    process.exit(4);
   }
 
   const started = await startAutoRoundJob({
@@ -409,7 +588,7 @@ async function main() {
 
   if (!started.started || !started.jobId) {
     const fail = { validationId: VALIDATION_ID, phase: "START_FAILED", started, preflight };
-    writeJson(path.join(process.cwd(), "kripto-5round-paper-validation.json"), fail);
+    writeJson(path.join(process.cwd(), RESULT_FILE), fail);
     console.log(JSON.stringify(fail, null, 2));
     await prisma.$disconnect();
     process.exit(3);
@@ -421,20 +600,44 @@ async function main() {
 
   const deadline = Date.now() + JOB_DEADLINE_MS;
   let lastStatus: Awaited<ReturnType<typeof getAutoRoundStatus>> | null = null;
+  let statusReadFailures = 0;
   while (Date.now() < deadline) {
-    lastStatus = await getAutoRoundStatus(user.id);
-    const jobRow = await prisma.autoRoundJob.findUnique({ where: { id: sessionId } });
-    if (jobRow && jobRow.status !== "RUNNING") break;
+    try {
+      lastStatus = await getAutoRoundStatus(user.id);
+      statusReadFailures = 0;
+      const jobRow = await prisma.autoRoundJob.findUnique({ where: { id: sessionId } });
+      if (jobRow && jobRow.status !== "RUNNING") break;
+    } catch (error) {
+      statusReadFailures += 1;
+      if (statusReadFailures >= 8) throw error;
+      await sleep(5_000);
+      continue;
+    }
     await sleep(POLL_MS);
   }
 
-  const finalJob = await prisma.autoRoundJob.findUnique({
+  let finalJob = await prisma.autoRoundJob.findUnique({
     where: { id: sessionId },
     include: { rounds: { orderBy: { roundNo: "asc" } } },
   });
 
+  let engineGraceObservedMs = 0;
   if (finalJob?.status === "RUNNING") {
+    const graceStartedAt = Date.now();
     await stopAutoRoundJob(user.id).catch(() => null);
+    await waitForJobTerminalization({
+      prisma,
+      sessionId,
+      timeoutMs: ENGINE_TERMINALIZATION_GRACE_MS,
+    });
+    engineGraceObservedMs = Date.now() - graceStartedAt;
+    finalJob = await prisma.autoRoundJob.findUnique({
+      where: { id: sessionId },
+      include: { rounds: { orderBy: { roundNo: "asc" } } },
+    });
+  }
+
+  if (finalJob?.status === "RUNNING") {
     criticalFailures.push({
       code: "JOB_TIMEOUT",
       message: `Job still RUNNING after ${JOB_DEADLINE_MS / 60_000} minutes`,
@@ -444,6 +647,8 @@ async function main() {
   const roundAnalyses = (finalJob?.rounds ?? []).map((r) =>
     analyzeRound(sessionId, r.roundNo, r as unknown as Record<string, unknown>),
   );
+  const storeTelemetry = getCanonicalCandidateStore().getTelemetry();
+  const transitionEvents = (storeTelemetry.recentTransitions ?? []) as CandidateTransitionEvent[];
 
   for (const ra of roundAnalyses) {
     criticalFailures.push(...ra.p0.criticalFailures);
@@ -461,6 +666,13 @@ async function main() {
         roundId: ra.roundId,
       });
     }
+    if (ra.hangSnapshotRequired && !ra.hangSnapshotExists) {
+      criticalFailures.push({
+        code: "HANG_SNAPSHOT_MISSING",
+        message: `Round ${ra.roundNo} abnormal terminal but hang snapshot is missing`,
+        roundId: ra.roundId,
+      });
+    }
   }
 
   const zombieCount = await prisma.autoRoundRun.count({
@@ -475,7 +687,7 @@ async function main() {
   }
 
   const tradeRound = roundAnalyses.find((r) => r.pnl.tradeCount > 0);
-  const dbConsistency = tradeRound ? await compareDbTrade(prisma, sessionId, tradeRound) : { status: "NO_TRADES", message: "Zero trades across 5 rounds — pipeline blocking stage analysis required" };
+  const dbConsistency = tradeRound ? await compareDbTrade(prisma, sessionId, tradeRound) : { status: "NO_TRADES", message: "Zero trades across 10 rounds — pipeline blocking stage analysis required" };
 
   const allPnl = roundAnalyses.flatMap((r) => {
     const p = readJson<{ entries?: Array<Record<string, unknown>> }>(path.join(r.artifactRoot, "pnl-ledger.json"));
@@ -486,12 +698,34 @@ async function main() {
   const grossPnL = allPnl.reduce((a, r) => a + Number(r.grossPnL ?? 0), 0);
   const totalFees = allPnl.reduce((a, r) => a + Number(r.totalFee ?? 0), 0);
   const netPnL = allPnl.reduce((a, r) => a + Number(r.netPnL ?? 0), 0);
+  const microForensic = await buildMicroBottleneckForensic({
+    startedAt: new Date(startedAt),
+    completedAt: new Date(),
+    moverTarget: Number((getShadowOutcomeEngine().getMoverEvents() ?? []).length || 6),
+  });
 
   const stopEarly = criticalFailures.some((f) =>
     ["AI_VETO_BYPASS", "AI_GATE_CONTRADICTION", "PNL_FEE_MISMATCH"].includes(f.code),
   );
 
   const terminalRounds = roundAnalyses.filter((r) => r.terminal).length;
+  const daemonAtEnd = getMarketDataDaemon().telemetry();
+  const ws1008Count = Number(daemonAtEnd.recentSocketCloses?.filter?.((x: { code?: number }) => Number(x?.code) === 1008)?.length ?? 0);
+  const legacyScanner = getLegacyScannerTelemetry();
+  if (legacyScanner.invocationTotal > 0) {
+    criticalFailures.push({
+      code: "LEGACY_SCANNER_INVOCATION_NONZERO",
+      message: `legacyScannerInvocationCount=${legacyScanner.invocationTotal}`,
+      details: { recent: legacyScanner.recentInvocations },
+    });
+  }
+  if (legacyScanner.persistenceTotal > 0) {
+    criticalFailures.push({
+      code: "LEGACY_SCANNER_PERSIST_NONZERO",
+      message: `legacyScannerPersistCount=${legacyScanner.persistenceTotal}`,
+      details: { recent: legacyScanner.recentPersistence },
+    });
+  }
   let productionReadiness: "NOT_READY" | "CONDITIONAL_READY" | "READY" = "NOT_READY";
   if (stopEarly || criticalFailures.some((f) => f.code.startsWith("AI_") || f.code === "PNL_FEE_MISMATCH")) {
     productionReadiness = "NOT_READY";
@@ -512,12 +746,24 @@ async function main() {
       aiGatePolicy: process.env.EXECUTION_AI_GATE_POLICY ?? "VETO",
       maxWaitSec: MAX_WAIT_SEC,
       totalRounds: TOTAL_ROUNDS,
+      maxRoundMinutes: MAX_ROUND_MINUTES,
+      terminalizationGraceMs: ENGINE_TERMINALIZATION_GRACE_MS,
+      configHash,
+      snapshot: configSnapshot,
     },
     preflight: {
       canStart: preflight.canStart,
       overallVerdict: preflight.overallVerdict,
       checks: preflight.checks,
       artifactPath: path.join(sessionRoot, "preflight.json"),
+    },
+    handoffDiagnostic: {
+      durationSec: Math.round((Date.now() - diagnosticStartedAt) / 1000),
+      counters: diagnosticCounters,
+      pass: diagnosticPass,
+      candidateStore: preRoundStore,
+      shadow: preRoundShadow,
+      moverEvents: preRoundMovers,
     },
     job: finalJob
       ? {
@@ -529,7 +775,46 @@ async function main() {
           finishedAt: finalJob.finishedAt,
         }
       : null,
-    rounds: roundAnalyses,
+    canonical: {
+      legacyScannerInvocationCount: legacyScanner.invocationTotal,
+      legacyScannerPersistCount: legacyScanner.persistenceTotal,
+      instanceOwnership: getCanonicalInstanceOwnership(),
+      candidateStore: {
+        instanceId: storeTelemetry.instanceId,
+        created: storeTelemetry.created,
+        transitions: storeTelemetry.transitions,
+        active: storeTelemetry.active,
+        executionReady: storeTelemetry.executionReady,
+        byState: storeTelemetry.byState,
+      },
+    },
+    rounds: roundAnalyses.map((ra) => {
+      const started = Date.parse(String((ra as { startedAt?: string }).startedAt ?? ""));
+      const ended = Date.parse(String((ra as { endedAt?: string }).endedAt ?? ""));
+      const inWindow = transitionEvents.filter((e) => {
+        if (!Number.isFinite(started) || !Number.isFinite(ended)) return true;
+        return e.at >= started && e.at <= ended;
+      });
+      const counts = countStates(inWindow);
+      return {
+        ...ra,
+        funnel: counts.byState,
+        lanes: counts.byLane,
+      };
+    }),
+    totalFunnel: countStates(transitionEvents),
+    shadow: {
+      tracked: getShadowOutcomeEngine().getTracked().length,
+      movers: getShadowOutcomeEngine().getMoverEvents().length,
+    },
+    marketRuntime: {
+      start: daemonAtStart,
+      end: daemonAtEnd,
+      ws1008Count,
+      priceDriftRejectCount: roundAnalyses.filter((r) => String(r.failReason ?? "").includes("Price drift exceeds tolerance")).length,
+      flashCandleRejectCount: roundAnalyses.filter((r) => String(r.failReason ?? "").includes("Flash candle price jump")).length,
+    },
+    microForensic,
     profitability: {
       classification: "NOT_PROVEN",
       trades: allPnl.length,
@@ -538,7 +823,7 @@ async function main() {
       grossPnL: Number(grossPnL.toFixed(4)),
       fees: Number(totalFees.toFixed(4)),
       netPnL: Number(netPnL.toFixed(4)),
-      note: "5-round validation sample only — not a profitability proof",
+      note: "10-round validation sample only — not a profitability proof",
     },
     dbConsistency,
     criticalFailures,
@@ -546,10 +831,11 @@ async function main() {
     zombieCount,
     terminalRounds,
     productionReadiness,
+    engineGraceObservedMs,
     lastStatus,
   };
 
-  writeJson(path.join(process.cwd(), "kripto-5round-paper-validation.json"), result);
+  writeJson(path.join(process.cwd(), RESULT_FILE), result);
   console.log(JSON.stringify(result, null, 2));
   await prisma.$disconnect();
   process.exit(stopEarly ? 10 : criticalFailures.length > 0 ? 11 : 0);

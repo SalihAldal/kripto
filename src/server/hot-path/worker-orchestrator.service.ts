@@ -1,6 +1,7 @@
 import { env } from "@/lib/config";
 import { logger } from "@/lib/logger";
 import { ensureScannerWorkerStarted, getScannerWorkerState } from "@/src/server/scanner/scanner-worker.service";
+import { ensureMarketDataDaemonStarted, getMarketDataDaemonWorkerState } from "@/src/server/market-data/spine/daemon-worker";
 import { ensurePumpEarlyCatcherStarted, getPumpEarlyCatcherState } from "@/src/server/scanner/pump-early-catcher.service";
 import { ensureDecisionReplayWorkersStarted, getDecisionReplayWorkerState } from "@/src/server/replay/decision-replay-workers";
 import { ensureMarketIntelWorkersStarted, getMarketIntelWorkerState } from "@/src/server/market-intelligence/market-intelligence-workers";
@@ -38,11 +39,13 @@ import {
   validateCriticalWorkerBudget,
 } from "@/src/server/hot-path/legacy-worker-freeze.service";
 import { LEGACY_WORKER_REGISTRY } from "@/src/server/hot-path/hot-path.registry";
+import { claimCriticalWorker } from "@/src/server/hot-path/worker-ownership.service";
 import type { HotPathWorkerBootResult, WorkerRuntimeSnapshot } from "@/src/server/hot-path/hot-path.types";
 
 type WorkerStarter = { id: string; start: () => { running: boolean }; getState: () => { running: boolean } };
 
 const WORKER_STARTERS: WorkerStarter[] = [
+  { id: "market-data-daemon", start: ensureMarketDataDaemonStarted, getState: getMarketDataDaemonWorkerState },
   { id: "scanner", start: ensureScannerWorkerStarted, getState: getScannerWorkerState },
   { id: "pump-early-catcher", start: ensurePumpEarlyCatcherStarted, getState: getPumpEarlyCatcherState },
   { id: "discovery", start: ensureDiscoveryWorkersStarted, getState: getDiscoveryWorkerState },
@@ -98,6 +101,36 @@ export async function bootHotPathWorkers(): Promise<HotPathWorkerBootResult> {
       continue;
     }
 
+    if (definition.tier === "CRITICAL") {
+      const claim = claimCriticalWorker(starter.id);
+      if (!claim.ok) {
+        const skipped = buildWorkerSnapshot(starter.id, false);
+        skipped.skippedReason = claim.reason;
+        skipped.enabled = false;
+        skipped.running = false;
+        workers.push(skipped);
+        logger.error(
+          { workerId: starter.id, reason: claim.reason },
+          "Critical worker start refused",
+        );
+        continue;
+      }
+    }
+
+    const projectedCritical =
+      workers.filter((w) => w.enabled && w.running && w.tier === "CRITICAL").length +
+      (definition.tier === "CRITICAL" ? 1 : 0);
+    const budget = validateCriticalWorkerBudget(projectedCritical);
+    if (!budget.ok) {
+      const skipped = buildWorkerSnapshot(starter.id, false);
+      skipped.skippedReason = "CRITICAL_WORKER_BUDGET_EXCEEDED";
+      skipped.enabled = false;
+      skipped.running = false;
+      workers.push(skipped);
+      logger.error({ message: budget.message, workerId: starter.id }, "Critical worker budget exceeded — start refused");
+      continue;
+    }
+
     const state = starter.start();
     workers.push(buildWorkerSnapshot(starter.id, state.running));
   }
@@ -105,11 +138,6 @@ export async function bootHotPathWorkers(): Promise<HotPathWorkerBootResult> {
   const activeCount = workers.filter((w) => w.enabled && w.running).length;
   const frozenCount = workers.filter((w) => !w.enabled).length;
   const criticalActive = workers.filter((w) => w.enabled && w.running && w.tier === "CRITICAL").length;
-
-  const budget = validateCriticalWorkerBudget(criticalActive);
-  if (!budget.ok) {
-    logger.warn({ message: budget.message }, "Hot path critical worker budget exceeded");
-  }
 
   const result: HotPathWorkerBootResult = {
     workers,

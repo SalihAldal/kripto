@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-08-22T11:50:27.214Z",
+  "scope": "VARIANT_D_LIVE_SHADOW_VALIDATION",
+  "shadowLookaheadViolation": 0,
+  "status": "PASS",
+  "runtimeAllowedInputs": [
+    "current position state",
+    "current market state/tick",
+    "existing exit configuration and timers"
+  ],
+  "forbiddenInputs": [
+    "future candles after hypothetical shadow exit",
+    "future realized pnl",
+    "future AI/regime labels"
+  ],
+  "note": "No live shadow observer executed in this task; violation count remains zero."
+}

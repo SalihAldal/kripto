@@ -1,0 +1,177 @@
+{
+  "reportId": "kripto-p0-final-hang-snapshot-fix",
+  "generatedAt": "2026-08-21T21:45:00.000Z",
+  "scope": "P0_FINAL_HANG_SNAPSHOT_EXPORT_AND_ABNORMAL_TERMINAL_FORENSICS",
+  "constraints": {
+    "codeChangesAllowed": true,
+    "strategyBehaviorChanged": false,
+    "riskSizingFeeBehaviorChanged": false,
+    "configChanged": false
+  },
+  "previousGap": {
+    "sessionId": "cmt3epoap0009un5od3he1qce",
+    "round1": {
+      "terminal": "tur_basarisiz",
+      "reason": "Tur secim suresi doldu (1200s)",
+      "hangSnapshotPresentBeforeFix": false
+    },
+    "round2": {
+      "terminal": "tur_basarisiz",
+      "reason": "AI_GATE_BLOCK: AI_VETO",
+      "hangSnapshotPresentBeforeFix": false
+    },
+    "problem": "hang snapshot semantics were not contract-driven by terminal class"
+  },
+  "classification": {
+    "canonicalSource": "src/server/forensics/round-terminal-classification.service.ts",
+    "normalTerminalExamples": [
+      "AI_GATE_BLOCK: AI_VETO",
+      "TDI_WAIT",
+      "TDI_REJECT",
+      "RISK_REJECT",
+      "SIM_TIGHT_FILTER",
+      "NO_CANDIDATE(S)"
+    ],
+    "abnormalRuntimeTerminalExamples": [
+      "SELECTION_BUDGET_EXCEEDED",
+      "BUDGET_EXPIRED",
+      "ROUND_STALLED",
+      "JOB_TIMEOUT",
+      "ROUND_NOT_TERMINAL",
+      "PERSIST_TIMEOUT",
+      "DEPENDENCY_RETRY_BUDGET_EXHAUSTED",
+      "AI_TIMEOUT_STALL",
+      "CANCELLATION_RUNTIME",
+      "SCHEDULER_RUNTIME_FAILURE",
+      "WATCHDOG_TERMINATION"
+    ]
+  },
+  "canonicalTrigger": {
+    "function": "ensureRoundHangSnapshotForAbnormalTerminal",
+    "location": "src/server/forensics/round-progress-watchdog.service.ts",
+    "wiredPaths": [
+      "src/server/execution/round-selection.service.ts::terminalizeRound (budget/stall watchdog path)",
+      "src/server/execution/auto-round-engine.service.ts::failRound (all failed terminalization paths)",
+      "src/server/forensics/ai-runtime.service.ts::writeMinimumAiStallArtifacts"
+    ],
+    "idempotency": "roundId + terminalReasonCode/terminalReason",
+    "failureVisibility": "export-error.json with artifact/roundId/reason/errorType/stackDigest/timestamp"
+  },
+  "snapshotSchema": {
+    "schemaVersion": "hang-snapshot-v1",
+    "requiredFieldsImplemented": [
+      "roundId",
+      "jobId",
+      "sessionId",
+      "terminalReason",
+      "terminalReasonCode",
+      "terminalClass",
+      "currentStage",
+      "startedAt",
+      "snapshotAt",
+      "endedAt",
+      "selectionBudgetMs",
+      "selectionElapsedMs",
+      "remainingBudgetMs",
+      "lastMeaningfulProgressAt",
+      "meaningfulProgressAgeMs",
+      "lastHeartbeatAt",
+      "heartbeatAgeMs",
+      "lastScannerProgressAt",
+      "lastMarketDataProgressAt",
+      "lastPumpProgressAt",
+      "lastAIProgressAt",
+      "lastTDIProgressAt",
+      "lastPersistAt",
+      "activeCandidates",
+      "activeAI",
+      "activeScannerWork",
+      "activePumpWork",
+      "activeDBWork",
+      "poolActive",
+      "poolQueued",
+      "retryCount",
+      "activeRetries",
+      "watchdogState",
+      "watchdogDecision",
+      "recoveryState",
+      "abortRequested",
+      "abortReason",
+      "terminalizationStartedAt",
+      "terminalizationDurationMs",
+      "dbTransientFailures",
+      "marketDataFailures",
+      "fallbackCount",
+      "selectionTimeBudgetBreakdownRef",
+      "roundLivenessRef",
+      "recoveryTelemetryRef"
+    ],
+    "safety": "raw runtime/watchdog deep objects are not embedded directly"
+  },
+  "prismaEmptyResponseAssessment": {
+    "observedError": "PrismaClientUnknownRequestError: Response from the Engine was empty",
+    "observedAt": "validator process during ai-performance read path",
+    "criticalPersistenceSemanticsChanged": false,
+    "forensicResilienceChanges": [
+      "runtime read failure in round-forensic-export recorded in tracker.failed as AUTO_ROUND_RUN_READ_FAILED",
+      "hang snapshot export failure always produces export-error.json (best effort) and never blocks business terminalization"
+    ]
+  },
+  "tests": {
+    "command": "pnpm vitest run tests/forensics/hang-snapshot-contract.test.ts tests/ai-cancellation.test.ts tests/forensics/forensic-export-runner.test.ts",
+    "result": "PASS",
+    "files": 3,
+    "tests": 22,
+    "newCoverageHighlights": [
+      "budget exceeded -> hang snapshot",
+      "round stalled/job timeout/persist timeout/retry budget exhausted -> hang snapshot",
+      "AI_VETO/TDI_REJECT/SIM_TIGHT_FILTER -> no required hang snapshot",
+      "idempotent duplicate abnormal terminalization",
+      "export-error.json on snapshot export failure",
+      "required snapshot fields exist",
+      "cyclic payload does not crash export",
+      "export failure is non-blocking"
+    ]
+  },
+  "controlledValidation": {
+    "type": "deterministic replay validation",
+    "sessionId": "cmt3epoap0009un5od3he1qce",
+    "rounds": [
+      {
+        "roundNo": 1,
+        "reason": "Tur secim suresi doldu (1200s)",
+        "terminalClass": "ABNORMAL_RUNTIME_TERMINAL",
+        "beforeHangSnapshot": false,
+        "ensureResult": "WRITTEN",
+        "afterHangSnapshot": true
+      },
+      {
+        "roundNo": 2,
+        "reason": "AI_GATE_BLOCK: AI_VETO",
+        "terminalClass": "NORMAL_TERMINAL",
+        "beforeHangSnapshot": false,
+        "ensureResult": "NORMAL_TERMINAL",
+        "afterHangSnapshot": false
+      }
+    ],
+    "runtimeStateAfterValidation": {
+      "runningJobs": 0,
+      "runningRounds": 0,
+      "activeLocks": 0,
+      "openAIStarted": 0
+    }
+  },
+  "remainingBlockers": [
+    "Full live 2-round post-fix runtime campaign was not rerun in this task; deterministic replay + tests were used for contract proof."
+  ],
+  "finalVerdict": {
+    "HANG_SNAPSHOT_CONTRACT": "PASS",
+    "ABNORMAL_TERMINAL_EXPORT": "PASS",
+    "NORMAL_TERMINAL_SEMANTICS": "PASS",
+    "EXPORT_FAILURE_VISIBLE": "PASS",
+    "PRISMA_FORENSIC_RESILIENCE": "PARTIAL",
+    "RUNTIME_LIVENESS": "PASS",
+    "READY_FOR_5_ROUNDS": "CONDITIONAL",
+    "READY_FOR_50_ROUNDS": "CONDITIONAL"
+  }
+}

@@ -82,7 +82,11 @@ describe("fast-entry route integration", () => {
     expect(res.status).toBe(200);
     expect(json.ok).toBe(true);
     expect(json.selected.symbol).toBe("BTCTRY");
-    expect(getBestFastEntryMock).toHaveBeenCalledWith({ scanLimit: 100 });
+    expect(getBestFastEntryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scanLimit: 100,
+      }),
+    );
     expect(openTradeMock).toHaveBeenCalledWith(
       expect.objectContaining({
         symbol: "BTCTRY",

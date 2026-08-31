@@ -1,0 +1,29 @@
+{
+  "source": "kripto-5round-paper-validation.json",
+  "classification": "COUNTER_SCOPE",
+  "violationCount": 3,
+  "violations": [
+    {
+      "roundNo": 3,
+      "candidateCount": 0,
+      "tdiWait": 37,
+      "tdiRejects": 463,
+      "aiInvoked": 102
+    },
+    {
+      "roundNo": 4,
+      "candidateCount": 0,
+      "tdiWait": 37,
+      "tdiRejects": 463,
+      "aiInvoked": 97
+    },
+    {
+      "roundNo": 5,
+      "candidateCount": 0,
+      "tdiWait": 37,
+      "tdiRejects": 463,
+      "aiInvoked": 80
+    }
+  ],
+  "fix": "ROUND_SCOPED_FILTER_IN_EXPORT"
+}

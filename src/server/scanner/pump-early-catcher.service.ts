@@ -5,11 +5,21 @@ import { markHeartbeat } from "@/src/server/observability/heartbeat";
 import { buildMarketContext } from "@/src/server/scanner/market-context-builder";
 import { evaluateMomentumBreakout } from "@/src/server/scanner/momentum-breakout.service";
 import { scoreContext } from "@/src/server/scanner/signal-scoring.engine";
-import { discoverTopGainerSymbols, type TopGainerDiscoveryItem } from "@/src/server/scanner/top-gainer-discovery.service";
-import { getExchangeProvider } from "@/src/server/exchange";
+import {
+  discoverTopGainerSymbols,
+  getTopGainerCacheMeta,
+  type TopGainerDiscoveryItem,
+} from "@/src/server/scanner/top-gainer-discovery.service";
+import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
 import { resolveWatchlist } from "@/src/server/scanner/watchlist.service";
+import {
+  resolveMarketContextTimeoutMs,
+  runCooperativePool,
+  withBoundedAwait,
+} from "@/src/server/execution/cooperative-async.service";
 import type { MomentumBreakoutAssessment } from "@/src/server/scanner/momentum-breakout.service";
 import type { ScannerCandidate } from "@/src/types/scanner";
+import { recordPumpScanEvent } from "@/src/server/scanner/pump-scan-lifecycle.service";
 
 type PumpEarlyWatcherState = {
   running: boolean;
@@ -62,7 +72,9 @@ function activeCandidateTtlMs() {
 }
 
 function livePumpCacheTtlMs() {
-  return Math.max(8_000, env.PUMP_LIVE_SCAN_CACHE_MS);
+  const configured = Math.max(8_000, env.PUMP_LIVE_SCAN_CACHE_MS);
+  const watcherAwareFloor = Math.max(30_000, Math.floor(Math.max(state.intervalMs, 5_000) * 2));
+  return Math.max(configured, watcherAwareFloor);
 }
 
 function pumpCandidateListCap(requested: number) {
@@ -130,19 +142,36 @@ function nextBatch(symbols: string[]) {
 async function mapWithConcurrency<T, R>(
   items: T[],
   concurrency: number,
-  worker: (item: T) => Promise<R>,
+  worker: (item: T, index: number, signal: AbortSignal) => Promise<R>,
+  options?: {
+    abortSignal?: AbortSignal;
+    selectionDeadlineMs?: number;
+    onItemComplete?: (processed: number, total: number) => void | Promise<void>;
+    workerTimeoutMs?: number;
+    label?: string;
+  },
 ) {
-  const results: Array<R | null> = new Array(items.length).fill(null);
-  let next = 0;
-  const runners = Array.from({ length: Math.max(1, Math.min(concurrency, items.length || 1)) }).map(async () => {
-    while (next < items.length) {
-      const index = next;
-      next += 1;
-      results[index] = await worker(items[index]).catch(() => null);
-    }
-  });
-  await Promise.all(runners);
-  return results;
+  if (items.length === 0) return [];
+  return runCooperativePool(
+    items,
+    async (item, index, signal) => {
+      try {
+        return await worker(item, index, signal);
+      } catch {
+        return null;
+      }
+    },
+    {
+      label: options?.label ?? "pump-scan-map",
+      concurrency: Math.max(1, Math.min(concurrency, items.length || 1)),
+      workerTimeoutMs: options?.workerTimeoutMs ?? resolveMarketContextTimeoutMs(),
+      abortSignal: options?.abortSignal,
+      selectionDeadlineMs: options?.selectionDeadlineMs,
+      onItemComplete: async (processed, total) => {
+        await options?.onItemComplete?.(processed, total);
+      },
+    },
+  );
 }
 
 function evaluatePumpPriority(candidate: ScannerCandidate) {
@@ -334,11 +363,12 @@ function evaluateIntradaySpikeContinuation(candidate: ScannerCandidate, leader: 
   };
 }
 
-async function discoverIntradaySpikeLeaders(limit = 32): Promise<TopGainerDiscoveryItem[]> {
+async function discoverIntradaySpikeLeaders(
+  limit = 32,
+  options?: { abortSignal?: AbortSignal; selectionDeadlineMs?: number },
+): Promise<TopGainerDiscoveryItem[]> {
   if (!env.PUMP_INTRADAY_ENABLED) return [];
-  const provider = getExchangeProvider();
-  if (!provider.listTickers24h) return [];
-  const rows = await provider.listTickers24h();
+  const rows = await marketDataGateway.listTickers24h();
   const quoteSuffix = env.BINANCE_PLATFORM === "tr" ? "TRY" : "USDT";
   const minVolume = Math.max(80_000, env.SCANNER_MIN_VOLUME_24H * 0.25);
   const seeds = rows
@@ -351,8 +381,22 @@ async function discoverIntradaySpikeLeaders(limit = 32): Promise<TopGainerDiscov
   const hits = await mapWithConcurrency(
     seeds,
     Math.max(3, Math.min(10, env.SCANNER_CONTEXT_CONCURRENCY)),
-    async (row): Promise<TopGainerDiscoveryItem | null> => {
-      const context = await buildMarketContext(row.symbol, { lite: true, priority: "high" }).catch(() => null);
+    async (row, _index, signal): Promise<TopGainerDiscoveryItem | null> => {
+      const context = await withBoundedAwait(
+        `intraday-lite:${row.symbol}`,
+        (innerSignal) =>
+          buildMarketContext(row.symbol, {
+            lite: true,
+            priority: "high",
+            signal: innerSignal,
+            timeoutMs: resolveMarketContextTimeoutMs(),
+            allowBackgroundIntelCapture: false,
+          }),
+        resolveMarketContextTimeoutMs(),
+        undefined,
+        undefined,
+        { signal },
+      ).catch(() => null);
       if (!context) return null;
       const shortMomentum = finite(context.metadata.shortMomentumPercent);
       const hourMomentum = finite(context.metadata.hourMomentumPercent);
@@ -375,7 +419,15 @@ async function discoverIntradaySpikeLeaders(limit = 32): Promise<TopGainerDiscov
         volume24h: row.volume24h,
         priorityScore: Number((row.change24h * 0.55 + shortMomentum * 18 + flow * 80).toFixed(2)),
         reason: `intraday-spike 24h=${row.change24h.toFixed(2)}% short=${shortMomentum.toFixed(2)}% flow=${flow.toFixed(3)}`,
+        discoveredAt: new Date().toISOString(),
+        source: "TOP_GAINER_24H",
       };
+    },
+    {
+      abortSignal: options?.abortSignal,
+      selectionDeadlineMs: options?.selectionDeadlineMs,
+      workerTimeoutMs: resolveMarketContextTimeoutMs(),
+      label: "intraday-spike-discovery",
     },
   );
 
@@ -435,11 +487,20 @@ function evaluateStrongGainerFastTrack(candidate: ScannerCandidate, leader: TopG
   };
 }
 
-async function scanTopPumpCandidates(limit = 6) {
-  const effectiveLimit = pumpCandidateListCap(limit);
+async function scanTopPumpCandidates(options?: {
+  limit?: number;
+  abortSignal?: AbortSignal;
+  selectionDeadlineMs?: number;
+  maxSymbolsToEvaluate?: number;
+  onProgress?: (processed: number, total: number) => void | Promise<void>;
+}) {
+  const effectiveLimit = pumpCandidateListCap(options?.limit ?? 6);
   const [topGainers, intradaySpikes] = await Promise.all([
     discoverTopGainerSymbols(Math.max(36, env.PUMP_CONTINUATION_SCAN_LIMIT)).catch(() => [] as TopGainerDiscoveryItem[]),
-    discoverIntradaySpikeLeaders(env.PUMP_INTRADAY_SCAN_LIMIT).catch(() => [] as TopGainerDiscoveryItem[]),
+    discoverIntradaySpikeLeaders(env.PUMP_INTRADAY_SCAN_LIMIT, {
+      abortSignal: options?.abortSignal,
+      selectionDeadlineMs: options?.selectionDeadlineMs,
+    }).catch(() => [] as TopGainerDiscoveryItem[]),
   ]);
   const symbols = await resolveWatchlist().catch(() => [] as string[]);
   const leaderMap = new Map<string, TopGainerDiscoveryItem>();
@@ -451,7 +512,12 @@ async function scanTopPumpCandidates(limit = 6) {
   }
   const hotLeaders = [...leaderMap.values()].sort((a, b) => b.change24h - a.change24h);
   const hotSymbols = hotLeaders.slice(0, Math.max(effectiveLimit * 3, 36)).map((row) => row.symbol);
-  const batch = Array.from(new Set([...hotSymbols, ...leaderMap.keys(), ...nextBatch(symbols)]));
+  const leaderExtras = [...leaderMap.keys()].slice(0, Math.max(effectiveLimit * 2, 24));
+  const maxSymbolsToEvaluate =
+    typeof options?.maxSymbolsToEvaluate === "number"
+      ? Math.max(1, Math.min(96, Math.floor(options.maxSymbolsToEvaluate)))
+      : Math.max(effectiveLimit, Math.min(96, Math.max(36, effectiveLimit * 4)));
+  const batch = Array.from(new Set([...hotSymbols, ...leaderExtras, ...nextBatch(symbols)])).slice(0, maxSymbolsToEvaluate);
   let earlyHits = 0;
   let continuationHits = 0;
   let intradayHits = 0;
@@ -459,10 +525,24 @@ async function scanTopPumpCandidates(limit = 6) {
   const rows = await mapWithConcurrency(
     batch,
     Math.max(2, Math.min(8, env.SCANNER_CONTEXT_CONCURRENCY)),
-    async (symbol): Promise<PumpEarlyCandidate | null> => {
+    async (symbol, _index, signal): Promise<PumpEarlyCandidate | null> => {
       const leader = leaderMap.get(symbol);
       const isIntradayLeader = leader?.reason.includes("intraday-spike") ?? false;
-      const context = await buildMarketContext(symbol, { lite: false, priority: "high" });
+      const context = await withBoundedAwait(
+        `pump-context:${symbol}`,
+        (innerSignal) =>
+          buildMarketContext(symbol, {
+            lite: false,
+            priority: "high",
+            signal: innerSignal,
+            timeoutMs: resolveMarketContextTimeoutMs(),
+            allowBackgroundIntelCapture: false,
+          }),
+        resolveMarketContextTimeoutMs(),
+        undefined,
+        undefined,
+        { signal },
+      );
       const enrichedContext = attachTopGainerMeta(context, leader);
       const score = scoreContext(enrichedContext);
       const candidate: ScannerCandidate = { rank: 1, context: enrichedContext, score };
@@ -530,6 +610,15 @@ async function scanTopPumpCandidates(limit = 6) {
       }
       return null;
     },
+    {
+      abortSignal: options?.abortSignal,
+      selectionDeadlineMs: options?.selectionDeadlineMs,
+      workerTimeoutMs: resolveMarketContextTimeoutMs(),
+      label: "pump-top-candidates",
+      onItemComplete: async (processed, total) => {
+        await options?.onProgress?.(processed, total);
+      },
+    },
   );
 
   const ranked = rows
@@ -551,7 +640,7 @@ async function scanTopPumpCandidates(limit = 6) {
 }
 
 async function scanBestPumpCandidate() {
-  const ranked = await scanTopPumpCandidates(1);
+  const ranked = await scanTopPumpCandidates({ limit: 1 });
   return ranked[0] ?? null;
 }
 
@@ -584,16 +673,69 @@ export function resolvePumpRoundMaxWaitSec(input: {
   return Math.max(input.baseMaxWaitSec, env.PUMP_CONTINUATION_MIN_DURATION_SEC);
 }
 
-export async function resolveLiveTopGainerPumpCandidates(options?: { forceRefresh?: boolean; limit?: number }) {
+export async function resolveLiveTopGainerPumpCandidates(options?: {
+  forceRefresh?: boolean;
+  limit?: number;
+  abortSignal?: AbortSignal;
+  selectionDeadlineMs?: number;
+  maxSymbolsToEvaluate?: number;
+  onProgress?: (processed: number, total: number) => void | Promise<void>;
+}) {
   if (!env.PUMP_EARLY_CATCHER_ENABLED) return [];
   const limit = pumpCandidateListCap(Number(options?.limit ?? 12));
   const now = Date.now();
-  if (!options?.forceRefresh && now - livePumpListCache.at < livePumpCacheTtlMs()) {
+  const cacheAgeMs = livePumpListCache.at > 0 ? now - livePumpListCache.at : Number.POSITIVE_INFINITY;
+  const cacheHit = !options?.forceRefresh && cacheAgeMs < livePumpCacheTtlMs();
+  const topGainerCacheMeta = getTopGainerCacheMeta();
+  if (topGainerCacheMeta.stale) {
+    recordPumpScanEvent({
+      kind: "priority_scan",
+      phase: "priorityScan",
+      scope: "cache",
+      reasonCode: "PUMP_SCAN_CACHE_FALLBACK",
+      fallbackUsed: "cache",
+      source: "priority",
+      message: "PRIORITY_DATA_STALE: top-gainer cache is stale; preferring cache or rotation fallback",
+      meta: topGainerCacheMeta,
+    });
+  }
+  recordPumpScanEvent({
+    kind: "cache_scan",
+    phase: "cacheScan",
+    scope: "cache",
+    candidateCount: livePumpListCache.value.length,
+    reasonCode: cacheHit ? "PUMP_SCAN_COMPLETE" : "PUMP_SCAN_CACHE_FALLBACK",
+    fallbackUsed: cacheHit ? "none" : "live_pump_scan",
+    source: "cache",
+    message: cacheHit
+      ? `Pump live cache hit (age=${Math.round(cacheAgeMs)}ms)`
+      : `Pump live cache miss (age=${Math.round(cacheAgeMs)}ms)`,
+    meta: { cacheHit, cacheMiss: !cacheHit, cacheAgeMs, liveScanTriggered: !cacheHit, topGainerCacheMeta },
+  });
+  if (cacheHit) {
     return livePumpListCache.value.slice(0, limit);
   }
-  const ranked = await scanTopPumpCandidates(limit).catch(() => [] as PumpEarlyCandidate[]);
+  const ranked = await scanTopPumpCandidates({
+    limit,
+    abortSignal: options?.abortSignal,
+    selectionDeadlineMs: options?.selectionDeadlineMs,
+    maxSymbolsToEvaluate: options?.maxSymbolsToEvaluate,
+    onProgress: options?.onProgress,
+  });
   livePumpListCache = { at: now, value: ranked };
   livePumpCache = { at: now, value: ranked[0] ?? null };
+  if (ranked.length === 0) {
+    recordPumpScanEvent({
+      kind: "end",
+      phase: "end",
+      scope: "live",
+      reasonCode: "PUMP_SCAN_EMPTY",
+      fallbackUsed: "safe_empty",
+      source: "live",
+      candidateCount: 0,
+      message: "Pump live scan completed with empty result",
+    });
+  }
   return ranked;
 }
 
@@ -607,7 +749,9 @@ async function tick() {
   if (runLock || !env.PUMP_EARLY_CATCHER_ENABLED) return;
   runLock = true;
   try {
-    const ranked = await scanTopPumpCandidates(Math.max(12, Math.ceil(env.PUMP_CONTINUATION_SCAN_LIMIT / 3)));
+    const ranked = await scanTopPumpCandidates({
+      limit: Math.max(12, Math.ceil(env.PUMP_CONTINUATION_SCAN_LIMIT / 3)),
+    });
     const now = Date.now();
     livePumpListCache = { at: now, value: ranked };
     const best = ranked[0] ?? null;
@@ -661,8 +805,10 @@ async function tick() {
 
 export function ensurePumpEarlyCatcherStarted() {
   if (!env.PUMP_EARLY_CATCHER_ENABLED) return { ...state, enabled: false };
-  const delegatedToWorker = env.ENABLE_SEPARATE_WORKER && env.APP_ROLE !== "worker";
-  if (timer) return { ...state, enabled: true, delegatedToWorker };
+  if (env.ENABLE_SEPARATE_WORKER && env.APP_ROLE !== "worker") {
+    return { ...state, enabled: false, delegatedToWorker: true };
+  }
+  if (timer) return { ...state, enabled: true, delegatedToWorker: false };
   state.running = true;
   state.startedAt = new Date().toISOString();
   state.intervalMs = Math.max(5_000, env.PUMP_EARLY_CATCHER_INTERVAL_MS);
@@ -672,17 +818,16 @@ export function ensurePumpEarlyCatcherStarted() {
   }, state.intervalMs);
   pushLog(
     "INFO",
-    `Pump Early Catcher baslatildi. interval=${state.intervalMs}ms role=${env.APP_ROLE}${delegatedToWorker ? " (web+worker)" : ""}`,
+    `Pump Early Catcher baslatildi. interval=${state.intervalMs}ms role=${env.APP_ROLE}`,
   );
   logger.info(
     {
       intervalMs: state.intervalMs,
       appRole: env.APP_ROLE,
-      delegatedToWorker,
     },
     "Pump Early Catcher started",
   );
-  return { ...state, enabled: true, delegatedToWorker };
+  return { ...state, enabled: true, delegatedToWorker: false };
 }
 
 export function getCachedPumpCandidates(limit = 8): PumpEarlyCandidate[] {

@@ -1,0 +1,147 @@
+{
+  "task": "KRIPTO P1 — SCANNER COVERAGE + CANDIDATE QUALITY + ENTRY TIMING FIX",
+  "status": "IMPLEMENTED_WITH_RUNTIME_BLOCKER",
+  "timestamp": "2026-08-17T17:31:00.000Z",
+  "scannerRootCause": {
+    "summary": "Top-gainer symbols could remain outside the rotating cycle slice and were not guaranteed evaluation in the same cycle.",
+    "path": "watchlist -> cursor -> cycleSymbols -> context/qualification/ranking -> AI scope",
+    "notDiscoveredPrimaryReason": "NOT_IN_CYCLE_SLICE",
+    "evidenceCategoryMapping": [
+      "SCANNER_ROTATION",
+      "PUMP_LANE_MISS",
+      "QUALIFICATION",
+      "LIQUIDITY",
+      "SPREAD",
+      "VOLATILITY",
+      "STALE_DATA",
+      "OTHER"
+    ]
+  },
+  "rotationAnalysis": {
+    "formula": "cyclesToVisit <= ceil(watchlistSize / cycleLimit)",
+    "minCycles": 1,
+    "maxCycles": "ceil(N/B)",
+    "expectedCycles": "(maxCycles + 1) / 2",
+    "cowFixture": {
+      "watchlistIndex": 0,
+      "cursor": 224,
+      "batch": 79,
+      "normalCycleIncluded": false,
+      "priorityLaneIncluded": true
+    }
+  },
+  "priorityLaneDesign": {
+    "goal": "evaluate sooner, never auto-approve",
+    "properties": {
+      "priorityMaxPerCycle": "env SCANNER_PRIORITY_MAX_PER_CYCLE (default 8, bounded 1..24)",
+      "dedupeAgainstCycle": true,
+      "source": "TOP_GAINER feed",
+      "priorityReason": "top gainer reason from discovery service",
+      "priorityScore": "top gainer priority score"
+    },
+    "safety": {
+      "bounded": true,
+      "deduplicated": true,
+      "rateLimited": true,
+      "observable": true,
+      "noBypass": [
+        "strategy",
+        "TDI",
+        "sizing",
+        "risk",
+        "AI",
+        "execution"
+      ]
+    }
+  },
+  "discoveryCoverageMetrics": [
+    "scannerUniverse",
+    "rotationCandidates",
+    "priorityCandidates",
+    "duplicatesRemoved",
+    "totalEvaluated",
+    "notDiscoveredCount",
+    "priorityRescuedCount",
+    "discoverySources[]"
+  ],
+  "entryTiming": {
+    "instrumented": [
+      "candidateTimestamp",
+      "decisionTimestamp",
+      "entryTimestamp",
+      "priceAtCandidate",
+      "priceAtDecision",
+      "priceAtEntry",
+      "entryDelayMs",
+      "movementToEntryPercent"
+    ],
+    "classifier": [
+      "GOOD_ENTRY",
+      "NORMAL",
+      "CHASING",
+      "EDGE_DECAY",
+      "UNKNOWN"
+    ],
+    "latencyAggregates": [
+      "entryDelayMs p50/p90/p95",
+      "movementToEntryPercent p50/p90/p95",
+      "candidateToDecision p50/p90/p95",
+      "decisionToEntry p50/p90/p95"
+    ],
+    "lookAheadPolicy": "decision-time and entry-time evidence only for runtime classification"
+  },
+  "tests": {
+    "focusedSuite": [
+      "tests/forensics/p1-strategy-scanner-ev.test.ts",
+      "tests/forensics/p2-tdi-slot-strategy.test.ts",
+      "tests/scanner.test.ts"
+    ],
+    "result": "PASS",
+    "counts": {
+      "files": 3,
+      "tests": 25
+    }
+  },
+  "controlledValidation": {
+    "requestedRounds": 2,
+    "result": "BLOCKED_BY_RUNTIME_INSTABILITY",
+    "symptoms": [
+      "scanner/AI phase stalled under unstable Binance/public API responses",
+      "manual stop required"
+    ],
+    "artifactsProduced": false
+  },
+  "changedFiles": [
+    "src/types/scanner.ts",
+    "src/server/scanner/scanner.service.ts",
+    "src/server/forensics/forensic.types.ts",
+    "src/server/forensics/forensic-context.ts",
+    "src/server/forensics/forensic-collector.service.ts",
+    "src/server/forensics/forensic-bridge.service.ts",
+    "src/server/forensics/scanner-qualification-forensics.service.ts",
+    "src/server/forensics/entry-timing-forensics.service.ts",
+    "src/server/forensics/p1-forensic-report.service.ts",
+    "src/server/forensics/round-forensic-export.service.ts",
+    "src/server/forensics/strategy-comparison-harness.service.ts",
+    "src/server/forensics/p2-experiment-services.ts",
+    "src/server/forensics/trade-pattern-analysis.service.ts",
+    "src/server/execution/execution-orchestrator.service.ts",
+    "tests/forensics/p1-strategy-scanner-ev.test.ts",
+    "scripts/_p1-scanner-entry-2round-validation.ts"
+  ],
+  "acceptance": {
+    "priorityCandidatesEvaluated": "PASS (code + tests)",
+    "cowTypeRotationMissResolved": "PASS (deterministic fixture test)",
+    "boundedScannerSafety": "PASS",
+    "noSymbolHardcode": "PASS",
+    "noTdiAiRiskBypass": "PASS (gates unchanged, tests green)",
+    "entryTimingObservable": "PASS",
+    "chasingMeasurable": "PASS",
+    "noLookAhead": "PASS",
+    "runtime2to5RoundProof": "BLOCKED"
+  },
+  "remainingBlockers": [
+    "Paper validation rounds require stable provider/network to finish within deadline.",
+    "Runtime dataset for full missed-opportunity reclassification depends on completed rounds."
+  ]
+}

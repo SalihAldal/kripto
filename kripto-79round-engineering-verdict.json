@@ -1,0 +1,29 @@
+{
+  "engineering": {
+    "P0_ENGINEERING_OPEN": 1,
+    "P1_ENGINEERING_OPEN": 1,
+    "P0_FIXED": 3,
+    "P1_ENGINEERING_FIXED": 1,
+    "MTF_DATA_CONTRACT": "PASS",
+    "PUMPRISK_DATA_CONTRACT": "PASS",
+    "SCANNER_CONFIDENCE": "PASS",
+    "NO_TRADE_STATE": "PASS",
+    "EMPTY_DECISION": "FAIL",
+    "TIMEOUT": "PASS",
+    "DB_RESILIENCE": "PASS",
+    "25P02": "FIXED",
+    "VERSION_CONFLICT": "FIXED",
+    "AI_HEALTH": "PASS",
+    "AI_RELIABILITY": "PASS",
+    "AI_CONSISTENCY": "PASS",
+    "TDI_ACCESSIBILITY": "PASS",
+    "EXECUTION_READY": "PASS",
+    "EXECUTION_LIFECYCLE": "FAIL",
+    "PNL_INTEGRITY": "PASS",
+    "100ROUND_DETERMINISTIC_ENDURANCE": "FAIL",
+    "VALID_BUY_LOST_TO_CORRECTNESS": 16,
+    "PHASE_A_GO": "NO_GO"
+  },
+  "blocked": true,
+  "testsOutput": "ess.test.ts (14 tests) 155ms\n ✓ tests/endurance/failure-injection.test.ts (11 tests) 76ms\n ✓ tests/endurance/state-machine-lifecycle.test.ts (7 tests) 19ms\n ✓ tests/endurance/50round-deterministic-stress.test.ts (5 tests) 282ms\n ❯ tests/ai-hybrid-engine.test.ts (5 tests | 2 failed) 68ms\n   × hybrid decision engine > risk veto durumunda NO_TRADE doner 28ms\n     → expected 'NO-TRADE' to be 'REJECT' // Object.is equality\n   × hybrid decision engine > no-trade mode nedenlerini ve engelleyen AI listesini doldurur 6ms\n     → expected 'HOLD' to be 'NO_TRADE' // Object.is equality\n ✓ tests/paper-round-gates-contract.test.ts (3 tests) 6ms\n ✓ tests/p0-tdi-buy-bottleneck.test.ts (11 tests) 948ms\n   ✓ P0 TDI buy bottleneck gates > canonical 46-round fixture records zero runtime BUY with duplicate momentum/tech blockers dominant 911ms\n[2026-08-29 15:11:05.594 +0300] \u001b[33mWARN\u001b[39m: \u001b[36mAI provider attempt failed\u001b[39m\n    \u001b[35mservice\u001b[39m: \"kinetic-app\"\n    \u001b[35menv\u001b[39m: \"development\"\n    \u001b[35mcontext\u001b[39m: \"test-retry\"\n    \u001b[35mattempt\u001b[39m: 0\n    \u001b[35mretries\u001b[39m: 1\n    error: \"fail\"\n ✓ tests/ai-provider-reliability.test.ts (20 tests) 308ms\n[2026-08-29 15:11:05.857 +0300] \u001b[33mWARN\u001b[39m: \u001b[36mAI provider attempt failed\u001b[39m\n    \u001b[35mservice\u001b[39m: \"kinetic-app\"\n    \u001b[35menv\u001b[39m: \"development\"\n    \u001b[35mcontext\u001b[39m: \"test-retry\"\n    \u001b[35mattempt\u001b[39m: 1\n    \u001b[35mretries\u001b[39m: 1\n    error: \"fail\"\n\n Test Files  1 failed | 10 passed (11)\n      Tests  2 failed | 107 passed (109)\n   Start at  15:10:56\n   Duration  8.27s (transform 11.13s, setup 0ms, collect 37.43s, tests 1.96s, environment 5ms, prepare 7.56s)\n\n\n\u001b[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.\u001b[39m\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  tests/ai-hybrid-engine.test.ts > hybrid decision engine > risk veto durumunda NO_TRADE doner\nAssertionError: expected 'NO-TRADE' to be 'REJECT' // Object.is equality\n\nExpected: \"REJECT\"\nReceived: \"NO-TRADE\"\n\n ❯ tests/ai-hybrid-engine.test.ts:179:43\n    177| \n    178|     expect(result.finalDecision).toBe(\"NO_TRADE\");\n    179|     expect(result.finalConsensusDecision).toBe(\"REJECT\");\n       |                                           ^\n    180|     expect(result.rejected).toBe(true);\n    181|     expect(result.rejectReason).toContain(\"Risk\");\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯\n\n FAIL  tests/ai-hybrid-engine.test.ts > hybrid decision engine > no-trade mode nedenlerini ve engelleyen AI listesini doldurur\nAssertionError: expected 'HOLD' to be 'NO_TRADE' // Object.is equality\n\nExpected: \"NO_TRADE\"\nReceived: \"HOLD\"\n\n ❯ tests/ai-hybrid-engine.test.ts:261:34\n    259|     });\n    260| \n    261|     expect(result.finalDecision).toBe(\"NO_TRADE\");\n       |                                  ^\n    262|     expect(result.finalConsensusDecision === \"NO-TRADE\" || result.fina…\n    263|     expect(result.decisionPayload?.noTradeMode?.enabled).toBe(true);\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯\n\n"
+}

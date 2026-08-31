@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-08-22T14:34:07.549Z",
+  "entries": [
+    {
+      "file": "src/server/scanner/market-context-builder.ts",
+      "function": "buildMarketContext snapshot section",
+      "caller": "scanner/market context pipeline",
+      "callee": "marketSignals emitter",
+      "input": [
+        "recentTrades",
+        "klines"
+      ],
+      "output": [
+        "shortMomentumPercent",
+        "shortFlowImbalance",
+        "tradeVelocity",
+        "change5m",
+        "change15m",
+        "change24h"
+      ],
+      "unit": "shortMomentumPercent: percentage-points; shortFlowImbalance: normalized [-1,1]",
+      "scale": "shortMomentumPercent around +/- few points, shortFlow around +/-1",
+      "range": "shortMomentum unbounded but practical small; shortFlow clamped by ratio"
+    },
+    {
+      "file": "src/server/decision-engine/experts/momentum-expert.utils.ts",
+      "function": "scoreMomentumImpulse/Continuation/Velocity/RelativeStrength",
+      "caller": "analyzeMomentumExpert",
+      "callee": "clampScore",
+      "input": [
+        "shortMomentumPercent",
+        "change5m",
+        "change15m",
+        "tradeVelocity",
+        "volumeSpikeRatio",
+        "change24h"
+      ],
+      "output": [
+        "mom",
+        "continuation",
+        "velocity",
+        "relStrength"
+      ],
+      "unit": "all sub-scores normalized to [0,100]",
+      "scale": "weighted linear terms",
+      "range": "0..100 after clamp"
+    },
+    {
+      "file": "src/server/decision-engine/experts/domain-experts.ts",
+      "function": "analyzeMomentumExpert",
+      "caller": "runAllExperts",
+      "callee": "scoreMomentum* helpers",
+      "input": [
+        "momentum telemetry + provider bias"
+      ],
+      "output": [
+        "MOMENTUM expert score/opinion/confidence"
+      ],
+      "unit": "score and confidence [0,100]",
+      "scale": "0.35*mom + 0.25*continuation + 0.2*velocity + 0.2*relStrength",
+      "range": "0..100 clamp"
+    },
+    {
+      "file": "src/server/decision-engine/conflict-detection.service.ts",
+      "function": "resolveMasterDecision",
+      "caller": "adjudicateWithMasterDecisionEngine",
+      "callee": "master decision bridge",
+      "input": [
+        "matrix.momentum",
+        "metrics.confidence",
+        "bullishCount",
+        "execution"
+      ],
+      "output": [
+        "BUY/WAIT/WATCHLIST/NO_TRADE"
+      ],
+      "unit": "threshold comparisons",
+      "scale": "momentum gate at >=60 for BUY",
+      "range": "decision enum"
+    },
+    {
+      "file": "src/server/ai/hybrid-momentum-gates.ts",
+      "function": "resolveLowMomentumInput + resolveMomentumWeak",
+      "caller": "hybrid-decision-engine",
+      "callee": "hybrid gate assembly",
+      "input": [
+        "shortMomentumPercent",
+        "shortFlowImbalance",
+        "sentimentScore",
+        "regimeSentimentDelta"
+      ],
+      "output": [
+        "momentumWeak boolean"
+      ],
+      "unit": "boolean gate",
+      "scale": "|shortMomentum|<0.08 && |shortFlow|<0.03 or sentiment below floor",
+      "range": "true/false"
+    },
+    {
+      "file": "src/server/ai/hybrid-decision-engine.ts",
+      "function": "momentumWeak -> noTradeReasonList/bridgeTdiDecision",
+      "caller": "analysis orchestrator",
+      "callee": "bridgeTdiDecision",
+      "input": [
+        "momentumWeak",
+        "sentiment",
+        "techStrongButOthersWeak"
+      ],
+      "output": [
+        "firstBlockingCondition=MOMENTUM (when weak)"
+      ],
+      "unit": "decision blockers",
+      "scale": "MOMENTUM tagged in blocker list",
+      "range": "WAIT/REJECT path"
+    }
+  ]
+}

@@ -132,6 +132,18 @@ export function mapMasterToLegacy(decision: MasterDecisionType): "BUY" | "SELL" 
   return "NO_TRADE";
 }
 
+/** Align consensus label with preserved hybrid BUY so execution gate does not see a false conflict. */
+export function mapMasterConsensusDecision(
+  decision: MasterDecisionType,
+  preservedHybridBuy: boolean,
+): "BUY" | "WATCHLIST" | "NO-TRADE" | "REJECT" {
+  if (preservedHybridBuy) return "BUY";
+  if (decision === "STRONG_BUY" || decision === "BUY") return "BUY";
+  if (decision === "WATCHLIST") return "WATCHLIST";
+  if (decision === "SELL" || decision === "REDUCE") return "REJECT";
+  return "NO-TRADE";
+}
+
 function countBearishExperts(opinions: ExpertOpinionResult[]) {
   return opinions.filter((row) => isBearish(row.opinion)).length;
 }

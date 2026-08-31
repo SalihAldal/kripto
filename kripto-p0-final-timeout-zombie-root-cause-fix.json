@@ -1,0 +1,174 @@
+{
+  "reportId": "kripto-p0-final-timeout-zombie-root-cause-fix",
+  "generatedAt": "2026-08-21T21:30:00.000Z",
+  "scope": "SAFE_RECONCILE_ACTIVE_VALIDATION_AND_FINAL_P0_2ROUND",
+  "constraints": {
+    "codeChanges": false,
+    "configChanges": false,
+    "strategyTdiAiRiskSizingFeesChanges": false
+  },
+  "activeValidationReconciliation": {
+    "targetSessionId": "cmszzpjdg0009unfceoh6xwcr",
+    "initialState": {
+      "jobStatus": "RUNNING",
+      "stopRequested": false,
+      "activeRunId": "cmt00gxwj0897unfcl7vclbtm",
+      "round1": {
+        "state": "tur_basarisiz",
+        "reason": "Tur secim suresi doldu (1200s)"
+      },
+      "round2": {
+        "state": "tariyor",
+        "terminal": false
+      },
+      "schedulerLeaseState": "RUNNING",
+      "schedulerLeaseLive": false,
+      "localSchedulerLoop": false,
+      "workerOwnershipCount": 0,
+      "lastMeaningfulProgressAt": "2026-08-19T11:33:24.354Z",
+      "selectionDeadline": "2026-08-19T11:51:28.291Z"
+    },
+    "classification": "STALE_NO_LIVE_OWNER",
+    "nativeActions": [
+      "stopAutoRoundJob(userId)",
+      "runPaperSessionPreflight(userId) zombie reconciliation",
+      "stopAutoRoundJob(userId) finalize STOPPED state"
+    ],
+    "result": {
+      "jobStatus": "STOPPED",
+      "stopRequested": true,
+      "activeRunId": null,
+      "runningJobs": 0,
+      "runningRounds": 0,
+      "activeLocks": 0,
+      "openAIStarted": 0
+    }
+  },
+  "intermediateCrashReconciliation": {
+    "sessionId": "cmt2z5o240009unnkwc03ama7",
+    "reason": "validation process crashed with PrismaClientUnknownRequestError (Response from the Engine was empty)",
+    "classification": "STALE_NO_LIVE_OWNER",
+    "nativeActions": [
+      "stopAutoRoundJob(userId)",
+      "runPaperSessionPreflight(userId) zombie reconciliation",
+      "stopAutoRoundJob(userId) finalize STOPPED state"
+    ],
+    "result": {
+      "jobStatus": "STOPPED",
+      "runningJobs": 0,
+      "runningRounds": 0
+    }
+  },
+  "finalP0Validation": {
+    "sessionId": "cmt3epoap0009un5od3he1qce",
+    "roundPolicy": {
+      "totalRounds": 2,
+      "maxPerRoundMinutes": 20
+    },
+    "job": {
+      "status": "COMPLETED",
+      "stopRequested": false,
+      "finishedAt": "2026-08-21T21:12:54.060Z",
+      "lastError": "AI_GATE_BLOCK: AI_VETO"
+    },
+    "rounds": [
+      {
+        "roundNo": 1,
+        "state": "tur_basarisiz",
+        "failReason": "Tur secim suresi doldu (1200s)",
+        "durationMs": 1235914,
+        "selectionBudgetMs": 1200000,
+        "selectionElapsedMs": 1236200,
+        "selectionBudgetExceeded": true,
+        "lastMeaningfulProgressAt": "2026-08-21T20:53:30.516Z",
+        "lastHeartbeatAt": "2026-08-21T20:54:04.054Z",
+        "watchdogState": {
+          "decision": "NONE",
+          "action": "Progress within threshold"
+        },
+        "activeWorkers": 0,
+        "queuedWorkers": 0,
+        "aiStarted": 0,
+        "aiTimeout": 22,
+        "retryCount": 11,
+        "aiProgress": 104,
+        "terminalizationDurationMs": 34779,
+        "artifacts": {
+          "round-summary.json": true,
+          "round-liveness.json": true,
+          "round-hang-snapshot.json": false,
+          "selectionTimeBudgetBreakdown.json": true,
+          "recovery-decisions.json": true,
+          "recovery-telemetry.json": true
+        }
+      },
+      {
+        "roundNo": 2,
+        "state": "tur_basarisiz",
+        "failReason": "AI_GATE_BLOCK: AI_VETO",
+        "durationMs": 1127317,
+        "selectionBudgetMs": 1200000,
+        "selectionElapsedMs": 1127452,
+        "selectionBudgetExceeded": false,
+        "lastMeaningfulProgressAt": "2026-08-21T21:12:45.938Z",
+        "lastHeartbeatAt": "2026-08-21T21:12:47.987Z",
+        "watchdogState": {
+          "decision": "NONE",
+          "action": "Legitimate long-running stage"
+        },
+        "activeWorkers": 0,
+        "queuedWorkers": 0,
+        "aiStarted": 19,
+        "aiTimeout": 0,
+        "retryCount": 1,
+        "aiProgress": 99,
+        "terminalizationDurationMs": 0,
+        "artifacts": {
+          "round-summary.json": true,
+          "round-liveness.json": true,
+          "round-hang-snapshot.json": false,
+          "selectionTimeBudgetBreakdown.json": true,
+          "recovery-decisions.json": true,
+          "recovery-telemetry.json": true
+        }
+      }
+    ],
+    "manualStopCount": 0,
+    "postReconciliationCheck": {
+      "runningJobs": 0,
+      "runningRounds": 0,
+      "activeLocks": 0,
+      "openAIStarted": 0
+    }
+  },
+  "beforeAfterMetrics": {
+    "before": {
+      "sessionId": "cmszzpjdg0009unfceoh6xwcr",
+      "runningJobs": 1,
+      "runningRounds": 1,
+      "activeLocks": 0,
+      "openAIStarted": 0
+    },
+    "after": {
+      "sessionId": "cmt3epoap0009un5od3he1qce",
+      "runningJobs": 0,
+      "runningRounds": 0,
+      "activeLocks": 0,
+      "openAIStarted": 0
+    }
+  },
+  "remainingBlockers": [
+    "round-hang-snapshot.json missing for both final validation rounds",
+    "validation runner previously crashed once with Prisma engine empty response; root cause is infra/runtime side, not strategy logic"
+  ],
+  "finalVerdict": {
+    "RECONCILIATION_CLEAN": "YES",
+    "TWO_ROUNDS_COMPLETED": "YES",
+    "SELECTION_TIMEOUT_FIXED": "PASS",
+    "ROUND_ZOMBIE_FIXED": "PARTIAL",
+    "AUTO_TERMINALIZATION": "PASS",
+    "MANUAL_STOP_REQUIRED": "NO",
+    "READY_FOR_5_ROUNDS": "CONDITIONAL",
+    "READY_FOR_50_ROUNDS": "NO"
+  }
+}

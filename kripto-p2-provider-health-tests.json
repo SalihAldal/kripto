@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-08-23T19:11:56.668Z",
+  "cases": [
+    {
+      "providerId": "provider-1",
+      "healthBefore": "UNKNOWN",
+      "healthAfter": "HEALTHY",
+      "remoteOk": true,
+      "latencyMs": 2082,
+      "errorCategory": ""
+    },
+    {
+      "providerId": "provider-2",
+      "healthBefore": "UNKNOWN",
+      "healthAfter": "HEALTHY",
+      "remoteOk": true,
+      "latencyMs": 1606,
+      "errorCategory": ""
+    },
+    {
+      "providerId": "provider-3",
+      "healthBefore": "UNKNOWN",
+      "healthAfter": "HEALTHY",
+      "remoteOk": true,
+      "latencyMs": 7469,
+      "errorCategory": ""
+    }
+  ],
+  "pass": true
+}

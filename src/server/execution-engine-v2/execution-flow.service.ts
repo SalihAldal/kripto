@@ -41,8 +41,27 @@ export async function executeApprovedSpotOrder(input: {
   openPositionCount?: number;
   spreadPercent?: number;
   liquidityScore?: number;
+  aiGateVerdict?: "AI_GATE_PASS" | "AI_ADVISORY_ONLY";
+  aiGatePolicy?: "VETO" | "ADVISORY";
+  aiGateReasonCode?: string;
 }): Promise<ExecutionFlowResult> {
   const startedAt = Date.now();
+  const allowAdvisoryPath = input.aiGateVerdict === "AI_ADVISORY_ONLY" && input.aiGatePolicy === "ADVISORY";
+  if (input.aiGateVerdict !== "AI_GATE_PASS" && !allowAdvisoryPath) {
+    return {
+      executionId: input.executionId,
+      logKey: "",
+      status: "REJECTED",
+      filledQuantity: 0,
+      averageFillPrice: 0,
+      fee: 0,
+      slippagePct: 0,
+      latencyMs: Date.now() - startedAt,
+      orderType: "MARKET",
+      rejected: true,
+      rejectReason: `AI gate required before order execution (verdict=${input.aiGateVerdict ?? "MISSING"}, policy=${input.aiGatePolicy ?? "UNKNOWN"}, reason=${input.aiGateReasonCode ?? "N/A"})`,
+    };
+  }
   if (!input.riskApproved) {
     return {
       executionId: input.executionId,
@@ -164,6 +183,23 @@ export async function executeApprovedSpotOrder(input: {
   }
 
   if (mode === "live") {
+    const { assertLiveOrderSubmissionAllowed } = await import("@/src/server/paper-runtime/live-lock");
+    const lock = assertLiveOrderSubmissionAllowed({ executionMode: mode });
+    if (!lock.allowed) {
+      return {
+        executionId: input.executionId,
+        logKey: "",
+        status: "REJECTED",
+        filledQuantity: 0,
+        averageFillPrice: 0,
+        fee: 0,
+        slippagePct: 0,
+        latencyMs: Date.now() - startedAt,
+        orderType: "MARKET",
+        rejected: true,
+        rejectReason: `LIVE_MODE_LOCKED:${lock.reasons.join(",")}`,
+      };
+    }
     const safety = await runPreTradeSafetyValidation({
       userId: input.userId,
       executionId: input.executionId,

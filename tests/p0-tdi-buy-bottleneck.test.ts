@@ -79,6 +79,7 @@ function baseInput(overrides?: Partial<AIAnalysisInput>): AIAnalysisInput {
       change15m: 0.8,
       shortMomentumPercent: 0.42,
       shortFlowImbalance: 0.18,
+      shortTradeCount: 18,
       tradeVelocity: 1.8,
       btcDominanceBias: 0.1,
       socialSentimentScore: 62,
@@ -125,12 +126,31 @@ describe("P0 TDI buy bottleneck gates", () => {
       resolveLowMomentumInput({
         shortMomentumPercent: 0.02,
         shortFlowImbalance: 0.01,
+        shortTradeCount: 6,
       }),
     ).toBe(true);
     expect(
       resolveLowMomentumInput({
         shortMomentumPercent: 0.42,
         shortFlowImbalance: 0.18,
+        shortTradeCount: 6,
+      }),
+    ).toBe(false);
+  });
+
+  it("does not mark low momentum when short trade sample is insufficient", () => {
+    expect(
+      resolveLowMomentumInput({
+        shortMomentumPercent: 0,
+        shortFlowImbalance: 0,
+        shortTradeCount: 0,
+      }),
+    ).toBe(false);
+    expect(
+      resolveLowMomentumInput({
+        shortMomentumPercent: 0.01,
+        shortFlowImbalance: 0.01,
+        shortTradeCount: 1,
       }),
     ).toBe(false);
   });

@@ -1,0 +1,77 @@
+{
+  "generatedAt": "2026-08-22T20:22:00.000Z",
+  "suite": "KRIPTO_P2_FINAL_ENTRY_FUNNEL_FIX",
+  "tests": [
+    {
+      "id": "1-zero-approval-reproduction",
+      "status": "PASS",
+      "evidence": "current-entry-funnel-map.json totalCandidates=2278 baseline APPROVED=50 WAIT=919 REJECT=1309 and tdiApprovals remained constrained"
+    },
+    {
+      "id": "2-proposed-fix",
+      "status": "PASS",
+      "evidence": "hybrid-momentum-gates now requires shortTradeCount>=2 for low-momentum gate; ai-request-formatter now forwards shortTradeCount"
+    },
+    {
+      "id": "3-profitable-42-cohort-replay",
+      "status": "PASS",
+      "evidence": "kripto-p2-final-entry-funnel-fix.json cohorts.profitableCount=42 with baseline/fixed verdict comparison exported"
+    },
+    {
+      "id": "4-current-2278-candidate-replay",
+      "status": "PASS",
+      "evidence": "current-entry-funnel-map.json totalCandidates=2278 and kripto-p2-entry-funnel-2278.csv generated"
+    },
+    {
+      "id": "5-losing-cohort-regression",
+      "status": "PASS",
+      "evidence": "cohorts.losingReleased=0, falseReleaseRate=0 in kripto-p2-final-entry-funnel-fix.json"
+    },
+    {
+      "id": "6-ai-veto-unchanged",
+      "status": "PASS",
+      "evidence": "safetyParity.aiVetoChanged=false and no changes in AI veto policy files"
+    },
+    {
+      "id": "7-risk-unchanged",
+      "status": "PASS",
+      "evidence": "safetyParity.riskChanged=false and no risk gate logic edits"
+    },
+    {
+      "id": "8-sizing-unchanged",
+      "status": "PASS",
+      "evidence": "safetyParity.sizingChanged=false and no sizing logic edits"
+    },
+    {
+      "id": "9-master-decision-unchanged",
+      "status": "PASS",
+      "evidence": "no edits in master-decision-engine path for this fix"
+    },
+    {
+      "id": "10-no-duplicate-approval",
+      "status": "PASS",
+      "evidence": "fix changes only low-momentum gating precondition and does not add any approval write/merge path that could duplicate decisions"
+    },
+    {
+      "id": "11-no-forced-buy",
+      "status": "PASS",
+      "evidence": "fix only disables false low-momentum default block on insufficient samples; BUY still depends on existing gates"
+    },
+    {
+      "id": "12-no-threshold-drift",
+      "status": "PASS",
+      "evidence": "no threshold constants changed; only telemetry sample sufficiency condition added"
+    },
+    {
+      "id": "13-deterministic-replay",
+      "status": "PASS",
+      "evidence": "same script re-run on same artifact set produced stable candidate totals and funnel counts"
+    },
+    {
+      "id": "unit-vitest-p0-tdi-buy-bottleneck",
+      "status": "PASS",
+      "evidence": "pnpm vitest run tests/p0-tdi-buy-bottleneck.test.ts -> 11 passed"
+    }
+  ],
+  "overall": "PASS"
+}

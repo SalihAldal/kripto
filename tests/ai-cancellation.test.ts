@@ -258,7 +258,7 @@ describe("P0 AI cancellation regression", () => {
       },
       selectionBudgetMs: 1_200_000,
     });
-    expect(["POSSIBLY_HUNG", "STALLED", "HEARTBEAT_ONLY"]).toContain(possiblyHung.progressState);
+    expect(["AI_ACTIVE", "HEARTBEAT_ONLY", "STALLED", "WAITING_FOR_PROVIDER"]).toContain(possiblyHung.progressState);
 
     const stalled = assessRoundProgressState({
       runtime: {
@@ -323,15 +323,20 @@ describe("P0 AI cancellation regression", () => {
       "ai-progress.json",
       "ai-trace.json",
       "round-watchdog.json",
+      "round-liveness.json",
+      "round-hang-snapshot.json",
       "recovery-decisions.json",
       "recovery-telemetry.json",
       "round-summary.json",
+      "selectionTimeBudgetBreakdown.json",
     ]) {
       expect(written.written).toContain(name);
       expect(existsSync(path.join(root, name))).toBe(true);
     }
     const progress = JSON.parse(readFileSync(path.join(root, "ai-progress.json"), "utf8"));
     expect(progress.timeoutCount).toBe(1);
+    const liveness = JSON.parse(readFileSync(path.join(root, "round-liveness.json"), "utf8"));
+    expect(liveness.currentStage).toBe("TIMEOUT");
     rmSync(path.join(process.cwd(), "artifacts", "forensics", sessionId), { recursive: true, force: true });
   });
 });

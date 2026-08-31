@@ -2,6 +2,10 @@ import type { DecisionTimelineStage } from "@prisma/client";
 import type { AIAnalysisInput, AIConsensusResult } from "@/src/types/ai";
 import type { ScannerCandidate } from "@/src/types/scanner";
 import type { SignalQualityResult } from "@/src/server/execution/signal-quality-gate.service";
+import type {
+  ScannerRejectTelemetry,
+  SpreadMomentumShadowResult,
+} from "@/src/server/scanner/scanner-reject-telemetry.service";
 
 export type DecisionOutcomeLabel = "NO_TRADE" | "HOLD" | "BUY" | "SELL" | "REJECT" | "APPROVE" | "CAUTION" | "UNKNOWN";
 
@@ -86,6 +90,8 @@ export type ScannerDecisionObservabilityInput = {
   reasons: string[];
   metrics?: Record<string, unknown>;
   contextMetadata?: Record<string, unknown>;
+  rejectTelemetry?: ScannerRejectTelemetry | null;
+  spreadMomentumShadow?: SpreadMomentumShadowResult | null;
 };
 
 export type AiDecisionObservabilityInput = {

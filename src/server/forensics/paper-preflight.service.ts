@@ -16,6 +16,7 @@ import { getActiveRoundOwnershipForJob } from "@/src/server/execution/round-regi
 import { prisma } from "@/src/server/db/prisma";
 import { PaperDbUnavailableError, validatePaperDbHealth } from "@/src/server/forensics/db-health.service";
 import { resolveRuntimeConfigSnapshot } from "@/src/server/forensics/resolved-config.service";
+import { runEngineSanityChecks } from "@/src/server/forensics/engine-sanity.service";
 import type {
   PaperJobReconciliationRecord,
   PaperPreflightArtifact,
@@ -528,7 +529,20 @@ export async function runPaperSessionPreflight(input: {
     resolvedConfig = checkResult("FAIL", "RESOLVED_CONFIG_ERROR", (error as Error).message || "Config resolution failed");
   }
 
-  const blockingChecks = [database, binance, clockSync, ai, activeJobs, zombieRounds, duplicatePaperJobs, resolvedConfig].filter(
+  const engineSanityReport = runEngineSanityChecks();
+  const engineSanity = engineSanityReport.ok
+    ? checkResult("PASS", "ENGINE_SANITY_OK", "Hybrid engine and data-contract modules verified")
+    : checkResult(
+        "FAIL",
+        "ENGINE_SANITY_FAIL",
+        engineSanityReport.checks
+          .filter((row) => row.status === "FAIL")
+          .map((row) => row.reasonDetail)
+          .join(" | "),
+        { checks: engineSanityReport.checks },
+      );
+
+  const blockingChecks = [database, binance, clockSync, ai, engineSanity, activeJobs, zombieRounds, duplicatePaperJobs, resolvedConfig].filter(
     (row) => row.status === "FAIL",
   );
   const warnChecks = [emergencyStop, workerLocks, zombieRounds, resolvedConfig, activeJobs].filter(

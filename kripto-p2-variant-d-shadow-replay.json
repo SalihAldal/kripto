@@ -1,0 +1,384 @@
+{
+  "generatedAt": "2026-08-22T11:41:27.449Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionBehaviorChange": true,
+    "noExitConfigChange": true
+  },
+  "sample": {
+    "baselineTrades": 173,
+    "variantDReplayedTrades": 163,
+    "invalidPairs": 0
+  },
+  "metrics": {
+    "baseline": {
+      "tradeCount": 163,
+      "winRate": 0.20245398773006135,
+      "grossPnL": -18.036834059999993,
+      "fees": 0,
+      "netPnL": -18.036834059999993,
+      "expectancy": -0.11065542368098155,
+      "profitFactor": 0.10236709974125871,
+      "averageWin": 0.062331561515151505,
+      "averageLoss": -0.15456750453846155,
+      "maxDrawdown": -18.036834059999993,
+      "averageHold": 761.2883435582822,
+      "medianHold": 620
+    },
+    "variantD": {
+      "tradeCount": 163,
+      "winRate": 0.294478527607362,
+      "grossPnL": -1.032189400000001,
+      "fees": 0,
+      "netPnL": -1.032189400000001,
+      "expectancy": -0.006332450306748472,
+      "profitFactor": 0.7402662899272966,
+      "averageWin": 0.06128833333333334,
+      "averageLoss": -0.03896107254901961,
+      "maxDrawdown": -1.2163994000000005,
+      "averageHold": 745.6687116564417,
+      "medianHold": 604
+    },
+    "deltas": {
+      "netPnlDelta": 17.004644659999993,
+      "expectancyDelta": 0.10432297337423307,
+      "drawdownDelta": 16.820434659999993
+    }
+  },
+  "manualTimeoutImpact": {
+    "manualTimeoutTradeCount": 17,
+    "baselineManualTimeoutNet": -10.341903619999998,
+    "variantDManualTimeoutNet": 0.38733100000000004,
+    "manualTimeoutNetDelta": 10.729234619999998,
+    "timeoutTradesImproved": 17,
+    "timeoutTradesWorsened": 0,
+    "timeoutTradesUnchanged": 0
+  },
+  "strategyAnalysis": [
+    {
+      "groupKey": "strategyClass",
+      "groupValue": "Mean Reversion",
+      "tradeCount": 138,
+      "baselineNetPnL": -16.751199589999995,
+      "variantDNetPnL": -0.8021294000000002,
+      "deltaNetPnL": 15.949070189999992,
+      "baselineExpectancy": -0.12138550427536228,
+      "variantDExpectancy": -0.005812531884057973,
+      "deltaExpectancy": 0.1155729723913043,
+      "drawdownDelta": 15.750360189999995,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "groupKey": "strategyClass",
+      "groupValue": "Other",
+      "tradeCount": 25,
+      "baselineNetPnL": -1.2856344699999998,
+      "variantDNetPnL": -0.23005999999999996,
+      "deltaNetPnL": 1.05557447,
+      "baselineExpectancy": -0.05142537879999999,
+      "variantDExpectancy": -0.009202399999999998,
+      "deltaExpectancy": 0.04222297879999999,
+      "drawdownDelta": 0.9942344699999998,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "groupKey": "strategyClass",
+      "groupValue": "Mean Reversion|Volatility Breakout|Trend Following|Other",
+      "tradeCount": 163,
+      "baselineNetPnL": -18.036834059999993,
+      "variantDNetPnL": -1.032189400000001,
+      "deltaNetPnL": 17.004644659999986,
+      "baselineExpectancy": -0.11065542368098155,
+      "variantDExpectancy": -0.006332450306748472,
+      "deltaExpectancy": 0.10432297337423307,
+      "drawdownDelta": 16.820434659999993,
+      "sampleStatus": "SUFFICIENT"
+    }
+  ],
+  "regimeAnalysis": [
+    {
+      "groupKey": "regimeClass",
+      "groupValue": "RANGE",
+      "tradeCount": 113,
+      "baselineNetPnL": -5.90720994,
+      "variantDNetPnL": -0.9156200000000003,
+      "deltaNetPnL": 4.991589940000001,
+      "baselineExpectancy": -0.052276194159292036,
+      "variantDExpectancy": -0.008102831858407083,
+      "deltaExpectancy": 0.04417336230088495,
+      "drawdownDelta": 4.807379940000001,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "groupKey": "regimeClass",
+      "groupValue": "HIGH_VOLATILITY",
+      "tradeCount": 6,
+      "baselineNetPnL": -0.16656946,
+      "variantDNetPnL": 0.023639999999999994,
+      "deltaNetPnL": 0.19020946,
+      "baselineExpectancy": -0.027761576666666666,
+      "variantDExpectancy": 0.003939999999999999,
+      "deltaExpectancy": 0.03170157666666666,
+      "drawdownDelta": 0.12860946,
+      "sampleStatus": "NOT_ENOUGH_DATA"
+    },
+    {
+      "groupKey": "regimeClass",
+      "groupValue": "LOW_VOLATILITY",
+      "tradeCount": 25,
+      "baselineNetPnL": -10.843989649999997,
+      "variantDNetPnL": 0.1134906,
+      "deltaNetPnL": 10.957480249999998,
+      "baselineExpectancy": -0.4337595859999999,
+      "variantDExpectancy": 0.004539624,
+      "deltaExpectancy": 0.43829920999999994,
+      "drawdownDelta": 10.708894449999997,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "groupKey": "regimeClass",
+      "groupValue": "UNKNOWN",
+      "tradeCount": 19,
+      "baselineNetPnL": -1.11906501,
+      "variantDNetPnL": -0.2537,
+      "deltaNetPnL": 0.8653650100000001,
+      "baselineExpectancy": -0.05889815842105263,
+      "variantDExpectancy": -0.013352631578947368,
+      "deltaExpectancy": 0.04554552684210526,
+      "drawdownDelta": 0.8276650099999999,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "groupKey": "regimeClass",
+      "groupValue": "LOW_VOLATILITY|RANGE|TREND|HIGH_VOLATILITY|CHAOS|LOW_LIQUIDITY|UNKNOWN",
+      "tradeCount": 163,
+      "baselineNetPnL": -18.036834059999993,
+      "variantDNetPnL": -1.032189400000001,
+      "deltaNetPnL": 17.004644659999986,
+      "baselineExpectancy": -0.11065542368098155,
+      "variantDExpectancy": -0.006332450306748472,
+      "deltaExpectancy": 0.10432297337423307,
+      "drawdownDelta": 16.820434659999993,
+      "sampleStatus": "SUFFICIENT"
+    }
+  ],
+  "transitionMatrix": [
+    {
+      "baselineExitReason": "MANUAL_TIMEOUT",
+      "variantDExitReason": "TIME_EXIT",
+      "count": 17,
+      "deltaNetPnL": 10.729234619999998
+    },
+    {
+      "baselineExitReason": "STRATEGY_EXIT",
+      "variantDExitReason": "TIME_EXIT",
+      "count": 91,
+      "deltaNetPnL": 3.61751288
+    },
+    {
+      "baselineExitReason": "STOP_LOSS",
+      "variantDExitReason": "TIME_EXIT",
+      "count": 43,
+      "deltaNetPnL": 2.7274909599999986
+    },
+    {
+      "baselineExitReason": "TAKE_PROFIT",
+      "variantDExitReason": "TIME_EXIT",
+      "count": 12,
+      "deltaNetPnL": -0.06959379999999998
+    }
+  ],
+  "lossTail": {
+    "baseline": {
+      "top1LossAbs": 9.8952037,
+      "top3LossAbs": 10.23427321,
+      "top5LossAbs": 10.531384209999999,
+      "top10LossAbs": 11.235624959999999,
+      "maxLoss": -9.8952037
+    },
+    "variantD": {
+      "top1LossAbs": 0.0864,
+      "top3LossAbs": 0.2554,
+      "top5LossAbs": 0.4146,
+      "top10LossAbs": 0.7937,
+      "maxLoss": -0.0864
+    }
+  },
+  "temporalOos": {
+    "baseline": [
+      {
+        "split": "TRAIN",
+        "tradeCount": 103,
+        "netPnL": -14.943674490000003,
+        "expectancy": -0.1450842183495146,
+        "profitFactor": 0.0668539365842077,
+        "winRate": 0.18446601941747573,
+        "drawdown": -14.943674490000003
+      },
+      {
+        "split": "VALIDATION",
+        "tradeCount": 34,
+        "netPnL": -1.7706417499999998,
+        "expectancy": -0.052077698529411756,
+        "profitFactor": 0.2055233045377096,
+        "winRate": 0.17647058823529413,
+        "drawdown": -1.7706417499999998
+      },
+      {
+        "split": "OOS",
+        "tradeCount": 36,
+        "netPnL": -1.8808849900000002,
+        "expectancy": -0.05224680527777778,
+        "profitFactor": 0.21927780408177794,
+        "winRate": 0.2222222222222222,
+        "drawdown": -1.94770499
+      }
+    ],
+    "variantD": [
+      {
+        "split": "TRAIN",
+        "tradeCount": 97,
+        "netPnL": -0.5676389999999998,
+        "expectancy": -0.005851948453608245,
+        "profitFactor": 0.7260983420823683,
+        "winRate": 0.26804123711340205,
+        "drawdown": -0.7941989999999999
+      },
+      {
+        "split": "VALIDATION",
+        "tradeCount": 32,
+        "netPnL": -0.16796000000000005,
+        "expectancy": -0.005248750000000002,
+        "profitFactor": 0.8031226556639159,
+        "winRate": 0.28125,
+        "drawdown": -0.37692000000000003
+      },
+      {
+        "split": "OOS",
+        "tradeCount": 34,
+        "netPnL": -0.29659040000000003,
+        "expectancy": -0.008723247058823531,
+        "profitFactor": 0.7171262607650009,
+        "winRate": 0.38235294117647056,
+        "drawdown": -0.46999040000000003
+      }
+    ],
+    "oosExpectancyDelta": 0.04352355821895425
+  },
+  "robustness": {
+    "class": "ROBUST",
+    "rows": [
+      {
+        "check": "overall",
+        "deltaNetPnL": 17.004644659999986
+      },
+      {
+        "check": "excluding_top1_winning_improvement",
+        "deltaNetPnL": 7.129599960000004
+      },
+      {
+        "check": "excluding_top3_winning_improvement",
+        "deltaNetPnL": 6.844023960000006
+      },
+      {
+        "check": "excluding_top1_loss",
+        "deltaNetPnL": 17.07291916
+      },
+      {
+        "check": "excluding_top3_loss",
+        "deltaNetPnL": 17.15172666
+      },
+      {
+        "check": "mr_only",
+        "deltaNetPnL": 15.949070189999992
+      },
+      {
+        "check": "non_mr",
+        "deltaNetPnL": 1.05557447
+      },
+      {
+        "check": "low_vol_only",
+        "deltaNetPnL": 10.957480249999998
+      },
+      {
+        "check": "non_low_vol",
+        "deltaNetPnL": 6.047164410000003
+      },
+      {
+        "check": "high_vol",
+        "deltaNetPnL": 0.19020946
+      },
+      {
+        "check": "trend",
+        "deltaNetPnL": 0
+      }
+    ]
+  },
+  "lookaheadAudit": {
+    "generatedAt": "2026-08-22T11:41:27.449Z",
+    "status": "YES",
+    "runtimeAvailableInformation": [
+      "position monitor mark price / current tick",
+      "elapsed holding time vs maxDurationSec",
+      "current TP/SL and strategy-exit conditions"
+    ],
+    "replayInformation": [
+      "historical post-entry path points were used only for offline counterfactual scoring"
+    ],
+    "forbiddenInRuntime": [
+      "future candles after hypothetical exit",
+      "future realized pnl labels",
+      "future regime/AI decisions"
+    ],
+    "finding": "No runtime recommendation depends on future-only information."
+  },
+  "productionCompatibility": {
+    "compatible": "PARTIAL",
+    "classification": "RESEARCH_ONLY_NEW_LOGIC_OR_SEMANTIC_CLEANUP",
+    "note": "MANUAL_TIMEOUT label semantics are mixed/misnamed; operational cleanup is needed before promotion."
+  },
+  "promotionGate": {
+    "status": "PROMISING",
+    "checks": {
+      "netExpectancyImproves": true,
+      "oosImproves": true,
+      "drawdownNotWorse": true,
+      "robustness": "ROBUST",
+      "lookaheadFree": true
+    }
+  },
+  "finalVerdict": {
+    "TRADES_REPLAYED": 163,
+    "MANUAL_TIMEOUT_TRADES": 17,
+    "MANUAL_TIMEOUT_SEMANTICS": "SYSTEM_TIMEOUT",
+    "VARIANT_D_NET_PNL_DELTA": 17.00464466,
+    "VARIANT_D_EXPECTANCY_DELTA": 0.10432297,
+    "VARIANT_D_DRAWDOWN_DELTA": 16.82043466,
+    "MANUAL_TIMEOUT_NET_DELTA": 10.72923462,
+    "OOS_DELTA": 0.04352356,
+    "ROBUSTNESS": "ROBUST",
+    "LOOKAHEAD_FREE": "YES",
+    "PRODUCTION_COMPONENT_COMPATIBLE": "PARTIAL",
+    "VARIANT_D_STATUS": "PROMISING",
+    "FIRST_EXPERIMENT": "Run controlled shadow experiment: MANUAL_TIMEOUT semantic split + Variant D precedence replay on same-entry cohorts",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+  },
+  "reportMustAnswer": {
+    "q1": "MANUAL_TIMEOUT is MISNAMED_SYSTEM_TIMEOUT",
+    "q2": "NO",
+    "q3": -10.34190362,
+    "q4": 17,
+    "q5": 0,
+    "q6": "Delta mostly comes from MANUAL_TIMEOUT and STOP_LOSS transition to TIME_EXIT/END_OF_REPLAY price points in variant replay path",
+    "q7": "ROBUST",
+    "q8": "YES_PARTIAL",
+    "q9": "YES",
+    "q10": "YES",
+    "q11": "YES",
+    "q12": "PARTIAL",
+    "q13": "YES",
+    "q14": "Controlled shadow replay with semantic audit gate",
+    "q15": "Do not change TDI/AI/risk/sizing/strategy/SL-TP/fee/exit configs in production based on this forensic-only pass."
+  }
+}

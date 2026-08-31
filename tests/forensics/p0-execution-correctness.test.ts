@@ -60,19 +60,30 @@ function mockAi(input: {
 }
 
 describe("P0-1 AI execution gate", () => {
-  const vetoPolicy = resolveAiExecutionGatePolicy({ mode: "paper", learningLane: true });
+  const productionPolicy = resolveAiExecutionGatePolicy({ mode: "paper", learningLane: true });
 
-  it("blocks NO_TRADE under default VETO policy", () => {
-    expect(vetoPolicy).toBe("VETO");
+  it("uses ADVISORY as the production default policy", () => {
+    expect(productionPolicy).toBe("ADVISORY");
     const gate = evaluateAiExecutionGate({
       aiDecision: "NO_TRADE",
-      policy: vetoPolicy,
+      policy: productionPolicy,
+      learningLane: true,
+      microTradeEligible: true,
+    });
+    expect(gate.verdict).toBe("AI_ADVISORY_ONLY");
+    expect(gate.executionSide).toBe("BUY");
+  });
+
+  it("blocks NO_TRADE under explicit VETO policy", () => {
+    const gate = evaluateAiExecutionGate({
+      aiDecision: "NO_TRADE",
+      policy: "VETO",
       learningLane: true,
       microTradeEligible: true,
     });
     expect(gate.verdict).toBe("AI_GATE_BLOCK");
     expect(gate.executionSide).toBeNull();
-    expect(gate.reasonCode).toBe("NO_TRADE");
+    expect(gate.reasonCode).toBe("AI_VETO");
   });
 
   for (const blocked of ["HOLD", "REJECT", "WAIT"] as const) {
@@ -85,7 +96,7 @@ describe("P0-1 AI execution gate", () => {
       });
       expect(gate.verdict).toBe("AI_GATE_BLOCK");
       expect(gate.executionSide).toBeNull();
-      expect(gate.reasonCode).toBe(blocked);
+      expect(gate.reasonCode).toBe("AI_VETO");
     });
   }
 
@@ -132,7 +143,7 @@ describe("P0-1 AI execution gate", () => {
       microTradeEligible: false,
     });
     expect(gate.verdict).toBe("AI_GATE_BLOCK");
-    expect(gate.reasonCode).toBe("CONSENSUS_MISSING");
+    expect(gate.reasonCode).toBe("AI_CONSENSUS_MISSING");
   });
 
   it("blocks when AI object is missing", () => {
@@ -157,7 +168,19 @@ describe("P0-1 AI execution gate", () => {
     expect(gate.reasonCode).toBe("AI_EVIDENCE_MISSING");
   });
 
-  it("marks advisory-only path explicitly when ADVISORY policy is enabled", () => {
+  it("advisory policy does not hard-veto NO_TRADE", () => {
+    const gate = evaluateAiExecutionGate({
+      aiDecision: "NO_TRADE",
+      policy: "ADVISORY",
+      learningLane: true,
+      microTradeEligible: true,
+    });
+    expect(gate.verdict).toBe("AI_ADVISORY_ONLY");
+    expect(gate.reasonCode).toBe("AI_ADVISORY");
+    expect(gate.executionSide).toBe("BUY");
+  });
+
+  it("advisory-only path proceeds without audited override payload", () => {
     const gate = evaluateAiExecutionGate({
       aiDecision: "NO_TRADE",
       policy: "ADVISORY",
@@ -167,7 +190,29 @@ describe("P0-1 AI execution gate", () => {
     expect(gate.verdict).toBe("AI_ADVISORY_ONLY");
     expect(gate.policy).toBe("ADVISORY");
     expect(gate.executionSide).toBe("BUY");
-    expect(gate.reasonCode).toBe("LEARNING_LANE_EXPLORATION_MICRO_TRADE");
+    expect(gate.reasonCode).toBe("AI_ADVISORY");
+  });
+
+  it("blocks when AI final decision conflicts with consensus", () => {
+    const gate = evaluateAiExecutionReadiness({
+      ai: mockAi({ finalDecision: "BUY", consensus: "NO_TRADE" }),
+      policy: "VETO",
+      learningLane: false,
+      microTradeEligible: false,
+    });
+    expect(gate.verdict).toBe("AI_GATE_BLOCK");
+    expect(gate.reasonCode).toBe("AI_DECISION_CONFLICT");
+  });
+
+  it("normalizes NO-TRADE spellings and blocks under veto", () => {
+    const gate = evaluateAiExecutionReadiness({
+      ai: mockAi({ finalDecision: "NO-TRADE", consensus: "NO TRADE" }),
+      policy: "VETO",
+      learningLane: false,
+      microTradeEligible: false,
+    });
+    expect(gate.verdict).toBe("AI_GATE_BLOCK");
+    expect(gate.reasonCode).toBe("AI_VETO");
   });
 
   it("persists AI gate verdict in forensic decision trace", () => {
@@ -224,6 +269,20 @@ describe("P0-2 exit model classification", () => {
       candles: [{ timestamp: 1100, high: 100.2, low: 98.8, close: 99.1 }],
     });
     expect(result?.exitReason).toBe("STOP_LOSS");
+  });
+
+  it("respects explicit same-candle TP precedence override", () => {
+    const result = replayExitFromCandles({
+      side: "LONG",
+      entryPrice: 100,
+      entryTimestamp: 1000,
+      takeProfitPrice: 101,
+      stopLossPrice: 99,
+      sameCandlePrecedence: "TAKE_PROFIT",
+      candles: [{ timestamp: 1100, high: 101.5, low: 98.5, close: 100.2 }],
+    });
+    expect(result?.exitReason).toBe("TAKE_PROFIT");
+    expect(result?.replayPrecedenceRule).toBe("TAKE_PROFIT");
   });
 
   it("classifies max-hold replay window as TIME_EXIT", () => {
@@ -291,6 +350,20 @@ describe("P0-2 exit model classification", () => {
     });
     expect(strategyExit.exitReason).toBe("STRATEGY_EXIT");
     expect(strategyExit.strategyExit).toBe(true);
+    expect(strategyExit.strategyExitReason).toBe("MOMENTUM_FADE");
+
+    const timeExit = mapPositionMonitorExit({
+      closeReason: "TIMEOUT",
+      entryPrice: 10,
+      exitPrice: 9.95,
+      entryTimestamp: Date.now() - 90_000,
+      side: "LONG",
+      quantity: 10,
+      decisionTimestamp: Date.now() - 1_000,
+      priceAtMonitorTick: 9.95,
+    });
+    expect(timeExit.exitReason).toBe("TIME_EXIT");
+    expect(timeExit.timeExitReason).toBe("TIMEOUT");
 
     const replayExit = mapReplayWindowExit({
       exitReason: "END_OF_REPLAY",
@@ -301,13 +374,21 @@ describe("P0-2 exit model classification", () => {
       takeProfitPrice: 101,
       stopLossPrice: 99,
       replayWindowEnded: true,
+      replayPrecedenceRule: "STOP_LOSS",
     });
     expect(replayExit.exitModel).toBe("REPLAY_WINDOW");
+    expect(replayExit.replayPrecedenceRule).toBe("STOP_LOSS");
   });
 });
 
 describe("P0-3 fee-aware metrics", () => {
   it("computes pre-trade fee edge metrics without future data", () => {
+    const guard = beginSimulationIntegrityGuard({
+      sessionId: "p0-fee-edge-no-lookahead",
+      decisionTimestamp: 1000,
+      stage: "ev",
+    });
+    expect(() => guard.assertDataTimestamp("future-candle", 1500)).toThrow(SimulationIntegrityViolation);
     const metrics = computeFeeEdgeMetrics({
       entryPrice: 5.05,
       quantity: 100,
@@ -326,6 +407,7 @@ describe("P0-3 fee-aware metrics", () => {
       Number((metrics.expectedGrossAtTp - metrics.estimatedRoundTripFees).toFixed(8)),
     );
     expect(metrics.expectedNetPnL).toBe(metrics.expectedNetAfterFeesAtTp);
+    expect(metrics.feeEdgeClass).toBeDefined();
   });
 
   it("records fee metrics on execution candidate forensic trace", () => {
@@ -377,6 +459,26 @@ describe("P0-3 fee-aware metrics", () => {
     expect(entry.feeToGrossRatio).toBe(computeClosedTradeFeeRatio({ grossPnL: entry.grossPnL, totalFee: entry.totalFee }));
     const reconcile = reconcileRoundPnl([entry], entry.netPnL);
     expect(reconcile.reconciled).toBe(true);
+  });
+
+  it("captures gross-positive but net-negative fee erosion cases", () => {
+    const entry = createPnlLedgerEntry({
+      tradeId: "t-fee-erosion",
+      symbol: "ATMTRY",
+      side: "LONG",
+      entryPrice: 10,
+      exitPrice: 10.01,
+      quantity: 10,
+      entryFee: 0.08,
+      exitFee: 0.08,
+      exitReason: "TAKE_PROFIT",
+      exitModel: "POSITION_MONITOR",
+    });
+    expect(entry.grossPnL).toBeGreaterThan(0);
+    expect(entry.netPnL).toBeLessThan(0);
+    expect(entry.grossPositiveNetNegative).toBe(true);
+    expect(entry.feeEdgeClass).toBe("FEE_EROSION");
+    expect(entry.feeReconciliationStatus).toBe("PASS");
   });
 
   it("marks fee reconciliation FAIL when totals diverge", () => {

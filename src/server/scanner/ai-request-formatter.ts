@@ -1,15 +1,27 @@
 import type { AIAnalysisInput } from "@/src/types/ai";
 import type { MarketContext } from "@/src/types/scanner";
-import { getKlines, getOrderBook, getRecentTrades } from "@/services/binance.service";
+import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
+import { isMarketDataUnavailableError } from "@/src/server/market-data/market-data-unavailable.error";
 import { getMarketSnapshot } from "@/src/server/scanner/market-snapshot-cache";
 import { buildMultiTimeframeAnalysis } from "@/src/server/ai/multi-timeframe.service";
 import { getAIAnalysisMemoryContext } from "@/src/server/ai/ai-analysis-memory.service";
+import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
+
+async function fromRamOrEmpty<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (isMarketDataUnavailableError(error)) return fallback;
+    throw error;
+  }
+}
 
 export async function formatAIRequest(
   context: MarketContext,
   strategyParams?: Record<string, unknown>,
   riskSettings?: AIAnalysisInput["riskSettings"],
 ): Promise<AIAnalysisInput> {
+  getMarketDataDaemon().subscribeDeep(context.symbol, "scanner-ai");
   const cached = getMarketSnapshot(context.symbol);
   const cachedUsable = Boolean(
     cached &&
@@ -27,15 +39,18 @@ export async function formatAIRequest(
           recentTrades: cached!.recentTrades,
         })
       : Promise.all([
-          getKlines(context.symbol, "1m", 80),
-          getOrderBook(context.symbol, 30),
-          getRecentTrades(context.symbol, 150),
+          fromRamOrEmpty(() => marketDataGateway.getKlines(context.symbol, "1m", 80), []),
+          fromRamOrEmpty(
+            () => marketDataGateway.getOrderBook(context.symbol, 30),
+            { lastUpdateId: 0, bids: [], asks: [] },
+          ),
+          fromRamOrEmpty(() => marketDataGateway.getRecentTrades(context.symbol, 150), []),
         ]).then(([klines, orderBook, recentTrades]) => ({ klines, orderBook, recentTrades })),
-    getKlines(context.symbol, "5m", 80),
-    getKlines(context.symbol, "15m", 80),
-    getKlines(context.symbol, "1h", 80),
-    getKlines(context.symbol, "4h", 80),
-    getKlines(context.symbol, "1d", 80),
+    Promise.resolve([]),
+    Promise.resolve([]),
+    Promise.resolve([]),
+    Promise.resolve([]),
+    Promise.resolve([]),
   ]);
   const { klines, orderBook, recentTrades } = baseSnapshot;
   const mtf = buildMultiTimeframeAnalysis({
@@ -78,6 +93,7 @@ export async function formatAIRequest(
       change24h: context.change24h,
       shortMomentumPercent: Number(context.metadata.shortMomentumPercent ?? 0),
       shortFlowImbalance: Number(context.metadata.shortFlowImbalance ?? 0),
+      shortTradeCount: Number(context.metadata.shortTradeCount ?? 0),
       tradeVelocity: Number(context.metadata.tradeVelocity ?? 0),
       // Harici kaynak bagli degilse notr default ile aciklanabilir karar korunur.
       btcDominanceBias: Number(context.metadata.btcDominanceBias ?? 0),

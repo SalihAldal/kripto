@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-08-19T09:36:30.000Z",
+  "reconciliationMode": "SAFE_STOP_REQUESTED_RECONCILIATION",
+  "jobs": [
+    {
+      "jobId": "cmsz9dsy80009unlw9c26k8hb",
+      "beforeStatus": "RUNNING",
+      "beforeStopRequested": true,
+      "beforeActiveRound": null,
+      "beforeLease": {
+        "state": "RUNNING",
+        "ownerId": "DESKTOP-3R7HR9F:51332:5e0e3464",
+        "lastHeartbeatAt": "2026-08-18T22:53:12.340Z",
+        "leaseLive": false,
+        "leaseStale": true
+      },
+      "ownerStatus": "NO_LIVE_OWNER",
+      "leaseStatus": "SCHEDULER_LEASE_STALE",
+      "roundStatus": "NO_OPEN_RUN",
+      "reason": "STALE_STOPPING_JOB",
+      "action": "stopAutoRoundJob (existing safe engine flow)",
+      "afterStatus": "STOPPED",
+      "afterStopRequested": true,
+      "afterTerminalState": "bekliyor",
+      "afterActiveRound": null,
+      "afterLease": {
+        "state": "RUNNING",
+        "ownerId": "DESKTOP-3R7HR9F:51332:5e0e3464",
+        "lastHeartbeatAt": "2026-08-18T22:53:12.340Z",
+        "leaseLive": false,
+        "leaseStale": true
+      },
+      "afterLock": {
+        "hasLocalLoop": false,
+        "ownershipRecords": 0
+      },
+      "reconciledAt": "2026-08-19T09:35:08.958Z"
+    },
+    {
+      "jobId": "cmsz7lzqi0009uneosnuhv08d",
+      "beforeStatus": "RUNNING",
+      "beforeStopRequested": true,
+      "beforeActiveRound": null,
+      "beforeLease": {
+        "state": "RUNNING",
+        "ownerId": "DESKTOP-3R7HR9F:10896:ece5bf89",
+        "lastHeartbeatAt": "2026-08-18T22:23:36.184Z",
+        "leaseLive": false,
+        "leaseStale": true
+      },
+      "ownerStatus": "NO_LIVE_OWNER",
+      "leaseStatus": "SCHEDULER_LEASE_STALE",
+      "roundStatus": "NO_OPEN_RUN",
+      "reason": "STALE_STOPPING_JOB",
+      "action": "stopAutoRoundJob (existing safe engine flow)",
+      "afterStatus": "STOPPED",
+      "afterStopRequested": true,
+      "afterTerminalState": "bekliyor",
+      "afterActiveRound": null,
+      "afterLease": {
+        "state": "RUNNING",
+        "ownerId": "DESKTOP-3R7HR9F:10896:ece5bf89",
+        "lastHeartbeatAt": "2026-08-18T22:23:36.184Z",
+        "leaseLive": false,
+        "leaseStale": true
+      },
+      "afterLock": {
+        "hasLocalLoop": false,
+        "ownershipRecords": 0
+      },
+      "reconciledAt": "2026-08-19T09:35:09.042Z"
+    }
+  ],
+  "postReconciliationProof": {
+    "runningJobsForUser": 0,
+    "openRunsForUser": 0,
+    "activeWorkerLocks": 0,
+    "duplicatePaperJobs": 0
+  }
+}
+

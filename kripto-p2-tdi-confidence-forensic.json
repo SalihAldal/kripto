@@ -1,0 +1,283 @@
+{
+  "generatedAt": "2026-08-22T14:13:34.901Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionChanges": true
+  },
+  "counts": {
+    "profitableHistoricalTrades": 42,
+    "currentPaperCandidates": 2278,
+    "evidenceClass": {
+      "EXACT_RUNTIME_REPLAY": 0,
+      "POLICY_FORENSIC_REPLAY": 0,
+      "INFERRED": 42
+    }
+  },
+  "confidenceFormula": {
+    "evidenceSource": {
+      "masterMetrics": "src/server/decision-engine/conflict-detection.service.ts",
+      "masterBlend": "src/server/decision-engine/master-decision-engine.service.ts",
+      "hybridConfidence": "src/server/ai/hybrid-decision-engine.ts"
+    },
+    "confidenceFormula": {
+      "masterMetricsConfidence": "clamp(consensusScore*0.55 + agreementScore*0.35 - conflictScore*0.15, 0, 100)",
+      "blendedConfidence": "clamp(hybridConfidence*0.55 + metrics.confidence*0.45 - metrics.conflictScore*0.08, 0, 100)",
+      "hybridRawDecisionConfidence": "clamp(technical.confidence*0.34 + sentiment.confidence*0.22 + (100-riskProviderRisk)*0.26 + tradeQualityScore*0.18 - conflictingFactors*4, 0, 100)",
+      "hybridAdjustedDecisionConfidence": "clamp(rawDecisionConfidence - criticSeverity*0.45 + criticOverrideTerm - regimeTransitionProbability*0.08 - regimeFlipRisk*0.06 - regimeChaosProbability*0.05 + stabilityBonus, 0, 100)"
+    },
+    "components": [
+      {
+        "name": "consensusScore",
+        "source": "computeConsensusMetrics",
+        "weight": 0.55,
+        "range": "0..100",
+        "normalization": "avg(actionable expert scores)",
+        "positiveContribution": "higher expert average raises confidence",
+        "negativeContribution": "lower expert scores reduce confidence",
+        "missingBehavior": "if all NO_OPINION, fallback to all opinions",
+        "noOpinionBehavior": "NO_OPINION excluded from actionable set",
+        "regimeInteraction": "indirect via MARKET expert",
+        "learningInteraction": "indirect via LEARNING expert",
+        "momentumInteraction": "indirect via MOMENTUM expert",
+        "sentimentInteraction": "indirect via expert outputs",
+        "technicalInteraction": "indirect via expert outputs"
+      },
+      {
+        "name": "agreementScore",
+        "source": "computeConsensusMetrics",
+        "weight": 0.35,
+        "range": "0..100",
+        "normalization": "derived from opinion polarity spread/stddev",
+        "positiveContribution": "higher agreement raises confidence",
+        "negativeContribution": "opinion dispersion lowers confidence",
+        "missingBehavior": "0 when no actionable polarity",
+        "noOpinionBehavior": "excluded before polarity build",
+        "regimeInteraction": "indirect",
+        "learningInteraction": "indirect",
+        "momentumInteraction": "indirect",
+        "sentimentInteraction": "indirect",
+        "technicalInteraction": "indirect"
+      },
+      {
+        "name": "conflictScore",
+        "source": "computeConsensusMetrics + blendedConfidence",
+        "weight": -0.15,
+        "range": "0..100",
+        "normalization": "conflicts.length*12 + severity sum*20, capped 100",
+        "positiveContribution": "none",
+        "negativeContribution": "direct subtraction from confidence",
+        "missingBehavior": "0 if no conflict",
+        "noOpinionBehavior": "NO_OPINION pairs skipped",
+        "regimeInteraction": "indirect",
+        "learningInteraction": "indirect",
+        "momentumInteraction": "indirect",
+        "sentimentInteraction": "indirect",
+        "technicalInteraction": "indirect"
+      },
+      {
+        "name": "hybridConfidence",
+        "source": "hybrid-decision-engine",
+        "weight": 0.55,
+        "range": "0..100",
+        "normalization": "role confidence blend + risk/regime/critic penalties",
+        "positiveContribution": "technical/sentiment quality and tradeQuality",
+        "negativeContribution": "critic severity + conflict factors + regime risk penalties",
+        "missingBehavior": "provider confidence defaults near neutral",
+        "noOpinionBehavior": "handled as neutral defaults in role pipeline",
+        "regimeInteraction": "explicit penalties/bonus",
+        "learningInteraction": "mostly downstream via master",
+        "momentumInteraction": "shortMomentum/shortFlow via conflicting factors and gating",
+        "sentimentInteraction": "direct weighted input",
+        "technicalInteraction": "direct weighted input"
+      }
+    ],
+    "thresholds": {
+      "minMasterConfidenceToPreserve": 40,
+      "minMasterBuyConfidence": 62,
+      "minHybridConfidenceToPreserve": 65
+    }
+  },
+  "reconstruction": {
+    "reconstructable": 0,
+    "notReconstructable": 42,
+    "status": "LIMITED"
+  },
+  "componentContribution": {
+    "topConfidenceSuppressor": "LEARNING_CONFIDENCE_INTERACTION",
+    "note": "Runtime expert-level contribution per historical trade is unavailable for most profitable cohort records; blocker and formula-level evidence used."
+  },
+  "interactions": [
+    {
+      "interaction": "confidence_x_momentum",
+      "interactionCount": 2278,
+      "WAIT_count": 193,
+      "profitableTradeCount": 42,
+      "averageConfidenceGap": -17.21831,
+      "averageNetPnL": 0.058422,
+      "class": "INTERACTION_EFFECT"
+    },
+    {
+      "interaction": "confidence_x_learning",
+      "interactionCount": 1135,
+      "WAIT_count": 1135,
+      "profitableTradeCount": 42,
+      "averageConfidenceGap": -22.104714,
+      "averageNetPnL": 0.058422,
+      "class": "DOWNSTREAM_EFFECT"
+    },
+    {
+      "interaction": "confidence_x_technical",
+      "interactionCount": 397,
+      "WAIT_count": 397,
+      "profitableTradeCount": 42,
+      "averageConfidenceGap": -19.560126,
+      "averageNetPnL": 0.058422,
+      "class": "INTERACTION_EFFECT"
+    },
+    {
+      "interaction": "confidence_x_regime",
+      "interactionCount": 2278,
+      "WAIT_count": 193,
+      "profitableTradeCount": 42,
+      "averageConfidenceGap": -17.21831,
+      "averageNetPnL": 0.058422,
+      "class": "UNKNOWN"
+    }
+  ],
+  "doublePenaltyAudit": {
+    "momentumScore_shortMomentum_shortFlow_overlap": 1448,
+    "learning_plus_low_confidence_overlap": 1135,
+    "verdict": "PARTIAL"
+  },
+  "normalizationAudit": {
+    "confidenceRangeObserved": {
+      "count": 2278,
+      "mean": 22.78169,
+      "median": 19.44,
+      "p25": 13.16,
+      "p75": 30.47,
+      "min": 6.33,
+      "max": 55.7
+    },
+    "anomalies": [],
+    "verdict": "NO"
+  },
+  "profitabilityRelation": {
+    "historicalProfitableConfidence": {
+      "count": 0,
+      "mean": null,
+      "median": null,
+      "p25": null,
+      "p75": null,
+      "min": null,
+      "max": null
+    },
+    "historicalLossConfidence": {
+      "count": 0,
+      "mean": null,
+      "median": null,
+      "p25": null,
+      "p75": null,
+      "min": null,
+      "max": null
+    },
+    "calibration": "UNKNOWN",
+    "quantileBuckets": []
+  },
+  "counterfactual": {
+    "label": "HISTORICAL_COUNTERFACTUAL",
+    "historicalBlockedProfitCount": 42,
+    "historicalNetPnLSuppressed": 2.45373448,
+    "averageSuppressedNetPnL": 0.05842225
+  },
+  "currentPopulation": {
+    "confidenceFailures": 2029,
+    "blockerCounts": {
+      "MOMENTUM": 664,
+      "LEARNING": 1135,
+      "TECHNICAL": 397,
+      "RISK": 74,
+      "CONFIDENCE": 8
+    },
+    "zeroApprovalPrimary": "CONFIDENCE_INTERACTION"
+  },
+  "oos": {
+    "trainCount": 25,
+    "validationCount": 8,
+    "oosCount": 9,
+    "trainWaitRate": 1,
+    "validationWaitRate": 1,
+    "oosWaitRate": 1,
+    "support": "YES"
+  },
+  "experiments": [
+    {
+      "experiment": "CONFIDENCE_INTERACTION_CORRECTION",
+      "hypothesis": "Confidence suppression is mainly interaction-driven (learning+momentum/technical coupling), not pure threshold issue.",
+      "evidence": {
+        "currentBlockers": {
+          "MOMENTUM": 664,
+          "LEARNING": 1135,
+          "TECHNICAL": 397,
+          "RISK": 74,
+          "CONFIDENCE": 8
+        },
+        "confidenceFailures": 2029,
+        "momentumTrio": 1448
+      },
+      "affectedTrades": 42,
+      "expectedImpact": "Recover correctness in candidate routing without lowering thresholds.",
+      "risk": "LOW (shadow/forensic only)",
+      "successCriterion": "Reduced WAIT share in offline replay by removing only proven duplicate/interaction penalty.",
+      "OOSStatus": "YES",
+      "rank": 1
+    },
+    {
+      "experiment": "DUPLICATE_PENALTY_CORRECTION",
+      "hypothesis": "Momentum is counted multiple times (momentumScore + shortMomentum + shortFlow) and compounds confidence suppression.",
+      "evidence": {
+        "momentumTrio": 1448
+      },
+      "affectedTrades": 42,
+      "expectedImpact": "Lower false WAIT while preserving risk controls.",
+      "risk": "LOW-MEDIUM",
+      "successCriterion": "Duplicate-penalty candidates show confidence gap reduction with unchanged threshold.",
+      "OOSStatus": "YES",
+      "rank": 2
+    },
+    {
+      "experiment": "REGIME_CONFIDENCE_SHADOW",
+      "hypothesis": "Regime-sensitive penalty terms reduce confidence disproportionately in specific regimes.",
+      "evidence": {
+        "regimeCounts": {
+          "RANGE": 834,
+          "LOW_VOLATILITY": 530,
+          "HIGH_VOLATILITY": 904,
+          "TREND": 10
+        }
+      },
+      "affectedTrades": 42,
+      "expectedImpact": "Explain regime-linked suppression mechanism before any policy changes.",
+      "risk": "LOW",
+      "successCriterion": "Interaction survives validation/OOS subsets.",
+      "OOSStatus": "YES",
+      "rank": 3
+    }
+  ],
+  "finalVerdict": {
+    "PROFITABLE_HISTORICAL_TRADES": 42,
+    "CURRENT_PAPER_CANDIDATES": 2278,
+    "CONFIDENCE_SUPPRESSION": "DOMINANT",
+    "TOP_CONFIDENCE_SUPPRESSOR": "LEARNING_CONFIDENCE_INTERACTION",
+    "DOUBLE_PENALTY": "PARTIAL",
+    "NORMALIZATION_BUG": "NO",
+    "CONFIDENCE_CALIBRATION": "UNKNOWN",
+    "CONFIDENCE_INTERACTION": "MIXED",
+    "HISTORICAL_COUNTERFACTUAL_NET_PNL": 2.45373448,
+    "OOS_SUPPORTED": "YES",
+    "FIRST_EXPERIMENT": "CONFIDENCE_INTERACTION_CORRECTION",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO",
+    "CURRENT_ZERO_APPROVAL_EXPLAINED": "YES"
+  }
+}

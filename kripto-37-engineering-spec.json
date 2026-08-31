@@ -1,0 +1,12 @@
+{
+  "selectedFix": "FIX_SCANNER",
+  "category": "SCANNER_FIX",
+  "file": "src/server/scanner/scanner.service.ts",
+  "function": "PRE_AI spread gate + scanner reject reason surfacing",
+  "condition": "spreadPercent > maxPreAiSpreadPercent && !momentumBreakout.ok; scanner REJECTED without reasonDetail",
+  "currentBehavior": "Spread gate cancels AI-bound candidates (PRE_AI_SPREAD_REJECT); 23/37 first-blocker events are scanner|REJECTED with empty underlying condition in artifacts",
+  "expectedBehavior": "Surface exact reject condition at scanner stage; shadow-evaluate spread+momentumBreakout before hard veto on qualified symbols",
+  "minimalChange": "Add reject-reason telemetry at scanner qualification + shadow spread+momentum gate; single-variable paper validation before threshold change",
+  "implementInThisTask": false,
+  "researchExecutionReadyAfterFix": 5
+}

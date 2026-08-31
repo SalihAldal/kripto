@@ -1,0 +1,1921 @@
+{
+  "generatedAt": "2026-08-23T16:44:11.299Z",
+  "constraints": {
+    "noPaperRun": true,
+    "noProductionCodeChange": true,
+    "noThresholdChange": true
+  },
+  "sources": {
+    "cohort37": "C:\\Users\\salih\\Desktop\\kripto-main\\kripto-37-actionable-top-gainer-forensic.json",
+    "globalForensic": "C:\\Users\\salih\\Desktop\\kripto-main\\kripto-global-missed-opportunity-forensic.json",
+    "shadowCsv": "C:\\Users\\salih\\Desktop\\kripto-main\\kripto-p2-single-variable-shadow-diff.csv",
+    "paperSession": "cmt5tpkex0001unpsl9hvy50n",
+    "attribution": "C:\\Users\\salih\\Desktop\\kripto-main\\kripto-p2-deep-profitability-attribution.json"
+  },
+  "cohort37": {
+    "count": 37,
+    "members": [
+      {
+        "symbol": "RAYTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "CONSENSUS",
+        "firstBlockerDetail": "PRE_AI_SPREAD_REJECT|Candidate rejected before AI due to spread gate",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=56.40, sentiment=65.23, risk=66.24, composite=61.35, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "NO",
+        "rootCategory": "UNKNOWN",
+        "falseNegative": true,
+        "legitimateRejection": true,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 5.834502103786812,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "PORTALTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "CONSENSUS",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "REJECTED|",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "NO",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 7.153965785381016,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "AMPTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=LOW_VOLATILITY_CALM, tech=57.89, sentiment=38.39, risk=57.88, composite=52.82, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 5.472636815920399,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "THETRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "EV_REJECT|EV_REJECT",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "NO",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 4.567022538552785,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "ZROTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "REJECTED|",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 4.436229205175598,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "HYPERTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 4.3613707165109075,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "RETRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=41.48, sentiment=14.56, risk=67.88, composite=41.61, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 4.119377889869695,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "DASHTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "CONSENSUS",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "REJECTED|",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "NO",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 4.018311291963377,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "TRBTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 3.0474040632054176,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "ROBOTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 3.0487804878048808,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "TSTTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 3.4021871202916194,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "TRUMPTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "CONSENSUS",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "REJECTED|",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "NO",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "CONSENSUS"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 3.2541776605101167,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "ICPTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=20.40, sentiment=39.94, risk=61.97, composite=36.70, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 13.636363636363633,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "XRPTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=HIGH_VOLATILITY_CHAOS, tech=45.30, sentiment=42.51, risk=46.78, composite=44.97, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 3.2102272727272596,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "MEGATRY",
+        "firstTrueBlocker": "AI",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=LOW_VOLATILITY_CALM, tech=48.90, sentiment=36.98, risk=65.42, composite=50.26, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "AI_RELIABILITY",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 2.811035918792298,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "FFTRY",
+        "firstTrueBlocker": "AI",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=62.55, sentiment=42.92, risk=67.88, composite=58.89, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "AI_RELIABILITY",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 7.421977445580905,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "MIRATRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.858575727181553,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "NEIROTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=LOW_VOLATILITY_CALM, tech=32.12, sentiment=34.31, risk=59.52, composite=40.09, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.7649769585253527,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "EULTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=41.48, sentiment=51.84, risk=61.97, composite=49.71, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 8.97226753670473,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "STRAXTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=LOW_VOLATILITY_CALM, tech=34.73, sentiment=36.77, risk=59.52, composite=41.95, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 8.200455580865599,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "EGLDTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 6.341154090044389,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "SOLTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 4.2992567537496065,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "WIFTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 3.020277481323386,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "ENSTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=46.04, sentiment=39.12, risk=67.88, composite=50.14, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 4.278863887864244,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "AVNTTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "SCANNER",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "NO",
+        "consensusReached": "NO",
+        "evReached": "NO",
+        "executionReady": "NO",
+        "aiTrueBlock": "NO",
+        "consensusTrueBlock": "NO",
+        "evTrueBlock": "NO",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 3.9665970772442667,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "IOTATRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "SCANNER",
+        "firstBlockerDetail": "PRE_AI_SPREAD_REJECT|Candidate rejected before AI due to spread gate",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "NO",
+        "evReached": "NO",
+        "executionReady": "NO",
+        "aiTrueBlock": "NO",
+        "consensusTrueBlock": "NO",
+        "evTrueBlock": "NO",
+        "rootCategory": "UNKNOWN",
+        "falseNegative": true,
+        "legitimateRejection": true,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 3.4563288183091943,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "METTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "SCANNER",
+        "firstBlockerDetail": "PRE_AI_SPREAD_REJECT|Candidate rejected before AI due to spread gate",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "NO",
+        "evReached": "NO",
+        "executionReady": "NO",
+        "aiTrueBlock": "NO",
+        "consensusTrueBlock": "NO",
+        "evTrueBlock": "NO",
+        "rootCategory": "UNKNOWN",
+        "falseNegative": true,
+        "legitimateRejection": true,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 3.4253092293054186,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "BONKTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "AI_DEGRADED|AI_DEGRADED",
+        "finalBlockerDetail": "REJECTED|",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "EV"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "AI"
+        },
+        "maxIntrawindowGain": 2.967741935483873,
+        "classification": "E) DISCOVERED_BUT_AI_BLOCKED"
+      },
+      {
+        "symbol": "ALGOTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=LOW_VOLATILITY_CALM, tech=34.31, sentiment=45.05, risk=65.42, composite=45.50, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.998636983189452,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "JUPTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=40.58, sentiment=33.76, risk=67.88, composite=46.18, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.880658436213985,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "BREVTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "SCANNER",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "NO",
+        "consensusReached": "NO",
+        "evReached": "NO",
+        "executionReady": "NO",
+        "aiTrueBlock": "NO",
+        "consensusTrueBlock": "NO",
+        "evTrueBlock": "NO",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.85714285714286,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "PYTHTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "EV_REJECT|EV_REJECT",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.737520128824479,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "WALTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=RANGE_SIDEWAYS, tech=55.45, sentiment=54.71, risk=67.88, composite=58.61, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.6785714285714106,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "OGNTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "REJECTED|REJECTED",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": true,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.6744186046511653,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "IOTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "SCANNER",
+        "firstBlockerDetail": "PRE_AI_SPREAD_REJECT|Candidate rejected before AI due to spread gate",
+        "finalBlockerDetail": "REJECTED|REJECTED",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "NO",
+        "evReached": "NO",
+        "executionReady": "NO",
+        "aiTrueBlock": "NO",
+        "consensusTrueBlock": "NO",
+        "evTrueBlock": "NO",
+        "rootCategory": "UNKNOWN",
+        "falseNegative": true,
+        "legitimateRejection": true,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.508796083830499,
+        "classification": "B) DISCOVERED_BUT_SCANNER_REJECTED"
+      },
+      {
+        "symbol": "STRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "CONSENSUS_REJECT|regime=LOW_VOLATILITY_CALM, tech=31.48, sentiment=39.82, risk=59.52, composite=41.22, risk_veto=false",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.4672320740169646,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "symbol": "VETTRY",
+        "firstTrueBlocker": "SCANNER",
+        "finalBlocker": "EV",
+        "firstBlockerDetail": "SCANNER_REJECT|REJECTED",
+        "finalBlockerDetail": "EV_REJECT|EV_REJECT",
+        "tdiReached": "NO",
+        "tdiBlocked": "NO",
+        "aiReached": "YES",
+        "consensusReached": "YES",
+        "evReached": "YES",
+        "executionReady": "NO",
+        "aiTrueBlock": "YES",
+        "consensusTrueBlock": "YES",
+        "evTrueBlock": "YES",
+        "rootCategory": "MULTI_GATE",
+        "falseNegative": false,
+        "legitimateRejection": false,
+        "counterfactualA": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualB": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualC": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualD": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualE": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "counterfactualF": {
+          "wouldReachExecutionReady": "NO",
+          "nextBlocker": "SCANNER"
+        },
+        "maxIntrawindowGain": 2.4074074074074097,
+        "classification": "L) INSUFFICIENT_EVIDENCE"
+      }
+    ]
+  },
+  "shadow932": {
+    "count": 932,
+    "reachedAi": 883,
+    "reachedConsensus": 883,
+    "reachedEv": 883,
+    "executionReady": 0,
+    "evOrderingProblems": 689,
+    "aiReliabilityOrPolicyRows": 694,
+    "shadowWouldReleaseCount": 893,
+    "downstreamKillerAfterShadowPass": {
+      "SCANNER": 130,
+      "AI": 557,
+      "UNKNOWN": 24,
+      "MASTER": 138,
+      "CONSENSUS": 44
+    },
+    "dominantDownstreamKiller": "AI",
+    "note": "Hybrid path emits AI/consensus/EV traces even when qualification rejects; firstTrueBlocker uses pipeline order (qualification before hybrid telemetry)."
+  },
+  "transitions": [
+    {
+      "transition": "SHADOW_DELTA→reachedAI_YES",
+      "count": 883
+    },
+    {
+      "transition": "SHADOW_AI→consensus_YES",
+      "count": 883
+    },
+    {
+      "transition": "SHADOW_CONSENSUS→ev_YES",
+      "count": 883
+    },
+    {
+      "transition": "SHADOW_DELTA→reachedAI_NO",
+      "count": 49
+    },
+    {
+      "transition": "SCANNER_FAIL",
+      "count": 35
+    },
+    {
+      "transition": "SCANNER_PASS",
+      "count": 2
+    },
+    {
+      "transition": "SCANNER_PASS→AI_FAIL",
+      "count": 2
+    }
+  ],
+  "rootCauseRanking": [
+    {
+      "category": "MULTI_GATE",
+      "affected": 31,
+      "firstBlocker": 31,
+      "finalBlocker": 0,
+      "falseNegative": 10,
+      "legitimate": 0,
+      "share": 0.8378378378378378
+    },
+    {
+      "category": "UNKNOWN",
+      "affected": 4,
+      "firstBlocker": 4,
+      "finalBlocker": 0,
+      "falseNegative": 4,
+      "legitimate": 4,
+      "share": 0.10810810810810811
+    },
+    {
+      "category": "AI_RELIABILITY",
+      "affected": 2,
+      "firstBlocker": 2,
+      "finalBlocker": 0,
+      "falseNegative": 0,
+      "legitimate": 0,
+      "share": 0.05405405405405406
+    }
+  ],
+  "lossControl": [
+    {
+      "gateRemoved": "AI",
+      "cohortReleased": 0,
+      "cohortShare": 0,
+      "historicalPairedTrades": 173,
+      "historicalProfitableOpportunities": 42,
+      "historicalLossTrades": 206,
+      "profitableReleasedEstimate": 0,
+      "losingReleasedEstimate": 15,
+      "netPnLImpact": "NOT_RE_SIMULATED",
+      "expectancy": "NOT_RE_SIMULATED",
+      "lossControlNote": "Per-gate historical re-simulation not available; estimates from attribution feeAwareImpact + cohort counterfactual release counts",
+      "status": "PARTIAL"
+    },
+    {
+      "gateRemoved": "CONSENSUS",
+      "cohortReleased": 0,
+      "cohortShare": 0,
+      "historicalPairedTrades": 173,
+      "historicalProfitableOpportunities": 42,
+      "historicalLossTrades": 206,
+      "profitableReleasedEstimate": 1,
+      "losingReleasedEstimate": 8,
+      "netPnLImpact": "NOT_RE_SIMULATED",
+      "expectancy": "NOT_RE_SIMULATED",
+      "lossControlNote": "Per-gate historical re-simulation not available; estimates from attribution feeAwareImpact + cohort counterfactual release counts",
+      "status": "PARTIAL"
+    },
+    {
+      "gateRemoved": "MASTER",
+      "cohortReleased": 0,
+      "cohortShare": 0,
+      "historicalPairedTrades": 173,
+      "historicalProfitableOpportunities": 42,
+      "historicalLossTrades": 206,
+      "profitableReleasedEstimate": 0,
+      "losingReleasedEstimate": 5,
+      "netPnLImpact": "NOT_RE_SIMULATED",
+      "expectancy": "NOT_RE_SIMULATED",
+      "lossControlNote": "Per-gate historical re-simulation not available; estimates from attribution feeAwareImpact + cohort counterfactual release counts",
+      "status": "PARTIAL"
+    },
+    {
+      "gateRemoved": "EV",
+      "cohortReleased": 0,
+      "cohortShare": 0,
+      "historicalPairedTrades": 173,
+      "historicalProfitableOpportunities": 42,
+      "historicalLossTrades": 206,
+      "profitableReleasedEstimate": 3,
+      "losingReleasedEstimate": 5,
+      "netPnLImpact": "NOT_RE_SIMULATED",
+      "expectancy": "NOT_RE_SIMULATED",
+      "lossControlNote": "Per-gate historical re-simulation not available; estimates from attribution feeAwareImpact + cohort counterfactual release counts",
+      "status": "PARTIAL"
+    },
+    {
+      "gateRemoved": "RISK",
+      "cohortReleased": 0,
+      "cohortShare": 0,
+      "historicalPairedTrades": 173,
+      "historicalProfitableOpportunities": 42,
+      "historicalLossTrades": 206,
+      "profitableReleasedEstimate": 0,
+      "losingReleasedEstimate": 5,
+      "netPnLImpact": "NOT_RE_SIMULATED",
+      "expectancy": "NOT_RE_SIMULATED",
+      "lossControlNote": "Per-gate historical re-simulation not available; estimates from attribution feeAwareImpact + cohort counterfactual release counts",
+      "status": "PARTIAL"
+    },
+    {
+      "gateRemoved": "SIZING",
+      "cohortReleased": 0,
+      "cohortShare": 0,
+      "historicalPairedTrades": 173,
+      "historicalProfitableOpportunities": 42,
+      "historicalLossTrades": 206,
+      "profitableReleasedEstimate": 0,
+      "losingReleasedEstimate": 5,
+      "netPnLImpact": "NOT_RE_SIMULATED",
+      "expectancy": "NOT_RE_SIMULATED",
+      "lossControlNote": "Per-gate historical re-simulation not available; estimates from attribution feeAwareImpact + cohort counterfactual release counts",
+      "status": "PARTIAL"
+    },
+    {
+      "gateRemoved": "REFERENCE_feeAware",
+      "cohortReleased": 3,
+      "profitableReleasedEstimate": 3,
+      "losingReleasedEstimate": 6,
+      "lossControlNote": "feeAwareImpact from deep-profitability-attribution",
+      "status": "PARTIAL"
+    }
+  ],
+  "engineeringSpec": {
+    "selectedFix": "FIX_AI_RELIABILITY",
+    "file": "src/server/ai/ai-orchestration.service.ts",
+    "function": "orchestrateProviderCalls",
+    "condition": "All provider calls degraded (DEGRADED_FALLBACK) with success=false before consensus",
+    "currentBehavior": "Paper session: rounds 1–5 terminal AI_NO_RESPONSE / AI_DECISION_CONFLICT; ai-trace shows 100% degraded provider calls; 0 execution-ready despite scanner shadow diffs",
+    "expectedBehavior": "Restore AI provider health + explicit reliability telemetry; round must not proceed to consensus on all-degraded path without operator signal",
+    "minimalSafeFix": "Add AI provider health gate and degraded-path telemetry; do NOT weaken VETO, consensus, or EV thresholds",
+    "shadowDownstreamAfterRelease": {
+      "SCANNER": 130,
+      "AI": 557,
+      "UNKNOWN": 24,
+      "MASTER": 138,
+      "CONSENSUS": 44
+    },
+    "mustNotChange": [
+      "TDI thresholds",
+      "momentum thresholds",
+      "confidence thresholds",
+      "AI VETO policy",
+      "consensus thresholds",
+      "EV thresholds",
+      "scanner production policy",
+      "Variant_D",
+      "risk/sizing/exits"
+    ],
+    "implementInThisTask": false
+  },
+  "verdict": {
+    "CANDIDATES_ANALYZED": 969,
+    "AI_REACHED": 35,
+    "AI_TRUE_BLOCK": 32,
+    "AI_RELIABILITY_BLOCK": 2,
+    "CONSENSUS_TRUE_BLOCK": 31,
+    "MASTER_TRUE_BLOCK": 0,
+    "EV_TRUE_BLOCK": 28,
+    "RISK_BLOCK": 0,
+    "SIZING_BLOCK": 0,
+    "EXECUTION_BLOCK": 0,
+    "UNKNOWN": 0,
+    "FIRST_TRUE_BLOCKER_DISTRIBUTION": {
+      "SCANNER": 35,
+      "AI": 2
+    },
+    "FINAL_BLOCKER_DISTRIBUTION": {
+      "CONSENSUS": 4,
+      "EV": 28,
+      "SCANNER": 5
+    },
+    "SHADOW_932_REACHED_AI": 883,
+    "SHADOW_932_REACHED_CONSENSUS": 883,
+    "SHADOW_932_REACHED_EV": 883,
+    "SHADOW_932_EXECUTION_READY": 0,
+    "PRIMARY_ROOT_CAUSE": "AI_RELIABILITY",
+    "PRIMARY_ROOT_CAUSE_SHARE": 0.7446351931330472,
+    "PRIMARY_FALSE_NEGATIVES": 10,
+    "PRIMARY_LEGITIMATE_REJECTIONS": 4,
+    "LOSS_CONTROL": "PARTIAL",
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "PRIMARY_ENGINEERING_FIX": "FIX_AI_RELIABILITY",
+    "EVIDENCE_CONFIDENCE": "HIGH",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO",
+    "NEXT_ENGINEERING_TASK": "Add AI provider health gate and degraded-path telemetry; do NOT weaken VETO, consensus, or EV thresholds"
+  }
+}

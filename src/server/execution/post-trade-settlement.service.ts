@@ -295,6 +295,7 @@ async function recordFeedbackLearning(input: {
         deepAnalysis,
         learningWeight,
         marketEvidence,
+        decisionFeatureSnapshot: (metadata.decisionFeatureSnapshot as Record<string, unknown> | undefined) ?? undefined,
       },
       openedAt: input.position.openedAt,
       closedAt,
@@ -375,15 +376,25 @@ export async function settleOpenPosition(input: {
   positionId: string;
   reason: PositionCloseReason;
   mode: TradingMode;
+  variantDEnabled?: boolean;
+  baselineComparableExitReason?: string | null;
+  actualVariantDExitReason?: string | null;
 }) {
   const position = await getPositionById(input.positionId);
   if (!position || position.status !== "OPEN") {
     return { closed: false, reason: "Position not found or already closed." };
   }
+  const decisionTimestamp = new Date().toISOString();
+  const variantTelemetryMeta = {
+    variantDEnabled: Boolean(input.variantDEnabled),
+    baselineComparableExitReason: input.baselineComparableExitReason ?? null,
+    actualVariantDExitReason: input.actualVariantDExitReason ?? null,
+  };
 
   const symbol = position.tradingPair.symbol;
+  const positionMeta = (position.metadata as Record<string, unknown> | null) ?? {};
   const venue = String(
-    ((position.metadata as Record<string, unknown> | null)?.executionVenue as string | undefined) ?? "BINANCE_TR",
+    (positionMeta.executionVenue as string | undefined) ?? "BINANCE_TR",
   );
   const isGlobalVenue = venue === "BINANCE_GLOBAL";
   const closeSide = position.side === "LONG" ? "SELL" : "BUY";
@@ -409,16 +420,69 @@ export async function settleOpenPosition(input: {
     };
   }
 
+  const recordClosedTradeForensics = (inputForensics: {
+    reason: PositionCloseReason;
+    closePrice: number;
+    quantity: number;
+    openFee: number;
+    closeFee: number;
+    slippageCost?: number;
+    decisionTimestamp?: string;
+  }) => {
+    const exitForensicsSnapshot = mapPositionMonitorExit({
+      closeReason: inputForensics.reason,
+      entryPrice: position.entryPrice,
+      exitPrice: inputForensics.closePrice,
+      entryTimestamp: position.openedAt,
+      exitTimestamp: new Date(),
+      takeProfitPrice: Number(positionMeta.takeProfitPrice ?? positionMeta.targetSellPrice ?? 0) || null,
+      stopLossPrice: Number(positionMeta.stopLossPrice ?? 0) || null,
+      side: position.side,
+      quantity: inputForensics.quantity,
+      openFee: inputForensics.openFee,
+      closeFee: inputForensics.closeFee,
+      decisionTimestamp: inputForensics.decisionTimestamp ?? decisionTimestamp,
+      priceAtMonitorTick: inputForensics.closePrice,
+    });
+    bridgeClosedTradePnl({
+      tradeId: position.id,
+      positionId: position.id,
+      symbol,
+      side: position.side,
+      entryPrice: position.entryPrice,
+      exitPrice: inputForensics.closePrice,
+      quantity: inputForensics.quantity,
+      entryFee: inputForensics.openFee,
+      exitFee: inputForensics.closeFee,
+      slippageCost: inputForensics.slippageCost ?? 0,
+      exitReason: exitForensicsSnapshot.exitReason,
+      exitModel: exitForensicsSnapshot.exitModel,
+      exitForensics: exitForensicsSnapshot,
+    });
+    return exitForensicsSnapshot;
+  };
+
   const finalizeBalanceMismatchClose = async (errorMessage: string) => {
+    const openFee = resolveOpenFee(position);
+    const settledQty = Number.isFinite(effectiveCloseQty) && effectiveCloseQty > 0 ? effectiveCloseQty : position.quantity;
+    recordClosedTradeForensics({
+      reason: input.reason,
+      closePrice: exitPrice,
+      quantity: settledQty,
+      openFee,
+      closeFee: 0,
+      slippageCost: 0,
+    });
     await closePositionRecord({
       positionId: position.id,
       closePrice: exitPrice,
       realizedPnl: 0,
-      feeTotal: position.feeTotal ?? 0,
+      feeTotal: openFee,
       metadata: {
         closeReason: input.reason,
         closeMode: "BALANCE_MISMATCH_AUTO_CLOSE",
         closeError: errorMessage,
+        ...variantTelemetryMeta,
       },
     });
     await createPnlRecord({
@@ -429,7 +493,7 @@ export async function settleOpenPosition(input: {
       unrealizedPnl: 0,
       grossPnl: 0,
       netPnl: 0,
-      feeTotal: position.feeTotal ?? 0,
+      feeTotal: openFee,
       slippageCost: 0,
       roePercent: 0,
       notes: `Balance mismatch auto-close: ${input.reason}`,
@@ -438,6 +502,7 @@ export async function settleOpenPosition(input: {
         symbol,
         closeError: errorMessage,
         skipExchangeCloseOrder: true,
+        ...variantTelemetryMeta,
       },
     });
     await addSystemLog({
@@ -464,7 +529,7 @@ export async function settleOpenPosition(input: {
         realizedPnl: 0,
         grossPnl: 0,
         netPnl: 0,
-        feeTotal: position.feeTotal ?? 0,
+        feeTotal: openFee,
         slippageCost: 0,
         roePercent: 0,
       },
@@ -497,7 +562,6 @@ export async function settleOpenPosition(input: {
   });
 
   let closeOrder: PlaceOrderResult | null = null;
-  const positionMeta = (position.metadata as Record<string, unknown> | null) ?? {};
   const closeSafety = await runPreTradeSafetyValidation({
     executionId: input.executionId,
     userId: position.userId,
@@ -620,6 +684,14 @@ export async function settleOpenPosition(input: {
             closeFee: 0,
             slippageCost: 0,
           });
+          recordClosedTradeForensics({
+            reason: input.reason,
+            closePrice: exitPrice,
+            quantity: effectiveCloseQty,
+            openFee: resolveOpenFee(position),
+            closeFee: 0,
+            slippageCost: 0,
+          });
           await closePositionRecord({
             positionId: position.id,
             closePrice: exitPrice,
@@ -630,6 +702,7 @@ export async function settleOpenPosition(input: {
               roePercent: fallbackPnl.roePercent,
               closeMode: "DUST_AUTO_CLOSE",
               closeError: (lastError as Error)?.message ?? "Notional below min",
+              ...variantTelemetryMeta,
             },
           });
           await createPnlRecord({
@@ -649,6 +722,7 @@ export async function settleOpenPosition(input: {
               symbol,
               skipExchangeCloseOrder: true,
               closeError: (lastError as Error)?.message ?? "Notional below min",
+              ...variantTelemetryMeta,
             },
           });
           await addSystemLog({
@@ -761,6 +835,7 @@ export async function settleOpenPosition(input: {
         mode: input.mode,
         linkedPositionId: position.id,
         pendingCloseOrder: true,
+        ...variantTelemetryMeta,
       },
     });
     await logTradeEvent({
@@ -788,6 +863,7 @@ export async function settleOpenPosition(input: {
         mode: input.mode,
         reason: input.reason,
         exchangeStatus: closeOrder.status,
+        ...variantTelemetryMeta,
       },
     });
     publishExecutionEvent({
@@ -831,32 +907,14 @@ export async function settleOpenPosition(input: {
     slippageCost,
   });
 
-  const exitForensicsSnapshot = mapPositionMonitorExit({
-    closeReason: input.reason,
-    entryPrice: position.entryPrice,
-    exitPrice,
-    entryTimestamp: position.openedAt,
-    exitTimestamp: new Date(),
-    takeProfitPrice: Number(positionMeta.takeProfitPrice ?? positionMeta.targetSellPrice ?? 0) || null,
-    stopLossPrice: Number(positionMeta.stopLossPrice ?? 0) || null,
-    side: position.side,
+  const exitForensicsSnapshot = recordClosedTradeForensics({
+    reason: input.reason,
+    closePrice: exitPrice,
     quantity: finalCloseQty,
     openFee,
     closeFee,
-  });
-  bridgeClosedTradePnl({
-    tradeId: position.id,
-    symbol,
-    side: position.side,
-    entryPrice: position.entryPrice,
-    exitPrice,
-    quantity: finalCloseQty,
-    entryFee: openFee,
-    exitFee: closeFee,
     slippageCost,
-    exitReason: exitForensicsSnapshot.exitReason,
-    exitModel: exitForensicsSnapshot.exitModel,
-    exitForensics: exitForensicsSnapshot,
+    decisionTimestamp,
   });
 
   const createdCloseOrder = await createTradeOrder({
@@ -881,6 +939,7 @@ export async function settleOpenPosition(input: {
       closeReason: input.reason,
       mode: input.mode,
       linkedPositionId: position.id,
+      ...variantTelemetryMeta,
     },
   });
   await logTradeEvent({
@@ -905,7 +964,7 @@ export async function settleOpenPosition(input: {
     fee: closeFee,
     slippage: slippageCost,
     executionRef: closeOrder.orderId,
-    metadata: { mode: input.mode, reason: input.reason },
+    metadata: { mode: input.mode, reason: input.reason, ...variantTelemetryMeta },
   });
 
   await closePositionRecord({
@@ -916,6 +975,7 @@ export async function settleOpenPosition(input: {
     metadata: {
       closeReason: input.reason,
       roePercent: pnl.roePercent,
+      ...variantTelemetryMeta,
     },
   });
 
@@ -932,7 +992,7 @@ export async function settleOpenPosition(input: {
     slippageCost: pnl.slippageCost,
     roePercent: pnl.roePercent,
     notes: `Position closed: ${input.reason}`,
-    metadata: { mode: input.mode },
+    metadata: { mode: input.mode, ...variantTelemetryMeta },
   });
 
   await logTradeEvent({

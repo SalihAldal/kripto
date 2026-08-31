@@ -1,6 +1,9 @@
 import { env } from "@/lib/config";
-import { marketDataOrchestrator, resolveAdaptiveTtlMs } from "@/src/server/market-data";
+import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
+import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
+import { resolveAdaptiveTtlMs } from "@/src/server/market-data";
 import type { MarketDataPriority } from "@/src/server/market-data/market-data.types";
+import { isMarketDataUnavailableError } from "@/src/server/market-data/market-data-unavailable.error";
 import { putMarketSnapshot } from "@/src/server/scanner/market-snapshot-cache";
 import { detectMarketRegime } from "@/src/server/scanner/market-regime.service";
 import { recordRegimeStability } from "@/src/server/scanner/regime-stability.service";
@@ -11,6 +14,51 @@ import type { MarketContext } from "@/src/types/scanner";
 
 const CONTEXT_CACHE_TTL_MS = 180_000;
 const contextCache = new Map<string, { at: number; context: MarketContext }>();
+
+export type PumpRiskComputation = {
+  score: number;
+  rawScore: number;
+  capped: boolean;
+  status: "AVAILABLE" | "UNAVAILABLE";
+  reason: string;
+};
+
+export function computePumpRisk(input: {
+  spreadPercent: number;
+  fakeSpikeScore: number;
+  priceDispersionPercent: number;
+  orderBookImbalance: number;
+}): PumpRiskComputation {
+  const parts = [
+    Number(input.spreadPercent),
+    Number(input.fakeSpikeScore),
+    Number(input.priceDispersionPercent),
+    Number(input.orderBookImbalance),
+  ];
+  const hasInvalid = parts.some((v) => !Number.isFinite(v));
+  if (hasInvalid) {
+    return {
+      score: 0,
+      rawScore: 0,
+      capped: false,
+      status: "UNAVAILABLE",
+      reason: "PUMP_RISK_INPUT_UNAVAILABLE",
+    };
+  }
+  const rawScore =
+    input.spreadPercent * 120 +
+    input.fakeSpikeScore * 18 +
+    input.priceDispersionPercent * 18 +
+    Math.abs(input.orderBookImbalance) * 40;
+  const bounded = Math.max(0, Math.min(100, rawScore));
+  return {
+    score: Number(bounded.toFixed(2)),
+    rawScore: Number(rawScore.toFixed(4)),
+    capped: rawScore >= 100,
+    status: "AVAILABLE",
+    reason: rawScore >= 100 ? "FORMULA_CLAMP_100" : "FORMULA_V1",
+  };
+}
 
 function stdDev(values: number[]) {
   const mean = values.reduce((acc, v) => acc + v, 0) / Math.max(values.length, 1);
@@ -76,9 +124,9 @@ function isFinitePositive(value: number | undefined | null) {
 }
 
 function hasLiveKlineSignal(closes: number[], volumes: number[]) {
-  if (closes.length < 20) return false;
+  if (closes.length < 6) return false;
   const positiveVolumes = volumes.filter((x) => x > 0).length;
-  return positiveVolumes >= Math.max(3, Math.floor(volumes.length * 0.08));
+  return positiveVolumes >= Math.max(2, Math.floor(volumes.length * 0.05));
 }
 
 function hasLiveOrderBookSignal(
@@ -113,6 +161,42 @@ function fallbackKlines(price: number, limit: number) {
   });
 }
 
+function deriveKlinesFromWindow(
+  points: Array<{ t: number; price: number; quoteVolume?: number }>,
+  limit: number,
+): KlineItem[] {
+  if (points.length === 0) return [];
+  const bucketMs = 60_000;
+  const byBucket = new Map<number, Array<{ t: number; price: number; quoteVolume?: number }>>();
+  for (const point of points) {
+    const key = Math.floor(point.t / bucketMs) * bucketMs;
+    const arr = byBucket.get(key) ?? [];
+    arr.push(point);
+    byBucket.set(key, arr);
+  }
+  const rows = [...byBucket.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .slice(-limit)
+    .map(([openTime, bucket]) => {
+      const sorted = bucket.sort((a, b) => a.t - b.t);
+      const open = sorted[0]?.price ?? 0;
+      const close = sorted[sorted.length - 1]?.price ?? open;
+      const high = Math.max(...sorted.map((row) => row.price));
+      const low = Math.min(...sorted.map((row) => row.price));
+      const volume = sorted.reduce((acc, row) => acc + Number(row.quoteVolume ?? 0), 0);
+      return {
+        openTime,
+        closeTime: openTime + bucketMs - 1,
+        open,
+        high,
+        low,
+        close,
+        volume,
+      } satisfies KlineItem;
+    });
+  return rows;
+}
+
 function fallbackRecentTrades(price: number, limit: number) {
   const now = Date.now();
   return Array.from({ length: limit }).map((_, idx) => ({
@@ -141,7 +225,14 @@ function rememberContext(context: MarketContext) {
 
 export async function buildMarketContext(
   symbol: string,
-  options?: { lite?: boolean; forceLive?: boolean; priority?: MarketDataPriority },
+  options?: {
+    lite?: boolean;
+    forceLive?: boolean;
+    priority?: MarketDataPriority;
+    signal?: AbortSignal;
+    timeoutMs?: number;
+    allowBackgroundIntelCapture?: boolean;
+  },
 ): Promise<MarketContext> {
   const normalized = symbol.toUpperCase();
   const lite = Boolean(options?.lite);
@@ -166,17 +257,65 @@ export async function buildMarketContext(
       };
     }
   }
-  const bundle = await marketDataOrchestrator.fetchContextBundle({
-    symbol: normalized,
-    lite,
-    priority,
-    maxAgeMs: options?.forceLive ? maxAgeMs : undefined,
-  });
+  let bundle;
+  try {
+    bundle = await marketDataGateway.fetchContextBundle({
+      symbol: normalized,
+      lite,
+      priority,
+      maxAgeMs: options?.forceLive ? maxAgeMs : undefined,
+      signal: options?.signal,
+      timeoutMs: options?.timeoutMs,
+    });
+  } catch (error) {
+    if (isMarketDataUnavailableError(error)) {
+      return {
+        symbol: normalized,
+        lastPrice: 0,
+        change24h: 0,
+        volume24h: 0,
+        volumeSpikePercent: 0,
+        spreadPercent: 0,
+        volatilityPercent: 0,
+        momentumPercent: 0,
+        orderBookImbalance: 0,
+        buyPressure: 0.5,
+        shortCandleSignal: 0,
+        fakeSpikeScore: 0,
+        pumpIntensity: 0,
+        pumpRisk: 0,
+        tradable: false,
+        rejectReasons: [error.code],
+        metadata: {
+          dataQualityOk: false,
+          marketDataCode: error.code,
+          liveDataHealthy: false,
+        },
+      };
+    }
+    throw error;
+  }
   const ticker = bundle.ticker;
   const resolvedSymbol = ticker.symbol.toUpperCase();
   const safeTickerPrice = Number.isFinite(ticker.price) && ticker.price > 0 ? ticker.price : 1;
   const safeTickerVolume = Number.isFinite(ticker.volume24h) && ticker.volume24h > 0 ? ticker.volume24h : 0;
-  const klines = bundle.klines1m.length > 0 ? bundle.klines1m : fallbackKlines(safeTickerPrice, 80);
+  const ringWindowMs = 15 * 60_000;
+  const ringWindow = getMarketDataDaemon().getWindow(normalized, ringWindowMs);
+  const derivedKlines = deriveKlinesFromWindow(ringWindow, 80);
+  const klineSource = bundle.klines1m.length > 0
+    ? "WS_KLINE"
+    : derivedKlines.length > 0
+      ? "WS_DERIVED"
+      : env.MARKET_DATA_ALLOW_SYNTHETIC
+        ? "SYNTHETIC"
+        : "MISSING";
+  const klines = bundle.klines1m.length > 0
+    ? bundle.klines1m
+    : derivedKlines.length > 0
+      ? derivedKlines
+      : env.MARKET_DATA_ALLOW_SYNTHETIC
+        ? fallbackKlines(safeTickerPrice, 80)
+        : [];
   const klines24h = bundle.klines1h.length > 0 ? bundle.klines1h : [];
   const orderBook =
     !lite &&
@@ -184,15 +323,19 @@ export async function buildMarketContext(
     bundle.orderBook.bids.length > 0 &&
     bundle.orderBook.asks.length > 0
       ? bundle.orderBook
-      : {
-          lastUpdateId: Date.now(),
-          bids: [{ price: safeTickerPrice, quantity: 0 }],
-          asks: [{ price: safeTickerPrice, quantity: 0 }],
-        };
+      : env.MARKET_DATA_ALLOW_SYNTHETIC
+        ? {
+            lastUpdateId: Date.now(),
+            bids: [{ price: safeTickerPrice, quantity: 0 }],
+            asks: [{ price: safeTickerPrice, quantity: 0 }],
+          }
+        : { lastUpdateId: 0, bids: [], asks: [] };
   const recentTrades =
     !lite && bundle.recentTrades && bundle.recentTrades.length > 0
       ? bundle.recentTrades
-      : fallbackRecentTrades(safeTickerPrice, 150);
+      : env.MARKET_DATA_ALLOW_SYNTHETIC
+        ? fallbackRecentTrades(safeTickerPrice, 150)
+        : [];
 
   if (!lite && bundle.orderBook && bundle.recentTrades) {
     putMarketSnapshot(resolvedSymbol, { klines, orderBook, recentTrades });
@@ -203,7 +346,16 @@ export async function buildMarketContext(
   const liveKlines = hasLiveKlineSignal(closes, volumes);
   const liveOrderBook = !lite && hasLiveOrderBookSignal(orderBook.bids, orderBook.asks);
   const liveTrades = !lite && hasLiveTradesSignal(recentTrades);
-  const liveDataHealthy = liveKlines || liveOrderBook || liveTrades;
+  const tickerUpdatedAtMs = Date.parse(String(ticker.updatedAt ?? ""));
+  const nowForTicker = Date.now();
+  const tickerFresh = Number.isFinite(tickerUpdatedAtMs)
+    ? nowForTicker - tickerUpdatedAtMs <= Math.max(5_000, env.MARKET_DATA_STALE_MS)
+    : true;
+  const coreMarketDataHealthy = tickerFresh && isFinitePositive(safeTickerPrice);
+  const rollingHistoryHealthy = closes.length >= 6;
+  const klineHealthy = closes.length >= 20;
+  const microDataHealthy = !lite && (liveOrderBook || liveTrades);
+  const liveDataHealthy = coreMarketDataHealthy && (rollingHistoryHealthy || microDataHealthy || liveKlines);
 
   const latestClose = closes[closes.length - 1];
   const latestTradePrice = recentTrades[recentTrades.length - 1]?.price;
@@ -347,10 +499,12 @@ export async function buildMarketContext(
   const stalePrice =
     (lastTradeAgeSec !== null && lastTradeAgeSec > staleThresholdSec) ||
     (lastKlineAgeSec !== null && lastKlineAgeSec > staleThresholdSec);
-  const missingKlines = klines.length < 20;
+  const missingKlines = klines.length < 6;
+  const weakKlineCoverage = klines.length < 20;
   const dataQualityIssues = [
     stalePrice ? "PRICE_STALE" : "",
     missingKlines ? "KLINE_MISSING" : "",
+    weakKlineCoverage ? "KLINE_WEAK_COVERAGE" : "",
     bookDeviationPercent >= 0.8 ? "BOOK_PRICE_DEVIATION" : "",
     tickerOutlier || priceDispersionPercent >= 2 ? "CONFLICTING_PRICES" : "",
     priceAnomaly ? "PRICE_ANOMALY_FALLBACK" : "",
@@ -428,18 +582,13 @@ export async function buildMarketContext(
     ).toFixed(4),
   );
 
-  const pumpRisk = Number(
-    Math.max(
-      0,
-      Math.min(
-        100,
-        spreadPercent * 120 +
-          fakeSpikeScore * 18 +
-          priceDispersionPercent * 18 +
-          Math.abs(orderBookImbalance) * 40,
-      ),
-    ).toFixed(2),
-  );
+  const pumpRiskComputation = computePumpRisk({
+    spreadPercent,
+    fakeSpikeScore,
+    priceDispersionPercent,
+    orderBookImbalance,
+  });
+  const pumpRisk = pumpRiskComputation.score;
 
   const [socialSnapshot, futuresIntel] = await Promise.all([
     lite ? Promise.resolve(null) : getSocialSentimentSnapshotSafe(resolvedSymbol),
@@ -453,6 +602,7 @@ export async function buildMarketContext(
         }).catch(() => null),
   ]);
   const macroNewsSentiment = socialSnapshot?.newsSentiment ?? env.MACRO_NEWS_SENTIMENT;
+  const optionalEnrichmentHealthy = !lite ? Boolean(socialSnapshot || futuresIntel) : true;
   const macroHighImpactNews = env.MACRO_HIGH_IMPACT_NEWS;
   const macroUncertaintyLevel = env.MACRO_UNCERTAINTY_LEVEL;
   const btcDominanceBias = env.MACRO_BTC_DOMINANCE_BIAS;
@@ -520,12 +670,17 @@ export async function buildMarketContext(
 
   const rejectReasons: string[] = [];
   if (options?.forceLive && !liveDataHealthy) rejectReasons.push("Live data unavailable");
-  if (!liveDataHealthy) rejectReasons.push("Market data degraded");
+  if (!coreMarketDataHealthy) rejectReasons.push("Core market data unavailable");
+  if (stalePrice) rejectReasons.push("Market data stale");
   if (tickerOutlier) rejectReasons.push("Ticker outlier filtered");
   if (effectiveLiquidity24h < env.SCANNER_MIN_VOLUME_24H) rejectReasons.push("Low liquidity");
   if (spreadPercent > env.SCANNER_MAX_SPREAD_PERCENT) rejectReasons.push("Spread too wide");
-  if (marketRegime.regime === "LOW_VOLUME_DEAD_MARKET") rejectReasons.push("Low volume regime");
-  if (dataQualityIssues.length > 0) rejectReasons.push(`Data quality issue (${dataQualityIssues.join(", ")})`);
+  if (marketRegime.regime === "LOW_VOLUME_DEAD_MARKET" && effectiveLiquidity24h < env.SCANNER_MIN_VOLUME_24H) {
+    rejectReasons.push("Low volume regime");
+  }
+  if (!lite && missingKlines && !liveOrderBook && !liveTrades && !liveKlines) {
+    rejectReasons.push("Data quality issue (KLINE_MISSING without deep fallback)");
+  }
 
   const context: MarketContext = {
     symbol: resolvedSymbol,
@@ -542,7 +697,11 @@ export async function buildMarketContext(
     fakeSpikeScore,
     pumpIntensity,
     pumpRisk,
-    tradable: rejectReasons.length === 0,
+    tradable:
+      isFinitePositive(effectiveLastPrice) &&
+      coreMarketDataHealthy &&
+      effectiveLiquidity24h >= env.SCANNER_MIN_VOLUME_24H &&
+      spreadPercent <= env.SCANNER_MAX_SPREAD_PERCENT,
     rejectReasons,
     metadata: {
       bidDepth: Number(bidDepth.toFixed(4)),
@@ -575,10 +734,21 @@ export async function buildMarketContext(
       volumeSpikePercent,
       pumpIntensity,
       pumpRisk,
+      pumpRiskRawScore: pumpRiskComputation.rawScore,
+      pumpRiskCapped: pumpRiskComputation.capped,
+      pumpRiskStatus: pumpRiskComputation.status,
+      pumpRiskReason: pumpRiskComputation.reason,
+      pumpRiskSemantics: "computed_formula_v1",
       snapshotTradeNotional: Number(snapshotTradeNotional.toFixed(2)),
       snapshotBookNotional: Number(snapshotBookNotional.toFixed(2)),
       effectiveLiquidity24h,
       liveDataHealthy,
+      coreMarketDataHealthy,
+      tickerHealthy: tickerFresh,
+      rollingHistoryHealthy,
+      klineHealthy,
+      microDataHealthy,
+      optionalEnrichmentHealthy,
       liveKlines,
       liveOrderBook,
       liveTrades,
@@ -653,7 +823,24 @@ export async function buildMarketContext(
       regimeStabilityReasons: regimeStability.reasons,
       liteSnapshot: lite,
       dataQualityIssues,
-      dataQualityOk: dataQualityIssues.length === 0,
+      dataQualityOk: coreMarketDataHealthy && !stalePrice && !priceAnomaly,
+      klineSource,
+      klineCount: klines.length,
+      daemonKlineCount: bundle.klines1m.length,
+      derivedKlineCount: derivedKlines.length,
+      rollingEventCount: ringWindow.length,
+      rollingWindowMs: ringWindowMs,
+      derivedCandlePreview:
+        derivedKlines.length > 0
+          ? {
+              openTime: derivedKlines[derivedKlines.length - 1].openTime,
+              open: derivedKlines[derivedKlines.length - 1].open,
+              high: derivedKlines[derivedKlines.length - 1].high,
+              low: derivedKlines[derivedKlines.length - 1].low,
+              close: derivedKlines[derivedKlines.length - 1].close,
+              volume: Number(derivedKlines[derivedKlines.length - 1].volume ?? 0),
+            }
+          : null,
     },
   };
 
@@ -676,22 +863,24 @@ export async function buildMarketContext(
   }
 
   rememberContext(context);
-  void import("@/src/server/market-intelligence/market-intelligence-queue")
-    .then(({ enqueueMarketIntelJob }) =>
-      enqueueMarketIntelJob({
-        type: "CAPTURE_SYMBOL",
-        symbol: resolvedSymbol,
-        interval: "M1",
-        captureInput: {
+  if (options?.allowBackgroundIntelCapture !== false && !options?.signal?.aborted) {
+    void import("@/src/server/market-intelligence/market-intelligence-queue")
+      .then(({ enqueueMarketIntelJob }) =>
+        enqueueMarketIntelJob({
+          type: "CAPTURE_SYMBOL",
           symbol: resolvedSymbol,
           interval: "M1",
-          context,
-          klines,
-          orderBook,
-          recentTrades,
-        },
-      }),
-    )
-    .catch(() => null);
+          captureInput: {
+            symbol: resolvedSymbol,
+            interval: "M1",
+            context,
+            klines,
+            orderBook,
+            recentTrades,
+          },
+        }),
+      )
+      .catch(() => null);
+  }
   return context;
 }

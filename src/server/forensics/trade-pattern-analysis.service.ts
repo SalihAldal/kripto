@@ -46,9 +46,13 @@ export function classifyLossPattern(input: {
     evidence.push(`fees=${input.totalFee} gross=${input.grossPnL} ratio=${feeRatio.toFixed(4)}`);
   }
 
-  if (input.entryTiming?.classification === "POSSIBLY_LATE") {
+  if (
+    input.entryTiming?.classification === "POSSIBLY_LATE" ||
+    input.entryTiming?.classification === "CHASING" ||
+    input.entryTiming?.classification === "EDGE_DECAY"
+  ) {
     classification = "ENTRY_TIMING";
-    evidence.push(`entryDelayMs=${input.entryTiming.entryDelayMs} classification=POSSIBLY_LATE`);
+    evidence.push(`entryDelayMs=${input.entryTiming.entryDelayMs} classification=${input.entryTiming.classification}`);
   }
 
   if (

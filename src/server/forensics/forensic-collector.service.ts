@@ -19,6 +19,7 @@ import type {
   ScannerQualificationRejection,
   NotDiscoveredAnalysisRecord,
   EntryTimingRecord,
+  ScannerCoverageSnapshot,
   TdiDecisionRecord,
   FeeAwareEntryPolicyEvaluation,
 } from "@/src/server/forensics/forensic.types";
@@ -319,7 +320,14 @@ export function recordNotDiscoveredAnalysis(input: NotDiscoveredAnalysisRecord) 
 export function recordEntryTiming(input: EntryTimingRecord) {
   const session = getOrCreateForensicSession();
   session.entryTimingRecords = session.entryTimingRecords ?? [];
-  session.entryTimingRecords.push(input);
+  const existingIndex = session.entryTimingRecords.findIndex(
+    (row) => row.candidateId === input.candidateId && row.symbol === input.symbol,
+  );
+  if (existingIndex >= 0) {
+    session.entryTimingRecords[existingIndex] = input;
+  } else {
+    session.entryTimingRecords.push(input);
+  }
   recordDecisionTrace({
     candidateId: input.candidateId,
     symbol: input.symbol,
@@ -376,6 +384,13 @@ export function recordScannerUniverseSnapshot(input: { watchlist: string[]; cycl
     capturedAt: new Date().toISOString(),
   };
   return session.scannerUniverseSnapshot;
+}
+
+export function recordScannerCoverageSnapshot(input: ScannerCoverageSnapshot) {
+  const session = getOrCreateForensicSession();
+  session.scannerCoverageSnapshots = session.scannerCoverageSnapshots ?? [];
+  session.scannerCoverageSnapshots.push(input);
+  return input;
 }
 
 export function recordMissedOpportunity(input: {

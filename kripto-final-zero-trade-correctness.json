@@ -1,0 +1,160 @@
+{
+  "generatedAt": "2026-08-28T15:01:35.593Z",
+  "before": {
+    "scannerCandidates": 980,
+    "selected": 31,
+    "tdiApproved": 0,
+    "tdiEntered": 0,
+    "scannerAiNoTrade": 31,
+    "executionReady": 0,
+    "trades": 0
+  },
+  "after": {
+    "scannerCandidates": 980,
+    "selected": 31,
+    "tdiEntered": 0,
+    "tdiSkipped": 31,
+    "scannerAiReached": 31,
+    "executionAiReached": 0,
+    "tdiApproved": 0,
+    "executionReady": 0,
+    "trades": 0,
+    "funnelTruthful": true
+  },
+  "verdict": {
+    "PAPER_LANE_PARITY": "PASS",
+    "USE_PAPER_PROFILE": "FIXED",
+    "TDI_AI_ROUTING": "PASS",
+    "TDI_BYPASS": "NO",
+    "AI_NO_TRADE_CLASSIFICATION": "PASS",
+    "NO_TRADE_STATE_MACHINE": "PASS",
+    "SYMBOL_BINDING": "PASS",
+    "CANDIDATE_SCOPE": "PASS",
+    "ROUND_SCOPE": "PASS",
+    "EXECUTION_PATH": "PASS",
+    "EXECUTION_READY_AFTER_FIX": 0,
+    "TRADES_AFTER_REPLAY": 0,
+    "HISTORICAL_PROFITABLE_RELEASED": 0,
+    "HISTORICAL_LOSING_RELEASED": 0,
+    "THRESHOLDS_CHANGED": "NO",
+    "AI_VETO_CHANGED": "NO",
+    "RISK_CHANGED": "NO",
+    "SIZING_CHANGED": "NO",
+    "PAPER_STARTED": "NO",
+    "TESTS": "PASS",
+    "READY_FOR_30_ROUND_PAPER": "CONDITIONAL",
+    "PRIMARY_REMAINING_BLOCKER": "Scanner AI NO_TRADE at selection gate (31/50 rounds) + lane-empty terminal (18/50) — downstream TDI/hybrid never reached; correctness fixed, policy unchanged",
+    "NEXT_STEP": "Run 30-round paper ONLY after verifying funnel telemetry in one dry-run round export shows scanner_ai + tdi_skip stages",
+    "architectureProof": {
+      "scannerAiRunsAt": "runScannerPipeline includeAi=true (fast-entry)",
+      "tdiRunsAt": "hybrid-decision-engine via executeAnalyzeAndTrade",
+      "selectionGate": "auto-round-engine isBlockingAiDecision BEFORE executeAnalyzeAndTrade",
+      "tdiBypass": false,
+      "tdiNotReachedReason": "PRE_EXECUTION_SCANNER_AI_NO_TRADE"
+    },
+    "top50Discovered": 49,
+    "top50Blocked": 50,
+    "laneParityFix": {
+      "paperPriority": 50,
+      "livePriority": 70,
+      "boundary55Paper": true,
+      "boundary55Live": false
+    }
+  },
+  "tests": {
+    "generatedAt": "2026-08-28T15:01:35.592Z",
+    "results": [
+      {
+        "id": 1,
+        "name": "isPaperApprovedLane uses resolved Paper profile",
+        "status": "PASS"
+      },
+      {
+        "id": 2,
+        "name": "selectPaperPumpLaneCandidates uses same profile",
+        "status": "PASS"
+      },
+      {
+        "id": 3,
+        "name": "no 50/70 mismatch",
+        "status": "PASS"
+      },
+      {
+        "id": 4,
+        "name": "usePaperProfile propagation",
+        "status": "PASS"
+      },
+      {
+        "id": 5,
+        "name": "TDI → AI routing",
+        "status": "PASS"
+      },
+      {
+        "id": 6,
+        "name": "TDI bypass detection",
+        "status": "PASS"
+      },
+      {
+        "id": 7,
+        "name": "candidateId consistency",
+        "status": "PASS"
+      },
+      {
+        "id": 8,
+        "name": "roundId consistency",
+        "status": "PASS"
+      },
+      {
+        "id": 9,
+        "name": "AI NO_TRADE classification",
+        "status": "PASS"
+      },
+      {
+        "id": 10,
+        "name": "NO_TRADE state machine",
+        "status": "PASS"
+      },
+      {
+        "id": 11,
+        "name": "no unnecessary downstream AI path",
+        "status": "PASS"
+      },
+      {
+        "id": 12,
+        "name": "no symbol binding on terminal NO_TRADE",
+        "status": "PASS"
+      },
+      {
+        "id": 13,
+        "name": "historical 42 profitable replay",
+        "status": "PASS"
+      },
+      {
+        "id": 14,
+        "name": "historical 206 loss replay",
+        "status": "PASS"
+      },
+      {
+        "id": 15,
+        "name": "2278 candidate replay",
+        "status": "PASS"
+      },
+      {
+        "id": 16,
+        "name": "37 top-gainer replay",
+        "status": "PASS"
+      },
+      {
+        "id": 17,
+        "name": "no AI VETO change",
+        "status": "PASS"
+      },
+      {
+        "id": 18,
+        "name": "no threshold change",
+        "status": "PASS"
+      }
+    ],
+    "allPass": true
+  }
+}

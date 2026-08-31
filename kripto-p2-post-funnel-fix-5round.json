@@ -1,0 +1,149 @@
+{
+  "generatedAt": "2026-08-22T20:49:46.867Z",
+  "sourceSessionId": "cmt4udz4u0009un3k9mndd8ki",
+  "validationId": "5round-stress-2026-08-22T20-39-59-778Z",
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY",
+    "clockSync": {
+      "status": "PASS",
+      "reasonCode": "CLOCK_SYNC_OK",
+      "reasonDetail": "Clock skew 135ms within threshold",
+      "timestamp": "2026-08-22T20:40:02.884Z",
+      "metadata": {
+        "localTime": "2026-08-22T20:40:02.881Z",
+        "serverTime": "2026-08-22T20:40:03.016Z",
+        "clockOffsetMs": 135,
+        "clockSkewMs": 135,
+        "apiLatencyMs": 87,
+        "skewThresholdMs": 5000,
+        "endpoint": "https://www.binance.tr/api/v3/time",
+        "timestampSource": "binance.api.v3.time"
+      }
+    },
+    "database": {
+      "status": "PASS",
+      "reasonCode": "DB_HEALTHY",
+      "reasonDetail": "PostgreSQL reachable and AutoRound schema accessible",
+      "timestamp": "2026-08-22T20:40:01.655Z"
+    },
+    "binance": {
+      "status": "PASS",
+      "reasonCode": "BINANCE_TR_HEALTHY",
+      "reasonDetail": "BTCTRY ticker ok (3699902)",
+      "timestamp": "2026-08-22T20:40:02.793Z",
+      "metadata": {
+        "symbol": "BTCTRY",
+        "price": 3699902
+      }
+    },
+    "ai": {
+      "status": "PASS",
+      "reasonCode": "AI_CONFIGURED",
+      "reasonDetail": "3 enabled AI provider(s)",
+      "timestamp": "2026-08-22T20:40:02.884Z",
+      "metadata": {
+        "providers": [
+          {
+            "id": "provider-1",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-2",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-3",
+            "name": "Gemini",
+            "model": "gemini-1.5-flash-latest"
+          }
+        ],
+        "remoteRequired": false
+      }
+    },
+    "emergencyStop": {
+      "status": "PASS",
+      "reasonCode": "EMERGENCY_STOP_INACTIVE",
+      "reasonDetail": "Emergency stop inactive",
+      "timestamp": "2026-08-22T20:40:02.903Z"
+    },
+    "artifactPath": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4udz4u0009un3k9mndd8ki\\preflight.json"
+  },
+  "rounds": [
+    {
+      "roundId": "1",
+      "roundNumber": 1,
+      "symbol": "TURBOTRY",
+      "startedAt": "",
+      "endedAt": "",
+      "durationMs": 0,
+      "terminalState": "tariyor",
+      "failReason": "",
+      "scannerCandidates": 0,
+      "priorityCandidates": 0,
+      "pumpCandidates": 0,
+      "fallbackCount": 0,
+      "tdiApproved": 0,
+      "tdiWait": 0,
+      "tdiRejected": 0,
+      "firstBlockingCondition": "UNKNOWN",
+      "aiCalls": 65,
+      "aiRemoteCalls": 0,
+      "aiDegradedCalls": 0,
+      "aiTimeouts": 0,
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "openedTrades": 0,
+      "closedTrades": 0,
+      "terminal": false
+    }
+  ],
+  "trades": [],
+  "campaign": {
+    "totalTrades": 0,
+    "wins": 0,
+    "losses": 0,
+    "breakeven": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "winRate": 0,
+    "expectancy": null,
+    "profitFactor": null,
+    "maxDrawdown": 0,
+    "maxDrawdownPct": 0,
+    "averageWin": 0,
+    "averageLoss": 0,
+    "averageHold": 0,
+    "medianHold": 0,
+    "systemTimeoutCount": 0,
+    "strategyExitCount": 0,
+    "stopLossCount": 0,
+    "takeProfitCount": 0
+  },
+  "verdict": {
+    "FIVE_ROUNDS_COMPLETED": "PARTIAL",
+    "TDI_APPROVED_TOTAL": 0,
+    "EXECUTION_READY_TOTAL": 0,
+    "LIVE_TRADES": 0,
+    "CLOSED_TRADES": 0,
+    "SYSTEM_TIMEOUT_COUNT": 0,
+    "GROSS_PNL": 0,
+    "FEES": 0,
+    "NET_PNL": 0,
+    "EXPECTANCY": "N/A",
+    "PROFIT_FACTOR": "N/A",
+    "MAX_DRAWDOWN": 0,
+    "AI_PARITY": "PASS",
+    "RUNTIME_STABLE": "NO",
+    "PNL_RECONCILIATION": "PASS",
+    "TRADE_GENERATION": "NOT_PROVEN",
+    "PROFITABILITY_SIGNAL": "NOT_PROVEN",
+    "FIRST_BLOCKING_STAGE": "TDI",
+    "NEXT_STEP": "AI_STARTED_ORPHAN ve stopRequested root-cause fixi tamamlanmadan yeni 5-round denemesi yapılmamalı.",
+    "PRODUCTION_DEFAULT": "BASELINE"
+  }
+}

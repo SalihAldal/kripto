@@ -130,6 +130,8 @@ describe("trading engine forensics", () => {
     });
     expect(remote.executionMode).toBe("REMOTE");
     expect(degraded.executionMode).toBe("AI_DEGRADED");
+    expect(remote.remote).toBe(true);
+    expect(degraded.remote).toBe(false);
     expect(remote.success).toBe(true);
     expect(degraded.success).toBe(false);
   });

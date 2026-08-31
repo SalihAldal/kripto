@@ -1,0 +1,278 @@
+{
+  "runId": "variantd-live-shadow-2026-08-22T12-28-31-411Z",
+  "startedAt": "2026-08-22T12:28:40.671Z",
+  "completedAt": "2026-08-22T13:09:14.714Z",
+  "sessionId": "cmt4cu3t50009un048xfufd0b",
+  "config": {
+    "totalRounds": 5,
+    "maxRoundMinutes": 30,
+    "executionVariantDShadowEnabled": "true",
+    "baselineExitAuthoritative": true,
+    "variantDObserveOnly": true
+  },
+  "preflightChecks": {
+    "PostgreSQL": "PASS",
+    "Binance": "PASS",
+    "Clock": "PASS",
+    "REAL_AI": "PASS",
+    "EmergencyStop": "PASS",
+    "ActiveJobs": "PASS",
+    "DuplicateJobs": "PASS",
+    "ZombieRounds": "PASS",
+    "WorkerLocks": "PASS",
+    "ResolvedConfig": "PASS",
+    "VariantDShadowEnabled": "PASS",
+    "BaselineExitEnabled": "PASS",
+    "VariantDExecutionDisabled": "PASS"
+  },
+  "preflight": {
+    "attemptId": "variantd-live-shadow-2026-08-22T12-28-31-411Z-preflight",
+    "userId": "cmpbhrfn10000un90aroynt6t",
+    "generatedAt": "2026-08-22T12:28:42.346Z",
+    "overallVerdict": "READY",
+    "canStart": true,
+    "blockReason": null,
+    "blockCode": null,
+    "database": {
+      "status": "PASS",
+      "reasonCode": "DB_HEALTHY",
+      "reasonDetail": "PostgreSQL reachable and AutoRound schema accessible",
+      "timestamp": "2026-08-22T12:28:40.737Z"
+    },
+    "binance": {
+      "status": "PASS",
+      "reasonCode": "BINANCE_TR_HEALTHY",
+      "reasonDetail": "BTCTRY ticker ok (3672171)",
+      "timestamp": "2026-08-22T12:28:42.120Z",
+      "metadata": {
+        "symbol": "BTCTRY",
+        "price": 3672171
+      }
+    },
+    "ai": {
+      "status": "PASS",
+      "reasonCode": "AI_CONFIGURED",
+      "reasonDetail": "3 enabled AI provider(s)",
+      "timestamp": "2026-08-22T12:28:42.240Z",
+      "metadata": {
+        "providers": [
+          {
+            "id": "provider-1",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-2",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-3",
+            "name": "Gemini",
+            "model": "gemini-1.5-flash-latest"
+          }
+        ],
+        "remoteRequired": false
+      }
+    },
+    "emergencyStop": {
+      "status": "PASS",
+      "reasonCode": "EMERGENCY_STOP_INACTIVE",
+      "reasonDetail": "Emergency stop inactive",
+      "timestamp": "2026-08-22T12:28:42.276Z"
+    },
+    "activeJobs": {
+      "status": "PASS",
+      "reasonCode": "NO_ACTIVE_JOB",
+      "reasonDetail": "No RUNNING auto-round job blocking startup",
+      "timestamp": "2026-08-22T12:28:42.329Z"
+    },
+    "zombieRounds": {
+      "status": "PASS",
+      "reasonCode": "NO_ZOMBIE_ROUNDS",
+      "reasonDetail": "No in-progress rounds with endedAt=null blocking startup",
+      "timestamp": "2026-08-22T12:28:42.332Z",
+      "metadata": {
+        "reconciledCount": 0
+      }
+    },
+    "workerLocks": {
+      "status": "PASS",
+      "reasonCode": "WORKER_LOCKS_CLEAR",
+      "reasonDetail": "No local scheduler loops registered",
+      "timestamp": "2026-08-22T12:28:42.332Z",
+      "metadata": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:60916:71879f33",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "staleLocalLoops": 0
+      }
+    },
+    "resolvedConfig": {
+      "status": "PASS",
+      "reasonCode": "PAPER_CONFIG_OK",
+      "reasonDetail": "Resolved runtime config confirms paper execution mode",
+      "timestamp": "2026-08-22T12:28:42.346Z",
+      "metadata": {
+        "executionMode": "paper",
+        "exchange": "binance"
+      }
+    },
+    "duplicatePaperJobs": {
+      "status": "PASS",
+      "reasonCode": "NO_DUPLICATE_PAPER_JOBS",
+      "reasonDetail": "At most one RUNNING paper job for user",
+      "timestamp": "2026-08-22T12:28:42.334Z"
+    },
+    "clockSync": {
+      "status": "PASS",
+      "reasonCode": "CLOCK_SYNC_OK",
+      "reasonDetail": "Clock skew 763ms within threshold",
+      "timestamp": "2026-08-22T12:28:42.240Z",
+      "metadata": {
+        "localTime": "2026-08-22T12:28:42.236Z",
+        "serverTime": "2026-08-22T12:28:42.999Z",
+        "clockOffsetMs": 763,
+        "clockSkewMs": 763,
+        "apiLatencyMs": 115,
+        "skewThresholdMs": 5000,
+        "endpoint": "https://www.binance.tr/api/v3/time",
+        "timestampSource": "binance.api.v3.time"
+      }
+    },
+    "reconciledRounds": [],
+    "reconciledJobs": [],
+    "artifactPath": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\preflight\\variantd-live-shadow-2026-08-22T12-28-31-411Z-preflight"
+  },
+  "roundSummaries": [
+    {
+      "roundId": "cmt4cu46u000nun04bslzfuil",
+      "roundNumber": 1,
+      "symbol": "MUBARAKTRY",
+      "startedAt": "2026-08-22T12:28:43.062Z",
+      "endedAt": "2026-08-22T12:46:17.027Z",
+      "durationMs": 1053965,
+      "terminalState": "tur_basarisiz",
+      "failReason": "AI_NO_RESPONSE",
+      "scannerCandidates": 288,
+      "tdiApproved": 0,
+      "tdiWait": 44,
+      "tdiRejected": 402,
+      "aiCalls": 300,
+      "remoteCalls": 294,
+      "degradedCalls": 6,
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "trades": 0,
+      "terminal": true
+    },
+    {
+      "roundId": "cmt4dgpo60cd7un047nq3r717",
+      "roundNumber": 2,
+      "symbol": "SENTTRY",
+      "startedAt": "2026-08-22T12:46:17.334Z",
+      "endedAt": "2026-08-22T12:58:57.886Z",
+      "durationMs": 760552,
+      "terminalState": "tur_basarisiz",
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "scannerCandidates": 212,
+      "tdiApproved": 0,
+      "tdiWait": 50,
+      "tdiRejected": 450,
+      "aiCalls": 300,
+      "remoteCalls": 294,
+      "degradedCalls": 6,
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "trades": 0,
+      "terminal": true
+    },
+    {
+      "roundId": "cmt4dx0p80nqcun04zgymxbux",
+      "roundNumber": 3,
+      "symbol": "STXTRY",
+      "startedAt": "2026-08-22T12:58:58.124Z",
+      "endedAt": "2026-08-22T13:09:00.754Z",
+      "durationMs": 602630,
+      "terminalState": "tur_basarisiz",
+      "failReason": "Tur motoru durduruldu",
+      "scannerCandidates": 0,
+      "tdiApproved": 0,
+      "tdiWait": 0,
+      "tdiRejected": 0,
+      "aiCalls": 0,
+      "remoteCalls": 0,
+      "degradedCalls": 0,
+      "executionReady": 0,
+      "orders": 0,
+      "fills": 0,
+      "trades": 0,
+      "terminal": true
+    }
+  ],
+  "shadowMetrics": {
+    "shadowEvaluationCount": 0,
+    "shadowErrors": 0,
+    "shadowTimeouts": 0,
+    "shadowLatencyP50": 0,
+    "shadowLatencyP95": 0,
+    "shadowLatencyP99": 0
+  },
+  "transitions": [],
+  "strategyRegimeComparison": [],
+  "layers": {
+    "HISTORICAL_REPLAY": {
+      "deltaNetPnL": 17.00464466,
+      "direction": "POSITIVE"
+    },
+    "HISTORICAL_OOS": {
+      "deltaExpectancy": 0.04352356,
+      "direction": "POSITIVE"
+    },
+    "LIVE_SHADOW_HOLDOUT": {
+      "liveTradesObserved": 0,
+      "baselineLiveNetPnl": 0,
+      "shadowLiveNetPnl": 0,
+      "shadowDeltaNet": 0,
+      "direction": "NOT_PROVEN"
+    }
+  },
+  "liveAgreesWithHistoricalOos": false,
+  "timeoutAnalysis": {
+    "systemTimeoutLiveCount": 0,
+    "systemTimeoutDeltaNetPnl": 0,
+    "effect": "NOT_PROVEN"
+  },
+  "economics": {
+    "baselineLiveNetPnl": 0,
+    "shadowLiveNetPnl": 0,
+    "shadowDeltaNet": 0
+  },
+  "finalVerdict": {
+    "FIVE_ROUNDS_COMPLETED": "NO",
+    "LIVE_TRADES_OBSERVED": 0,
+    "SYSTEM_TIMEOUT_LIVE_COUNT": 0,
+    "BASELINE_LIVE_NET_PNL": 0,
+    "VARIANT_D_SHADOW_NET_DELTA": 0,
+    "HISTORICAL_REPLAY_DELTA": 17.00464466,
+    "HISTORICAL_OOS_DELTA": 0.04352356,
+    "LIVE_SHADOW_DIRECTION": "NOT_PROVEN",
+    "SYSTEM_TIMEOUT_SHADOW_EFFECT": "NOT_PROVEN",
+    "OUTSIDE_MR_LOWVOL_EFFECT": "NOT_PROVEN",
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "RUNTIME_REGRESSION": "NO",
+    "BASELINE_BEHAVIOR_UNCHANGED": "YES",
+    "SHADOW_NON_BLOCKING": "PASS",
+    "SHADOW_ERRORS": 0,
+    "SHADOW_TIMEOUTS": 0,
+    "VARIANT_D_STATUS": "RESEARCH_ONLY",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO",
+    "NEXT_STEP": "LIVE_SHADOW_NOT_EXERCISED: maintain shadow wiring and rerun controlled holdout when natural trades occur."
+  }
+}

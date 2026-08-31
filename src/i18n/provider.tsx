@@ -14,15 +14,14 @@ type I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
-function pickInitialLocale(): Locale {
-  if (typeof window === "undefined") return "tr";
+function readStoredLocale(): Locale {
   const stored = window.localStorage.getItem("kinetic.locale");
   if (stored === "tr" || stored === "en") return stored;
   return window.navigator.language.toLowerCase().startsWith("tr") ? "tr" : "en";
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => pickInitialLocale());
+  const [locale, setLocaleState] = useState<Locale>("tr");
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
@@ -33,10 +32,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.lang = locale;
-    }
-  }, [locale]);
+    const stored = readStoredLocale();
+    setLocaleState(stored);
+    document.documentElement.lang = stored;
+  }, []);
 
   const t = useCallback(
     (key: TranslationKey) => {

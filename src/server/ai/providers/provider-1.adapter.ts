@@ -327,7 +327,10 @@ export class Provider1Adapter implements AIProviderAdapter {
       riskScore: blendedRisk,
       metadata: {
         ...expertOutput.metadata,
+        ...remote.metadata,
         remote: true,
+        remoteOk: true,
+        degraded: false,
         remoteEnrichmentUsed: true,
         remoteDecision: remote.decision,
         remoteConfidence: remote.confidence,

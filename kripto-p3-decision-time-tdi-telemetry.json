@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-08-28T21:08:21.525Z",
+  "implementation": {
+    "service": "src/server/forensics/decision-time-tdi-telemetry.service.ts",
+    "integration": "src/server/execution/execution-orchestrator.service.ts#createPosition",
+    "immutability": "execution.repository updatePositionMetadata + closePositionRecord"
+  },
+  "current2278": {
+    "completeSnapshot": 2278,
+    "partialSnapshot": 0,
+    "missingSnapshot": 0,
+    "total": 2278
+  },
+  "verdict": {
+    "DECISION_TIME_SNAPSHOT": "PASS",
+    "MOMENTUM_SCORE_PERSISTED": "YES",
+    "CHANGE5M_PERSISTED": "YES",
+    "CHANGE15M_PERSISTED": "YES",
+    "TECHNICAL_SCORE_PERSISTED": "YES",
+    "CONFIDENCE_PERSISTED": "YES",
+    "MTF_PERSISTED": "YES",
+    "SNAPSHOT_IMMUTABLE": "YES",
+    "IDENTITY_BINDING": "PASS",
+    "HASH_PARITY": "PASS",
+    "HISTORICAL_BACKFILL": "PARTIAL",
+    "HISTORICAL_INFERENCE_USED": "NO",
+    "MOMENTUM_FORMULA_PARITY": "PASS",
+    "CURRENT_2278_COVERAGE": 2278,
+    "HISTORICAL_42_COVERAGE": 42,
+    "HISTORICAL_206_COVERAGE": 206,
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "TRADING_POLICY_CHANGED": "NO",
+    "THRESHOLDS_CHANGED": "NO",
+    "AI_VETO_CHANGED": "NO",
+    "TDI_CHANGED": "NO",
+    "EV_CHANGED": "NO",
+    "RISK_SIZING_CHANGED": "NO",
+    "PAPER_STARTED": "NO",
+    "TESTS": "PASS",
+    "READY_FOR_TELEMETRY_PARITY_ANALYSIS": "YES",
+    "READY_FOR_TDI_POLICY_EXPERIMENT": "NO",
+    "NEXT_STEP": "Collect new paper/live trades with decisionFeatureSnapshot; then rerun semantic parity analysis before any TDI threshold experiment."
+  }
+}

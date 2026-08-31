@@ -40,7 +40,7 @@ describe("round progress state", () => {
       runtime: runtime({}),
       selectionStartedAt: Date.now() - 120_000,
     });
-    expect(assessment.progressState).toBe("ACTIVE_PROGRESS");
+    expect(assessment.progressState).toBe("AI_ACTIVE");
     expect(shouldBlockRecoveryRestart(assessment)).toBe(true);
   });
 

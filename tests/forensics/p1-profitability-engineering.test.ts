@@ -10,6 +10,7 @@ import { buildEvComponentAttributionReport } from "@/src/server/forensics/ev-com
 import { buildMrRegimeGatingExperiment } from "@/src/server/forensics/mr-regime-gating-experiment.service";
 import { buildOpportunityFunnelReport } from "@/src/server/forensics/opportunity-funnel.service";
 import { buildFeeAwareEdgeResearchReport } from "@/src/server/forensics/fee-aware-edge-research.service";
+import { buildReplayExitDiagnostics } from "@/src/server/forensics/exit-fee-forensics.service";
 import { evaluatePromotionGate, buildStrategyRegimeMatrix } from "@/src/server/forensics/promotion-gate.service";
 import { buildP1ForensicReports } from "@/src/server/forensics/p1-forensic-report.service";
 import { computeFeeEdgeMetrics } from "@/src/server/forensics/fee-edge-metrics.service";
@@ -201,8 +202,42 @@ describe("P1-10 fee-aware edge research", () => {
       ],
     });
     expect(report.sampleSize).toBe(1);
-    expect(report.rows[0]?.classification).toBe("FEE_ERASING_EDGE");
+    expect(report.rows[0]?.classification).toBe("FEE_EROSION");
+    expect(metrics.expectedGrossEdge).toBe(metrics.expectedGrossPnL);
+    expect(metrics.expectedNetEdge).toBe(metrics.expectedNetPnL);
+    expect(metrics.feeClassification).toBe("FEE_EROSION");
     expect(report.deterministicHash).toHaveLength(16);
+  });
+});
+
+describe("P1 replay exit diagnostics", () => {
+  it("uses TRUE/FALSE/UNKNOWN diagnostics without rewriting history", () => {
+    const replayEnd = createPnlLedgerEntry({
+      tradeId: "r1",
+      positionId: "p1",
+      symbol: "XTRY",
+      side: "LONG",
+      entryPrice: 10,
+      exitPrice: 10,
+      quantity: 1,
+      entryFee: 0.01,
+      exitFee: 0.01,
+      exitReason: "END_OF_REPLAY",
+      exitModel: "REPLAY_WINDOW",
+      exitForensics: {
+        exitModel: "REPLAY_WINDOW",
+        exitReason: "END_OF_REPLAY",
+        entryPrice: 10,
+        exitPrice: 10,
+        entryTimestamp: "2026-08-17T00:00:00.000Z",
+        exitTimestamp: "2026-08-17T00:05:00.000Z",
+        durationMs: 300000,
+      },
+    });
+    const report = buildReplayExitDiagnostics({ pnlEntries: [replayEnd] });
+    expect(report.rows[0]?.tpWouldHitBeforeBoundary).toBe("UNKNOWN");
+    expect(report.rows[0]?.slWouldHitBeforeBoundary).toBe("UNKNOWN");
+    expect(report.rows[0]?.positionMonitorActive).toBe("FALSE");
   });
 });
 
@@ -347,6 +382,10 @@ describe("P1 bundle integration", () => {
     expect(bundle.mrRegimeGatingExperiment?.baselineLabel).toBe("CURRENT_MR");
     expect(bundle.promotionGate?.promoted).toBe(false);
     expect(bundle.feeAwareEdgeResearch?.sampleSize).toBeGreaterThanOrEqual(0);
+    expect(bundle.exitForensicsReport).toBeDefined();
+    expect(bundle.replayExitDiagnostics).toBeDefined();
+    expect(bundle.feeByStrategy).toBeDefined();
+    expect(bundle.feeByHoldTime).toBeDefined();
   });
 });
 

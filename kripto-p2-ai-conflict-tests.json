@@ -1,0 +1,11 @@
+{
+  "suite": "tests/p2-scanner-ai-conflict.test.ts",
+  "cases": 19,
+  "status": "PASS",
+  "replaySymbols": [
+    "EDENTRY",
+    "GENIUSTRY",
+    "HOLOTRY",
+    "FDUSDTRY"
+  ]
+}

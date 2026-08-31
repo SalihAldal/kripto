@@ -1,0 +1,71 @@
+{
+  "currentBaseline": [
+    {
+      "method": "CURRENT_BASELINE",
+      "split": "VALIDATION",
+      "sample": 49,
+      "spearmanScoreNet": 0.061792,
+      "lowCount": 0,
+      "midCount": 29,
+      "highCount": 20,
+      "lowExpectancy": 0,
+      "midExpectancy": -0.04737373,
+      "highExpectancy": -0.04146965,
+      "highWinRate": 0.25,
+      "highLossRate": 0.75,
+      "highNetPnL": -0.82939308,
+      "highProfitFactor": 0.33223711
+    },
+    {
+      "method": "CURRENT_BASELINE",
+      "split": "OOS",
+      "sample": 50,
+      "spearmanScoreNet": -0.201015,
+      "lowCount": 0,
+      "midCount": 23,
+      "highCount": 27,
+      "lowExpectancy": 0,
+      "midExpectancy": -0.04321041,
+      "highExpectancy": -0.05543344,
+      "highWinRate": 0.222222,
+      "highLossRate": 0.777778,
+      "highNetPnL": -1.4967029,
+      "highProfitFactor": 0.21413299
+    }
+  ],
+  "calibratedBest": [
+    {
+      "method": "LOGISTIC_CALIBRATION",
+      "split": "VALIDATION",
+      "sample": 49,
+      "spearmanScoreNet": 0.036067,
+      "lowCount": 14,
+      "midCount": 17,
+      "highCount": 18,
+      "lowExpectancy": -0.06449268,
+      "midExpectancy": -0.03278147,
+      "highExpectancy": -0.04128048,
+      "highWinRate": 0.277778,
+      "highLossRate": 0.722222,
+      "highNetPnL": -0.74304873,
+      "highProfitFactor": 0.27663774
+    },
+    {
+      "method": "LOGISTIC_CALIBRATION",
+      "split": "OOS",
+      "sample": 50,
+      "spearmanScoreNet": -0.03367,
+      "lowCount": 12,
+      "midCount": 13,
+      "highCount": 25,
+      "lowExpectancy": -0.03088034,
+      "midExpectancy": -0.06962049,
+      "highExpectancy": -0.04859647,
+      "highWinRate": 0.24,
+      "highLossRate": 0.76,
+      "highNetPnL": -1.21491178,
+      "highProfitFactor": 0.25105175
+    }
+  ],
+  "delta": 0.00683697
+}

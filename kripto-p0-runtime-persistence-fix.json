@@ -1,0 +1,240 @@
+{
+  "generatedAt": "2026-08-18T01:28:07.711Z",
+  "objective": "KRIPTO P0 runtime persistence timeout fix",
+  "rootCause": [
+    "MULTIPLE_WRITERS",
+    "TRANSACTION_CONTENTION",
+    "CONNECTION_POOL"
+  ],
+  "writerMap": [
+    {
+      "writer": "RoundRuntimeController.transition/heartbeat",
+      "function": "persist -> idempotentPatchJobActiveRound + idempotentMergeRunMetadata",
+      "table": "AutoRoundJob + AutoRoundRun",
+      "rowKey": "job.id + run.id",
+      "transaction": "runInstrumentedTransaction",
+      "frequency": "high under scanner/AI",
+      "caller": "runCooperativeRoundSelection hooks"
+    },
+    {
+      "writer": "setJobState",
+      "function": "updateAutoRoundJob(activeState)",
+      "table": "AutoRoundJob",
+      "rowKey": "job.id",
+      "transaction": "single update",
+      "frequency": "per state transition",
+      "caller": "auto-round-engine"
+    },
+    {
+      "writer": "touchSchedulerLease",
+      "function": "compareAndSetSchedulerLease",
+      "table": "AutoRoundJob.metadata.schedulerLease",
+      "rowKey": "job.id",
+      "transaction": "prisma.$transaction",
+      "frequency": "loop heartbeat (now throttled)",
+      "caller": "runRoundJob scheduler loop"
+    },
+    {
+      "writer": "Scheduler recovery audit",
+      "function": "appendRecoveryAuditEvent",
+      "table": "AutoRoundJob.metadata.recoveryAudit/recoveryState",
+      "rowKey": "job.id",
+      "transaction": "prisma.$transaction",
+      "frequency": "watchdog/recovery ticks (now coalesced)",
+      "caller": "executeSchedulerRecovery"
+    },
+    {
+      "writer": "Terminal transitions",
+      "function": "transactionallyFailRound / transactionallyCompleteRound",
+      "table": "AutoRoundRun + AutoRoundJob",
+      "rowKey": "run.id + job.id",
+      "transaction": "runInstrumentedTransaction",
+      "frequency": "per round terminalization",
+      "caller": "auto-round-engine + recovery"
+    }
+  ],
+  "before": {
+    "sessionId": "cmsxuaect0009unioi4gvkxcb",
+    "rounds": [
+      {
+        "roundNo": 1,
+        "state": "tur_basarisiz",
+        "failReason": "Tur secim suresi doldu (1200s)",
+        "scannerCandidates": 102,
+        "tdiApproved": 0,
+        "tdiWait": 3,
+        "executionReady": 0,
+        "aiCalls": 244,
+        "orders": 0,
+        "trades": 0
+      },
+      {
+        "roundNo": 2,
+        "state": "tur_basarisiz",
+        "failReason": "AI_GATE_BLOCK: AI_VETO",
+        "scannerCandidates": 70,
+        "tdiApproved": 0,
+        "tdiWait": 10,
+        "executionReady": 0,
+        "aiCalls": 300,
+        "orders": 0,
+        "trades": 0
+      }
+    ],
+    "aggregate": {
+      "scannerCandidates": 172,
+      "tdiApproved": 0,
+      "tdiWait": 13,
+      "executionReady": 0,
+      "aiCalls": 544,
+      "orders": 0,
+      "trades": 0,
+      "patchCount": 99,
+      "p50Ms": 21,
+      "p95Ms": 986,
+      "p99Ms": 14742,
+      "maxMs": 14742,
+      "timeoutCount": 2,
+      "timeoutRows": [
+        {
+          "roundNo": 2,
+          "durationMs": 9583,
+          "reason": "\nInvalid `tx.autoRoundJob.updateMany()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:393:43\n\n  390   },\n  391 });\n  392 \n→ 393 const updated = await tx.autoRoundJob.updateMany(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 9100 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 2,
+          "durationMs": 14742,
+          "reason": ""
+        }
+      ],
+      "coalescedWrites": 0,
+      "maxQueueDepth": 0,
+      "maxQueueWaitMs": 0,
+      "retryCount": 0
+    }
+  },
+  "after": {
+    "sessionId": "cmsxx9h680009unmgzid9xa9g",
+    "rounds": [
+      {
+        "roundNo": 1,
+        "state": "tur_basarisiz",
+        "failReason": "AI_NO_RESPONSE",
+        "scannerCandidates": 143,
+        "tdiApproved": 0,
+        "tdiWait": 13,
+        "executionReady": 0,
+        "aiCalls": 300,
+        "orders": 0,
+        "trades": 0
+      },
+      {
+        "roundNo": 2,
+        "state": "tur_basarisiz",
+        "failReason": "SIM_TIGHT_FILTER_30m: non-pump kalite dusuk (composite=42.8, sentiment=47.3, mtf=52.0) | AI role consensus zayif (tech=24.3, sentiment=47.3, risk=56.7) | Sahte hour-only pump (tape=0.000%, hour=-0.170%) | EMA trend uyumsuz (EMA50=1.1748, EMA200=1.1752) | BTC EMA20 altinda (BTCTRY) | Kalite skoru dusuk (29/100 < 52)",
+        "scannerCandidates": 161,
+        "tdiApproved": 0,
+        "tdiWait": 31,
+        "executionReady": 0,
+        "aiCalls": 300,
+        "orders": 0,
+        "trades": 0
+      }
+    ],
+    "aggregate": {
+      "scannerCandidates": 304,
+      "tdiApproved": 0,
+      "tdiWait": 44,
+      "executionReady": 0,
+      "aiCalls": 600,
+      "orders": 0,
+      "trades": 0,
+      "patchCount": 98,
+      "p50Ms": 8,
+      "p95Ms": 61,
+      "p99Ms": 126,
+      "maxMs": 126,
+      "timeoutCount": 0,
+      "timeoutRows": [],
+      "coalescedWrites": 0,
+      "maxQueueDepth": 0,
+      "maxQueueWaitMs": 0,
+      "retryCount": 0
+    }
+  },
+  "beforeAfter": {
+    "timeoutCount": {
+      "before": 2,
+      "after": 0
+    },
+    "p50Ms": {
+      "before": 21,
+      "after": 8
+    },
+    "p95Ms": {
+      "before": 986,
+      "after": 61
+    },
+    "p99Ms": {
+      "before": 14742,
+      "after": 126
+    },
+    "maxMs": {
+      "before": 14742,
+      "after": 126
+    }
+  },
+  "queueBehavior": {
+    "coalescedWrites": 0,
+    "maxQueueDepth": 0,
+    "maxQueueWaitMs": 0,
+    "retryCount": 0
+  },
+  "transactionAnalysis": {
+    "note": "No patchJobActiveRound timeout row observed in controlled validation.",
+    "timeoutRows": []
+  },
+  "connectionPoolAnalysis": {
+    "note": "No connection acquisition/transaction-expired timeout surfaced in patchJobActiveRound path during this validation."
+  },
+  "tests": [
+    "tests/round-runtime.test.ts",
+    "tests/auto-round-integrity.test.ts",
+    "tests/scheduler-ownership.test.ts",
+    "tests/forensics/p1-runtime-reliability.test.ts"
+  ],
+  "validation2Round": {
+    "sessionId": "cmsxx9h680009unmgzid9xa9g",
+    "aggregate": {
+      "scannerCandidates": 304,
+      "tdiApproved": 0,
+      "tdiWait": 44,
+      "executionReady": 0,
+      "aiCalls": 600,
+      "orders": 0,
+      "trades": 0,
+      "patchCount": 98,
+      "p50Ms": 8,
+      "p95Ms": 61,
+      "p99Ms": 126,
+      "maxMs": 126,
+      "timeoutCount": 0,
+      "timeoutRows": [],
+      "coalescedWrites": 0,
+      "maxQueueDepth": 0,
+      "maxQueueWaitMs": 0,
+      "retryCount": 0
+    },
+    "schedulerCrashObserved": false,
+    "zombieObserved": false
+  },
+  "remainingRisks": [
+    "Round outcomes still fail on business gates (AI_NO_RESPONSE / SIM_TIGHT_FILTER) even though persistence path is stable.",
+    "Queue telemetry fields remained low/zero in final snapshots; keep observing under future stress campaigns."
+  ],
+  "finalVerdict": {
+    "RUNTIME_STABILITY": "PASS",
+    "READY_FOR_5_ROUND": "CONDITIONAL",
+    "READY_FOR_30_50_ROUND": "CONDITIONAL"
+  }
+}

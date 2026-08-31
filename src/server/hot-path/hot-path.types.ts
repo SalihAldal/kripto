@@ -30,12 +30,16 @@ export type HotPathStageAudit = {
 
 export type WorkerTier = "CRITICAL" | "SUPPORTING" | "OBSERVE_ONLY";
 
+export type WorkerRuntimeClass = "CANONICAL" | "LEGACY" | "SHADOW_ONLY" | "RESEARCH_ONLY" | "DISABLED";
+
 export type LegacyWorkerDefinition = {
   id: string;
   label: string;
   tier: WorkerTier;
   queueName?: string;
   profitImpact: "direct" | "indirect" | "none";
+  runtimeClass?: WorkerRuntimeClass;
+  ownership?: string;
 };
 
 export type WorkerRuntimeSnapshot = {

@@ -2,10 +2,15 @@ import { logger } from "@/lib/logger";
 import { env } from "@/lib/config";
 import { prisma } from "@/src/server/db/prisma";
 import { listPersistedExecutionEvents, publishExecutionEvent } from "@/src/server/execution/execution-event-bus";
-import { closePositionManually, executeAnalyzeAndTrade } from "@/src/server/execution/execution-orchestrator.service";
+import {
+  closePositionManually,
+  ensureOpenPositionMonitors,
+  executeAnalyzeAndTrade,
+} from "@/src/server/execution/execution-orchestrator.service";
 import { evaluateMomentumBreakout } from "@/src/server/scanner/momentum-breakout.service";
-import { ensurePumpEarlyCatcherStarted, resolvePumpRoundMaxWaitSec } from "@/src/server/scanner/pump-early-catcher.service";
+import { resolvePumpRoundMaxWaitSec } from "@/src/server/scanner/pump-early-catcher.service";
 import type { ScannerCandidate } from "@/src/types/scanner";
+import type { FastEntryResult } from "@/src/server/scanner/fast-entry.service";
 import {
   evaluatePaperEntryQuality,
   formatPaperEntryQualityReason,
@@ -34,20 +39,34 @@ import {
   acquireOrCreateRoundRun,
   type AutoRoundHistoryFilter,
   type AutoRoundState,
+  persistRoundOwnershipRecord,
   updateAutoRoundJob,
   updateAutoRoundRun,
 } from "@/src/server/repositories/auto-round.repository";
 import {
   transactionallyCompleteRound,
   transactionallyFailRound,
+  auditAutoRoundIntegrity,
 } from "@/src/server/repositories/auto-round-integrity.repository";
+import { isBlockingAiDecision } from "@/src/server/execution/ai-execution-gate.service";
+import { isTopGainerPumpSignal } from "@/src/server/scanner/paper-lane-profile";
+import {
+  isTerminalNonExecutableReason,
+  recordCandidateFunnelStage,
+} from "@/src/server/forensics/candidate-funnel-trace.service";
+import { shouldBindSymbolOnTerminalFail } from "@/src/server/execution/auto-round-terminal-policy";
 import { getPositionById, getRuntimeExecutionContext, getEmergencyStopState, listOpenPositionsByUser } from "@/src/server/repositories/execution.repository";
 import { writeStructuredLog } from "@/src/server/observability/structured-log";
 import { runPaperSessionPreflight } from "@/src/server/forensics/paper-preflight.service";
+import { ensureMarketDataDaemonStarted } from "@/src/server/market-data/spine/daemon-worker";
+import { ensureScannerWorkerStarted } from "@/src/server/scanner/scanner-worker.service";
+import { getCanonicalCandidateStore } from "@/src/server/candidate/candidate-store.service";
 import { beginForensicPaperSession } from "@/src/server/forensics/forensic-bridge.service";
 import { attachForensicRound, getForensicSession, getOrCreateForensicSession } from "@/src/server/forensics/forensic-context";
 import { runRoundForensicExport } from "@/src/server/forensics/forensic-export-runner.service";
 import { traceCandidateReject, traceCandidateTraded } from "@/src/server/forensics/candidate-lifecycle.service";
+import { terminalizeOpenAiCandidates } from "@/src/server/forensics/ai-runtime.service";
+import { ensureRoundHangSnapshotForAbnormalTerminal } from "@/src/server/forensics/round-progress-watchdog.service";
 import { getSafeModeState, persistRoundState } from "@/src/server/recovery/failsafe-recovery.service";
 import {
   calculateNetProfitPercent,
@@ -69,8 +88,11 @@ import { resolveRoundWatchdogStaleMs } from "@/src/server/execution/cooperative-
 import {
   assertSchedulerLoopOwnership,
   atomicSpawnScheduler,
+  getProcessOwnerId,
   getSchedulerLeaseSnapshot,
   getSchedulerRegistrySnapshot,
+  hasLocalSchedulerLoop,
+  isSchedulerLeaseLive,
   type LeasePersistence,
   touchSchedulerLease,
 } from "@/src/server/execution/scheduler-ownership.service";
@@ -91,6 +113,7 @@ import {
   resolveAdaptiveEntryDecision,
   summarizeEntryDecisionForMetadata,
 } from "@/src/server/execution/entry-decision-engine.service";
+import { classifyAiNoResponseScope, evaluateScannerPolicy } from "@/src/server/execution/scanner-false-block-policy.service";
 import {
   atomicAcquireRoundOwnership,
   getActiveRoundOwnershipForJob,
@@ -116,6 +139,25 @@ type StartRoundInput = {
 
 const inProgressRoundStates: AutoRoundState[] = ["tariyor", "coin_secildi", "alim_yapildi", "satis_bekleniyor"];
 
+function terminalizeAiForRuns(
+  runs: Array<{ id: string; roundNo: number }>,
+  reasonCode: string,
+  cancelReason: string,
+) {
+  let closed = 0;
+  for (const run of runs) {
+    const terminalized = terminalizeOpenAiCandidates({
+      roundId: String(run.roundNo),
+      runId: run.id,
+      reasonCode,
+      cancelReason,
+      signalPropagated: true,
+    });
+    closed += terminalized.length;
+  }
+  return closed;
+}
+
 function buildSchedulerLeasePersistence(): LeasePersistence {
   return {
     loadLease: loadSchedulerLease,
@@ -127,10 +169,13 @@ function buildSchedulerLeasePersistence(): LeasePersistence {
 const schedulerLeasePersistence = buildSchedulerLeasePersistence();
 
 function sortInProgressRuns(
-  runs: Array<{ id: string; state: string; startedAt: Date; symbol?: string | null; metadata?: unknown }>,
+  runs: Array<{ id: string; state: string; startedAt: Date; endedAt?: Date | null; symbol?: string | null; metadata?: unknown }>,
 ) {
   return runs
-    .filter((run) => inProgressRoundStates.includes(run.state as AutoRoundState))
+    .filter(
+      (run) =>
+        !run.endedAt && inProgressRoundStates.includes(run.state as AutoRoundState),
+    )
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
 }
 
@@ -361,7 +406,7 @@ function resolvePaperRoundProfile(profile: ReturnType<typeof resolveRoundHorizon
 }
 
 async function evaluatePreTradeLearningMemory(input: {
-  selected: NonNullable<Awaited<ReturnType<typeof getBestFastEntry>>["selected"]>;
+  selected: NonNullable<FastEntryResult["selected"]>;
   maxWaitSec: number;
   paperMode?: boolean;
 }) {
@@ -542,7 +587,7 @@ async function evaluatePreTradeLearningMemory(input: {
 }
 
 async function evaluateAutoRoundLearningCandidate(input: {
-  selected: NonNullable<Awaited<ReturnType<typeof getBestFastEntry>>["selected"]>;
+  selected: NonNullable<FastEntryResult["selected"]>;
   maxWaitSec: number;
   targetProfitPct: number;
   consecutiveRejections?: number;
@@ -563,11 +608,31 @@ async function evaluateAutoRoundLearningCandidate(input: {
   const riskScore = Number(ai?.finalRiskScore ?? analysisScorecard?.riskScore ?? 0);
   const scannerScore = Number(input.selected.score.score ?? 0);
   const scannerConfidence = Number(input.selected.score.confidence ?? 0);
-  const mtfAlignment = Number(ai?.decisionPayload?.timeframeAnalysis?.alignmentScore ?? context.metadata.mtfAlignmentScore ?? 0);
-  const shortMomentum = Number(context.metadata.shortMomentumPercent ?? 0);
+  const mtfFromAiRaw = ai?.decisionPayload?.timeframeAnalysis?.alignmentScore;
+  const mtfFromContextRaw = context.metadata.mtfAlignmentScore;
+  const mtfFromAi = mtfFromAiRaw !== undefined && mtfFromAiRaw !== null && Number.isFinite(Number(mtfFromAiRaw));
+  const mtfFromContext =
+    mtfFromContextRaw !== undefined && mtfFromContextRaw !== null && Number.isFinite(Number(mtfFromContextRaw));
+  const mtfAlignment = mtfFromAi ? Number(mtfFromAiRaw) : mtfFromContext ? Number(mtfFromContextRaw) : null;
+  const mtfUnavailable = mtfAlignment === null;
+  const shortMomentumRaw = context.metadata.shortMomentumPercent;
+  const shortMomentumPresent = shortMomentumRaw !== undefined && shortMomentumRaw !== null && Number.isFinite(Number(shortMomentumRaw));
+  const shortMomentum = shortMomentumPresent ? Number(shortMomentumRaw) : 0;
   const hourMomentum = Number(context.metadata.hourMomentumPercent ?? 0);
   const effectiveShortMomentum = Math.max(shortMomentum, hourMomentum);
-  const shortFlow = Number(context.metadata.shortFlowImbalance ?? 0);
+  const shortFlowRaw = context.metadata.shortFlowImbalance;
+  const shortFlowPresent = shortFlowRaw !== undefined && shortFlowRaw !== null && Number.isFinite(Number(shortFlowRaw));
+  const shortFlow = shortFlowPresent ? Number(shortFlowRaw) : 0;
+  const shortTradeCount = Number(context.metadata.shortTradeCount ?? 0);
+  const hasReliableShortTelemetry =
+    shortTradeCount >= 3 || (shortMomentumPresent && shortFlowPresent && Math.abs(shortMomentum) + Math.abs(shortFlow) > 0);
+  const staleShortTelemetry =
+    !hasReliableShortTelemetry &&
+    shortTradeCount <= 0 &&
+    Math.abs(shortMomentum) <= 0.000001 &&
+    Math.abs(shortFlow) <= 0.000001;
+  const volumeRatio20Raw = context.metadata.volumeRatio20;
+  const hasVolumeTelemetry = volumeRatio20Raw !== undefined && volumeRatio20Raw !== null && Number.isFinite(Number(volumeRatio20Raw));
   const regimeTransitionProbability = Number(context.metadata.regimeTransitionProbability ?? 0);
   const regimeChaosProbability = Number(context.metadata.regimeChaosProbability ?? 0);
   const regimeLifecyclePhase = String(context.metadata.regimeLifecyclePhase ?? "");
@@ -580,7 +645,7 @@ async function evaluateAutoRoundLearningCandidate(input: {
   const riskRoleScore = Number(roleScores.find((row) => row.role === "AI-3_RISK")?.score ?? 0);
   const roleRiskVeto = Boolean(roleScores.find((row) => row.role === "AI-3_RISK")?.veto);
   const hasRoleScores = roleScores.some((r) => Number(r.score) > 0);
-  const hasMtfFromAi = Number(ai?.decisionPayload?.timeframeAnalysis?.alignmentScore ?? 0) > 0;
+  const hasMtfFromAi = mtfFromAi && Number(mtfFromAiRaw) > 0;
   // aiMissing: roleScores yoksa AI eksik sayılır (momentum-breakout override durumu dahil)
   const aiMissing = !ai || !hasRoleScores;
   const paperExplorationCandidate = true;
@@ -602,12 +667,7 @@ async function evaluateAutoRoundLearningCandidate(input: {
     if (confidence > 0) return confidence;
     return scannerScore;
   })();
-  const topGainerPump =
-    Boolean(context.metadata.topGainerDiscovery ?? false) ||
-    Boolean(context.metadata.pumpEarlyConfirmed ?? false) ||
-    Boolean(context.metadata.pumpContinuationMode ?? false) ||
-    Boolean(context.metadata.pumpIntradaySpike ?? false) ||
-    Number(context.metadata.topGainerPriorityScore ?? 0) >= 70;
+  const topGainerPump = isTopGainerPumpSignal(context.metadata as Record<string, unknown>, true);
   const change24h = Number(context.metadata.topGainerChange24h ?? context.change24h ?? 0);
   const pumpLaneCandidate =
     topGainerPump &&
@@ -621,8 +681,9 @@ async function evaluateAutoRoundLearningCandidate(input: {
   const targetEdgeAfterSpread = input.targetProfitPct - context.spreadPercent * 2;
   // dataDegraded: AI tüm rol skorları eksikse VEYA klasik tape+flow verisi bozuksa
   const dataDegraded =
-    (!hasRoleScores && mtfAlignment <= 0) ||
-    (mtfAlignment <= 0 &&
+    (!hasRoleScores && (mtfUnavailable || mtfAlignment <= 0)) ||
+    !hasReliableShortTelemetry ||
+    ((!mtfUnavailable && mtfAlignment <= 0) &&
       Math.abs(shortMomentum) < 0.02 &&
       (Math.abs(shortFlow) >= 0.95 || Math.abs(shortFlow) <= 0.001));
   const effectiveMinConfidence = adaptiveThresholds.minConfidence;
@@ -668,7 +729,7 @@ async function evaluateAutoRoundLearningCandidate(input: {
       (change24h < 28 ||
         effectiveShortMomentum < 0.55 ||
         shortFlow < 0.12 ||
-        mtfAlignment < 50 ||
+        (!mtfUnavailable && mtfAlignment < 50) ||
         compositeAvg < 62);
     const weakPumpRocketEntry =
       rocketPump &&
@@ -845,26 +906,26 @@ async function evaluateAutoRoundLearningCandidate(input: {
     !pumpLaneCandidate &&
     !steadyGainCandidate &&
     !strongPumpContinuation &&
-    (compositeAvg < (aiMissing ? 46 : 54) ||
+      (compositeAvg < (aiMissing ? 46 : 54) ||
       (hasRoleScores && sentimentRoleScore > 0 && sentimentRoleScore < 48) ||
-      (hasMtfFromAi && mtfAlignment < 35) ||
-      shortMomentum < (aiMissing ? 0.008 : 0.015) ||
-      shortFlow < (aiMissing ? 0.003 : 0.008));
+      (hasMtfFromAi && mtfAlignment !== null && mtfAlignment < 35) ||
+      (hasReliableShortTelemetry && shortMomentum < (aiMissing ? 0.008 : 0.015)) ||
+      (hasReliableShortTelemetry && shortFlow < (aiMissing ? 0.003 : 0.008)));
   const riskySteadyGainQuality =
     steadyGainCandidate &&
     (compositeAvg < 52 ||
       (hasRoleScores && sentimentRoleScore > 0 && sentimentRoleScore < 44) ||
-      (hasMtfFromAi && mtfAlignment < 30) ||
-      shortMomentum < 0.008 ||
-      shortFlow < 0.004);
+      (hasMtfFromAi && mtfAlignment !== null && mtfAlignment < 30) ||
+      (hasReliableShortTelemetry && shortMomentum < 0.008) ||
+      (hasReliableShortTelemetry && shortFlow < 0.004));
   const riskySteadyGainRangeSideways =
     steadyGainCandidate &&
     rangeSideways &&
-    (mtfAlignment < 35 || compositeAvg < 58);
+    ((!mtfUnavailable && mtfAlignment < 35) || compositeAvg < 58);
   const riskySteadyGainNoEdge =
     steadyGainCandidate &&
     (targetEdgeAfterSpread < 0.2 ||
-      (rangeSideways && shortMomentum < 0.025 && shortFlow < 0.01));
+      (rangeSideways && hasReliableShortTelemetry && shortMomentum < 0.025 && shortFlow < 0.01));
   const roleConsensusWeak =
     roleRiskVeto ||
     (technicalRoleScore > 0 && technicalRoleScore < 38) ||
@@ -884,13 +945,13 @@ async function evaluateAutoRoundLearningCandidate(input: {
       : "",
     riskyLearningMicroRange ? "learning-micro RANGE_SIDEWAYS paper blok" : "",
     riskyNonPumpQuality
-      ? `non-pump kalite dusuk (composite=${compositeAvg.toFixed(1)}, sentiment=${sentimentRoleScore.toFixed(1)}, mtf=${mtfAlignment.toFixed(1)})`
+      ? `non-pump kalite dusuk (composite=${compositeAvg.toFixed(1)}, sentiment=${sentimentRoleScore.toFixed(1)}, mtf=${mtfUnavailable ? "UNAVAILABLE" : mtfAlignment.toFixed(1)})`
       : "",
     riskySteadyGainQuality
-      ? `steady-gain kalite dusuk (composite=${compositeAvg.toFixed(1)}, mtf=${mtfAlignment.toFixed(1)})`
+      ? `steady-gain kalite dusuk (composite=${compositeAvg.toFixed(1)}, mtf=${mtfUnavailable ? "UNAVAILABLE" : mtfAlignment.toFixed(1)})`
       : "",
     riskySteadyGainRangeSideways
-      ? `steady-gain RANGE blok (mtf=${mtfAlignment.toFixed(1)}, composite=${compositeAvg.toFixed(1)})`
+      ? `steady-gain RANGE blok (mtf=${mtfUnavailable ? "UNAVAILABLE" : mtfAlignment.toFixed(1)}, composite=${compositeAvg.toFixed(1)})`
       : "",
     riskySteadyGainNoEdge
       ? `steady-gain edge yetersiz (targetEdge=${targetEdgeAfterSpread.toFixed(3)}%, momentum=${shortMomentum.toFixed(3)})`
@@ -918,12 +979,23 @@ async function evaluateAutoRoundLearningCandidate(input: {
     scannerConfidence < effectiveMinScannerConfidence
       ? `scanner confidence ${scannerConfidence.toFixed(2)} < ${effectiveMinScannerConfidence}`
       : "",
-    mtfAlignment < effectiveMinMtfAlignment && !dataDegraded && effectiveMinMtfAlignment > 0 ? `MTF ${mtfAlignment.toFixed(2)} < ${effectiveMinMtfAlignment}` : "",
+    mtfUnavailable ? "MTF UNAVAILABLE (explicit contract)" : "",
+    mtfAlignment !== null &&
+    mtfAlignment < effectiveMinMtfAlignment &&
+    !dataDegraded &&
+    effectiveMinMtfAlignment > 0
+      ? `MTF ${mtfAlignment.toFixed(2)} < ${effectiveMinMtfAlignment}`
+      : "",
     riskScore > effectiveMaxRiskScore ? `risk ${riskScore.toFixed(2)} > ${effectiveMaxRiskScore}` : "",
     context.spreadPercent > effectiveMaxSpreadPercent ? `spread ${context.spreadPercent.toFixed(4)}% > ${effectiveMaxSpreadPercent}%` : "",
     context.fakeSpikeScore > profile.maxFakeSpikeScore ? `fake spike ${context.fakeSpikeScore.toFixed(2)} > ${profile.maxFakeSpikeScore}` : "",
+    String(context.metadata.pumpRiskStatus ?? "AVAILABLE") !== "AVAILABLE"
+      ? "pump risk UNAVAILABLE (explicit contract)"
+      : "",
     context.pumpRisk > effectiveMaxPumpRisk && !strongPumpContinuation
-      ? `pump risk ${context.pumpRisk.toFixed(2)} > ${effectiveMaxPumpRisk}`
+      ? `pump risk ${context.pumpRisk.toFixed(2)} > ${effectiveMaxPumpRisk}${
+          Boolean(context.metadata.pumpRiskCapped) ? ` (raw=${Number(context.metadata.pumpRiskRawScore ?? 0).toFixed(2)}, capped)` : ""
+        }`
       : "",
     context.volatilityPercent > effectiveMaxVolatilityPercent && !strongPumpContinuation
       ? `volatility ${context.volatilityPercent.toFixed(4)}% > ${effectiveMaxVolatilityPercent}%`
@@ -964,7 +1036,7 @@ async function evaluateAutoRoundLearningCandidate(input: {
   if (!entryQuality.ok) {
     reasons.push(formatPaperEntryQualityReason(entryQuality));
   }
-  const entryDecision = resolveAdaptiveEntryDecision({
+  const rawEntryDecision = resolveAdaptiveEntryDecision({
     reasons,
     compositeAvg,
     consecutiveRejections: input.consecutiveRejections ?? 0,
@@ -973,10 +1045,33 @@ async function evaluateAutoRoundLearningCandidate(input: {
     effectiveConfidenceFloor: learningAdjustedMinConfidence,
     effectiveQualityFloor: effectiveMinQualityScore,
   });
+  const blockerTrail = [
+    rawEntryDecision.primaryBlocker,
+    ...rawEntryDecision.secondaryBlockers,
+  ].filter((x): x is string => typeof x === "string" && x.length > 0);
+  const scannerPolicy = evaluateScannerPolicy({
+    blockers: blockerTrail,
+    hasShortTelemetry: hasReliableShortTelemetry,
+    hasVolumeTelemetry,
+    staleShortTelemetry,
+  });
+  const entryDecision =
+    !rawEntryDecision.ok && scannerPolicy.action === "DEFER"
+      ? {
+          ...rawEntryDecision,
+          ok: true,
+          primaryBlocker: null,
+          secondaryBlockers: [],
+        }
+      : rawEntryDecision;
   return {
     ok: entryDecision.ok,
     profile,
-    reason: entryDecision.ok ? "entry-accepted" : reasons.join(" | "),
+    reason: entryDecision.ok
+      ? scannerPolicy.action === "DEFER" && blockerTrail.length > 0
+        ? `entry-deferred:${scannerPolicy.reasonCodes.join(",") || "UNKNOWN_DATA_OR_DUPLICATE"}`
+        : "entry-accepted"
+      : reasons.join(" | "),
     entryDecision: summarizeEntryDecisionForMetadata(entryDecision),
     entryQuality,
     metrics: {
@@ -984,7 +1079,9 @@ async function evaluateAutoRoundLearningCandidate(input: {
       riskScore,
       scannerScore,
       scannerConfidence,
-      mtfAlignment,
+      mtfAlignment: mtfAlignment ?? 0,
+      mtfStatus: mtfUnavailable ? "UNAVAILABLE" : "AVAILABLE",
+      mtfSource: mtfFromAi ? "AI" : mtfFromContext ? "MARKET_CONTEXT" : "NONE",
       shortMomentum,
       shortFlow,
       spreadPercent: context.spreadPercent,
@@ -1019,12 +1116,63 @@ async function evaluateAutoRoundLearningCandidate(input: {
       riskyLastResortPaper,
       targetEdgeAfterSpread,
       learningMemory,
+      hasReliableShortTelemetry,
+      staleShortTelemetry,
+      hasVolumeTelemetry,
+      scannerPolicyAction: scannerPolicy.action,
+      scannerPolicyClasses: scannerPolicy.classes,
+      scannerPolicyReasonCodes: scannerPolicy.reasonCodes,
     },
   };
 }
 
 function toStateText(state: AutoRoundState) {
   return state.replaceAll("_", " ");
+}
+
+async function reconcileRegistryIntegrityForJob(jobId: string, ownerId: string) {
+  const job = await getAutoRoundJobById(jobId);
+  if (!job) return { reconciled: false };
+
+  const report = recoverRoundRegistryFromRuns({
+    jobId,
+    ownerId,
+    runs: job.rounds ?? [],
+    inProgressStates: inProgressRoundStates,
+    onDuplicateRun: async (runId) => {
+      await transactionallyFailRound({
+        jobId,
+        runId,
+        reason: "Duplicate in-progress run consolidated by registry reconcile",
+        rejectBucket: "registry",
+      }).catch(() => null);
+    },
+  });
+
+  const integrity = await auditAutoRoundIntegrity(jobId);
+  if (integrity?.orphanActiveRunId) {
+    const activeRun =
+      (job.rounds ?? []).find(
+        (run) => !run.endedAt && inProgressRoundStates.includes(run.state as AutoRoundState),
+      ) ?? null;
+    await updateAutoRoundJob({
+      jobId,
+      activeRunId: activeRun?.id ?? null,
+      activeState: activeRun ? (activeRun.state as AutoRoundState) : "bekliyor",
+    }).catch(() => null);
+  }
+
+  for (const ownership of getActiveRoundOwnershipForJob(jobId)) {
+    const record = getRoundOwnershipRecord(jobId, ownership.roundNo);
+    if (record) {
+      await persistRoundOwnershipRecord({ jobId, record }).catch(() => null);
+    }
+  }
+
+  return {
+    reconciled: report.duplicatesConsolidated > 0 || report.staleReleased > 0 || Boolean(integrity?.orphanActiveRunId),
+    report,
+  };
 }
 
 async function reconcileStaleWaitingRunsForJob(jobId: string) {
@@ -1083,10 +1231,12 @@ async function setJobState(jobId: string, state: AutoRoundState, message: string
   const roundNo = Number(context?.roundNo ?? job.currentRound ?? 0);
   const runId = typeof context?.runId === "string" ? context.runId : undefined;
   const selectionAttempt = Number(context?.selectionAttempt ?? 0);
-  await updateAutoRoundJob({
-    jobId,
-    activeState: state,
-  });
+  if (job.activeState !== state) {
+    await updateAutoRoundJob({
+      jobId,
+      activeState: state,
+    });
+  }
   publishExecutionEvent({
     executionId: `round-job-${jobId}`,
     symbol: undefined,
@@ -1158,12 +1308,30 @@ function isPaperAutoRoundJob(job: { aiMode: string }) {
   return job.aiMode.toLowerCase() === "learning" || env.EXECUTION_MODE === "paper";
 }
 
+function buildSelectionReason(selected: ScannerCandidate | null) {
+  const explanation = String(selected?.ai?.explanation ?? "scanner + ai consensus").trim();
+  const finalDecision = String(selected?.ai?.finalDecision ?? "").toUpperCase();
+  if (
+    finalDecision &&
+    finalDecision !== "NO_TRADE" &&
+    finalDecision !== "HOLD" &&
+    explanation.toUpperCase().includes("NO_TRADE RESOLVED")
+  ) {
+    return `FINAL_DECISION=${finalDecision} | ${explanation}`;
+  }
+  return explanation;
+}
+
 async function haltAutoRoundJobForPause(jobId: string, reason: string) {
   cancelRoundSelection(jobId, reason);
-  clearRoundCancellation(jobId);
   stopSchedulerWatchdog(jobId);
   const job = await getAutoRoundJobById(jobId);
   if (job) {
+    terminalizeAiForRuns(
+      (job.rounds ?? []).map((run) => ({ id: run.id, roundNo: Number(run.roundNo ?? 0) })).filter((run) => run.roundNo > 0),
+      "JOB_PAUSED",
+      reason,
+    );
     for (const run of job.rounds ?? []) {
       if (inProgressRoundStates.includes(run.state as AutoRoundState) && !run.endedAt) {
         await updateAutoRoundRun({
@@ -1176,6 +1344,7 @@ async function haltAutoRoundJobForPause(jobId: string, reason: string) {
       }
     }
   }
+  clearRoundCancellation(jobId);
   await updateAutoRoundJob({
     jobId,
     status: "STOPPED",
@@ -1221,11 +1390,40 @@ async function failRound(input: {
       ) ?? releasedRecord;
   }
 
+  const runtime = readRuntimeFromMetadata((existingRun?.metadata as Record<string, unknown> | null) ?? null);
+  if (existingRun?.roundNo) {
+    terminalizeAiForRuns(
+      [{ id: input.runId, roundNo: existingRun.roundNo }],
+      "ROUND_FAILED",
+      input.reason,
+    );
+  }
+  if (existingRun) {
+    ensureRoundHangSnapshotForAbnormalTerminal({
+      sessionId: input.jobId,
+      roundId: String(existingRun.roundNo ?? job.currentRound),
+      runId: input.runId,
+      jobId: input.jobId,
+      nowIso: new Date().toISOString(),
+      startedAt: existingRun.startedAt ? new Date(existingRun.startedAt).toISOString() : null,
+      endedAt: new Date().toISOString(),
+      terminalReason: input.reason,
+      currentStage: runtime?.step ? String(runtime.step) : "FAILED",
+      currentCandidate: runtime?.currentCandidate ? String(runtime.currentCandidate) : undefined,
+      runtime: (runtime ?? {}) as unknown as Record<string, unknown>,
+      activeRetries: Number(runtime?.retryCount ?? 0),
+      activeAI: Number(runtime?.aiProcessed ?? 0),
+      activeScannerWork: Number(runtime?.scannerSymbolsProcessed ?? runtime?.candidatesProcessed ?? 0),
+      activePumpWork: Number(runtime?.pumpProcessed ?? 0),
+      activeDBWork: Number(runtime?.dbTransientFailures ?? 0),
+    });
+  }
+
   await transactionallyFailRound({
     jobId: input.jobId,
     runId: input.runId,
     reason: input.reason,
-    symbol: input.symbol,
+    symbol: shouldBindSymbolOnTerminalFail(input.reason, input.symbol),
     confidence: input.confidence,
     rejectBucket,
     activeState: input.activeState ?? "tur_basarisiz",
@@ -1242,7 +1440,6 @@ async function failRound(input: {
 
   const forensicSession = getForensicSession() ?? getOrCreateForensicSession({ sessionId: input.jobId, jobId: input.jobId });
   if (forensicSession && existingRun) {
-    const runtime = readRuntimeFromMetadata((existingRun.metadata as Record<string, unknown> | null) ?? null);
     await runRoundForensicExport({
       session: forensicSession,
       roundId: String(existingRun.roundNo ?? job.currentRound),
@@ -1251,7 +1448,7 @@ async function failRound(input: {
       roundNo: existingRun.roundNo ?? job.currentRound,
       startedAt: existingRun.startedAt,
       endedAt: new Date(),
-      symbol: input.symbol ?? existingRun.symbol,
+      symbol: shouldBindSymbolOnTerminalFail(input.reason, input.symbol ?? existingRun?.symbol ?? undefined),
       failReason: input.reason,
       result: "failed",
       userId: job.userId,
@@ -1263,6 +1460,71 @@ async function failRound(input: {
       selectionBudgetMs: runtime?.selectionBudgetMs != null ? Number(runtime.selectionBudgetMs) : null,
     });
   }
+}
+
+async function completeNoTradeRound(input: {
+  jobId: string;
+  runId: string;
+  reason: string;
+  roundOwnerId?: string;
+}) {
+  const job = await getAutoRoundJobById(input.jobId);
+  const run = await getAutoRoundRunById(input.runId).catch(() => null);
+  if (!job || !run) return;
+  const ownership =
+    getActiveRoundOwnershipForJob(input.jobId).find((row) => row.runId === input.runId)?.roundOwner ??
+    input.roundOwnerId;
+  let releasedRecord = getRoundOwnershipRecord(input.jobId, run.roundNo) ?? null;
+  if (ownership) {
+    await releaseRoundOwnership({
+      jobId: input.jobId,
+      roundNo: run.roundNo,
+      runId: input.runId,
+      ownerId: ownership,
+      finalStatus: "ROUND_COMPLETED",
+    }).catch(() => null);
+    releasedRecord = getRoundOwnershipRecord(input.jobId, run.roundNo) ?? releasedRecord;
+  }
+  await transactionallyCompleteRound({
+    jobId: input.jobId,
+    runId: input.runId,
+    ownership: releasedRecord,
+    runPatch: {
+      state: "tur_tamamlandi",
+      netPnl: 0,
+      feeTotal: 0,
+      result: "no_trade",
+      metadata: {
+        closeReason: "VALID_NO_CANDIDATE",
+        terminalReason: input.reason,
+      },
+    },
+  });
+  await setJobState(input.jobId, "tur_tamamlandi", `Tur tamamlandi (trade yok): ${input.reason}`, {
+    runId: input.runId,
+    roundNo: run.roundNo,
+    reason: input.reason,
+  });
+  const forensicSession = getForensicSession() ?? getOrCreateForensicSession({ sessionId: input.jobId, jobId: input.jobId });
+  await runRoundForensicExport({
+    session: forensicSession,
+    roundId: String(run.roundNo),
+    runId: input.runId,
+    jobId: input.jobId,
+    roundNo: run.roundNo,
+    startedAt: run.startedAt,
+    endedAt: new Date(),
+    symbol: null,
+    failReason: input.reason,
+    result: "no_trade",
+    userId: job.userId,
+    terminalState: "tur_tamamlandi",
+    currentStage: "NO_CANDIDATE",
+    lastProgressAt: new Date().toISOString(),
+    heartbeatAt: new Date().toISOString(),
+    elapsedMs: null,
+    selectionBudgetMs: null,
+  });
 }
 
 async function tryRecoverStaleOpenPaperPositions(input: {
@@ -1403,6 +1665,11 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
 
       if (job.stopRequested || ctx.signal.aborted) {
         cancelRoundSelection(jobId, "Tur motoru durduruldu");
+        terminalizeAiForRuns(
+          (job.rounds ?? []).map((run) => ({ id: run.id, roundNo: Number(run.roundNo ?? 0) })).filter((run) => run.roundNo > 0),
+          "JOB_STOP_REQUESTED",
+          "Tur motoru durduruldu",
+        );
         clearRoundCancellation(jobId);
         await updateAutoRoundJob({
           jobId,
@@ -1423,6 +1690,11 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
 
       const doneCount = job.completedRounds + job.failedRounds;
       if (doneCount >= job.totalRounds) {
+        terminalizeAiForRuns(
+          (job.rounds ?? []).map((run) => ({ id: run.id, roundNo: Number(run.roundNo ?? 0) })).filter((run) => run.roundNo > 0),
+          "JOB_COMPLETED",
+          "Tum hedef turlar tamamlandi",
+        );
         clearRoundCancellation(jobId);
         await updateAutoRoundJob({
           jobId,
@@ -1439,17 +1711,30 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         ? (job.rounds ?? []).find((run) => run.id === activeOwnership.runId)
         : sortInProgressRuns(job.rounds ?? [])[0];
       if (runningRun) {
+        const runMeta = (runningRun.metadata as Record<string, unknown> | null) ?? {};
         const startedAtMs = new Date(runningRun.startedAt).getTime();
-        const ageSec = Number.isFinite(startedAtMs) ? Math.floor((Date.now() - startedAtMs) / 1000) : 0;
-        const runtime = readRuntimeFromMetadata((runningRun.metadata as Record<string, unknown> | null) ?? null);
+        let ageSec = Number.isFinite(startedAtMs) ? Math.floor((Date.now() - startedAtMs) / 1000) : 0;
+        const runtime = readRuntimeFromMetadata(runMeta);
         const heartbeatAgeSec = runtime?.heartbeatAt
           ? Math.floor((Date.now() - new Date(runtime.heartbeatAt).getTime()) / 1000)
           : ageSec;
         const selectionBudgetSec = resolveAutoRoundSelectionBudgetSec();
-        const staleLimitSec =
-          runningRun.state === "tariyor" && !runningRun.symbol
-            ? Math.max(300, selectionBudgetSec + 60)
-            : Math.max(300, job.maxWaitSec + 120);
+        const executionPhaseStates: AutoRoundState[] = ["coin_secildi", "alim_yapildi", "satis_bekleniyor"];
+        let staleLimitSec: number;
+        if (runningRun.state === "tariyor" && !runningRun.symbol) {
+          staleLimitSec = Math.max(300, selectionBudgetSec + 60);
+        } else if (executionPhaseStates.includes(runningRun.state as AutoRoundState)) {
+          const phaseAnchor =
+            typeof runMeta.coinSelectedAt === "string"
+              ? runMeta.coinSelectedAt
+              : runtime?.heartbeatAt ?? runningRun.startedAt;
+          const phaseStartMs = new Date(phaseAnchor).getTime();
+          ageSec = Number.isFinite(phaseStartMs) ? Math.floor((Date.now() - phaseStartMs) / 1000) : ageSec;
+          const runMaxWaitSec = Number(runMeta.maxWaitSec ?? job.maxWaitSec ?? 900);
+          staleLimitSec = Math.max(300, runMaxWaitSec + 120);
+        } else {
+          staleLimitSec = Math.max(300, job.maxWaitSec + 120);
+        }
         const heartbeatStaleSec = Math.max(45, Math.floor(resolveRoundWatchdogStaleMs() / 1000));
         if (
           ageSec > staleLimitSec ||
@@ -1543,7 +1828,6 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         roundNo,
         runId: run.id,
       });
-      ensurePumpEarlyCatcherStarted();
 
       let openPositions = await listOpenPositionsByUser(job.userId);
       if (openPositions.length > 0) {
@@ -1593,6 +1877,10 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
       let selectionSource = "scanner";
       const jobMeta = ((job.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>;
       let consecutiveFilterRejections = Number(jobMeta.consecutiveFilterRejections ?? 0);
+      let aiNoResponseStreak = 0;
+      const loadLatestRunMetadata = async () =>
+        (((await getAutoRoundRunById(run.id).catch(() => null))?.metadata as Record<string, unknown> | null) ??
+          {}) as Record<string, unknown>;
 
       for (let attempt = 0; attempt < maxSelectionAttempts; attempt += 1) {
         if (Date.now() - selectionStartedAt >= selectionBudgetMs) {
@@ -1645,7 +1933,11 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         }
         if (selected) {
           selectionSource =
-            cooperative.source === "pump-cache" || cooperative.source === "pump-live" ? cooperative.source : "scanner";
+            cooperative.source === "pump-cache" ||
+            cooperative.source === "pump-live" ||
+            cooperative.source === "opportunity"
+              ? cooperative.source
+              : "scanner";
         } else {
           lastRejectReason = cooperative.reason ?? "Uygun coin secilemedi";
           traceCandidateReject({
@@ -1654,10 +1946,34 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
             reasonCode: cooperative.reason?.includes("PUMP_SCAN_FAILED") ? "PUMP_SCAN_FAILED" : "NO_CANDIDATE",
             reasonDetail: lastRejectReason,
           });
+          if (lastRejectReason.includes("VALID_NO_CANDIDATE")) {
+            break;
+          }
           if (attempt + 1 < maxSelectionAttempts) continue;
           break;
         }
         symbol = selected.context.symbol.toUpperCase();
+        const aiFinalDecision = String(selected.ai?.finalDecision ?? "");
+        recordCandidateFunnelStage({
+          symbol,
+          stage: "scanner_ai",
+          verdict: aiFinalDecision || "MISSING",
+          reasonCode: "SCANNER_AI_EVALUATED",
+          reasonDetail: "Scanner pipeline includeAi=true produced candidate.ai before selection gate",
+          runId: run.id,
+          roundId: String(roundNo),
+        });
+        if (isBlockingAiDecision(aiFinalDecision)) {
+          recordCandidateFunnelStage({
+            symbol,
+            stage: "scanner_ai",
+            verdict: aiFinalDecision || "MISSING",
+            reasonCode: "AI_ADVISORY",
+            reasonDetail: `AI decision=${aiFinalDecision || "EMPTY"} is advisory; canonical path continues`,
+            runId: run.id,
+            roundId: String(roundNo),
+          });
+        }
         if (!job.allowRepeatCoin && usedSymbols.includes(symbol)) {
           excludedSymbols.add(symbol);
           lastRejectReason = `${symbol} tekrar alimi engellendi`;
@@ -1684,12 +2000,13 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
             excludedSymbols.add(symbol);
             consecutiveFilterRejections += 1;
             lastRejectReason = `SIM_TIGHT_FILTER_${learningFit.profile.label}: ${learningFit.reason}`;
+            const latestRunMeta = await loadLatestRunMetadata();
             await updateAutoRoundRun({
               runId: run.id,
               state: "tariyor",
               symbol,
               metadata: {
-                ...(((run.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>),
+                ...latestRunMeta,
                 rejectedCandidate: symbol,
                 selectionAttempt: attempt + 1,
                 selectionSource,
@@ -1738,18 +2055,24 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           });
         }
 
+        const latestRunMeta = await loadLatestRunMetadata();
+        const selectedReason = buildSelectionReason(selected);
         await updateAutoRoundRun({
           runId: run.id,
           state: "coin_secildi",
           symbol,
-          selectedReason: selected.ai?.explanation ?? "scanner + ai consensus",
+          selectedReason,
           metadata: {
-            ...(((run.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>),
+            ...latestRunMeta,
             selectionAttempt: attempt + 1,
             excludedSymbols: Array.from(excludedSymbols),
             confidence: Number(selected.ai?.finalConfidence ?? selected.ai?.analysisScorecard?.confidenceScore ?? 0),
+            aiFinalDecision: String(selected.ai?.finalDecision ?? ""),
+            aiConsensusDecision: String(selected.ai?.finalConsensusDecision ?? ""),
+            aiVetoStatus: String(selected.ai?.vetoStatus ?? ""),
             horizonProfile: horizonProfile.label,
             consecutiveFilterRejections: 0,
+            coinSelectedAt: new Date().toISOString(),
           },
         });
         await updateAutoRoundJob({
@@ -1792,11 +2115,11 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           totalRounds: job.totalRounds,
           maxSelectionAttempts,
           patch: {
-            step: "EXECUTING",
-            message: `Tur ${roundNo}: ${symbol} icin islem aciliyor`,
+            step: "SYMBOL_SELECTED",
+            message: `Tur ${roundNo}: ${symbol} execution pre-check`,
             currentSymbol: symbol,
             currentPipeline: "execution",
-            executionPhasePct: 25,
+            executionPhasePct: 5,
           },
         }).catch(() => null);
         await transitionRoundLifecycle({
@@ -1806,6 +2129,16 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           ownerId: roundOwnerId,
           status: "EXECUTION_RUNNING",
         }).catch(() => null);
+
+        recordCandidateFunnelStage({
+          symbol,
+          stage: "scanner_ai",
+          verdict: String(selected.ai?.finalDecision ?? "MISSING"),
+          reasonCode: "SCANNER_AI_EXECUTABLE",
+          reasonDetail: "Scanner AI passed selection gate; execution pipeline will evaluate TDI/hybrid",
+          runId: run.id,
+          roundId: String(roundNo),
+        });
 
         execution = await executeAnalyzeAndTrade({
           requestedSymbol: symbol,
@@ -1818,32 +2151,104 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           preselectedCandidate: selected,
           learningLane,
           executionMode,
+          roundId: String(roundNo),
+          runId: run.id,
+          sessionId: jobId,
         });
         if (execution?.opened && execution.positionId) {
           break;
         }
         lastRejectReason = execution?.rejectReason ?? "Alim acilisi basarisiz";
-        if (lastRejectReason.toLowerCase().includes("cooldown")) {
+        const rejectReasonLower = lastRejectReason.toLowerCase();
+        if (rejectReasonLower.includes("cooldown")) {
+          aiNoResponseStreak = 0;
           excludedSymbols.add(symbol);
           continue;
+        }
+        if (rejectReasonLower.includes("ai_no_response")) {
+          aiNoResponseStreak += 1;
+          const aiFailureScope = classifyAiNoResponseScope({
+            rejectReason: lastRejectReason,
+            hasHealthyProvider: false,
+            providerFailureCount: aiNoResponseStreak,
+          });
+          excludedSymbols.add(symbol);
+          if (attempt + 1 < maxSelectionAttempts && (aiFailureScope === "CANDIDATE_LOCAL_FAILURE" || aiFailureScope === "ROUND_GLOBAL_FAILURE")) {
+            continue;
+          }
+        } else {
+          aiNoResponseStreak = 0;
         }
         break;
       }
 
       if (!selected || !execution?.opened || !execution.positionId) {
+        const reason = lastRejectReason || "Alim acilisi basarisiz";
+        const noCandidateLike =
+          !selected ||
+          reason.includes("NO_CANDIDATE") ||
+          reason.includes("Microstructure engine produced no confirmed candidate") ||
+          isTerminalNonExecutableReason(reason);
+        if (noCandidateLike) {
+          const noCandidateObservationMs = Math.min(
+            120_000,
+            Math.max(30_000, Math.floor(Math.max(60, job.maxWaitSec) * 150)),
+          );
+          const observeStart = Date.now();
+          while (Date.now() - observeStart < noCandidateObservationMs) {
+            await patchRoundRuntimeProgress({
+              jobId,
+              runId: run.id,
+              roundNo,
+              totalRounds: job.totalRounds,
+              maxSelectionAttempts,
+              patch: {
+                step: "NO_CANDIDATE",
+                message: `Tur ${roundNo}: VALID_NO_CANDIDATE observe (${Math.floor((Date.now() - observeStart) / 1000)}s)`,
+                currentPipeline: "opportunity-engine",
+              },
+            }).catch(() => null);
+            await sleep(2_000);
+          }
+          await completeNoTradeRound({
+            jobId,
+            runId: run.id,
+            reason: reason || "VALID_NO_CANDIDATE",
+            roundOwnerId,
+          });
+          continue;
+        }
         await failRound({
           jobId,
           runId: run.id,
-          reason: lastRejectReason || "Alim acilisi basarisiz",
-          symbol,
+          reason,
+          symbol:
+            selected && execution && !isTerminalNonExecutableReason(reason)
+              ? symbol
+              : undefined,
           confidence: Number(selected?.ai?.finalConfidence ?? selected?.ai?.analysisScorecard?.confidenceScore ?? 0),
         });
         continue;
       }
 
       const openedPosition = await getPositionById(execution.positionId).catch(() => null);
+      const selectedCandidateId = String(selected.context.metadata.opportunityCandidateId ?? "");
       const resolvedBuyPrice = Number(execution.details?.entryPrice ?? openedPosition?.entryPrice ?? 0);
       const resolvedBuyQty = Number(execution.details?.filledQuantity ?? openedPosition?.quantity ?? 0);
+      await patchRoundRuntimeProgress({
+        jobId,
+        runId: run.id,
+        roundNo,
+        totalRounds: job.totalRounds,
+        maxSelectionAttempts,
+        patch: {
+          step: "EXECUTING",
+          message: `Tur ${roundNo}: ${symbol} icin alis emri acildi`,
+          currentSymbol: symbol,
+          currentPipeline: "execution",
+          executionPhasePct: 60,
+        },
+      }).catch(() => null);
 
       const effectiveMaxWaitSec = Number(execution.details?.maxDurationSec ?? roundMaxWaitSec ?? job.maxWaitSec);
 
@@ -1925,6 +2330,11 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           roundOwnerId,
         });
         continue;
+      }
+      if (selectedCandidateId) {
+        getCanonicalCandidateStore().transitionCandidate(selectedCandidateId, "PAPER_CLOSED", [
+          `CLOSE_REASON_${String(closeResult.closeReason ?? "UNKNOWN")}`,
+        ]);
       }
 
       const nextUsed = job.allowRepeatCoin ? usedSymbols : [...usedSymbols, symbol];
@@ -2061,7 +2471,6 @@ function buildSchedulerSpawnResponse(jobId: string, spawn: AtomicSpawnResult) {
 }
 
 export async function startAutoRoundJob(input: StartRoundInput) {
-  ensurePumpEarlyCatcherStarted();
   const { user } = await getRuntimeExecutionContext(input.userId);
   const paperMode = input.aiMode.toLowerCase() === "learning" || env.EXECUTION_MODE === "paper";
   if (paperMode) {
@@ -2094,6 +2503,17 @@ export async function startAutoRoundJob(input: StartRoundInput) {
       pauseKind: pause.kind,
     };
   }
+  await ensureOpenPositionMonitors(user.id).catch((error) => {
+    logger.warn(
+      {
+        userId: user.id,
+        error: (error as Error).message,
+      },
+      "Failed to restore open position monitors at job start",
+    );
+  });
+  ensureMarketDataDaemonStarted();
+  ensureScannerWorkerStarted();
   const running = await findRunningAutoRoundJob(user.id);
   if (running) {
     const spawn = await ensureSingleSchedulerLoop(running.id);
@@ -2139,6 +2559,11 @@ export async function startAutoRoundJob(input: StartRoundInput) {
 async function finalizeStoppedAutoRoundJob(jobId: string) {
   const job = await getAutoRoundJobById(jobId);
   if (!job) return;
+  terminalizeAiForRuns(
+    (job.rounds ?? []).map((run) => ({ id: run.id, roundNo: Number(run.roundNo ?? 0) })).filter((run) => run.roundNo > 0),
+    "JOB_FINALIZED_STOPPED",
+    "Tur motoru durduruldu",
+  );
   for (const run of job.rounds) {
     if (inProgressRoundStates.includes(run.state as AutoRoundState) && !run.endedAt) {
       await updateAutoRoundRun({
@@ -2182,6 +2607,16 @@ export async function stopAutoRoundJob(userId?: string) {
     activeState: "bekliyor",
   });
   cancelRoundSelection(job.id, "Tur motoru durduruldu");
+  const latestJob = await getAutoRoundJobById(job.id);
+  if (latestJob) {
+    terminalizeAiForRuns(
+      (latestJob.rounds ?? [])
+        .map((run) => ({ id: run.id, roundNo: Number(run.roundNo ?? 0) }))
+        .filter((run) => run.roundNo > 0),
+      "JOB_STOP_REQUESTED",
+      "Tur motoru durduruldu",
+    );
+  }
   stopSchedulerWatchdog(job.id);
   await setJobState(job.id, "bekliyor", "Tur motoru durdurma istegi aldi");
   return {
@@ -2387,9 +2822,30 @@ function enrichJobForStatus(job: NonNullable<Awaited<ReturnType<typeof findRunni
   };
 }
 
+let lastStatusPollRecoveryAt = 0;
+const STATUS_POLL_RECOVERY_DEBOUNCE_MS = 30_000;
+
+async function maybeRecoverOnStatusPoll(jobId: string) {
+  const now = Date.now();
+  if (now - lastStatusPollRecoveryAt < STATUS_POLL_RECOVERY_DEBOUNCE_MS) return;
+  if (hasLocalSchedulerLoop(jobId)) return;
+  const localLease = getSchedulerLeaseSnapshot(jobId);
+  if (localLease && isSchedulerLeaseLive(localLease, getProcessOwnerId())) return;
+  lastStatusPollRecoveryAt = now;
+  await executeSchedulerRecovery({
+    jobId,
+    trigger: "status_poll",
+    operator: "automatic",
+  }).catch(() => null);
+  await atomicStartSchedulerWatchdog(jobId).catch(() => null);
+}
+
 export async function getAutoRoundStatus(userId?: string) {
   const { user } = await getRuntimeExecutionContext(userId);
   const running = await findRunningAutoRoundJob(user.id);
+  if (running) {
+    await maybeRecoverOnStatusPoll(running.id);
+  }
   const recentJobsRaw = await listAutoRoundJobs(user.id, 8);
   for (const job of recentJobsRaw) {
     await reconcileStaleWaitingRunsForJob(job.id);
@@ -2562,6 +3018,7 @@ export async function removeAutoRoundRun(userId: string, runId: string) {
 configureSchedulerRecovery({
   spawnScheduler: ensureSingleSchedulerLoop,
   reconcileStaleWaitingRuns: reconcileStaleWaitingRunsForJob,
+  reconcileRegistryIntegrity: reconcileRegistryIntegrityForJob,
   recoverRoundRegistry: (input) =>
     recoverRoundRegistryFromRuns({
       jobId: input.jobId,
@@ -2574,6 +3031,14 @@ configureSchedulerRecovery({
         startedAt: run.startedAt,
         endedAt: run.endedAt,
       })),
+      onDuplicateRun: async (runId) => {
+        await transactionallyFailRound({
+          jobId: input.jobId,
+          runId,
+          reason: "Duplicate in-progress run consolidated by round registry recovery",
+          rejectBucket: "registry",
+        }).catch(() => null);
+      },
     }),
   cancelRoundSelection: (jobId) => cancelRoundSelection(jobId, "Recovery restart current stage"),
   failActiveRound: async (jobId, reason) => {

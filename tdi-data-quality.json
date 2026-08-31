@@ -1,0 +1,134 @@
+{
+  "generatedAt": "2026-08-18T08:26:31.671Z",
+  "runId": "p1-tdi-data-quality-2026-08-18T08-26-29-586Z",
+  "smokeSessionId": "cmsyd5spj000bund4xns2j4yh",
+  "inventory": [
+    {
+      "field": "technicalScore",
+      "sourceModule": "src/server/ai/hybrid-decision-engine.ts",
+      "producer": "scoreTechnical",
+      "consumer": "bridgeTdiDecision/buildTdiDecisionRecord",
+      "expectedType": "number",
+      "expectedRange": "0..100",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "momentumScore",
+      "sourceModule": "src/server/decision-engine/experts/momentum-expert.utils.ts",
+      "producer": "scoreMomentumImpulse",
+      "consumer": "bridgeTdiDecision/buildTdiDecisionRecord",
+      "expectedType": "number",
+      "expectedRange": "0..100",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "sentimentScore",
+      "sourceModule": "src/server/ai/hybrid-decision-engine.ts",
+      "producer": "scoreSentiment",
+      "consumer": "bridgeTdiDecision/buildTdiDecisionRecord",
+      "expectedType": "number",
+      "expectedRange": "0..100",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "shortMomentum",
+      "sourceModule": "src/server/scanner/market-context-builder.ts",
+      "producer": "market context metadata.shortMomentumPercent",
+      "consumer": "momentum gates + TDI bridge",
+      "expectedType": "number",
+      "expectedRange": "percent-points (e.g. 0.42 = 0.42%)",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "shortFlowImbalance",
+      "sourceModule": "src/server/ai/analysis-orchestrator.ts",
+      "producer": "recent trade flow imbalance",
+      "consumer": "momentum gates + TDI bridge",
+      "expectedType": "number",
+      "expectedRange": "-1..1",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "executionScore",
+      "sourceModule": "src/server/execution/execution-orchestrator.service.ts",
+      "producer": "scanner/quality score",
+      "consumer": "TDI bridge + forensics",
+      "expectedType": "number",
+      "expectedRange": "0..100",
+      "required": false,
+      "fallback": "NOT_APPLICABLE",
+      "missingDataBehavior": "OPTIONAL_NOT_AVAILABLE"
+    },
+    {
+      "field": "confidence",
+      "sourceModule": "src/server/ai/hybrid-decision-engine.ts",
+      "producer": "hybrid/master consensus confidence",
+      "consumer": "TDI wait reason + sensitivity",
+      "expectedType": "number",
+      "expectedRange": "0..100",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "bullishCount",
+      "sourceModule": "src/server/ai/hybrid-decision-engine.ts",
+      "producer": "directional vote count",
+      "consumer": "forensic explainability",
+      "expectedType": "number",
+      "expectedRange": "0..8",
+      "required": false,
+      "fallback": "UNKNOWN",
+      "missingDataBehavior": "OPTIONAL_NOT_AVAILABLE"
+    },
+    {
+      "field": "learningScore",
+      "sourceModule": "src/server/decision-engine/conflict-detection.service.ts",
+      "producer": "master matrix learning score",
+      "consumer": "confidence/momentum attribution",
+      "expectedType": "number",
+      "expectedRange": "0..100",
+      "required": false,
+      "fallback": "UNKNOWN",
+      "missingDataBehavior": "OPTIONAL_NOT_AVAILABLE"
+    },
+    {
+      "field": "regime",
+      "sourceModule": "src/server/scanner/market-regime.service.ts",
+      "producer": "market regime classifier",
+      "consumer": "hybrid and master deltas",
+      "expectedType": "string",
+      "expectedRange": "known regime enum",
+      "required": true,
+      "fallback": "UNKNOWN",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    },
+    {
+      "field": "regimeDelta",
+      "sourceModule": "src/server/ai/hybrid-decision-engine.ts",
+      "producer": "resolveRegimePolicy",
+      "consumer": "threshold reconciliation",
+      "expectedType": "object",
+      "expectedRange": "{technical,sentiment,composite}",
+      "required": true,
+      "fallback": "none",
+      "missingDataBehavior": "DATA_QUALITY_BLOCK"
+    }
+  ],
+  "dataQualitySummary": {
+    "waitCount": 76,
+    "dataQualityBlockCount": 0,
+    "policyBlockCount": 76
+  },
+  "rootCauseCounts": {}
+}

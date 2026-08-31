@@ -5,6 +5,7 @@ import {
   readRuntimeFromMetadata,
   registerRoundCancellation,
 } from "@/src/server/execution/round-runtime.service";
+import { BoundedPrismaError } from "@/src/server/execution/bounded-prisma.service";
 import { RoundSelectionAbortError } from "@/src/server/execution/round-runtime.types";
 
 vi.mock("@/src/server/repositories/auto-round.repository", () => ({
@@ -101,5 +102,78 @@ describe("round runtime controller", () => {
       },
     });
     expect(snapshot?.step).toBe("SCANNING");
+  });
+
+  it("keeps heartbeat non-fatal on bounded persistence timeout", async () => {
+    const controller = new RoundRuntimeController(
+      {
+        jobId: "job-timeout",
+        runId: "run-timeout",
+        roundNo: 1,
+        totalRounds: 3,
+        selectionStartedAt: Date.now(),
+        selectionBudgetMs: 60_000,
+        selectionAttempt: 1,
+        onPersist: async () => {
+          throw new BoundedPrismaError("round-runtime.patchJobActiveRound timed out after 15000ms");
+        },
+      },
+      3,
+    );
+
+    await expect(controller.heartbeat("hb")).resolves.toBeUndefined();
+  });
+
+  it("maps transition persistence timeout to abortable persist-timeout code", async () => {
+    const controller = new RoundRuntimeController(
+      {
+        jobId: "job-transition-timeout",
+        runId: "run-transition-timeout",
+        roundNo: 1,
+        totalRounds: 3,
+        selectionStartedAt: Date.now(),
+        selectionBudgetMs: 60_000,
+        selectionAttempt: 1,
+        onPersist: async () => {
+          throw new BoundedPrismaError("round-runtime.mergeRunMetadata timed out after 15000ms");
+        },
+      },
+      3,
+    );
+
+    await expect(controller.transition("SCANNING", "scanner step")).rejects.toMatchObject({
+      name: "RoundSelectionAbortError",
+      code: "PERSIST_TIMEOUT",
+    });
+  });
+
+  it("serializes concurrent transition persists to avoid overlap", async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const controller = new RoundRuntimeController(
+      {
+        jobId: "job-queue",
+        runId: "run-queue",
+        roundNo: 1,
+        totalRounds: 3,
+        selectionStartedAt: Date.now(),
+        selectionBudgetMs: 60_000,
+        selectionAttempt: 1,
+        onPersist: async () => {
+          inFlight += 1;
+          maxInFlight = Math.max(maxInFlight, inFlight);
+          await new Promise((resolve) => setTimeout(resolve, 20));
+          inFlight -= 1;
+        },
+      },
+      3,
+    );
+
+    await Promise.all([
+      controller.transition("PUMP_SCAN", "pump"),
+      controller.transition("SCANNING", "scan"),
+      controller.transition("AI_ANALYSIS", "ai"),
+    ]);
+    expect(maxInFlight).toBe(1);
   });
 });

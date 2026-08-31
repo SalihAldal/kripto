@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-08-28T20:59:55.352Z",
+  "constraints": {
+    "noPolicyChange": true,
+    "noPaper": true,
+    "noThresholdChange": true
+  },
+  "counts": {
+    "profitable": 42,
+    "losing": 206,
+    "current2278": 2278
+  },
+  "evidenceQuality": {
+    "profitable": {
+      "SETUP_SNAPSHOT": 42
+    },
+    "topLevelMomentumScorePresent": 0
+  },
+  "verdict": {
+    "MOMENTUM_HISTORICAL_VS_CURRENT": "FORMULA_MISMATCH",
+    "CONFIDENCE_HISTORICAL_VS_CURRENT": "SAME_CONCEPT_DIFFERENT_FORMULA",
+    "TECHNICAL_HISTORICAL_VS_CURRENT": "UNKNOWN",
+    "SHORT_MOMENTUM_HISTORICAL_VS_CURRENT": "EXACTLY_SAME",
+    "MTF_HISTORICAL_VS_CURRENT": "EXACTLY_SAME",
+    "HISTORICAL_FEATURE_COMPARABILITY": "NOT_COMPARABLE",
+    "PROFITABLE_MOMENTUM_MEDIAN_CURRENT": 10.108,
+    "LOSING_MOMENTUM_MEDIAN_CURRENT": 6.44,
+    "PROFITABLE_CONFIDENCE_MEDIAN_CURRENT": 58,
+    "LOSING_CONFIDENCE_MEDIAN_CURRENT": 58,
+    "MOMENTUM_DISCRIMINATION": "POSITIVE",
+    "CONFIDENCE_DISCRIMINATION": "NONE",
+    "CURRENT_2278_DISTRIBUTION_SHIFT": "YES",
+    "LOOKAHEAD_VIOLATIONS": 247,
+    "ZERO_TRADE_ROOT_CAUSE": "REAL_POLICY_STRICTNESS",
+    "PRIMARY_EVIDENCE": "0/248 LearningTrade rows have metadata.momentumScore; P2/P3 inferred symbol medians (median~1.94-18.78). setupSnapshot.shortMomentum reconstructs to median 10.21 profitable vs 6.45 losing under scoreMomentumImpulse; current2278 median 18.78; TDI threshold 60 exceeds observed max (~46.7 reconstructed, ~40.6 runtime).",
+    "SAFE_NEXT_EXPERIMENT": "FEATURE_PIPELINE_FIX",
+    "PRODUCTION_CHANGE": "NO",
+    "PAPER_STARTED": "NO",
+    "NEXT_STEP": "Persist decision-time TDI telemetry (momentumScore, technical, sentiment, change5m/15m) into position metadata at entry before re-running any policy experiment; do not tune TDI threshold until telemetry parity is proven."
+  },
+  "discrimination": [
+    {
+      "feature": "reconstructedMomentumScore",
+      "profitableMedian": 10.108,
+      "losingMedian": 6.44,
+      "profitableCount": 42,
+      "losingCount": 206,
+      "auroc": 0.569117,
+      "cohensD": 0.159487,
+      "iqrOverlap": 0.757665,
+      "discrimination": "POSITIVE"
+    },
+    {
+      "feature": "reconstructedConfidence",
+      "profitableMedian": 58,
+      "losingMedian": 58,
+      "profitableCount": 42,
+      "losingCount": 206,
+      "auroc": 0.515892,
+      "cohensD": 0.066302,
+      "iqrOverlap": 0.948182,
+      "discrimination": "NONE"
+    },
+    {
+      "feature": "reconstructedTechnicalScore",
+      "profitableMedian": 48.54,
+      "losingMedian": 55.56,
+      "profitableCount": 42,
+      "losingCount": 206,
+      "auroc": 0.405629,
+      "cohensD": -0.30919,
+      "iqrOverlap": 0.929506,
+      "discrimination": "NEGATIVE"
+    },
+    {
+      "feature": "reconstructedShortMomentum",
+      "profitableMedian": 0.361,
+      "losingMedian": 0.23,
+      "profitableCount": 42,
+      "losingCount": 206,
+      "auroc": 0.569175,
+      "cohensD": 0.158446,
+      "iqrOverlap": 0.757665,
+      "discrimination": "POSITIVE"
+    },
+    {
+      "feature": "reconstructedShortFlow",
+      "profitableMedian": 0.7273,
+      "losingMedian": 0.6724,
+      "profitableCount": 42,
+      "losingCount": 206,
+      "auroc": 0.530629,
+      "cohensD": 0.242732,
+      "iqrOverlap": 0.913099,
+      "discrimination": "POSITIVE"
+    },
+    {
+      "feature": "reconstructedMtf",
+      "profitableMedian": 57.9,
+      "losingMedian": 67.65,
+      "profitableCount": 42,
+      "losingCount": 206,
+      "auroc": 0.483125,
+      "cohensD": -0.155049,
+      "iqrOverlap": 0.554852,
+      "discrimination": "NEGATIVE"
+    }
+  ],
+  "scaleAudit": [
+    {
+      "feature": "momentumScore",
+      "historicalStoredMedian": null,
+      "priorInferredMedian": 31.7,
+      "reconstructedCurrentMedianProfitable": 10.108,
+      "reconstructedCurrentMedianLosing": 6.44,
+      "current2278Median": 18.78,
+      "tdiThreshold": 60,
+      "maxReconstructedProfitable": 46.718,
+      "maxCurrent2278": 40.61,
+      "thresholdReachable": "NO",
+      "rootCause": "Prior P3 compared inferred symbol medians; DB has no top-level momentumScore. Current formula max ~40-55, threshold 60 unreachable."
+    }
+  ]
+}

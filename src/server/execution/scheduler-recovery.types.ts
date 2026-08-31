@@ -172,4 +172,5 @@ export type SchedulerRecoveryDeps = {
   cancelRoundSelection: (jobId: string) => void;
   stopJob: (jobId: string, reason: string) => Promise<void>;
   failActiveRound?: (jobId: string, reason: string) => Promise<void>;
+  reconcileRegistryIntegrity?: (jobId: string, ownerId: string) => Promise<{ reconciled: boolean }>;
 };

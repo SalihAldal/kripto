@@ -1,0 +1,230 @@
+{
+  "task": "KRIPTO — MASTER P0/P1/P1/P2 IMPLEMENTATION AUDIT",
+  "timestamp": "2026-08-17T18:05:00.000Z",
+  "mode": "READ_ONLY_AUDIT",
+  "executiveVerdict": {
+    "overall": "PARTIAL",
+    "profitabilityReadiness": "NOT_READY",
+    "validatedPositiveNetEdge": "NOT_PROVEN"
+  },
+  "workPackages": {
+    "p0_ai_execution_parity": {
+      "implementation": "PASS",
+      "runtimeWiring": "PASS",
+      "tests": "PASS",
+      "artifacts": "PASS",
+      "liveProof": "NOT_PROVEN",
+      "verdict": "PARTIAL",
+      "notes": [
+        "Canonical AI gate is wired in orchestrated execution paths.",
+        "Historical replay parity reports indicate NO_TRADE execution divergence fixed in replay dataset.",
+        "Controlled runtime round proof was incomplete.",
+        "Manual/admin order path is an intentional non-gated exception."
+      ]
+    },
+    "p1_scanner_candidate_entry": {
+      "implementation": "PASS",
+      "runtimeWiring": "PASS",
+      "tests": "PASS",
+      "artifacts": "PARTIAL",
+      "liveProof": "NOT_PROVEN",
+      "verdict": "PARTIAL",
+      "notes": [
+        "COW-type miss reproduction and bounded priority rescue are tested.",
+        "Priority lane does not directly auto-approve execution.",
+        "Runtime scanner/entry artifacts are often empty in failed rounds."
+      ]
+    },
+    "p1_exit_fee": {
+      "implementation": "PASS",
+      "runtimeWiring": "PASS",
+      "tests": "PASS",
+      "artifacts": "PASS",
+      "liveProof": "NOT_PROVEN",
+      "verdict": "PARTIAL",
+      "notes": [
+        "Exit model separation and reason attribution are implemented and tested.",
+        "Fee pre/post metrics and reconciliation formulas are implemented and tested.",
+        "Recent controlled run marked EXIT_VALIDATION_BLOCKED with no closed trades."
+      ]
+    },
+    "p2_strategy_regime_profitability": {
+      "implementation": "PASS",
+      "runtimeWiring": "PASS",
+      "tests": "PASS",
+      "artifacts": "PASS",
+      "liveProof": "PARTIAL",
+      "verdict": "PARTIAL",
+      "notes": [
+        "P2 framework (matrix, experiments, gate, OOS, concentration) is wired and tested.",
+        "No auto-promotion observed.",
+        "Runtime evidence quality remains low due zero/low closed-trade sample."
+      ]
+    }
+  },
+  "requiredAnswers": {
+    "A": "PARTIAL",
+    "B": "YES",
+    "C": "PARTIAL",
+    "D": "PARTIAL",
+    "E": "PARTIAL",
+    "F": "PARTIAL",
+    "G": "NOT_PROVEN",
+    "H": "CONDITIONAL"
+  },
+  "scorecard": [
+    {
+      "area": "P0 Execution",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Partial",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P1 Scanner",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Partial",
+      "liveProof": "Weak",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P1 Entry",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Partial",
+      "liveProof": "Weak",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P1 Exit",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Blocked",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P1 Fee",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Blocked",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P2 Strategy",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Weak",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P2 Regime",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Weak",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P2 EV",
+      "implementation": "Present",
+      "runtimeWiring": "Wired",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Insufficient",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P2 AI Quality",
+      "implementation": "Present",
+      "runtimeWiring": "Wired",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Insufficient",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P2 A/B",
+      "implementation": "Strong",
+      "runtimeWiring": "Strong",
+      "tests": "Yes",
+      "artifacts": "Yes",
+      "liveProof": "Insufficient",
+      "verdict": "PARTIAL"
+    },
+    {
+      "area": "P2 OOS",
+      "implementation": "Present",
+      "runtimeWiring": "Wired",
+      "tests": "Partial",
+      "artifacts": "Yes",
+      "liveProof": "Insufficient",
+      "verdict": "NOT_PROVEN"
+    },
+    {
+      "area": "Profitability",
+      "implementation": "Not proven",
+      "runtimeWiring": "N/A",
+      "tests": "N/A",
+      "artifacts": "Partial",
+      "liveProof": "Insufficient",
+      "verdict": "NOT_PROVEN"
+    }
+  ],
+  "criticalGaps": [
+    {
+      "requirement": "Stable runtime validation evidence",
+      "currentBehavior": "Recent sessions fail/stop before sufficient closed trades",
+      "expectedBehavior": "Completed controlled rounds with non-empty trade and exit/fee datasets",
+      "risk": "Implementation-only confidence without runtime confirmation",
+      "nextAction": "Run stable controlled rounds and re-audit with evidence-rich artifacts",
+      "status": "NOT_PROVEN"
+    },
+    {
+      "requirement": "Real exit behavior proof",
+      "currentBehavior": "EXIT_VALIDATION_BLOCKED in recent P1 exit/fee validation",
+      "expectedBehavior": "Observed closed trades with measurable position-monitor exits",
+      "risk": "Exit quality remains inferential",
+      "nextAction": "Obtain completed rounds with closed trades and re-check exit distributions",
+      "status": "NOT_PROVEN"
+    },
+    {
+      "requirement": "OOS-backed promotion confidence",
+      "currentBehavior": "OOS frequently unavailable due sample insufficiency",
+      "expectedBehavior": "Sufficient in/out-sample evidence before promotion",
+      "risk": "Overfit or inconclusive variant judgments",
+      "nextAction": "Accumulate sample and re-evaluate promotion gates",
+      "status": "NOT_PROVEN"
+    },
+    {
+      "requirement": "Root-level P2 CSV outputs match report claim",
+      "currentBehavior": "Referenced in JSON claim, not found in workspace root at audit time",
+      "expectedBehavior": "CSV files present and verifiable",
+      "risk": "CLAIM_NOT_PROVEN for output presence",
+      "nextAction": "Regenerate/export and verify root file presence in a successful run",
+      "status": "CLAIM_NOT_PROVEN"
+    }
+  ],
+  "artifactAudit": {
+    "requiredReportsPresent": true,
+    "claimNotProvenFlags": [
+      "Runtime proof for several packages remains incomplete due failed/stopped rounds",
+      "Some generated-output claims (root CSV presence) are not verifiable at audit time"
+    ]
+  },
+  "largePaperReadiness": {
+    "status": "CONDITIONAL",
+    "summary": "Infrastructure and tests are largely ready, but evidence readiness is not sufficient for trustworthy 30-50+ profitability conclusions."
+  }
+}

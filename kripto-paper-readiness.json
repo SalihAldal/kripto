@@ -1,0 +1,6 @@
+{
+  "READY_FOR_30_ROUND_PAPER": "CONDITIONAL",
+  "reason": "Scanner AI NO_TRADE at selection gate (31/50 rounds) + lane-empty terminal (18/50) — downstream TDI/hybrid never reached; correctness fixed, policy unchanged",
+  "deterministicCorrectness": "FIXED",
+  "paperStarted": false
+}

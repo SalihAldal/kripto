@@ -1,0 +1,9 @@
+{
+  "recommendation": "FEATURE_PIPELINE_FIX",
+  "rationale": "0/248 LearningTrade rows have metadata.momentumScore; P2/P3 inferred symbol medians (median~1.94-18.78). setupSnapshot.shortMomentum reconstructs to median 10.21 profitable vs 6.45 losing under scoreMomentumImpulse; current2278 median 18.78; TDI threshold 60 exceeds observed max (~46.7 reconstructed, ~40.6 runtime).",
+  "blockedExperiments": [
+    "TDI_POLICY_EXPERIMENT",
+    "MOMENTUM_POLICY_EXPERIMENT"
+  ],
+  "prerequisite": "Persist entry-time TDI feature vector to position/LearningTrade metadata"
+}

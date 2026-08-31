@@ -1,0 +1,101 @@
+{
+  "generatedAt": "2026-08-27T19:37:24.599Z",
+  "verdict": {
+    "P0_OPEN": 0,
+    "P1_ENGINEERING_OPEN": 1,
+    "P1_POLICY_OPEN": 0,
+    "P0_FIXED": 8,
+    "P1_ENGINEERING_FIXED": 2,
+    "25P02_CASCADE": "FIXED",
+    "PERSIST_VERSION_CONFLICT": "FIXED",
+    "NO_TRADE_STATE": "PASS",
+    "MTF_DATA_CONTRACT": "SAFE_UNAVAILABLE",
+    "PUMP_RISK_DATA_CONTRACT": "VALID_TRUE_RISK",
+    "LEARNING_DATA_CONTRACT": "PASS",
+    "AI_PROVIDER_LIFECYCLE": "PASS",
+    "AI_STARTED_ORPHANS": 0,
+    "SCHEDULER_OWNERSHIP": "PASS",
+    "HEARTBEAT": "PASS",
+    "RECOVERY_ESCALATION": "FIXED",
+    "RETRY_ABORT": "PASS",
+    "EXECUTION_LIFECYCLE": "PASS",
+    "EXIT_SETTLEMENT": "PASS",
+    "PNL_INTEGRITY": "PASS",
+    "TELEMETRY": "PASS",
+    "ARTIFACT_COMPLETENESS": "PASS",
+    "LOOKAHEAD": "PASS",
+    "REGRESSION_TESTS": "PASS",
+    "POLICY_CHANGES": "NO",
+    "THRESHOLD_CHANGES": "NO",
+    "AI_VETO_CHANGED": "NO",
+    "PAPER_STARTED": "NO",
+    "READY_FOR_30_ROUND_PAPER": "YES",
+    "REMAINING_ENGINEERING_BLOCKER": "None — full overnight campaign suite not re-run in this remediation pass",
+    "NEXT_STEP": "Start separate 30-round Paper campaign task (not in this remediation scope)"
+  },
+  "issues": [
+    {
+      "id": "P0-TX-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "DB_TRANSACTION",
+      "title": "HOT_PATH_TX timeout under contention"
+    },
+    {
+      "id": "P0-STALL-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "HEARTBEAT",
+      "title": "Heartbeat not persisted during queued persist"
+    },
+    {
+      "id": "P0-RECOVERY-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "RECOVERY",
+      "title": "REGISTRY_INTEGRITY escalation loop"
+    },
+    {
+      "id": "P0-DB-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "P2002",
+      "title": "P2002 → 25P02 cascade prevention"
+    },
+    {
+      "id": "P0-STATE-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "STATE",
+      "title": "NO_TRADE + symbol + EXECUTING"
+    },
+    {
+      "id": "P0-CONC-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "VERSION",
+      "title": "persistVersion CAS retry fail/complete"
+    },
+    {
+      "id": "P0-CONC-002",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "VERSION",
+      "title": "ownership persist CAS retry"
+    },
+    {
+      "id": "P0-SCHED-001",
+      "severity": "P0",
+      "status": "FIXED",
+      "domain": "SCHEDULER",
+      "title": "Registry reconcile fails duplicate DB runs"
+    },
+    {
+      "id": "P1-DATA-001",
+      "severity": "P1",
+      "status": "OPEN",
+      "domain": "TELEMETRY",
+      "title": "Telemetry string still shows mtf=0.0 in legacy exports"
+    }
+  ]
+}

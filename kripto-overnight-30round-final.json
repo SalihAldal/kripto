@@ -1,0 +1,1850 @@
+{
+  "validationId": "overnight-30round-2026-08-22T23-23-52-425Z",
+  "sessionId": "cmt4zxkbm001gun8ghz4qsb0w",
+  "startedAt": "2026-08-22T23:23:57.985Z",
+  "completedAt": "2026-08-23T01:22:19.914Z",
+  "config": {
+    "totalRounds": 30,
+    "maxRoundMinutes": 30,
+    "executionMode": "paper",
+    "exchange": "tr",
+    "aiGatePolicy": "VETO",
+    "variantDEnabled": "true"
+  },
+  "job": {
+    "id": "cmt4zxkbm001gun8ghz4qsb0w",
+    "status": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 10,
+    "lastError": "scanner-ai pool aborted: Tur secim suresi doldu (1200s)",
+    "finishedAt": "2026-08-23T01:22:17.709Z"
+  },
+  "rounds": [
+    {
+      "roundNo": 1,
+      "roundId": "cmt4zxl9f001tun8gz2x8h86o",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 205,
+      "scannerCandidates": 205,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 23,
+        "tdiRejects": 292
+      },
+      "ai": {
+        "aiInvokedCount": 27,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\1",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 2,
+      "roundId": "cmt50l41x09iuun8gmkl9y7qi",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "SIM_TIGHT_FILTER_30m: non-pump kalite dusuk (composite=43.8, sentiment=31.7, mtf=73.5) | AI role consensus zayif (tech=37.8, sentiment=31.7, risk=62.0) | momentum/flow zayif (-0.0850, -1.0000) | regime chop warning | regime lifecycle risk (CHOP) | EMA trend uyumsuz (EMA50=235.9905, EMA200=236.3686) | Kalite skoru dusuk (30/100 < 52)",
+      "candidateCount": 247,
+      "scannerCandidates": 247,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 11,
+        "tdiRejects": 174
+      },
+      "ai": {
+        "aiInvokedCount": 85,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\2",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 3,
+      "roundId": "cmt513ymm0k3vun8gqsd07fkp",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 48,
+      "scannerCandidates": 48,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 85,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\3",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 4,
+      "roundId": "cmt519ram0nmvun8gk7m02l8r",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 84,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\4",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 5,
+      "roundId": "cmt51eo5m0rajun8gvb31uy4l",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 74,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\5",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 6,
+      "roundId": "cmt51sifa0y05un8g57mzms4r",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "SIM_TIGHT_FILTER_30m: non-pump kalite dusuk (composite=54.5, sentiment=71.7, mtf=45.5) | AI role consensus zayif (tech=32.1, sentiment=71.7, risk=59.5) | momentum/flow zayif (-0.0002, 1.0000) | Sahte hour-only pump (tape=-0.000%, hour=-0.228%) | EMA trend uyumsuz (EMA50=0.0026, EMA200=0.0026) | Hacim yetersiz (0.46x < 1.05x) | Kalite skoru dusuk (39/100 < 52)",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 81,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\6",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 7,
+      "roundId": "cmt52e2kl189lun8gc1z2xj2q",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 46,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\7",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 8,
+      "roundId": "cmt52ksck1aogun8gyfzo1i42",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 83,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\8",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 9,
+      "roundId": "cmt5319zf1f0gun8g7co4oiii",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 95,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\9",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 10,
+      "roundId": "cmt53cvq21jiuun8g4237c6h1",
+      "state": "tur_basarisiz",
+      "terminal": true,
+      "failReason": "AI_GATE_BLOCK: AI_VETO",
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 93,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\10",
+      "artifactsExist": true
+    },
+    {
+      "roundNo": 11,
+      "roundId": "cmt53r6rf1oa6un8gst00c5dn",
+      "state": "tariyor",
+      "terminal": false,
+      "failReason": null,
+      "candidateCount": 0,
+      "scannerCandidates": 0,
+      "tdi": {
+        "tdiApprovals": 0,
+        "tdiWait": 0,
+        "tdiRejects": 0
+      },
+      "ai": {
+        "aiInvokedCount": 9,
+        "aiFailedCount": 0,
+        "aiNoResponseCount": 0
+      },
+      "execution": {
+        "executionReadyCount": 0,
+        "ordersCreatedCount": 0,
+        "fillsCount": 0
+      },
+      "positions": {
+        "positionsOpened": 0,
+        "positionsClosed": 0
+      },
+      "pnl": {
+        "tradeCount": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "variantD": {
+        "trades": 0,
+        "netPnL": 0
+      },
+      "exits": [],
+      "pnlEntries": [],
+      "criticalFailures": [],
+      "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmt4zxkbm001gun8ghz4qsb0w\\rounds\\11",
+      "artifactsExist": true
+    }
+  ],
+  "incidents": [],
+  "fixChangelog": [],
+  "healthSnapshots": [
+    {
+      "timestamp": "2026-08-22T23:33:42.827Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 1,
+      "stopRequested": false,
+      "activeRunId": "cmt50l41x09iuun8gmkl9y7qi",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-22T23:33:42.634Z",
+        "overallScore": 96,
+        "schedulerHealth": 100,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 80,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "lease",
+                "failure": "LEASE_HELD_BY_PEER",
+                "severity": "info",
+                "message": "Scheduler lease owned by another process",
+                "evidence": {
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 80,
+            "canRecover": false,
+            "hasLocalLoop": false,
+            "hasLiveLease": true,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt50l41x09iuun8gmkl9y7qi",
+            "activeRunRoundNo": 2,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-22T23:33:37.375Z",
+              "lastProgressAt": "2026-08-22T23:33:37.375Z",
+              "heartbeatAgeMs": 5120,
+              "progressAgeMs": 5120,
+              "stallElapsedMs": 5120,
+              "elapsedMs": 1791,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1198209,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "PUMP_CONFIRMATION",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 1,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": 16.4,
+                "currentPipeline": "pump-confirmation",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-22T23:33:37.375Z",
+                "lastRawProgressAt": "2026-08-22T23:33:37.375Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "2",
+              "stage": "PUMP_CONFIRMATION",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-22T23:33:37.375Z",
+              "heartbeatAt": "2026-08-22T23:33:37.375Z",
+              "elapsedMs": 1791,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 5120,
+              "selectionBudgetRemainingMs": 1198209
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-22T23:48:25.675Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 2,
+      "stopRequested": false,
+      "activeRunId": "cmt513ymm0k3vun8gqsd07fkp",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-22T23:48:25.663Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt513ymm0k3vun8gqsd07fkp",
+            "activeRunRoundNo": 3,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-22T23:48:25.459Z",
+              "lastProgressAt": "2026-08-22T23:48:25.459Z",
+              "heartbeatAgeMs": 178,
+              "progressAgeMs": 178,
+              "stallElapsedMs": 178,
+              "elapsedMs": 12188,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1187812,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "SCANNING",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 13,
+                "aiProcessed": 0,
+                "aiTotal": 108,
+                "scannerTotal": 108,
+                "intraRoundPct": 31.37,
+                "currentPipeline": "scanner-full",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-22T23:48:25.459Z",
+                "lastRawProgressAt": "2026-08-22T23:48:25.459Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "3",
+              "stage": "SCANNING",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-22T23:48:25.459Z",
+              "heartbeatAt": "2026-08-22T23:48:25.459Z",
+              "elapsedMs": 12188,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 178,
+              "selectionBudgetRemainingMs": 1187812
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-22T23:52:45.700Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 3,
+      "stopRequested": false,
+      "activeRunId": "cmt519ram0nmvun8gk7m02l8r",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-22T23:52:45.677Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt519ram0nmvun8gk7m02l8r",
+            "activeRunRoundNo": 4,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-22T23:52:44.655Z",
+              "lastProgressAt": "2026-08-22T23:52:44.655Z",
+              "heartbeatAgeMs": 1011,
+              "progressAgeMs": 1011,
+              "stallElapsedMs": 1011,
+              "elapsedMs": 976,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1199024,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "FULL_SCAN",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 3,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": 56,
+                "currentPipeline": "scanner-full",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-22T23:52:44.655Z",
+                "lastRawProgressAt": "2026-08-22T23:52:44.655Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "4",
+              "stage": "FULL_SCAN",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-22T23:52:44.655Z",
+              "heartbeatAt": "2026-08-22T23:52:44.655Z",
+              "elapsedMs": 976,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 1011,
+              "selectionBudgetRemainingMs": 1199024
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-22T23:56:35.872Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 4,
+      "stopRequested": false,
+      "activeRunId": "cmt51eo5m0rajun8gvb31uy4l",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-22T23:56:35.864Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt51eo5m0rajun8gvb31uy4l",
+            "activeRunRoundNo": 5,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-22T23:56:35.647Z",
+              "lastProgressAt": "2026-08-22T23:56:35.647Z",
+              "heartbeatAgeMs": 206,
+              "progressAgeMs": 206,
+              "stallElapsedMs": 206,
+              "elapsedMs": 2757,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1197243,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "SCANNING",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 6,
+                "aiProcessed": 0,
+                "aiTotal": 108,
+                "scannerTotal": 108,
+                "intraRoundPct": 29.56,
+                "currentPipeline": "scanner-full",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-22T23:56:35.647Z",
+                "lastRawProgressAt": "2026-08-22T23:56:35.647Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "5",
+              "stage": "SCANNING",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-22T23:56:35.647Z",
+              "heartbeatAt": "2026-08-22T23:56:35.647Z",
+              "elapsedMs": 2757,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 206,
+              "selectionBudgetRemainingMs": 1197243
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-23T00:07:19.189Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 5,
+      "stopRequested": false,
+      "activeRunId": "cmt51sifa0y05un8g57mzms4r",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-23T00:07:19.173Z",
+        "overallScore": 79,
+        "schedulerHealth": 25,
+        "runtimeHealth": 60,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              },
+              {
+                "component": "runtime",
+                "failure": "RUNTIME_STALL",
+                "severity": "warn",
+                "message": "Active round missing runtime heartbeat",
+                "evidence": {
+                  "runId": "cmt51sifa0y05un8g57mzms4r",
+                  "roundNo": 6,
+                  "progressState": "STALLED"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt51sifa0y05un8g57mzms4r",
+            "activeRunRoundNo": 6,
+            "progressAssessment": {
+              "progressState": "STALLED",
+              "reasonCode": "NO_PROGRESS_TIMEOUT",
+              "reasonDetail": "No heartbeat/progress within stall threshold (180s)",
+              "heartbeatAt": null,
+              "lastProgressAt": null,
+              "heartbeatAgeMs": null,
+              "progressAgeMs": null,
+              "stallElapsedMs": null,
+              "elapsedMs": 0,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1200000,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": null,
+                "selectionAttempt": null,
+                "candidatesProcessed": 0,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": null,
+                "currentPipeline": null,
+                "meaningfulProgress": false,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": null,
+                "lastRawProgressAt": null
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "6",
+              "stage": "selection",
+              "progressState": "STALLED",
+              "recoveryDecision": "NO_ACTION",
+              "reasonCode": "NO_PROGRESS_TIMEOUT",
+              "reasonDetail": "No heartbeat/progress within stall threshold (180s)",
+              "recoveryCount": 0,
+              "lastProgressAt": null,
+              "heartbeatAt": null,
+              "elapsedMs": 0,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": null,
+              "selectionBudgetRemainingMs": 1200000
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-23T00:24:06.872Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 6,
+      "stopRequested": false,
+      "activeRunId": "cmt52e2kl189lun8gc1z2xj2q",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-23T00:24:06.857Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt52e2kl189lun8gc1z2xj2q",
+            "activeRunRoundNo": 7,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-23T00:24:04.783Z",
+              "lastProgressAt": "2026-08-23T00:24:04.783Z",
+              "heartbeatAgeMs": 2054,
+              "progressAgeMs": 2054,
+              "stallElapsedMs": 2054,
+              "elapsedMs": 231,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1199769,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "FULL_SCAN",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 2,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": 56,
+                "currentPipeline": "scanner-full",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-23T00:24:04.783Z",
+                "lastRawProgressAt": "2026-08-23T00:24:04.783Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "7",
+              "stage": "FULL_SCAN",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-23T00:24:04.783Z",
+              "heartbeatAt": "2026-08-23T00:24:04.783Z",
+              "elapsedMs": 231,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 2054,
+              "selectionBudgetRemainingMs": 1199769
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-23T00:29:28.357Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 7,
+      "stopRequested": false,
+      "activeRunId": "cmt52ksck1aogun8gyfzo1i42",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-23T00:29:28.170Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt52ksck1aogun8gyfzo1i42",
+            "activeRunRoundNo": 8,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-23T00:29:27.135Z",
+              "lastProgressAt": "2026-08-23T00:29:27.135Z",
+              "heartbeatAgeMs": 792,
+              "progressAgeMs": 792,
+              "stallElapsedMs": 792,
+              "elapsedMs": 9223,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1190777,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "PUMP_CONFIRMATION",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 3,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": 18.2,
+                "currentPipeline": "pump-confirmation",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-23T00:29:27.135Z",
+                "lastRawProgressAt": "2026-08-23T00:29:27.135Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "8",
+              "stage": "PUMP_CONFIRMATION",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-23T00:29:27.135Z",
+              "heartbeatAt": "2026-08-23T00:29:27.135Z",
+              "elapsedMs": 9223,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 792,
+              "selectionBudgetRemainingMs": 1190777
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-22T23:33:31.188Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-23T00:42:20.722Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 8,
+      "stopRequested": false,
+      "activeRunId": "cmt5319zf1f0gun8g7co4oiii",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-23T00:42:20.508Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt5319zf1f0gun8g7co4oiii",
+            "activeRunRoundNo": 9,
+            "progressAssessment": {
+              "progressState": "SCANNER_ACTIVE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-23T00:42:10.916Z",
+              "lastProgressAt": "2026-08-23T00:42:08.551Z",
+              "heartbeatAgeMs": 9467,
+              "progressAgeMs": 11832,
+              "stallElapsedMs": 11832,
+              "elapsedMs": 3372,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1196628,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "PUMP_CONFIRMATION",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 1,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": 20,
+                "currentPipeline": "pump-confirmation",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-23T00:42:08.551Z",
+                "lastRawProgressAt": "2026-08-23T00:42:08.551Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "9",
+              "stage": "PUMP_CONFIRMATION",
+              "progressState": "SCANNER_ACTIVE",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-23T00:42:08.551Z",
+              "heartbeatAt": "2026-08-23T00:42:10.916Z",
+              "elapsedMs": 3372,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 11832,
+              "selectionBudgetRemainingMs": 1196628
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-23T00:42:04.072Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-23T00:51:22.152Z",
+      "jobState": "RUNNING",
+      "activeState": "tariyor",
+      "completedRounds": 0,
+      "failedRounds": 9,
+      "stopRequested": false,
+      "activeRunId": "cmt53cvq21jiuun8g4237c6h1",
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-23T00:51:22.132Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": "cmt53cvq21jiuun8g4237c6h1",
+            "activeRunRoundNo": 10,
+            "progressAssessment": {
+              "progressState": "ACTIVE_PROGRESS",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "heartbeatAt": "2026-08-23T00:51:22.005Z",
+              "lastProgressAt": "2026-08-23T00:51:22.005Z",
+              "heartbeatAgeMs": 107,
+              "progressAgeMs": 107,
+              "stallElapsedMs": 107,
+              "elapsedMs": 13305,
+              "selectionBudgetMs": 1200000,
+              "selectionBudgetRemainingMs": 1186695,
+              "stallThresholdMs": 180000,
+              "progressStaleThresholdMs": 180000,
+              "possiblyHungGraceMs": 180000,
+              "evidence": {
+                "step": "NEXT_CANDIDATE",
+                "selectionAttempt": 1,
+                "candidatesProcessed": 6,
+                "aiProcessed": 0,
+                "aiTotal": 0,
+                "scannerTotal": 0,
+                "intraRoundPct": 26.67,
+                "currentPipeline": "pump-confirmation",
+                "meaningfulProgress": true,
+                "dependencyDegraded": false,
+                "lastMeaningfulProgressAt": "2026-08-23T00:51:22.005Z",
+                "lastRawProgressAt": "2026-08-23T00:51:22.005Z"
+              }
+            },
+            "progressTelemetry": {
+              "roundId": "10",
+              "stage": "NEXT_CANDIDATE",
+              "progressState": "ACTIVE_PROGRESS",
+              "recoveryDecision": "CONTINUE",
+              "reasonCode": "PROGRESS_ADVANCING",
+              "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+              "recoveryCount": 0,
+              "lastProgressAt": "2026-08-23T00:51:22.005Z",
+              "heartbeatAt": "2026-08-23T00:51:22.005Z",
+              "elapsedMs": 13305,
+              "selectionBudgetMs": 1200000,
+              "stallElapsedMs": 107,
+              "selectionBudgetRemainingMs": 1186695
+            },
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-23T00:42:04.072Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-23T01:02:14.738Z",
+      "jobState": "RUNNING",
+      "activeState": "tur_basarisiz",
+      "completedRounds": 0,
+      "failedRounds": 10,
+      "stopRequested": false,
+      "activeRunId": null,
+      "scheduler": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "activeLease": {
+          "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+          "ownerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+          "createdAt": "2026-08-22T23:15:16.082Z",
+          "lastHeartbeatAt": "2026-08-22T23:33:33.487Z",
+          "version": 3,
+          "generation": 1,
+          "state": "RUNNING"
+        },
+        "roundRegistry": {
+          "entries": [],
+          "activeCount": 0
+        },
+        "readOnly": true
+      },
+      "health": {
+        "generatedAt": "2026-08-23T01:02:14.714Z",
+        "overallScore": 85,
+        "schedulerHealth": 25,
+        "runtimeHealth": 100,
+        "recoveryHealth": 100,
+        "watchdogHealth": 70,
+        "scannerHealth": 100,
+        "aiHealth": 100,
+        "databaseHealth": 100,
+        "ownershipHealth": 100,
+        "heartbeatHealth": 100,
+        "leaseHealth": 100,
+        "registryHealth": 100,
+        "jobs": [
+          {
+            "jobId": "cmt4zxkbm001gun8ghz4qsb0w",
+            "jobStatus": "RUNNING",
+            "issues": [
+              {
+                "component": "scheduler",
+                "failure": "SCHEDULER_LEASE_STALE",
+                "severity": "critical",
+                "message": "Running job has no live scheduler loop or lease",
+                "evidence": {
+                  "leaseState": "RUNNING",
+                  "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6"
+                }
+              }
+            ],
+            "score": 25,
+            "canRecover": true,
+            "hasLocalLoop": false,
+            "hasLiveLease": false,
+            "leaseOwnerId": "DESKTOP-3R7HR9F:43072:44683eb6",
+            "activeRunId": null,
+            "activeRunRoundNo": null,
+            "progressAssessment": null,
+            "progressTelemetry": null,
+            "recoveryState": {
+              "recoveryCount": 0,
+              "recoverySuccess": 0,
+              "recoveryFailure": 0,
+              "lastRecoveryAt": null,
+              "lastCause": null,
+              "lastDurationMs": 0,
+              "escalationLevel": 0,
+              "windowStartedAt": "2026-08-23T00:42:04.072Z"
+            }
+          }
+        ],
+        "watchdog": {
+          "activeCount": 0,
+          "entries": []
+        },
+        "recoveryManager": {
+          "processOwnerId": "DESKTOP-3R7HR9F:23148:418a6915",
+          "pendingRecoveries": 0
+        }
+      }
+    }
+  ],
+  "criticalFailures": [
+    {
+      "code": "ZOMBIE_ROUNDS",
+      "message": "1 zombie run(s)"
+    }
+  ],
+  "criticalCampaignStop": false,
+  "policyChangesDuringCampaign": false,
+  "metrics": {
+    "roundsCompleted": 0,
+    "roundsFailed": 10,
+    "roundsRecovered": 0,
+    "trades": 0,
+    "closedTrades": 0,
+    "winRate": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "expectancy": null,
+    "profitFactor": null,
+    "maxDrawdown": 0,
+    "exitReasonCounts": {},
+    "variantDLiveTrades": 0,
+    "variantDNetPnL": 0,
+    "aiVetoBypass": 0,
+    "aiOrphans": 0,
+    "zombieCount": 1,
+    "duplicateOrders": 0,
+    "pnlMismatches": 0
+  },
+  "profitabilityStatus": "NOT_PROVEN",
+  "primaryRuntimeIncident": "NONE"
+}

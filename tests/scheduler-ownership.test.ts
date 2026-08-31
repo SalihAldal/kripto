@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeEach, vi } from "vitest";
 import {
   atomicSpawnScheduler,
   getSchedulerRegistrySnapshot,
@@ -6,6 +6,7 @@ import {
   ownerRegistry,
   resetSchedulerOwnershipForTests,
   spawnQueues,
+  touchSchedulerLease,
 } from "@/src/server/execution/scheduler-ownership.service";
 
 const stressLevels = [1, 10, 25, 50, 100];
@@ -81,5 +82,36 @@ describe("scheduler ownership atomic spawn", () => {
     const lease = ownerRegistry.get(jobId);
     expect(lease?.state).toBe("STOPPED");
     expect(states).toEqual(["run:1"]);
+  });
+
+  it("throttles scheduler lease persistence writes", async () => {
+    vi.useFakeTimers();
+    const jobId = "job-lease-throttle";
+    const persistLease = vi.fn(async ({ lease }: { lease: unknown }) => ({ ok: true, lease }));
+    await atomicSpawnScheduler(
+      jobId,
+      async (ctx) => {
+        await touchSchedulerLease(jobId, ctx, {
+          loadLease: async () => null,
+          persistLease,
+        });
+        await touchSchedulerLease(jobId, ctx, {
+          loadLease: async () => null,
+          persistLease,
+        });
+        await vi.advanceTimersByTimeAsync(11_000);
+        await touchSchedulerLease(jobId, ctx, {
+          loadLease: async () => null,
+          persistLease,
+        });
+      },
+      {
+        loadLease: async () => null,
+        persistLease,
+      },
+    );
+    await vi.runAllTimersAsync();
+    vi.useRealTimers();
+    expect(persistLease.mock.calls.length).toBeLessThanOrEqual(3);
   });
 });

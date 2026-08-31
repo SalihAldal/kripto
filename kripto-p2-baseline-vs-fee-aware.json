@@ -1,0 +1,184 @@
+{
+  "generatedAt": "2026-08-21T23:57:31.915Z",
+  "scope": "DIRECT_NATIVE_KRIPTO_REPOSITORY_ONLY",
+  "experiment": {
+    "name": "BASELINE_vs_FEE_AWARE",
+    "method": "DETERMINISTIC_PAIRED_POLICY_EVALUATION_FROM_EXISTING_FORENSICS",
+    "sameOpportunityGuarantee": {
+      "candidatePairs": 2,
+      "validPairs": 2,
+      "invalidPairs": 0,
+      "invalidPairRule": "INVALID_A_B_PAIR excluded from profitability comparison"
+    },
+    "datasetLimitations": [
+      "Paired sample contains fee-policy evaluations only; no executed trades in paired rounds.",
+      "expectedGrossEdge field not persisted in these forensic snapshots; expectedNetEdge and ratio are available.",
+      "Trade-level profitability comparison is therefore not statistically meaningful in this run."
+    ]
+  },
+  "baseline": {
+    "tradeCount": 0,
+    "wins": 0,
+    "losses": 0,
+    "winRate": 0,
+    "grossPnL": 0,
+    "totalFees": 0,
+    "netPnL": 0,
+    "expectancy": 0,
+    "profitFactor": 0,
+    "averageWin": 0,
+    "averageLoss": 0,
+    "maxDrawdown": 0,
+    "maxDrawdownPct": 0,
+    "averageHoldTime": 0,
+    "medianHoldTime": 0,
+    "feePerTrade": 0,
+    "feeDragPct": 0,
+    "grossPositiveNetNegativeCount": 0
+  },
+  "feeAware": {
+    "tradeCount": 0,
+    "wins": 0,
+    "losses": 0,
+    "winRate": 0,
+    "grossPnL": 0,
+    "totalFees": 0,
+    "netPnL": 0,
+    "expectancy": 0,
+    "profitFactor": 0,
+    "averageWin": 0,
+    "averageLoss": 0,
+    "maxDrawdown": 0,
+    "maxDrawdownPct": 0,
+    "averageHoldTime": 0,
+    "medianHoldTime": 0,
+    "feePerTrade": 0,
+    "feeDragPct": 0,
+    "grossPositiveNetNegativeCount": 0
+  },
+  "impact": {
+    "baselineEntries": 2,
+    "feeAwareEntries": 2,
+    "baselineRejected": 0,
+    "feeAwareRejected": 0,
+    "feeAwareAdditionalRejects": 0,
+    "baselineOpportunitiesRejectedByFeePolicy": 0,
+    "tradeReductionRate": 0,
+    "opportunityRetentionRate": 1
+  },
+  "entryQualityComparison": {
+    "baseline": "NOT_PROVEN",
+    "feeAware": "NOT_PROVEN",
+    "reason": "No executed paired trades."
+  },
+  "exitComparison": {
+    "status": "EXIT_COMPARISON_NOT_PROVEN",
+    "reason": "No paired executed trade lifecycle in this experiment sample."
+  },
+  "strategyBreakdown": "NOT_ENOUGH_DATA",
+  "regimeBreakdown": "NOT_ENOUGH_DATA",
+  "safetyParity": {
+    "status": "PASS",
+    "checks": [
+      "AI_VETO",
+      "RISK",
+      "SIZING",
+      "CLOCK_SAFETY",
+      "EMERGENCY_STOP",
+      "POSITION_LIMITS"
+    ],
+    "note": "No evidence of safety bypass in paired records; parity remains PASS from controlled runtime evidence."
+  },
+  "lookAheadAudit": {
+    "status": "YES",
+    "note": "Only decision-time fee policy fields were used (timestamped policy evaluations)."
+  },
+  "outOfSample": {
+    "status": "NO",
+    "reason": "Insufficient paired trade sample."
+  },
+  "statisticalLimitations": [
+    "Sample size too small for significance.",
+    "No paired executed trades => expectancy/PnL delta unproven."
+  ],
+  "promotionGate": {
+    "status": "RESEARCH_ONLY",
+    "checks": {
+      "netExpectancyImproves": false,
+      "netPnlImproves": false,
+      "feeDragDecreases": false,
+      "drawdownAcceptable": true,
+      "opportunityRetentionAcceptable": true,
+      "safetyRegression": false,
+      "lookAhead": false,
+      "symbolOverfit": false,
+      "oneTradeDependence": false,
+      "reproducible": true,
+      "sufficientSample": false,
+      "oosSupport": false
+    }
+  },
+  "recommendation": "Keep FEE_AWARE as RESEARCH_ONLY. Next step: collect paired executed trades with preserved fee policy evaluations.",
+  "nextPaperValidationStage": "Run a controlled 5-round paired evidence stage with minimum 3 closed trades and non-replay exit evidence before any promotion discussion.",
+  "finalAnswers": {
+    "VALID_PAIRED_SAMPLE": 2,
+    "BASELINE_TRADES": 0,
+    "FEE_AWARE_TRADES": 0,
+    "BASELINE_NET_PNL": 0,
+    "FEE_AWARE_NET_PNL": 0,
+    "BASELINE_NET_EXPECTANCY": 0,
+    "FEE_AWARE_NET_EXPECTANCY": 0,
+    "BASELINE_FEES": 0,
+    "FEE_AWARE_FEES": 0,
+    "GROSS_POSITIVE_NET_NEGATIVE_BASELINE": 0,
+    "GROSS_POSITIVE_NET_NEGATIVE_FEE_AWARE": 0,
+    "OPPORTUNITY_RETENTION": 1,
+    "LOOKAHEAD_FREE": "YES",
+    "SAFETY_PARITY": "PASS",
+    "OOS_SUPPORTED": "NO",
+    "FEE_AWARE_STATUS": "RESEARCH_ONLY",
+    "BEST_NEXT_STEP": "Generate paired executed-trade sample where fee-aware decision snapshot and full trade lifecycle coexist in the same deterministic dataset."
+  },
+  "pairedRows": [
+    {
+      "sessionId": "cmstfrnqz0007unusktsdehqt",
+      "roundNo": 1,
+      "candidateId": "execution:USTCTRY:a2882f11",
+      "symbol": "USTCTRY",
+      "decisionTimestamp": "2026-08-14T21:14:22.332Z",
+      "baselineInputHash": "4788c1656c4d945c",
+      "variantInputHash": "4788c1656c4d945c",
+      "baselineDecision": "ALLOW_OBSERVE",
+      "feeAwareDecision": "PASS",
+      "expectedGrossEdge": null,
+      "expectedNetEdge": 15.52173039,
+      "estimatedRoundTripFee": 2.9995614,
+      "feeToGrossEdgeRatio": 0.16195118791196333,
+      "minimumGrossMoveToCoverFees": 2.9995614,
+      "edgeAfterFees": 15.52173039,
+      "feeClassification": "FEE_SAFE",
+      "reachedExecutionTrade": 0
+    },
+    {
+      "sessionId": "cmstg76eb0007undcg1a00659",
+      "roundNo": 1,
+      "candidateId": "execution:ALLOTRY:aca84455",
+      "symbol": "ALLOTRY",
+      "decisionTimestamp": "2026-08-14T21:31:12.531Z",
+      "baselineInputHash": "0d8fa8ba2db6063e",
+      "variantInputHash": "0d8fa8ba2db6063e",
+      "baselineDecision": "ALLOW_OBSERVE",
+      "feeAwareDecision": "PASS",
+      "expectedGrossEdge": null,
+      "expectedNetEdge": 13.52375763,
+      "estimatedRoundTripFee": 2.993748,
+      "feeToGrossEdgeRatio": 0.18124807423921122,
+      "minimumGrossMoveToCoverFees": 2.993748,
+      "edgeAfterFees": 13.52375763,
+      "feeClassification": "FEE_SAFE",
+      "reachedExecutionTrade": 0
+    }
+  ],
+  "invalidPairs": [],
+  "counterfactualRows": []
+}

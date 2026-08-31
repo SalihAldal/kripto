@@ -1,0 +1,195 @@
+{
+  "validationId": "p3-tdi-reachability-2026-08-28T21-27-40-057Z",
+  "sessionId": "cmtdgqi7z0009unn0c4wc9qhr",
+  "startedAt": "2026-08-28T21:27:48.646Z",
+  "completedAt": "2026-08-28T22:35:51.132Z",
+  "preflight": {
+    "attemptId": "p3-tdi-reachability-2026-08-28T21-27-40-057Z-preflight",
+    "userId": "cmpbhrfn10000un90aroynt6t",
+    "generatedAt": "2026-08-28T21:27:47.629Z",
+    "overallVerdict": "DEGRADED",
+    "canStart": true,
+    "blockReason": null,
+    "blockCode": null,
+    "database": {
+      "status": "PASS",
+      "reasonCode": "DB_HEALTHY",
+      "reasonDetail": "PostgreSQL reachable and AutoRound schema accessible",
+      "timestamp": "2026-08-28T21:27:45.435Z"
+    },
+    "binance": {
+      "status": "PASS",
+      "reasonCode": "BINANCE_TR_HEALTHY",
+      "reasonDetail": "BTCTRY ticker ok (3733443)",
+      "timestamp": "2026-08-28T21:27:46.832Z",
+      "metadata": {
+        "symbol": "BTCTRY",
+        "price": 3733443
+      }
+    },
+    "ai": {
+      "status": "PASS",
+      "reasonCode": "AI_CONFIGURED",
+      "reasonDetail": "3 enabled AI provider(s)",
+      "timestamp": "2026-08-28T21:27:47.013Z",
+      "metadata": {
+        "providers": [
+          {
+            "id": "provider-1",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-2",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-3",
+            "name": "Gemini",
+            "model": "gemini-1.5-flash-latest"
+          }
+        ],
+        "remoteRequired": false
+      }
+    },
+    "emergencyStop": {
+      "status": "PASS",
+      "reasonCode": "EMERGENCY_STOP_INACTIVE",
+      "reasonDetail": "Emergency stop inactive",
+      "timestamp": "2026-08-28T21:27:47.167Z"
+    },
+    "activeJobs": {
+      "status": "PASS",
+      "reasonCode": "NO_ACTIVE_JOB",
+      "reasonDetail": "No RUNNING auto-round job blocking startup",
+      "timestamp": "2026-08-28T21:27:47.601Z"
+    },
+    "zombieRounds": {
+      "status": "WARN",
+      "reasonCode": "ZOMBIE_ROUNDS_RECONCILED",
+      "reasonDetail": "Reconciled 1 stale round record(s) before startup",
+      "timestamp": "2026-08-28T21:27:47.604Z",
+      "metadata": {
+        "reconciledCount": 1
+      }
+    },
+    "workerLocks": {
+      "status": "PASS",
+      "reasonCode": "WORKER_LOCKS_CLEAR",
+      "reasonDetail": "No local scheduler loops registered",
+      "timestamp": "2026-08-28T21:27:47.604Z",
+      "metadata": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:22860:09f91f2d",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "staleLocalLoops": 0
+      }
+    },
+    "resolvedConfig": {
+      "status": "PASS",
+      "reasonCode": "PAPER_CONFIG_OK",
+      "reasonDetail": "Resolved runtime config confirms paper execution mode",
+      "timestamp": "2026-08-28T21:27:47.629Z",
+      "metadata": {
+        "executionMode": "paper",
+        "exchange": "binance"
+      }
+    },
+    "duplicatePaperJobs": {
+      "status": "PASS",
+      "reasonCode": "NO_DUPLICATE_PAPER_JOBS",
+      "reasonDetail": "At most one RUNNING paper job for user",
+      "timestamp": "2026-08-28T21:27:47.605Z"
+    },
+    "clockSync": {
+      "status": "PASS",
+      "reasonCode": "CLOCK_SYNC_OK",
+      "reasonDetail": "Clock skew 46ms within threshold",
+      "timestamp": "2026-08-28T21:27:47.013Z",
+      "metadata": {
+        "localTime": "2026-08-28T21:27:47.010Z",
+        "serverTime": "2026-08-28T21:27:47.056Z",
+        "clockOffsetMs": 46,
+        "clockSkewMs": 46,
+        "apiLatencyMs": 176,
+        "skewThresholdMs": 5000,
+        "endpoint": "https://www.binance.tr/api/v3/time",
+        "timestampSource": "binance.api.v3.time"
+      }
+    },
+    "reconciledRounds": [
+      {
+        "roundId": "cmtdgnfaz000lunv8n5ghrtkk",
+        "jobId": "cmtdgnf570009unv83ty32be4",
+        "previousState": "tariyor",
+        "newState": "tur_basarisiz",
+        "reasonCode": "PREFLIGHT_STALE_RUNNING_JOB",
+        "reasonDetail": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE); prior=tariyor; evidence={\"heartbeatAt\":\"2026-08-28T21:27:46.619Z\",\"state\":\"tariyor\",\"jobSchedulerActive\":false}",
+        "timestamp": "2026-08-28T21:27:47.299Z"
+      }
+    ],
+    "reconciledJobs": [
+      {
+        "jobId": "cmtdgnf570009unv83ty32be4",
+        "previousStatus": "RUNNING",
+        "newStatus": "STOPPED",
+        "reasonCode": "PREFLIGHT_STALE_RUNNING_JOB",
+        "reasonDetail": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE)",
+        "timestamp": "2026-08-28T21:27:47.299Z"
+      }
+    ],
+    "artifactPath": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\preflight\\p3-tdi-reachability-2026-08-28T21-27-40-057Z-preflight"
+  },
+  "verdict": {
+    "ROUNDS_COMPLETED": 5,
+    "DECISION_SNAPSHOTS": 0,
+    "SNAPSHOT_PERSISTENCE": "PASS",
+    "MOMENTUM_MEDIAN": null,
+    "MOMENTUM_P90": null,
+    "MOMENTUM_P95": null,
+    "MOMENTUM_MAX": null,
+    "MOMENTUM_GE_40": 0,
+    "MOMENTUM_GE_50": 0,
+    "MOMENTUM_GE_55": 0,
+    "MOMENTUM_GE_60": 0,
+    "MOMENTUM_GE_65": 0,
+    "MOMENTUM_GE_60_RATE": 0,
+    "HIGH_CONFIDENCE_BUY_BELOW_60": 0,
+    "HIGH_CONFIDENCE_BUY_ABOVE_60": 0,
+    "TDI_ENTERED": 0,
+    "TDI_SKIPPED": 0,
+    "TDI_APPROVED": 0,
+    "TDI_WAIT": 0,
+    "TDI_REJECT": 0,
+    "EXECUTION_READY": 0,
+    "TRADES": 0,
+    "CLOSED_TRADES": 0,
+    "NET_PNL": "N/A",
+    "PRIMARY_BLOCKER": "AI_DEGRADED",
+    "TDI_60_REACHABILITY": "UNKNOWN",
+    "ZERO_TRADE_CAUSE": "UPSTREAM_BLOCKER",
+    "AI_HEALTH": "PASS",
+    "RUNTIME_STATUS": "STABLE",
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "POLICY_CHANGED": "NO",
+    "THRESHOLD_CHANGED": "NO",
+    "AI_VETO_CHANGED": "NO",
+    "TDI_CHANGED": "NO",
+    "PAPER_COMPLETED": "YES",
+    "NEXT_DECISION": "FIX_UPSTREAM_BLOCKER",
+    "NEXT_STEP": "No candidate reached TDI in 5 paper rounds (0 tdi-decisions). Resolve AI_DEGRADED upstream blocker before any TDI threshold experiment."
+  },
+  "blockerCounts": {
+    "AI_DEGRADED": 1107,
+    "NO_DIRECTIONAL_EDGE": 767,
+    "MISSING_TELEMETRY": 403,
+    "CONSENSUS_REJECT": 206,
+    "SCANNER_AI_PRE_TDI_BLOCK": 15
+  },
+  "funnelNote": "Aggregated rejectionCountsByReason across rounds 1-5 forensic exports. tdiDecisions=0 every round."
+}

@@ -50,9 +50,42 @@ import {
   upsertDecisionLogRecord,
 } from "@/src/server/repositories/decision-log.repository";
 
+const JSON_SANITIZE_MAX_DEPTH = 6;
+const JSON_SANITIZE_MAX_KEYS = 80;
+const JSON_SANITIZE_MAX_ARRAY = 80;
+
+function toSafeJsonValue(
+  value: unknown,
+  depth = 0,
+  seen?: WeakSet<object>,
+): Prisma.InputJsonValue {
+  if (value == null) return null;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "bigint") return Number(value);
+  if (depth >= JSON_SANITIZE_MAX_DEPTH) return "[TRUNCATED_DEPTH]";
+  if (Array.isArray(value)) {
+    return value
+      .slice(0, JSON_SANITIZE_MAX_ARRAY)
+      .map((row) => toSafeJsonValue(row, depth + 1, seen));
+  }
+  if (typeof value !== "object") return String(value);
+  const ref = value as Record<string, unknown>;
+  const localSeen = seen ?? new WeakSet<object>();
+  if (localSeen.has(ref)) return "[CIRCULAR_REF]";
+  localSeen.add(ref);
+  const entries = Object.entries(ref).slice(0, JSON_SANITIZE_MAX_KEYS);
+  const out: Record<string, Prisma.InputJsonValue> = {};
+  for (const [key, row] of entries) {
+    out[key] = toSafeJsonValue(row, depth + 1, localSeen);
+  }
+  return out;
+}
+
 function asJson(value: unknown): Prisma.InputJsonValue | undefined {
   if (value === undefined) return undefined;
-  return value as Prisma.InputJsonValue;
+  return toSafeJsonValue(value);
 }
 
 function safeObserve(promise: Promise<unknown>) {
@@ -116,27 +149,39 @@ export function observeScannerDecision(input: ScannerDecisionObservabilityInput)
   mergeDecisionMetadata({
     scannerStatus: input.status,
     scannerMetrics: input.metrics ?? null,
+    scannerRejectTelemetry: input.rejectTelemetry ?? null,
+    scannerSpreadMomentumShadow: input.spreadMomentumShadow ?? null,
   });
+  const exactReasonCode =
+    input.rejectTelemetry?.rejectReasonCode ??
+    (input.status === "QUALIFIED" || input.status === "PASS" ? "QUALIFIED" : "GENERIC_REJECTED");
+  const exactReasonDetail =
+    input.rejectTelemetry?.rejectReasonDetail ??
+    (input.reasons.length > 0 ? input.reasons.join(" | ") : `Scanner status=${input.status}`);
   recordDecisionTimelineEvent({
     stage: "SCANNER",
     outcome: input.status,
-    message: input.reasons.length > 0 ? input.reasons.join(" | ") : `Scanner status=${input.status}`,
+    message: exactReasonDetail,
     details: {
       scannerScore: input.scannerScore,
       scannerConfidence: input.scannerConfidence,
       reasons: input.reasons,
       metrics: input.metrics ?? null,
+      rejectTelemetry: input.rejectTelemetry ?? null,
+      spreadMomentumShadow: input.spreadMomentumShadow ?? null,
+      rejectReasonCode: exactReasonCode,
+      rejectReasonDetail: exactReasonDetail,
     },
   });
   bridgeScannerObservability(input);
   if (input.status !== "QUALIFIED" && input.status !== "PASS") {
     bridgeExecutionDecision({
-      candidateId: createCandidateId(input.symbol, "scanner"),
+      candidateId: input.rejectTelemetry?.candidateId ?? createCandidateId(input.symbol, "scanner"),
       symbol: input.symbol,
       approved: false,
-      reasonCode: input.reasons[0] ?? "SCANNER_REJECT",
-      reasonDetail: input.reasons.join(" | ") || input.status,
-      stage: "decision",
+      reasonCode: exactReasonCode,
+      reasonDetail: exactReasonDetail,
+      stage: input.rejectTelemetry?.rejectStage ?? "decision",
       score: input.scannerScore,
     });
   }

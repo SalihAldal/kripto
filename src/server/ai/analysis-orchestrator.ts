@@ -16,16 +16,29 @@ import { buildMultiTimeframeAnalysis } from "@/src/server/ai/multi-timeframe.ser
 import { detectMarketRegime } from "@/src/server/scanner/market-regime.service";
 import { recordRegimeStability } from "@/src/server/scanner/regime-stability.service";
 import { collectPreTradeFuturesIntelligence } from "@/src/server/futures/futures-intelligence.service";
-import { withAiRetry } from "@/src/server/ai/utils";
+import {
+  attachProviderHealthState,
+  buildAllProvidersDegradedConsensusResult,
+  classifyProviderHealthState,
+  consensusVoteLabel,
+  evaluateProviderHealthGate,
+} from "@/src/server/ai/ai-provider-health.service";
 import { throwIfAborted, yieldAsyncStackUnwind, runOnFreshStack } from "@/src/server/execution/cancellable-work.service";
 import { withBoundedPrisma } from "@/src/server/execution/bounded-prisma.service";
 import { CooperativeAsyncCancelledError, CooperativeAsyncTimeoutError } from "@/src/server/execution/cooperative-async.types";
 import { markHeartbeat } from "@/src/server/observability/heartbeat";
 import { withCircuitBreaker } from "@/src/server/resilience/circuit-breaker";
+import { isTransientPrismaConnectivityError } from "@/src/server/db/transient-prisma-error";
 import { logTradeEvent } from "@/src/server/observability/trade-event-log";
 import { buildAnalysisScorecard } from "@/src/server/ai/analysis-scorecard.service";
 import { buildShortTermReport } from "@/src/server/ai/short-term-report.service";
 import { normalizeAiModelOutput } from "@/src/server/ai/normalize-model-output";
+import { withAiRetry } from "@/src/server/ai/utils";
+import {
+  getProviderRegistryEntry,
+  recordProviderOutcome,
+  resetStaleProviderHealth,
+} from "@/src/server/ai/ai-provider-health-registry.service";
 import {
   applyAiPerformanceWeights,
   ensureAiPerformanceEvaluator,
@@ -155,11 +168,77 @@ export type AIConsensusOptions = {
   signal?: AbortSignal;
 };
 
+const STACK_DEPTH_SOFT_LIMIT = 70;
+const STACK_DEPTH_HARD_LIMIT = 110;
+
+class AIStackDepthGuardError extends Error {
+  readonly code = "AI_STACK_DEPTH_GUARD";
+  readonly phase: string;
+  readonly stackDepth: number;
+
+  constructor(phase: string, stackDepth: number, reason: string) {
+    super(`AI_STACK_DEPTH_GUARD:${phase}:${reason}`);
+    this.name = "AIStackDepthGuardError";
+    this.phase = phase;
+    this.stackDepth = stackDepth;
+  }
+}
+
+function currentStackDepth() {
+  const stack = new Error().stack;
+  if (!stack) return 0;
+  return stack
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("at ")).length;
+}
+
+function resolveFailoverProviderChain(primaryProviderId: string): string[] {
+  const enabled = getProviderConfigs().map((row) => row.id);
+  if (enabled.length <= 1) return [primaryProviderId];
+  return [primaryProviderId, ...enabled.filter((id) => id !== primaryProviderId)];
+}
+
 async function analyzeLaneWithSingleProvider(
   input: AIAnalysisInput,
   lane: "technical" | "momentum" | "risk",
   providerId: string,
+  candidateId: string,
   signal?: AbortSignal,
+): Promise<AIProviderResult> {
+  const chain = resolveFailoverProviderChain(providerId);
+  let lastResult: AIProviderResult | null = null;
+  for (let index = 0; index < chain.length; index += 1) {
+    const activeProviderId = chain[index]!;
+    const result = await executeLaneProviderCall(input, lane, activeProviderId, candidateId, signal, {
+      failoverFrom: index > 0 ? providerId : undefined,
+      failoverAttempt: index,
+      skipForensicBridge: index < chain.length - 1,
+    });
+    lastResult = result;
+    if (result.remoteOk) return result;
+    if (index < chain.length - 1) {
+      logger.warn(
+        {
+          lane,
+          primaryProviderId: providerId,
+          failoverProviderId: chain[index + 1],
+          healthState: result.healthState,
+        },
+        "AI lane provider degraded; attempting failover provider",
+      );
+    }
+  }
+  return lastResult!;
+}
+
+async function executeLaneProviderCall(
+  input: AIAnalysisInput,
+  lane: "technical" | "momentum" | "risk",
+  providerId: string,
+  candidateId: string,
+  signal?: AbortSignal,
+  failoverMeta?: { failoverFrom?: string; failoverAttempt?: number; skipForensicBridge?: boolean },
 ): Promise<AIProviderResult> {
   const providerConfig = getProviderConfigs().find((x) => x.id === providerId);
   if (!providerConfig) {
@@ -173,6 +252,9 @@ async function analyzeLaneWithSingleProvider(
   }
   const provider = createProviderAdapter(providerConfig);
   const start = Date.now();
+  const requestStartedAt = new Date(start).toISOString();
+  const healthBefore = getProviderRegistryEntry(provider.config.id);
+  resetStaleProviderHealth(provider.config.id);
   try {
     const output =
       lane === "technical"
@@ -218,32 +300,55 @@ async function analyzeLaneWithSingleProvider(
       output,
       latencyMs: Date.now() - start,
     };
+    const finalized = attachProviderHealthState(result);
+    const registryAfter = recordProviderOutcome({
+      providerId: finalized.providerId,
+      ok: finalized.ok,
+      remoteOk: Boolean(finalized.remoteOk),
+      healthState: finalized.healthState ?? classifyProviderHealthState(finalized),
+      error: finalized.failureCategory,
+    });
+    const requestEndedAt = new Date().toISOString();
     await logTradeEvent({
       symbol: input.symbol,
       eventType: "AI_PROVIDER_RESULT",
       newValue: {
-        providerId: result.providerId,
-        providerName: result.providerName,
-        model: result.model,
+        providerId: finalized.providerId,
+        providerName: finalized.providerName,
+        model: finalized.model,
         lane,
         ok: true,
-        remoteOk: result.remoteOk,
-        degraded: result.degraded,
-        failureCategory: result.failureCategory,
-        latencyMs: result.latencyMs,
+        remoteOk: finalized.remoteOk,
+        degraded: finalized.degraded,
+        failureCategory: finalized.failureCategory,
+        latencyMs: finalized.latencyMs,
+        healthBefore: healthBefore.healthState,
+        healthAfter: registryAfter.healthState,
       },
     });
-    bridgeAiProviderResult({
-      symbol: input.symbol,
-      provider: result.providerId,
-      model: result.model,
-      latencyMs: result.latencyMs,
-      ok: result.ok,
-      remote: Boolean(result.remoteOk),
-      degraded: result.degraded,
-      reason: result.failureCategory,
-    });
-    return result;
+    if (!failoverMeta?.skipForensicBridge) {
+      bridgeAiProviderResult({
+        candidateId,
+        symbol: input.symbol,
+        provider: finalized.providerId,
+        model: finalized.model,
+        latencyMs: finalized.latencyMs,
+        ok: finalized.ok,
+        remote: Boolean(finalized.remoteOk),
+        degraded: finalized.degraded,
+        healthState: finalized.healthState,
+        reason: finalized.failureCategory,
+        healthBefore: healthBefore.healthState,
+        healthAfter: registryAfter.healthState,
+        requestStartedAt,
+        requestEndedAt,
+        responseReceived: true,
+        errorType: finalized.failureCategory,
+        retryCount: 0,
+        finalHealth: registryAfter.healthState,
+      });
+    }
+    return finalized;
   } catch (error) {
     if (error instanceof CooperativeAsyncCancelledError || error instanceof CooperativeAsyncTimeoutError) {
       throw error;
@@ -263,33 +368,58 @@ async function analyzeLaneWithSingleProvider(
       latencyMs: Date.now() - start,
       error: (error as Error).message,
     };
+    const finalized = attachProviderHealthState(result);
+    const registryAfter = recordProviderOutcome({
+      providerId: finalized.providerId,
+      ok: false,
+      remoteOk: false,
+      healthState: finalized.healthState ?? classifyProviderHealthState(finalized),
+      error: finalized.error,
+      failureCategory: finalized.failureCategory,
+    });
+    const requestEndedAt = new Date().toISOString();
     await logTradeEvent({
       symbol: input.symbol,
       eventType: "AI_PROVIDER_RESULT",
-      reason: result.error,
+      reason: finalized.error,
       newValue: {
-        providerId: result.providerId,
-        providerName: result.providerName,
-        model: result.model,
+        providerId: finalized.providerId,
+        providerName: finalized.providerName,
+        model: finalized.model,
         lane,
         ok: false,
         remoteOk: false,
         degraded: true,
-        failureCategory: result.failureCategory,
-        latencyMs: result.latencyMs,
+        failureCategory: finalized.failureCategory,
+        latencyMs: finalized.latencyMs,
+        healthBefore: healthBefore.healthState,
+        healthAfter: registryAfter.healthState,
       },
     });
-    bridgeAiProviderResult({
-      symbol: input.symbol,
-      provider: result.providerId,
-      model: result.model,
-      latencyMs: result.latencyMs,
-      ok: false,
-      remote: false,
-      degraded: true,
-      reason: result.error,
-    });
-    return result;
+    if (!failoverMeta?.skipForensicBridge) {
+      bridgeAiProviderResult({
+        candidateId,
+        symbol: input.symbol,
+        provider: finalized.providerId,
+        model: finalized.model,
+        latencyMs: finalized.latencyMs,
+        ok: false,
+        remote: false,
+        degraded: true,
+        healthState: finalized.healthState,
+        reason: finalized.error,
+        healthBefore: healthBefore.healthState,
+        healthAfter: registryAfter.healthState,
+        requestStartedAt,
+        requestEndedAt,
+        responseReceived: false,
+        errorCode: finalized.failureCategory,
+        errorType: finalized.failureCategory,
+        retryCount: lane === "risk" ? 0 : 1,
+        finalHealth: registryAfter.healthState,
+      });
+    }
+    return finalized;
   }
 }
 
@@ -648,12 +778,23 @@ export async function runAIConsensusFromInput(
   options?: AIConsensusOptions,
 ): Promise<AIConsensusResult> {
   const result = await runAIConsensusFromInputImpl(input, options);
-  observeAiDecision({
-    decisionId: getActiveDecisionId() ?? createDecisionId(),
-    symbol: input.symbol,
-    input,
-    result,
-  });
+  try {
+    observeAiDecision({
+      decisionId: getActiveDecisionId() ?? createDecisionId(),
+      symbol: input.symbol,
+      input,
+      result,
+    });
+  } catch (error) {
+    const message = (error as Error).message;
+    logger.warn(
+      {
+        symbol: input.symbol,
+        error: message,
+      },
+      "AI decision observability failed; consensus result preserved",
+    );
+  }
   return result;
 }
 
@@ -669,6 +810,79 @@ async function runAIConsensusFromInputImpl(
   options?: AIConsensusOptions,
 ): Promise<AIConsensusResult> {
   const signal = options?.signal ?? input.runtimeControl?.abortSignal;
+  const phaseTraces: NonNullable<AIAnalysisInput["consensusTelemetry"]>["phaseTraces"] = [];
+  const appendPhaseTrace = (
+    phase: string,
+    freshStackUsed: boolean,
+    phaseDurationMs: number,
+    stackDepth: number,
+    depthRiskStatus: "OK" | "RISKY" | "GUARDED",
+  ) => {
+    phaseTraces?.push({
+      phase,
+      freshStackUsed,
+      phaseDurationMs,
+      depthRiskStatus,
+      stackDepth,
+    });
+  };
+  const runGuardedSyncPhase = async <T>(
+    phase: string,
+    fn: () => T,
+    freshStackUsed = true,
+  ): Promise<T> => {
+    const stackDepth = currentStackDepth();
+    const startedAt = Date.now();
+    if (stackDepth >= STACK_DEPTH_HARD_LIMIT) {
+      appendPhaseTrace(phase, freshStackUsed, 0, stackDepth, "GUARDED");
+      throw new AIStackDepthGuardError(phase, stackDepth, "stack_depth_threshold_reached");
+    }
+    try {
+      const value = freshStackUsed ? await runOnFreshStack(fn) : fn();
+      appendPhaseTrace(
+        phase,
+        freshStackUsed,
+        Date.now() - startedAt,
+        stackDepth,
+        stackDepth >= STACK_DEPTH_SOFT_LIMIT ? "RISKY" : "OK",
+      );
+      return value;
+    } catch (error) {
+      if (error instanceof RangeError) {
+        appendPhaseTrace(phase, freshStackUsed, Date.now() - startedAt, stackDepth, "GUARDED");
+        throw new AIStackDepthGuardError(phase, stackDepth, error.message);
+      }
+      throw error;
+    }
+  };
+  const runGuardedAsyncPhase = async <T>(
+    phase: string,
+    fn: () => Promise<T>,
+  ): Promise<T> => {
+    const stackDepth = currentStackDepth();
+    const startedAt = Date.now();
+    if (stackDepth >= STACK_DEPTH_HARD_LIMIT) {
+      appendPhaseTrace(phase, false, 0, stackDepth, "GUARDED");
+      throw new AIStackDepthGuardError(phase, stackDepth, "stack_depth_threshold_reached");
+    }
+    try {
+      const value = await fn();
+      appendPhaseTrace(
+        phase,
+        false,
+        Date.now() - startedAt,
+        stackDepth,
+        stackDepth >= STACK_DEPTH_SOFT_LIMIT ? "RISKY" : "OK",
+      );
+      return value;
+    } catch (error) {
+      if (error instanceof RangeError) {
+        appendPhaseTrace(phase, false, Date.now() - startedAt, stackDepth, "GUARDED");
+        throw new AIStackDepthGuardError(phase, stackDepth, error.message);
+      }
+      throw error;
+    }
+  };
   throwIfAborted(signal, "AI consensus aborted");
   const now = Date.now();
   const lastKlineClose = input.klines[input.klines.length - 1]?.closeTime ?? 0;
@@ -829,7 +1043,7 @@ async function runAIConsensusFromInputImpl(
   const snapshotBuildStarted = Date.now();
   const indicatorSnapshot =
     input.indicatorSnapshot ??
-    (await runOnFreshStack(() => Object.freeze(buildIndicatorSnapshot(input))));
+    (await runGuardedSyncPhase("indicator_snapshot", () => Object.freeze(buildIndicatorSnapshot(input))));
   const indicatorSnapshotBuildMs = input.indicatorSnapshot ? 0 : Date.now() - snapshotBuildStarted;
   const consensusInput: AIAnalysisInput = {
     ...input,
@@ -841,6 +1055,7 @@ async function runAIConsensusFromInputImpl(
     consensusTelemetry: {
       indicatorSnapshotBuildCount: input.indicatorSnapshot ? 0 : 1,
       indicatorSnapshotBuildMs,
+      phaseTraces,
     },
   };
   await yieldAsyncStackUnwind();
@@ -850,20 +1065,26 @@ async function runAIConsensusFromInputImpl(
   let riskSingle: AIProviderResult;
   try {
     [technicalSingle, momentumSingle, riskSingle] = await Promise.all([
-      withCircuitBreaker(
-        "ai:technical",
-        () => analyzeLaneWithSingleProvider(consensusInput, "technical", laneProviderMap.technical, signal),
-        { threshold: 4, cooldownMs: 20_000 },
+      runGuardedAsyncPhase("technical_specialist", () =>
+        withCircuitBreaker(
+          "ai:technical",
+          () => analyzeLaneWithSingleProvider(consensusInput, "technical", laneProviderMap.technical, consensusCandidateId, signal),
+          { threshold: 4, cooldownMs: 20_000 },
+        ),
       ),
-      withCircuitBreaker(
-        "ai:momentum",
-        () => analyzeLaneWithSingleProvider(consensusInput, "momentum", laneProviderMap.momentum, signal),
-        { threshold: 4, cooldownMs: 20_000 },
+      runGuardedAsyncPhase("momentum_specialist", () =>
+        withCircuitBreaker(
+          "ai:momentum",
+          () => analyzeLaneWithSingleProvider(consensusInput, "momentum", laneProviderMap.momentum, consensusCandidateId, signal),
+          { threshold: 4, cooldownMs: 20_000 },
+        ),
       ),
-      withCircuitBreaker(
-        "ai:risk",
-        () => analyzeLaneWithSingleProvider(consensusInput, "risk", laneProviderMap.risk, signal),
-        { threshold: 4, cooldownMs: 20_000 },
+      runGuardedAsyncPhase("risk_specialist", () =>
+        withCircuitBreaker(
+          "ai:risk",
+          () => analyzeLaneWithSingleProvider(consensusInput, "risk", laneProviderMap.risk, consensusCandidateId, signal),
+          { threshold: 4, cooldownMs: 20_000 },
+        ),
       ),
     ]);
   } catch (error) {
@@ -894,6 +1115,69 @@ async function runAIConsensusFromInputImpl(
   const momentum = [momentumSingle];
   const risk = [riskSingle];
 
+  const providerHealthEval = evaluateProviderHealthGate(
+    [technicalSingle, momentumSingle, riskSingle],
+    new Date(consensusStarted).toISOString(),
+  );
+  consensusInput.consensusTelemetry = {
+    ...consensusInput.consensusTelemetry,
+    ...providerHealthEval.telemetry,
+    aiPath: providerHealthEval.aiPath,
+    healthyProviderCount: providerHealthEval.counts.HEALTHY,
+    degradedProviderCount: providerHealthEval.counts.DEGRADED,
+    unavailableProviderCount:
+      providerHealthEval.counts.UNAVAILABLE +
+      providerHealthEval.counts.TIMEOUT +
+      providerHealthEval.counts.INVALID_RESPONSE +
+      providerHealthEval.counts.RATE_LIMITED +
+      providerHealthEval.counts.ABORTED,
+  };
+
+  if (providerHealthEval.gate === "ALL_DEGRADED" || providerHealthEval.eligibleForConsensus.length === 0) {
+    const degradedLaneOutputs = [technicalSingle, momentumSingle, riskSingle].map((row) =>
+      attachProviderHealthState(row),
+    );
+    const degradedConsensus = buildAllProvidersDegradedConsensusResult({
+      symbol: input.symbol,
+      outputs: degradedLaneOutputs,
+      health: providerHealthEval,
+    });
+    degradedConsensus.consensusTelemetry = consensusInput.consensusTelemetry;
+    bridgeConsensusResult({
+      symbol: input.symbol,
+      consensus: degradedConsensus,
+      providers: degradedLaneOutputs,
+      masterRuleId: "AI_PROVIDER_DEGRADED",
+    });
+    recordConsensusAudit({
+      symbol: input.symbol,
+      candidateId: consensusCandidateId,
+      consensusStart: new Date(consensusStarted).toISOString(),
+      consensusEnd: new Date().toISOString(),
+      durationMs: Date.now() - consensusStarted,
+      providerVotes: Object.fromEntries(
+        degradedLaneOutputs.map((row) => [row.providerId, consensusVoteLabel(row)]),
+      ),
+      finalDecision: degradedConsensus.finalDecision,
+      confidence: degradedConsensus.finalConfidence,
+      status: "AI_PROVIDER_DEGRADED",
+      reasonDetail: degradedConsensus.explanation,
+    });
+    await logTradeEvent({
+      symbol: input.symbol,
+      eventType: "AI_ANALYSIS_RESULT",
+      reason: degradedConsensus.explanation,
+      aiConfidence: 0,
+      price: input.lastPrice,
+      newValue: { decision: degradedConsensus.finalDecision, aiPath: providerHealthEval.aiPath },
+    });
+    pushLog(
+      "WARN",
+      `${input.symbol.toUpperCase()} AI_PROVIDER_DEGRADED: consensus suppressed (${providerHealthEval.gate})`,
+    );
+    return degradedConsensus;
+  }
+
   const merged = new Map<string, AIProviderResult[]>();
   for (const row of [...technical, ...momentum, ...risk]) {
     const prev = merged.get(row.providerId) ?? [];
@@ -905,37 +1189,55 @@ async function runAIConsensusFromInputImpl(
   for (const [providerId, rows] of merged.entries()) {
     const okRows = rows.filter((x) => x.ok && x.output);
     if (okRows.length === 0) {
-      aggregated.push({
-        providerId,
-        providerName: rows[0]?.providerName ?? providerId,
-        ok: false,
-        latencyMs: rows.reduce((acc, x) => acc + x.latencyMs, 0),
-        error: rows.map((x) => x.error).filter(Boolean).join(" | "),
-      });
+      aggregated.push(
+        attachProviderHealthState({
+          providerId,
+          providerName: rows[0]?.providerName ?? providerId,
+          ok: false,
+          latencyMs: rows.reduce((acc, x) => acc + x.latencyMs, 0),
+          error: rows.map((x) => x.error).filter(Boolean).join(" | "),
+        }),
+      );
       continue;
     }
 
-    aggregated.push({
-      providerId,
-      providerName: rows[0]?.providerName ?? providerId,
-      ok: true,
-      output: aggregateModelOutputs(okRows.map((x) => x.output!), input),
-      latencyMs: rows.reduce((acc, x) => acc + x.latencyMs, 0),
-    });
+    aggregated.push(
+      attachProviderHealthState({
+        providerId,
+        providerName: rows[0]?.providerName ?? providerId,
+        ok: true,
+        output: aggregateModelOutputs(okRows.map((x) => x.output!), input),
+        latencyMs: rows.reduce((acc, x) => acc + x.latencyMs, 0),
+        remoteOk: okRows.some((x) => x.remoteOk),
+        degraded: okRows.every((x) => x.degraded),
+      }),
+    );
   }
 
-  const { user } = await withBoundedPrisma(
+  const runtimeContext = await withBoundedPrisma(
     "ai-consensus.getRuntimeExecutionContext",
     () => getRuntimeExecutionContext(),
     undefined,
     { signal },
-  );
+  ).catch((error) => {
+    if (isTransientPrismaConnectivityError(error)) {
+      pushLog(
+        "WARN",
+        `${input.symbol.toUpperCase()} AI memory path degraded: MEMORY_UNAVAILABLE (runtime context read transiently failed)`,
+      );
+      return null;
+    }
+    throw error;
+  });
+  const user = runtimeContext?.user;
   throwIfAborted(signal, "AI consensus post-lane aborted");
-  const weightedAggregated = await applyAiPerformanceWeights(user.id, aggregated);
+  const weightedAggregated = user
+    ? await applyAiPerformanceWeights(user.id, aggregated)
+    : aggregated.map((row) => ({ ...row }));
   await yieldAsyncStackUnwind();
   throwIfAborted(signal, "AI consensus pre-hybrid aborted");
   const hybridStarted = Date.now();
-  const consensus = await runOnFreshStack(() =>
+  const consensus = await runGuardedSyncPhase("hybrid_decision", () =>
     buildHybridDecision({
       analysisInput: consensusInput,
       technicalResults: technical,
@@ -961,33 +1263,39 @@ async function runAIConsensusFromInputImpl(
     ),
     finalRiskScore: Number((((consensus.finalRiskScore * 0.8) + (baseConsensus.finalRiskScore * 0.2))).toFixed(2)),
   };
-  finalConsensus.analysisScorecard = await runOnFreshStack(() =>
+  finalConsensus.analysisScorecard = await runGuardedSyncPhase("analysis_scorecard", () =>
     buildAnalysisScorecard(consensusInput, finalConsensus),
   );
+  if (!user) {
+    finalConsensus.explanation = `${finalConsensus.explanation} | MEMORY_UNAVAILABLE:NO_OPINION`;
+  }
   finalConsensus.consensusTelemetry = consensusInput.consensusTelemetry;
   bridgeConsensusResult({
     symbol: input.symbol,
     consensus: finalConsensus,
     providers: weightedAggregated,
     masterRuleId: finalConsensus.decisionPayload?.consensusEngine?.finalDecision,
+    providerHealthGate: providerHealthEval.gate,
   });
   if (finalConsensus.decisionPayload) {
-    finalConsensus.decisionPayload.shortTermReport = await runOnFreshStack(() =>
+    finalConsensus.decisionPayload.shortTermReport = await runGuardedSyncPhase("short_term_report", () =>
       buildShortTermReport(consensusInput, finalConsensus),
     );
   }
-  ensureAiPerformanceEvaluator(user.id);
-  await recordAiPerformancePrediction({
-    userId: user.id,
-    symbol: input.symbol,
-    entryPrice: input.lastPrice,
-    outputs: weightedAggregated,
-  }).catch(() => null);
-  await recordAIAnalysisPrediction({
-    userId: user.id,
-    analysisInput: input,
-    result: finalConsensus,
-  });
+  if (user) {
+    ensureAiPerformanceEvaluator(user.id);
+    await recordAiPerformancePrediction({
+      userId: user.id,
+      symbol: input.symbol,
+      entryPrice: input.lastPrice,
+      outputs: weightedAggregated,
+    }).catch(() => null);
+    await recordAIAnalysisPrediction({
+      userId: user.id,
+      analysisInput: input,
+      result: finalConsensus,
+    });
+  }
   const degradedProviders = aggregated.filter((x) => !x.ok);
   if (degradedProviders.length > 0) {
     pushLog(
@@ -1048,14 +1356,25 @@ async function runAIConsensusFromInputImpl(
     },
   });
 
-  const adjudicated = await adjudicateWithMasterDecisionEngine({
-    decisionId: getActiveDecisionId() ?? createDecisionId(),
-    input,
-    legacyResult: finalConsensus,
-    providerResults: weightedAggregated,
-  });
+  const adjudicated = await runGuardedAsyncPhase("master_adjudication", () =>
+    adjudicateWithMasterDecisionEngine({
+      decisionId: getActiveDecisionId() ?? createDecisionId(),
+      input,
+      legacyResult: finalConsensus,
+      providerResults: weightedAggregated,
+    }),
+  );
 
-  const persistedCalibration = await listConfidenceCalibration().catch(() => []);
+  const persistedCalibration = await listConfidenceCalibration().catch((error) => {
+    if (isTransientPrismaConnectivityError(error)) {
+      pushLog(
+        "WARN",
+        `${input.symbol.toUpperCase()} confidence calibration unavailable: MEMORY_UNAVAILABLE/NO_OPINION`,
+      );
+      return [];
+    }
+    throw error;
+  });
   const calibrationBins = mapPersistedCalibrationBins(persistedCalibration);
 
   const calibrated = applyConfidenceCalibrationToDecision({

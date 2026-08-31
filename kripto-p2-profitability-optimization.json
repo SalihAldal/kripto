@@ -1,91 +1,185 @@
 {
-  "validationId": "p2-profitability-2026-08-14T22-45-29-533Z",
-  "verdict": "PASS",
-  "startedAt": "2026-08-14T22:45:32.599Z",
-  "completedAt": "2026-08-14T23:10:40.904Z",
-  "sessionId": "cmstjckww0007unsg4v4iff2q",
-  "config": {
-    "maxRounds": 3,
-    "aiGatePolicy": "VETO",
-    "experimentalChangesPromoted": false
+  "task": "KRIPTO P2 — STRATEGY + REGIME + EDGE PROFITABILITY OPTIMIZATION",
+  "timestamp": "2026-08-17T18:00:30.000Z",
+  "finalProfitabilityVerdict": "NOT_PROVEN",
+  "validationRun": {
+    "validationId": "p2-profitability-2026-08-17T17-53-47-412Z",
+    "verdict": "PASS",
+    "startedAt": "2026-08-17T17:53:49.698Z",
+    "completedAt": "2026-08-17T17:59:48.271Z",
+    "sessionId": "cmsxj8zqh0007un4ksq8ygspa",
+    "maxRounds": 5,
+    "aiGatePolicy": "VETO"
+  },
+  "currentBaseline": {
+    "sourceRound": 1,
+    "tradeCount": 0,
+    "winRate": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "profitFactor": 0,
+    "expectancy": 0,
+    "maxDrawdown": 0,
+    "averageWin": 0,
+    "averageLoss": 0,
+    "averageHold": 0,
+    "medianHold": 0,
+    "aiAlignment": "NOT_PROVEN",
+    "entryQuality": "NOT_PROVEN",
+    "exitModelQuality": "NOT_PROVEN",
+    "feeStatus": "UNKNOWN",
+    "scannerDiscoveryQuality": "NOT_PROVEN"
+  },
+  "historicalReference": {
+    "tradeCount": 51,
+    "netPnL": -5.43489355,
+    "grossPnL": -0.33651532,
+    "fees": 5.09837823,
+    "winRatePct": 17.65,
+    "profitFactor": 0.2461,
+    "note": "Historical evidence only; not treated as current post-fix baseline."
+  },
+  "strategyRegimeMatrix": {
+    "jsonArtifact": "artifacts/forensics/cmsxj8zqh0007un4ksq8ygspa/rounds/1/strategy-regime-matrix-p2.json",
+    "csvArtifact": "kripto-strategy-regime-matrix.csv",
+    "sparseCellLabel": "NOT_ENOUGH_DATA"
+  },
+  "meanReversionAnalysis": {
+    "status": "RESEARCH_ONLY",
+    "separationFramework": [
+      "MR_STRATEGY_WEAKNESS",
+      "MR_REGIME_MISMATCH",
+      "MR_ENTRY_PROBLEM",
+      "MR_EXIT_PROBLEM",
+      "MR_FEE_PROBLEM"
+    ]
+  },
+  "volatilityBreakoutAnalysis": {
+    "status": "RESEARCH_ONLY",
+    "artifact": "volatility-breakout-validation.json"
+  },
+  "trendFollowingAnalysis": {
+    "status": "NOT_PROVEN",
+    "artifact": "trend-following-validation.json"
+  },
+  "candidateQuality": {
+    "artifact": "candidate-quality-factors.json",
+    "evidenceClasses": [
+      "FACT",
+      "REPEATED_PATTERN",
+      "HYPOTHESIS"
+    ]
+  },
+  "evCalibration": {
+    "artifact": "ev-calibration.json",
+    "status": "EVIDENCE_LIMITED"
+  },
+  "tdiCalibration": {
+    "artifact": "tdi-sensitivity.json",
+    "status": "EVIDENCE_LIMITED"
+  },
+  "aiPredictiveQuality": {
+    "artifact": "ai-strategy-interaction.json",
+    "aiNoTradeBypass": 0,
+    "status": "EVIDENCE_LIMITED"
+  },
+  "experiments": {
+    "singleChangeOnly": true,
+    "registryArtifact": "profitability-experiments.json",
+    "csvArtifact": "kripto-profitability-experiments.csv",
+    "promotionGateArtifact": "promotion-gate.json",
+    "promotionDecisionsArtifact": "promotion-decisions.json"
+  },
+  "outOfSample": {
+    "artifact": "out-of-sample-evaluation.json",
+    "status": "INSUFFICIENT_SAMPLE"
+  },
+  "profitConcentration": {
+    "artifact": "profit-concentration.json",
+    "classification": "UNKNOWN"
+  },
+  "lossAttributionBeforeAfter": {
+    "status": "INCONCLUSIVE",
+    "reason": "Current post-fix controlled round produced no closed trades."
+  },
+  "doNotTouchYet": {
+    "do_not_change_yet": [
+      "AI confidence thresholds",
+      "TDI thresholds",
+      "Sizing thresholds",
+      "EV thresholds",
+      "Risk limits",
+      "maxPositions",
+      "AI prompts",
+      "SL/TP",
+      "strategy hard enable/disable",
+      "symbol allowlists"
+    ],
+    "research_only": [
+      "MR regime gating",
+      "Breakout regime preference",
+      "Entry timing protection",
+      "Fee-aware edge protection"
+    ],
+    "implemented_change_observability_only": [
+      "baseline metrics artifact",
+      "out-of-sample artifact",
+      "profit concentration artifact",
+      "candidate quality factors artifact",
+      "P2 CSV exports",
+      "promotion gate strictness criteria"
+    ]
+  },
+  "stagedValidationDesign": {
+    "stage_5_10_rounds": {
+      "minTrades": 5,
+      "remoteAiRequired": true,
+      "nonReplayExitRequired": true,
+      "feeReconciliationRequired": true,
+      "aiParityRequired": true,
+      "requiredArtifacts": [
+        "pnl-ledger.json",
+        "exit-forensics.json",
+        "fee-aware-entry-policy.json"
+      ]
+    },
+    "stage_30_50_rounds": {
+      "minTrades": 20,
+      "remoteAiRequired": true,
+      "nonReplayExitRequired": true,
+      "feeReconciliationRequired": true,
+      "aiParityRequired": true,
+      "requiredArtifacts": [
+        "baseline-metrics.json",
+        "strategy-regime-matrix-p2.json",
+        "profit-concentration.json"
+      ]
+    },
+    "stage_100_plus_rounds": {
+      "minTrades": 60,
+      "remoteAiRequired": true,
+      "nonReplayExitRequired": true,
+      "feeReconciliationRequired": true,
+      "aiParityRequired": true,
+      "requiredArtifacts": [
+        "out-of-sample-evaluation.json",
+        "promotion-gate.json",
+        "profitability-experiments.json"
+      ]
+    }
+  },
+  "readiness": {
+    "stage_5_10": "PARTIAL",
+    "stage_30_50": "NOT_READY",
+    "stage_100_plus": "NOT_READY"
   },
   "unitTests": {
-    "total": 34,
-    "p2Optimization": 11,
+    "total": 36,
+    "p2Optimization": 13,
     "p2TdiSlot": 11,
     "p1Engineering": 11,
     "roundExport": 1
-  },
-  "roundAnalysis": [
-    {
-      "roundNo": 1,
-      "present": [
-        "slot-allocation-analysis.json",
-        "slot-allocation-experiment.json",
-        "tdi-sensitivity.json",
-        "fee-aware-entry-experiment.json",
-        "entry-timing-experiment.json",
-        "ai-strategy-interaction.json",
-        "opportunity-value.json",
-        "profitability-experiments.json",
-        "promotion-decisions.json",
-        "promotion-gate.json"
-      ],
-      "missing": [],
-      "experimentCount": 4,
-      "anyPromoted": false,
-      "safetyPreserved": {
-        "aiGate": true,
-        "riskGate": true,
-        "sizingGate": true,
-        "executionIntegrity": true,
-        "pnlReconciliation": true
-      }
-    },
-    {
-      "roundNo": 2,
-      "present": [],
-      "missing": [
-        "slot-allocation-analysis.json",
-        "slot-allocation-experiment.json",
-        "tdi-sensitivity.json",
-        "fee-aware-entry-experiment.json",
-        "entry-timing-experiment.json",
-        "ai-strategy-interaction.json",
-        "opportunity-value.json",
-        "profitability-experiments.json",
-        "promotion-decisions.json",
-        "promotion-gate.json"
-      ],
-      "experimentCount": 0,
-      "anyPromoted": false,
-      "safetyPreserved": null
-    },
-    {
-      "roundNo": 3,
-      "present": [],
-      "missing": [
-        "slot-allocation-analysis.json",
-        "slot-allocation-experiment.json",
-        "tdi-sensitivity.json",
-        "fee-aware-entry-experiment.json",
-        "entry-timing-experiment.json",
-        "ai-strategy-interaction.json",
-        "opportunity-value.json",
-        "profitability-experiments.json",
-        "promotion-decisions.json",
-        "promotion-gate.json"
-      ],
-      "experimentCount": 0,
-      "anyPromoted": false,
-      "safetyPreserved": null
-    }
-  ],
-  "acceptance": {
-    "p2ArtifactsGenerated": true,
-    "noAutoPromotion": true,
-    "baselineBehaviorIntact": true,
-    "safetyPreserved": true
   },
   "recommendedProductionChanges": [],
   "researchOnlyChanges": [
@@ -93,6 +187,7 @@
     "Fee-aware entry floor",
     "Entry timing protection",
     "Slot 3 vs 4 simulation",
-    "TDI threshold sensitivity"
+    "TDI threshold sensitivity",
+    "Breakout regime preference"
   ]
 }

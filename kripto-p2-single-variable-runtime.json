@@ -1,0 +1,41 @@
+{
+  "validationId": "spread-momentum-shadow-2026-08-23T13-08-42-706Z",
+  "sessionId": "cmt5tpkex0001unpsl9hvy50n",
+  "zombieCount": 0,
+  "aiStartedOrphans": 0,
+  "aiVetoBypass": 0,
+  "pnlMismatch": 0,
+  "criticalFailures": [],
+  "roundTerminalStates": [
+    {
+      "roundNo": 1,
+      "state": "tur_basarisiz",
+      "terminal": true
+    },
+    {
+      "roundNo": 2,
+      "state": "tur_basarisiz",
+      "terminal": true
+    },
+    {
+      "roundNo": 3,
+      "state": "tur_basarisiz",
+      "terminal": true
+    },
+    {
+      "roundNo": 4,
+      "state": "tur_basarisiz",
+      "terminal": true
+    },
+    {
+      "roundNo": 5,
+      "state": "tur_basarisiz",
+      "terminal": true
+    },
+    {
+      "roundNo": 6,
+      "state": "tur_basarisiz",
+      "terminal": true
+    }
+  ]
+}

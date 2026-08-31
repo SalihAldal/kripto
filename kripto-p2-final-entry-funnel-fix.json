@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-08-22T20:21:03.416Z",
+  "rootCause": {
+    "class": "MOMENTUM_CONTEXT_MAPPING",
+    "file": "src/server/ai/hybrid-momentum-gates.ts",
+    "function": "resolveLowMomentumInput",
+    "condition": "abs(shortMomentumPercent)<0.08 && abs(shortFlowImbalance)<0.03",
+    "dataPath": "scanner.metadata.shortMomentumPercent/shortFlowImbalance -> formatAIRequest.marketSignals -> resolveLowMomentumInput",
+    "expected": "low-momentum gate only with sufficient short-window trade samples",
+    "actual": "zero-default telemetry values trigger low-momentum gate even when short-window sample is insufficient",
+    "previousFixesFailedReason": "confidence/momentum threshold tweaks cannot override an upstream telemetry-default gating error"
+  },
+  "current2278": {
+    "baseline": {
+      "approved": 50,
+      "wait": 919,
+      "reject": 1309
+    },
+    "fixed": {
+      "approved": 433,
+      "wait": 875,
+      "reject": 970
+    },
+    "newApproved": 383,
+    "newWait": -44,
+    "newReject": -339,
+    "fixedExecutionReady": 433,
+    "suspectedMomentumDefaultRows": 508
+  },
+  "cohorts": {
+    "profitableCount": 42,
+    "losingCount": 206,
+    "breakevenCount": 0,
+    "profitableReleased": 0,
+    "losingReleased": 0,
+    "breakevenReleased": 0,
+    "releasedNetPnL": 0,
+    "releasedExpectancy": 0,
+    "falseReleaseRate": 0
+  },
+  "safetyParity": {
+    "aiVetoChanged": false,
+    "riskChanged": false,
+    "sizingChanged": false,
+    "maxPositionsChanged": false,
+    "emergencyStopChanged": false,
+    "clockSafetyChanged": false,
+    "orderValidationChanged": false,
+    "feeReconciliationChanged": false
+  }
+}

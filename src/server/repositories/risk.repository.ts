@@ -1,6 +1,26 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/src/server/db/prisma";
 
+export type ApiFailureDomain = "EXECUTION" | "ACCOUNT" | "MARKET_DATA" | "METADATA";
+
+export type ApiFailureState = {
+  domain: ApiFailureDomain;
+  count: number;
+  consecutiveFailures: number;
+  lastFailureAt?: string;
+  lastSuccessAt?: string;
+  blockedUntil?: string;
+  openUntil?: string;
+  state: "CLOSED" | "OPEN" | "HALF_OPEN";
+  resetCount: number;
+  lastFailureCode?: string;
+  lastFailureMessage?: string;
+};
+
+function apiFailureKey(userId: string, domain: ApiFailureDomain) {
+  return `risk.api_failures.${userId}.${domain}`;
+}
+
 export async function getRiskConfigByUser(userId: string) {
   return prisma.riskConfig.findUnique({
     where: { userId },
@@ -157,30 +177,103 @@ export async function setPausedState(input: {
 }
 
 export async function getApiFailureState(userId: string) {
-  const key = `risk.api_failures.${userId}`;
-  const row = await prisma.appSetting.findUnique({ where: { key } });
+  const key = apiFailureKey(userId, "EXECUTION");
+  const fallbackKey = `risk.api_failures.${userId}`;
+  const row =
+    (await prisma.appSetting.findUnique({ where: { key } })) ??
+    (await prisma.appSetting.findUnique({ where: { key: fallbackKey } }));
   const value = (row?.value as Record<string, unknown> | undefined) ?? {};
   return {
     count: Number(value.count ?? 0),
+    consecutiveFailures: Number(value.consecutiveFailures ?? value.count ?? 0),
     lastFailureAt: typeof value.lastFailureAt === "string" ? value.lastFailureAt : undefined,
+    lastSuccessAt: typeof value.lastSuccessAt === "string" ? value.lastSuccessAt : undefined,
     blockedUntil: typeof value.blockedUntil === "string" ? value.blockedUntil : undefined,
+    openUntil:
+      typeof value.openUntil === "string"
+        ? value.openUntil
+        : typeof value.blockedUntil === "string"
+          ? value.blockedUntil
+          : undefined,
+    state:
+      value.state === "OPEN" || value.state === "HALF_OPEN" || value.state === "CLOSED"
+        ? value.state
+        : "CLOSED",
+    resetCount: Number(value.resetCount ?? 0),
+    lastFailureCode: typeof value.lastFailureCode === "string" ? value.lastFailureCode : undefined,
+    lastFailureMessage: typeof value.lastFailureMessage === "string" ? value.lastFailureMessage : undefined,
+    domain: "EXECUTION" as const,
   };
 }
 
-export async function setApiFailureState(userId: string, value: { count: number; lastFailureAt?: string; blockedUntil?: string }) {
-  const key = `risk.api_failures.${userId}`;
+export async function getApiFailureStateByDomain(userId: string, domain: ApiFailureDomain): Promise<ApiFailureState> {
+  const key = apiFailureKey(userId, domain);
+  const row = await prisma.appSetting.findUnique({ where: { key } });
+  const value = (row?.value as Record<string, unknown> | undefined) ?? {};
+  return {
+    domain,
+    count: Number(value.count ?? 0),
+    consecutiveFailures: Number(value.consecutiveFailures ?? value.count ?? 0),
+    lastFailureAt: typeof value.lastFailureAt === "string" ? value.lastFailureAt : undefined,
+    lastSuccessAt: typeof value.lastSuccessAt === "string" ? value.lastSuccessAt : undefined,
+    blockedUntil: typeof value.blockedUntil === "string" ? value.blockedUntil : undefined,
+    openUntil:
+      typeof value.openUntil === "string"
+        ? value.openUntil
+        : typeof value.blockedUntil === "string"
+          ? value.blockedUntil
+          : undefined,
+    state:
+      value.state === "OPEN" || value.state === "HALF_OPEN" || value.state === "CLOSED"
+        ? value.state
+        : "CLOSED",
+    resetCount: Number(value.resetCount ?? 0),
+    lastFailureCode: typeof value.lastFailureCode === "string" ? value.lastFailureCode : undefined,
+    lastFailureMessage: typeof value.lastFailureMessage === "string" ? value.lastFailureMessage : undefined,
+  };
+}
+
+export async function setApiFailureState(
+  userId: string,
+  value: {
+    count: number;
+    consecutiveFailures?: number;
+    lastFailureAt?: string;
+    lastSuccessAt?: string;
+    blockedUntil?: string;
+    openUntil?: string;
+    state?: "CLOSED" | "OPEN" | "HALF_OPEN";
+    resetCount?: number;
+    lastFailureCode?: string;
+    lastFailureMessage?: string;
+  },
+  domain: ApiFailureDomain = "EXECUTION",
+) {
+  const key = apiFailureKey(userId, domain);
   return prisma.appSetting.upsert({
     where: { key },
     create: {
       key,
       scope: "USER",
       userId,
-      value,
+      value: {
+        ...value,
+        consecutiveFailures: value.consecutiveFailures ?? value.count,
+        openUntil: value.openUntil ?? value.blockedUntil,
+        state: value.state ?? "CLOSED",
+        resetCount: value.resetCount ?? 0,
+      },
       valueType: "json",
       status: "ACTIVE",
     },
     update: {
-      value,
+      value: {
+        ...value,
+        consecutiveFailures: value.consecutiveFailures ?? value.count,
+        openUntil: value.openUntil ?? value.blockedUntil,
+        state: value.state ?? "CLOSED",
+        resetCount: value.resetCount ?? 0,
+      },
       status: "ACTIVE",
     },
   });

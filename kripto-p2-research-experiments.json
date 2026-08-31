@@ -1,0 +1,26 @@
+[
+  {
+    "experiment": "TDI_INTERACTION_ANALYSIS",
+    "hypothesis": "Historical profitable profiles are primarily lost at momentum/confidence interactions before AI gate.",
+    "affectedCohort": "historical profitable trades blocked by simulated current TDI",
+    "expectedMeasurement": "Pass/Wait/Reject shift by blocker class without changing production thresholds.",
+    "risk": "LOW (offline replay only)",
+    "successCriterion": "Primary blocker share remains stable in OOS split (<=10pp drift)."
+  },
+  {
+    "experiment": "MOMENTUM_POLICY_SHADOW",
+    "hypothesis": "Momentum-driven WAIT/REJECT cluster is the largest suppressor bucket for profitable profiles.",
+    "affectedCohort": "momentum-blocked profitable historical trades",
+    "expectedMeasurement": "Momentum blocker share and near-threshold density under shadow diagnostics.",
+    "risk": "LOW (research-only)",
+    "successCriterion": "Momentum remains top blocker with reproducible share in chronological OOS."
+  },
+  {
+    "experiment": "REGIME_AWARE_TDI_SHADOW",
+    "hypothesis": "Suppression profile changes by regime and can be measured without touching production policy.",
+    "affectedCohort": "RANGE/TREND/HIGH_VOL/LOW_VOL regime buckets",
+    "expectedMeasurement": "Per-regime pass/wait/reject + first-blocker distribution.",
+    "risk": "LOW (offline + shadow analytics)",
+    "successCriterion": "At least one regime shows materially different blocker composition."
+  }
+]

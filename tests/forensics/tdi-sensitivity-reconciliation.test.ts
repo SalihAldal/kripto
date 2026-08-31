@@ -265,4 +265,110 @@ describe("TDI forensic sensitivity reconciliation", () => {
     expect(report.scoreAboveThresholdRate).toBe(1);
     expect(report.runtimeApprovalEquivalentRate).toBe(0);
   });
+
+  it("captures first blocking condition distribution for WAIT rows", () => {
+    const session: ForensicSessionContext = {
+      sessionId: "blocking-test",
+      mode: "paper",
+      startedAt: "2026-08-15T00:00:00.000Z",
+      terminals: [],
+      scannerCycles: [],
+      candidates: [],
+      aiCalls: [],
+      consensus: [],
+      evAudits: [],
+      decisions: [],
+      riskSizing: [],
+      orders: [],
+      pnlEntries: [],
+      meanReversionEntries: [],
+      scannerQualificationRejections: [],
+      notDiscoveredRecords: [],
+      entryTimingRecords: [],
+      tdiDecisions: [
+        buildTdiDecisionRecord({
+          candidateId: "hybrid:WAIT:1",
+          symbol: "A",
+          verdict: "WAIT",
+          hybridDecision: "HOLD",
+          reasonDetail: "Momentum guven vermiyor | Teknik guclu ama diger AI destegi zayif",
+        }),
+        buildTdiDecisionRecord({
+          candidateId: "hybrid:WAIT:2",
+          symbol: "B",
+          verdict: "WAIT",
+          hybridDecision: "HOLD",
+          reasonDetail: "Timeframe'ler cakisiyor",
+        }),
+      ],
+      feePolicyEvaluations: [],
+      rejectionCountsByStage: {},
+      rejectionCountsByReason: {},
+    };
+    const report = buildTdiSensitivityReport({ session, currentThreshold: 55, variation: 2 });
+    expect(report.firstBlockingDistribution?.MOMENTUM).toBe(1);
+    expect(report.firstBlockingDistribution?.MTF_ALIGNMENT).toBe(1);
+  });
+
+  it("does not classify WATCHLIST waits as BELOW_THRESHOLD when hybridRejected is true", () => {
+    const row = buildTdiDecisionRecord({
+      candidateId: "tdi:WATCH:1",
+      symbol: "WATCHTRY",
+      verdict: "WAIT",
+      masterDecision: "WATCHLIST",
+      hybridDecision: "NO_TRADE",
+      hybridRejected: true,
+      consensusScore: 59,
+      confidence: 44,
+      reasonDetail: "WATCHLIST resolved by master decision engine",
+    });
+    expect(row.waitReasonCode).toBe("NEUTRAL");
+  });
+
+  it("wait distribution follows replayed runtime WAIT taxonomy", () => {
+    const session: ForensicSessionContext = {
+      sessionId: "wait-replay-alignment",
+      mode: "paper",
+      startedAt: "2026-08-15T00:00:00.000Z",
+      terminals: [],
+      scannerCycles: [],
+      candidates: [],
+      aiCalls: [],
+      consensus: [],
+      evAudits: [],
+      decisions: [],
+      riskSizing: [],
+      orders: [],
+      pnlEntries: [],
+      meanReversionEntries: [],
+      scannerQualificationRejections: [],
+      notDiscoveredRecords: [],
+      entryTimingRecords: [],
+      tdiDecisions: [
+        buildTdiDecisionRecord({
+          candidateId: "hybrid:WAIT:keep",
+          symbol: "A",
+          verdict: "WAIT",
+          hybridDecision: "HOLD",
+          consensusScore: 61,
+          reasonDetail: "Momentum guven vermiyor",
+        }),
+        buildTdiDecisionRecord({
+          candidateId: "hybrid:WAIT:demote",
+          symbol: "B",
+          verdict: "WAIT",
+          hybridDecision: "NO_TRADE",
+          consensusScore: 61,
+          reasonDetail: "No-trade mode",
+        }),
+      ],
+      feePolicyEvaluations: [],
+      rejectionCountsByStage: {},
+      rejectionCountsByReason: {},
+    };
+    const report = buildTdiSensitivityReport({ session, currentThreshold: 55, variation: 2 });
+    expect(report.runtimeWaitCount).toBe(1);
+    expect(report.waitDistribution.NEUTRAL).toBe(1);
+    expect(Object.values(report.waitDistribution).reduce((sum, value) => sum + value, 0)).toBe(report.runtimeWaitCount);
+  });
 });

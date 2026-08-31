@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-08-22T15:12:25.473Z",
+  "constraints": {
+    "noPaperRun": true,
+    "noMarketData": true,
+    "noProductionChanges": true
+  },
+  "pairedReference": {
+    "totalHistoricalTrades": 346,
+    "validPairedTrades": 173
+  },
+  "part1_definition": {
+    "EV": {
+      "source": "forensic bridge / tdi-decisions expectedValue",
+      "formula": "expectedValue := composite/consensus score from hybrid+master path",
+      "units": "score",
+      "range": "approximately 0..100",
+      "normalization": "none in production record; raw persisted score",
+      "timestamp": "decision-time (tdi decision snapshot)",
+      "missingBehavior": "fallback to consensusScore then inferred train median in research-only replay"
+    },
+    "liquidity": {
+      "source": "forensic bridge liquidity field (primarily volume24h proxy)",
+      "formula": "liquidity := analysisInput.volume24h when persisted",
+      "units": "notional volume proxy",
+      "range": "asset-dependent positive scale",
+      "normalization": "none in production record; normalized in shadow using TRAIN min-max",
+      "timestamp": "decision-time (market snapshot at decision)",
+      "missingBehavior": "fallback to volume24h then inferred train median in research-only replay"
+    }
+  },
+  "part2_interaction_definition": {
+    "formula": "interactionScore = evNorm * liqNorm / 100",
+    "evNorm": "TRAIN-only min-max normalization with 5th/95th percentile clipping",
+    "liqNorm": "TRAIN-only min-max normalization with 5th/95th percentile clipping",
+    "scaling": "0..100",
+    "ranking": "descending interactionScore",
+    "bins": "Q1..Q4 from TRAIN quantiles",
+    "highEdgeRule": "interactionScore >= TRAIN q70 (top 30%)"
+  },
+  "lookaheadViolations": 0,
+  "selectedRegionEconomics": {
+    "profitableSelected": 8,
+    "losingSelected": 68,
+    "breakevenSelected": 0,
+    "netPnL": -3.56764184,
+    "fees": 0.22745687,
+    "expectancy": -0.04694266,
+    "netReturn": -0.0051912539,
+    "profitFactor": 0.09596667,
+    "drawdown": 0.1272834
+  },
+  "current2278": {
+    "total": 2278,
+    "highEdge": 782,
+    "topBuckets": {
+      "top10": 228,
+      "top20": 456,
+      "top30": 683,
+      "top10ThresholdScore": 15.284925,
+      "top20ThresholdScore": 7.182873,
+      "top30ThresholdScore": 3.512363
+    }
+  },
+  "momentumComparison": {
+    "momentumOOSExpectancy": -0.05386983,
+    "evLiqOOSExpectancy": -0.0476492,
+    "strongerSignal": "EV_X_LIQUIDITY"
+  },
+  "finalVerdict": {
+    "EV_LIQUIDITY_OOS_EXPECTANCY": -0.0476492,
+    "EV_ONLY_OOS_EXPECTANCY": -0.0514033,
+    "LIQUIDITY_ONLY_OOS_EXPECTANCY": -0.04834353,
+    "INTERACTION_ADDS_VALUE": "YES",
+    "POSITIVE_NET_REGION": "NO",
+    "PROFITABLE_SELECTED": 8,
+    "LOSING_SELECTED": 68,
+    "CURRENT_2278_HIGH_EDGE": 782,
+    "OOS_SUPPORTED": "NO",
+    "ROBUSTNESS": "ROBUST",
+    "STATUS": "RESEARCH_ONLY",
+    "NEXT_STEP": "KEEP_RESEARCH_ONLY_DO_NOT_TOUCH_PRODUCTION_GATES",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+  }
+}

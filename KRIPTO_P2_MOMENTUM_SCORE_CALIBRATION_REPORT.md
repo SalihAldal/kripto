@@ -1,0 +1,19 @@
+# KRIPTO P2 — MOMENTUM SCORE CALIBRATION + PROFITABILITY RELATIONSHIP FORENSIC
+
+## Artifacts
+- canonical score/outcome: `kripto-p2-momentum-score-outcome.csv`
+- threshold calibration curve: `kripto-p2-momentum-threshold-curve.csv`
+- current vs historical: `kripto-p2-momentum-current-vs-historical.csv`
+- oos: `kripto-p2-momentum-oos.json`
+
+## Final Verdict
+MOMENTUM_SCORE_RELATIONSHIP = NO_RELATIONSHIP
+MOMENTUM_CALIBRATION = BAD
+HISTORICAL_PROFITABLE_BELOW_THRESHOLD = 42
+HISTORICAL_LOSS_BELOW_THRESHOLD = 206
+PROFITABLE_LOW_SCORE_NET_PNL = 2.45373448
+LOW_SCORE_EXPECTANCY = -0.08419881
+CURRENT_2278_LOW_SCORE_SHARE = 1
+CURRENT_ZERO_APPROVAL_CAUSE = SCORE_MISCalibration
+SAFE_NEXT_EXPERIMENT = MOMENTUM_SCORE_RECALIBRATION
+PRODUCTION_CHANGE_RECOMMENDED = NO

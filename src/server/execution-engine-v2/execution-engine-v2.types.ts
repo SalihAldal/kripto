@@ -15,7 +15,17 @@ export type ExecutionOrderType = "MARKET" | "LIMIT" | "IOC" | "FOK";
 export type ExecutionEngineV2JobPayload =
   | { type: "ENTRY_EVALUATE"; symbol: string; decisionId: string; decisionConfidence: number; price?: number }
   | { type: "EXIT_EVALUATE"; positionId: string; symbol?: string }
-  | { type: "EXECUTE_ORDER"; executionId: string; userId: string; symbol: string; side: "BUY" | "SELL"; riskApproved: boolean }
+  | {
+      type: "EXECUTE_ORDER";
+      executionId: string;
+      userId: string;
+      symbol: string;
+      side: "BUY" | "SELL";
+      riskApproved: boolean;
+      aiGateVerdict?: "AI_GATE_PASS" | "AI_ADVISORY_ONLY";
+      aiGatePolicy?: "VETO" | "ADVISORY";
+      aiGateReasonCode?: string;
+    }
   | { type: "VERIFY_ORDER"; logKey: string }
   | { type: "RECONCILE"; symbol?: string }
   | { type: "RECOVERY"; executionId?: string }

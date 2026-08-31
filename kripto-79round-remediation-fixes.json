@@ -1,0 +1,29 @@
+[
+  {
+    "issue": "P0_REFERENCE_ERROR",
+    "rootCause": "resolveMinimumProtectedProfitPercent missing import in hybrid-decision-engine",
+    "file": "src/server/ai/hybrid-decision-engine.ts",
+    "function": "buildHybridDecision",
+    "oldBehavior": "ReferenceError on every hybrid/TDI path",
+    "newBehavior": "Import from profit-thresholds; hybrid executes",
+    "safetyImpact": "No policy change"
+  },
+  {
+    "issue": "P0_SCHEDULER_STALE_MODULE",
+    "rootCause": "Long-lived scheduler held pre-fix module cache",
+    "file": "scripts/hold-paper-scheduler.ts",
+    "function": "main",
+    "oldBehavior": "Started without engine sanity verification",
+    "newBehavior": "ENGINE_SANITY_FAIL exits before holding scheduler",
+    "safetyImpact": "Prevents silent ReferenceError loops"
+  },
+  {
+    "issue": "P1_PREFLIGHT_GAP",
+    "rootCause": "Paper preflight did not verify hybrid engine load",
+    "file": "src/server/forensics/paper-preflight.service.ts",
+    "function": "runPaperSessionPreflight",
+    "oldBehavior": "AI_CONFIGURED only",
+    "newBehavior": "ENGINE_SANITY blocks paper start",
+    "safetyImpact": "Blocks campaign with broken runtime"
+  }
+]

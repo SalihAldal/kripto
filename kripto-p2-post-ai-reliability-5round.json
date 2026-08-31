@@ -1,0 +1,420 @@
+{
+  "validationId": "post-ai-reliability-5round-2026-08-23T17-33-47-813Z",
+  "phase": "A_CONTROLLED_PAPER",
+  "startedAt": "2026-08-23T17:34:19.606Z",
+  "completedAt": "2026-08-23T18:18:58.288Z",
+  "sessionId": "cmt6371a00009unk8kb84hssc",
+  "preFixBaseline": {
+    "sessionId": "cmt5tpkex0001unpsl9hvy50n",
+    "aiNoResponseGlobalRounds": 1,
+    "aiDecisionConflictRounds": 4,
+    "note": "Pre-fix shadow paper session rounds 1-5"
+  },
+  "job": {
+    "id": "cmt6371a00009unk8kb84hssc",
+    "status": "COMPLETED",
+    "completedRounds": 0,
+    "failedRounds": 5
+  },
+  "rounds": [
+    {
+      "roundNo": 1,
+      "roundId": "1",
+      "startedAt": "2026-08-23T17:34:22.999Z",
+      "endedAt": "2026-08-23T17:44:15.942Z",
+      "durationMin": 9.88,
+      "terminalState": "tur_basarisiz",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=66.3, sentiment=0.0, mtf=0.0) | risk 100.00 > 82",
+      "terminal": true,
+      "scanner": {
+        "candidateCount": 262,
+        "scannerPass": 262,
+        "scannerReject": 0
+      },
+      "tdi": {
+        "approved": 0,
+        "wait": 0,
+        "reject": 0
+      },
+      "ai": {
+        "providerCount": 3,
+        "healthyProviders": 0,
+        "degradedProviders": 300,
+        "timeouts": 0,
+        "unavailable": 300,
+        "invalidResponse": 0,
+        "aborted": 0,
+        "remoteCalls": 0,
+        "localFallbackCalls": 300,
+        "aiPath": "ALL_DEGRADED",
+        "aiProviderDegradedCandidates": 0,
+        "invoked": 82
+      },
+      "consensus": {
+        "entered": 231,
+        "passed": 0,
+        "rejected": 231,
+        "unavailableEvidenceCount": 231
+      },
+      "ev": {
+        "entered": 0,
+        "passed": 0,
+        "wait": 0,
+        "rejected": 0
+      },
+      "risk": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "sizing": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "openedTrades": 0,
+        "closedTrades": 0
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "safety": {
+        "aiStartedOrphans": 0,
+        "pnlMismatch": 0
+      },
+      "pnlEntries": [],
+      "orderRows": []
+    },
+    {
+      "roundNo": 2,
+      "roundId": "2",
+      "startedAt": "2026-08-23T17:44:16.364Z",
+      "endedAt": "2026-08-23T17:55:01.693Z",
+      "durationMin": 10.75,
+      "terminalState": "tur_basarisiz",
+      "failReason": "AI_PROVIDER_DEGRADED",
+      "terminal": true,
+      "scanner": {
+        "candidateCount": 238,
+        "scannerPass": 238,
+        "scannerReject": 0
+      },
+      "tdi": {
+        "approved": 0,
+        "wait": 0,
+        "reject": 0
+      },
+      "ai": {
+        "providerCount": 0,
+        "healthyProviders": 0,
+        "degradedProviders": 0,
+        "timeouts": 0,
+        "unavailable": 0,
+        "invalidResponse": 0,
+        "aborted": 0,
+        "remoteCalls": 0,
+        "localFallbackCalls": 0,
+        "aiPath": "UNKNOWN",
+        "aiProviderDegradedCandidates": 0,
+        "invoked": 83
+      },
+      "consensus": {
+        "entered": 226,
+        "passed": 0,
+        "rejected": 226,
+        "unavailableEvidenceCount": 226
+      },
+      "ev": {
+        "entered": 0,
+        "passed": 0,
+        "wait": 0,
+        "rejected": 0
+      },
+      "risk": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "sizing": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "openedTrades": 0,
+        "closedTrades": 0
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "safety": {
+        "aiStartedOrphans": 0,
+        "pnlMismatch": 0
+      },
+      "pnlEntries": [],
+      "orderRows": []
+    },
+    {
+      "roundNo": 3,
+      "roundId": "3",
+      "startedAt": "2026-08-23T17:55:01.923Z",
+      "endedAt": "2026-08-23T18:00:27.669Z",
+      "durationMin": 5.43,
+      "terminalState": "tur_basarisiz",
+      "failReason": "AI_PROVIDER_DEGRADED",
+      "terminal": true,
+      "scanner": {
+        "candidateCount": 0,
+        "scannerPass": 0,
+        "scannerReject": 0
+      },
+      "tdi": {
+        "approved": 0,
+        "wait": 0,
+        "reject": 0
+      },
+      "ai": {
+        "providerCount": 0,
+        "healthyProviders": 0,
+        "degradedProviders": 0,
+        "timeouts": 0,
+        "unavailable": 0,
+        "invalidResponse": 0,
+        "aborted": 0,
+        "remoteCalls": 0,
+        "localFallbackCalls": 0,
+        "aiPath": "UNKNOWN",
+        "aiProviderDegradedCandidates": 0,
+        "invoked": 29
+      },
+      "consensus": {
+        "entered": 133,
+        "passed": 0,
+        "rejected": 133,
+        "unavailableEvidenceCount": 133
+      },
+      "ev": {
+        "entered": 0,
+        "passed": 0,
+        "wait": 0,
+        "rejected": 0
+      },
+      "risk": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "sizing": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "openedTrades": 0,
+        "closedTrades": 0
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "safety": {
+        "aiStartedOrphans": 0,
+        "pnlMismatch": 0
+      },
+      "pnlEntries": [],
+      "orderRows": []
+    },
+    {
+      "roundNo": 4,
+      "roundId": "4",
+      "startedAt": "2026-08-23T18:00:27.886Z",
+      "endedAt": "2026-08-23T18:11:30.072Z",
+      "durationMin": 11.05,
+      "terminalState": "tur_basarisiz",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=58.8, sentiment=0.0, mtf=0.0) | risk 100.00 > 82",
+      "terminal": true,
+      "scanner": {
+        "candidateCount": 0,
+        "scannerPass": 0,
+        "scannerReject": 0
+      },
+      "tdi": {
+        "approved": 0,
+        "wait": 0,
+        "reject": 0
+      },
+      "ai": {
+        "providerCount": 0,
+        "healthyProviders": 0,
+        "degradedProviders": 0,
+        "timeouts": 0,
+        "unavailable": 0,
+        "invalidResponse": 0,
+        "aborted": 0,
+        "remoteCalls": 0,
+        "localFallbackCalls": 0,
+        "aiPath": "UNKNOWN",
+        "aiProviderDegradedCandidates": 0,
+        "invoked": 84
+      },
+      "consensus": {
+        "entered": 210,
+        "passed": 0,
+        "rejected": 210,
+        "unavailableEvidenceCount": 210
+      },
+      "ev": {
+        "entered": 0,
+        "passed": 0,
+        "wait": 0,
+        "rejected": 0
+      },
+      "risk": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "sizing": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "openedTrades": 0,
+        "closedTrades": 0
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "safety": {
+        "aiStartedOrphans": 0,
+        "pnlMismatch": 0
+      },
+      "pnlEntries": [],
+      "orderRows": []
+    },
+    {
+      "roundNo": 5,
+      "roundId": "5",
+      "startedAt": "2026-08-23T18:11:30.349Z",
+      "endedAt": "2026-08-23T18:18:46.275Z",
+      "durationMin": 7.27,
+      "terminalState": "tur_basarisiz",
+      "failReason": "AI_PROVIDER_DEGRADED",
+      "terminal": true,
+      "scanner": {
+        "candidateCount": 0,
+        "scannerPass": 0,
+        "scannerReject": 0
+      },
+      "tdi": {
+        "approved": 0,
+        "wait": 0,
+        "reject": 0
+      },
+      "ai": {
+        "providerCount": 0,
+        "healthyProviders": 0,
+        "degradedProviders": 0,
+        "timeouts": 0,
+        "unavailable": 0,
+        "invalidResponse": 0,
+        "aborted": 0,
+        "remoteCalls": 0,
+        "localFallbackCalls": 0,
+        "aiPath": "UNKNOWN",
+        "aiProviderDegradedCandidates": 0,
+        "invoked": 88
+      },
+      "consensus": {
+        "entered": 232,
+        "passed": 0,
+        "rejected": 232,
+        "unavailableEvidenceCount": 232
+      },
+      "ev": {
+        "entered": 0,
+        "passed": 0,
+        "wait": 0,
+        "rejected": 0
+      },
+      "risk": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "sizing": {
+        "entered": 0,
+        "passed": 0,
+        "rejected": 0
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "openedTrades": 0,
+        "closedTrades": 0
+      },
+      "pnl": {
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      },
+      "safety": {
+        "aiStartedOrphans": 0,
+        "pnlMismatch": 0
+      },
+      "pnlEntries": [],
+      "orderRows": []
+    }
+  ],
+  "profitability": {
+    "wins": 0,
+    "losses": 0,
+    "breakeven": 0,
+    "expectancy": null,
+    "closedTrades": 0,
+    "netPnL": 0
+  },
+  "safety": {
+    "zombieCount": 0,
+    "aiStartedOrphans": 0,
+    "pnlMismatch": 0,
+    "criticalFailures": []
+  },
+  "phaseAVerdict": {
+    "FIVE_ROUNDS_COMPLETED": "YES",
+    "AI_NO_RESPONSE_GLOBAL_FAILURES": 0,
+    "AI_PROVIDER_DEGRADED_CANDIDATE_LOCAL": 0,
+    "HEALTHY_CANDIDATE_CONTINUATION": 0,
+    "EXECUTION_READY": 0,
+    "TRADES": 0,
+    "CLOSED_TRADES": 0,
+    "NET_PNL": 0,
+    "AI_STARTED_ORPHANS": 0,
+    "ZOMBIES": 0,
+    "AI_VETO_BYPASS": 0,
+    "AI_RELIABILITY_EFFECT": "NEUTRAL",
+    "READY_FOR_30_ROUNDS": "YES"
+  }
+}

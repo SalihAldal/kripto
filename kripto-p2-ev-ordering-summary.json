@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-08-23T17:33:48.502Z",
+  "phase": "B_OFFLINE_ONLY",
+  "primarySession": "cmt5tpkex0001unpsl9hvy50n",
+  "totalEvAuditsPrimary": 1111,
+  "totalEvAuditsAllSessions": 29092,
+  "anomalyCountPrimary": 856,
+  "anomalyCountReferenced": 689,
+  "classificationCounts": {
+    "DUPLICATE_GATE": 856
+  },
+  "rootCause": "DUPLICATE_GATE",
+  "rootCauseShare": 1,
+  "codePath": {
+    "file": "src/server/ai/hybrid-decision-engine.ts",
+    "function": "buildHybridDecision",
+    "bridge": "src/server/forensics/forensic-bridge.service.ts bridgeHybridEv",
+    "lines": "1460-1485"
+  },
+  "lossControl": {
+    "pairedTradesReference": 173,
+    "profitableTradesReference": 42,
+    "note": "Anomalies are telemetry labeling — not independent EV formula false rejects; loss-control re-simulation NOT_APPLICABLE for hybrid-v1 mirror records",
+    "falseRejectEstimate": 0,
+    "legitimateRejectEstimate": 856,
+    "status": "PARTIAL"
+  },
+  "engineeringTarget": "FIX_EV_DUPLICATE_GATE",
+  "EV_FOLLOWUP_REQUIRED": true,
+  "verdict": {
+    "EV_689_ANOMALIES": 856,
+    "EV_TRUE_FALSE_REJECTS": 0,
+    "EV_FALSE_REJECTS": 0,
+    "EV_ORDERING_ROOT_CAUSE": "DUPLICATE_GATE",
+    "EV_ENGINEERING_TARGET": "FIX_EV_DUPLICATE_GATE",
+    "THRESHOLDS_CHANGED": "NO"
+  }
+}

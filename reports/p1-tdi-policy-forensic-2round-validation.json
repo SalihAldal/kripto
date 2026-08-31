@@ -1,0 +1,38 @@
+{
+  "runId": "p1-tdi-policy-forensic-2026-08-18T17-53-37-655Z",
+  "smokeSessionId": "cmsyyp5xv000bunp4lhexsx0z",
+  "finalVerdict": {
+    "TDI_POLICY_CORRECTNESS": "PARTIAL",
+    "ZERO_BUY_EXPLAINED": "YES",
+    "RUNTIME_REGRESSION": "NONE",
+    "AI_PARITY": "PASS",
+    "READY_FOR_P2": "YES",
+    "READY_FOR_5_ROUND": "YES"
+  },
+  "smokeSummary": {
+    "sessionId": "cmsyyp5xv000bunp4lhexsx0z",
+    "scannerCandidates": 132,
+    "tdiApproved": 0,
+    "tdiWait": 33,
+    "tdiRejected": 257,
+    "firstBlockingCondition": {
+      "MOMENTUM": 19,
+      "TECHNICAL": 13,
+      "CONFIDENCE": 1
+    },
+    "technicalBlockCount": 13,
+    "momentumBlockCount": 19,
+    "confidenceBlockCount": 1,
+    "dataQualityBlockCount": 0,
+    "policyBlockCount": 33,
+    "executionReady": 0,
+    "aiCalls": 426,
+    "aiVeto": 0,
+    "orders": 0,
+    "trades": 0,
+    "patchJobActiveRoundTimeoutCount": 0,
+    "patchP50": 9,
+    "patchP95": 79,
+    "patchP99": 1016
+  }
+}

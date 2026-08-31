@@ -18,6 +18,7 @@ import {
   type AsyncRuntimeTelemetry,
   type AsyncTelemetryEvent,
 } from "@/src/server/execution/cooperative-async.types";
+import { writeRoundHangSnapshotArtifact } from "@/src/server/forensics/round-progress-watchdog.service";
 
 export {
   CooperativeAsyncCancelledError,
@@ -399,6 +400,7 @@ export type RoundSelectionWatchdogHandle = { stop: () => void };
 
 export function startRoundSelectionWatchdog(input: {
   jobId: string;
+  roundId?: string;
   getLastHeartbeatAt: () => string | undefined;
   getLastProgressAt?: () => string | undefined;
   getRuntimeSnapshot?: () => import("@/src/server/execution/round-runtime.types").RoundRuntimeSnapshot;
@@ -423,6 +425,18 @@ export function startRoundSelectionWatchdog(input: {
     });
     if (assessment.reasonCode === "SELECTION_BUDGET_EXCEEDED" && !staleReported) {
       staleReported = true;
+      const runtime = input.getRuntimeSnapshot?.();
+      if (runtime) {
+        writeRoundHangSnapshotArtifact({
+          sessionId: `job-${input.jobId}`,
+          roundId: input.roundId ?? "unknown",
+          nowIso: new Date().toISOString(),
+          currentStage: runtime.step,
+          currentCandidate: runtime.currentCandidate,
+          runtime: runtime as unknown as Record<string, unknown>,
+          watchdog: assessment as unknown as Record<string, unknown>,
+        });
+      }
       input.onStale(assessment.reasonDetail);
       return;
     }
@@ -432,6 +446,18 @@ export function startRoundSelectionWatchdog(input: {
     if (assessment.progressState === "STALLED" && !staleReported) {
       staleReported = true;
       const reason = assessment.reasonDetail;
+      const runtime = input.getRuntimeSnapshot?.();
+      if (runtime) {
+        writeRoundHangSnapshotArtifact({
+          sessionId: `job-${input.jobId}`,
+          roundId: input.roundId ?? "unknown",
+          nowIso: new Date().toISOString(),
+          currentStage: runtime.step,
+          currentCandidate: runtime.currentCandidate,
+          runtime: runtime as unknown as Record<string, unknown>,
+          watchdog: assessment as unknown as Record<string, unknown>,
+        });
+      }
       input.onProgressStale?.(reason);
       input.onStale(reason);
     }

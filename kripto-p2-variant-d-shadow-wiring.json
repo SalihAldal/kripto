@@ -1,0 +1,23 @@
+{
+  "SHADOW_WIRING": "PASS",
+  "POSITION_MONITOR_CONNECTED": "YES",
+  "LIVE_SHADOW_ZERO_CAUSE": "NOT_WIRED",
+  "SYSTEM_TIMEOUT_SHADOW": "PASS",
+  "SAME_STATE_HASH": "PASS",
+  "BASELINE_BEHAVIOR_UNCHANGED": "YES",
+  "LOOKAHEAD_VIOLATIONS": 0,
+  "SHADOW_NON_BLOCKING": "PASS",
+  "SHADOW_LATENCY": {
+    "p50": 0,
+    "p95": 0,
+    "p99": 0,
+    "count": 16,
+    "errors": 1,
+    "timeouts": 0
+  },
+  "SYNTHETIC_SCENARIOS": "12/12",
+  "PRODUCTION_COMPONENT_COMPATIBILITY": "FULL",
+  "VARIANT_D_STATUS": "PROMISING_LIVE_SHADOW",
+  "NEXT_STEP": "Enable controlled paper shadow flag and collect <=5 rounds without changing baseline exit behavior.",
+  "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+}

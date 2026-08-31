@@ -38,6 +38,8 @@ export type ScannerScore = {
     velocity: number;
     candle: number;
     fakeSpikePenalty: number;
+    positiveEvidence?: number;
+    negativeEvidence?: number;
     futuresRiskPenalty?: number;
     leverageStressPenalty?: number;
     regimeTransitionPenalty?: number;
@@ -56,12 +58,37 @@ export type ScannerCandidate = {
   ai?: AIConsensusResult;
 };
 
+export type DiscoverySource = "ROTATION" | "PRIORITY" | "PUMP" | "OTHER";
+
+export type ScannerCoverageMetrics = {
+  scannerUniverse: number;
+  priorityMaxPerCycle?: number;
+  rotationCandidates: number;
+  priorityCandidates: number;
+  rotationCount?: number;
+  priorityCount?: number;
+  duplicatesRemoved: number;
+  duplicateCount?: number;
+  totalEvaluated: number;
+  totalEvaluationCount?: number;
+  notDiscoveredCount: number;
+  priorityRescuedCount: number;
+  discoverySources: Array<{
+    symbol: string;
+    discoverySource: DiscoverySource;
+    prioritySource?: string;
+    priorityReason?: string;
+    priorityScore?: number;
+  }>;
+};
+
 export type ScannerPipelineResult = {
   scannedAt: string;
   totalSymbols: number;
   qualifiedSymbols: number;
   aiEvaluatedSymbols: number;
   candidates: ScannerCandidate[];
+  coverage?: ScannerCoverageMetrics;
 };
 
 export type ScannerApiRow = {

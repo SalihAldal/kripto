@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-08-23T13:00:28.645Z",
+  "cohortSize": 37,
+  "diagnosableGenericRejects": 15,
+  "falseNegativesExplained": 19,
+  "falseNegativesTotal": 19,
+  "legitimateRejectionsConfirmed": 17,
+  "shadowReleasedProfitable": 0,
+  "shadowReleasedLosing": 0,
+  "shadowNetPnL": 0,
+  "pairedTradesReference": 173,
+  "lossControlStatus": "PARTIAL",
+  "productionPolicyChanged": false
+}

@@ -1,0 +1,17 @@
+{
+  "available": true,
+  "reason": null,
+  "split": {
+    "train": 103,
+    "validation": 34,
+    "oos": 36
+  },
+  "metrics": {
+    "trainBaselineExpectancy": -0.1450842183495146,
+    "trainFeeAwareExpectancy": -0.1429001695145631,
+    "validationBaselineExpectancy": -0.052077698529411756,
+    "validationFeeAwareExpectancy": -0.052077698529411756,
+    "oosBaselineExpectancy": -0.05224680527777778,
+    "oosFeeAwareExpectancy": -0.05224680527777778
+  }
+}

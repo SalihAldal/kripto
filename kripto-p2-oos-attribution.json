@@ -1,0 +1,131 @@
+{
+  "baseline": [
+    {
+      "split": "TRAIN",
+      "tradeCount": 103,
+      "netPnL": -14.943674490000003,
+      "expectancy": -0.1450842183495146,
+      "profitFactor": 0.0668539365842077,
+      "winRate": 0.18446601941747573,
+      "drawdown": -14.943674490000003
+    },
+    {
+      "split": "VALIDATION",
+      "tradeCount": 34,
+      "netPnL": -1.7706417499999998,
+      "expectancy": -0.052077698529411756,
+      "profitFactor": 0.2055233045377096,
+      "winRate": 0.17647058823529413,
+      "drawdown": -1.7706417499999998
+    },
+    {
+      "split": "OOS",
+      "tradeCount": 36,
+      "netPnL": -1.8808849900000002,
+      "expectancy": -0.05224680527777778,
+      "profitFactor": 0.21927780408177794,
+      "winRate": 0.2222222222222222,
+      "drawdown": -1.94770499
+    }
+  ],
+  "feeAwareCounterfactual": [
+    {
+      "split": "TRAIN",
+      "tradeCount": 103,
+      "blocked": 9,
+      "netPnL": -14.71871746,
+      "expectancy": -0.1429001695145631,
+      "profitFactor": 0.06107448660385129,
+      "winRate": 0.1553398058252427,
+      "drawdown": -14.71871746
+    },
+    {
+      "split": "VALIDATION",
+      "tradeCount": 34,
+      "blocked": 0,
+      "netPnL": -1.7706417499999998,
+      "expectancy": -0.052077698529411756,
+      "profitFactor": 0.2055233045377096,
+      "winRate": 0.17647058823529413,
+      "drawdown": -1.7706417499999998
+    },
+    {
+      "split": "OOS",
+      "tradeCount": 36,
+      "blocked": 0,
+      "netPnL": -1.8808849900000002,
+      "expectancy": -0.05224680527777778,
+      "profitFactor": 0.21927780408177794,
+      "winRate": 0.2222222222222222,
+      "drawdown": -1.94770499
+    }
+  ],
+  "entryQuality": [
+    {
+      "entryQuality": "GOOD_ENTRY",
+      "tradeCount": 36,
+      "expectancy": -0.05224680527777778
+    }
+  ],
+  "regimeAware": [
+    {
+      "regime": "RANGE",
+      "tradeCount": 11,
+      "expectancy": -0.05489783909090909
+    },
+    {
+      "regime": "LOW_VOLATILITY",
+      "tradeCount": 7,
+      "expectancy": -0.06218962
+    },
+    {
+      "regime": "UNKNOWN",
+      "tradeCount": 12,
+      "expectancy": -0.056259329999999996
+    },
+    {
+      "regime": "HIGH_VOLATILITY",
+      "tradeCount": 6,
+      "expectancy": -0.027761576666666666
+    }
+  ],
+  "strategyRegime": [
+    {
+      "strategy": "Mean Reversion",
+      "regime": "LOW_VOLATILITY",
+      "tradeCount": 29,
+      "winRate": 0.27586206896551724,
+      "grossPnL": -11.023537019999997,
+      "fees": 0,
+      "netPnL": -11.023537019999997,
+      "expectancy": -0.3801219662068965,
+      "profitFactor": 0.03704315981911306,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "strategy": "Mean Reversion",
+      "regime": "RANGE",
+      "tradeCount": 118,
+      "winRate": 0.17796610169491525,
+      "grossPnL": -6.13787774,
+      "fees": 0,
+      "netPnL": -6.13787774,
+      "expectancy": -0.05201591305084746,
+      "profitFactor": 0.1823208235239352,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "strategy": "Other",
+      "regime": "UNKNOWN",
+      "tradeCount": 20,
+      "winRate": 0.15,
+      "grossPnL": -1.2672170100000002,
+      "fees": 0,
+      "netPnL": -1.2672170100000002,
+      "expectancy": -0.06336085050000001,
+      "profitFactor": 0.14027810775064908,
+      "sampleStatus": "SUFFICIENT"
+    }
+  ],
+  "status": "PARTIAL"
+}

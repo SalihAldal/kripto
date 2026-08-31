@@ -1,0 +1,663 @@
+{
+  "generatedAt": "2026-08-18T19:49:47.997Z",
+  "scope": "DIRECT_NATIVE_KRIPTO_REPOSITORY_ONLY",
+  "objective": "CREATE_A_REPEATABLE_POSITIVE_NET_EDGE",
+  "source": {
+    "latestJobId": "cmsyyp5xv000bunp4lhexsx0z",
+    "latestRoundNo": 2,
+    "roundCount": 2,
+    "roundRefs": [
+      {
+        "roundNo": 1,
+        "roundId": "1",
+        "endedAt": "2026-08-18T18:14:13.685Z",
+        "result": "failed"
+      },
+      {
+        "roundNo": 2,
+        "roundId": "2",
+        "endedAt": "2026-08-18T18:34:15.484Z",
+        "result": "failed"
+      }
+    ]
+  },
+  "canonicalBaseline": {
+    "candidateCount": 132,
+    "tdiApproved": 0,
+    "tdiWait": 33,
+    "aiCalls": 290,
+    "executionReady": 0,
+    "orders": 0,
+    "fills": 0,
+    "closedTrades": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "expectancy": 0,
+    "drawdown": 0,
+    "strategy": {
+      "Mean Reversion": 198,
+      "Volatility Breakout": 0,
+      "Trend Following": 8,
+      "other": 84
+    },
+    "exit": {
+      "POSITION_MONITOR": 0,
+      "REPLAY_WINDOW": 0,
+      "note": "No closed trade in latest post-fix run."
+    },
+    "entry": {
+      "GOOD_ENTRY": 0,
+      "NORMAL": 0,
+      "CHASING": 0,
+      "EDGE_DECAY": 0,
+      "note": "No execution path reached entry classification."
+    },
+    "fee": {
+      "FEE_SAFE": 0,
+      "FEE_BORDERLINE": 0,
+      "FEE_EROSION": 0,
+      "note": "No executed trade in latest post-fix run."
+    }
+  },
+  "strategyRegimeProfitability": {
+    "dimensions": [
+      "strategy",
+      "regime"
+    ],
+    "rows": [
+      {
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "sample": 48,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "TREND",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "HIGH_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "LOW_VOLATILITY",
+        "sample": 150,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "CHAOS",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "LOW_LIQUIDITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "UNKNOWN",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "RANGE",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "TREND",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "HIGH_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "LOW_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "CHAOS",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "LOW_LIQUIDITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "regime": "UNKNOWN",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "RANGE",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "TREND",
+        "sample": 8,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "HIGH_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "LOW_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "CHAOS",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "LOW_LIQUIDITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "Trend Following",
+        "regime": "UNKNOWN",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "RANGE",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "TREND",
+        "sample": 2,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "HIGH_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "LOW_VOLATILITY",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "CHAOS",
+        "sample": 66,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "LOW_LIQUIDITY",
+        "sample": 16,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      },
+      {
+        "strategy": "other",
+        "regime": "UNKNOWN",
+        "sample": 0,
+        "wins": 0,
+        "losses": 0,
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0,
+        "expectancy": 0,
+        "profitFactor": 0,
+        "drawdown": 0,
+        "status": "NOT_ENOUGH_DATA"
+      }
+    ],
+    "notEnoughDataRule": "sample < 20 OR closedTrades == 0"
+  },
+  "entryQualityAnalysis": {
+    "status": "NOT_ENOUGH_DATA",
+    "comparedFields": [
+      "entryDelay",
+      "momentum",
+      "shortMomentum",
+      "shortFlow",
+      "sentiment",
+      "liquidity",
+      "volatility",
+      "regime",
+      "strategy"
+    ],
+    "result": "No winner/loser split possible because closedTrades=0 in latest post-fix run.",
+    "driverAssessment": "UNPROVEN"
+  },
+  "feeEdgeAnalysis": {
+    "currentRun": {
+      "expectedGrossEdgeRows": 0,
+      "expectedNetEdgeRows": 0,
+      "grossPositiveNetNegative": 0,
+      "feeDominantGroups": 0
+    },
+    "historicalEvidence": {
+      "trades": 51,
+      "grossPnL": -0.33651532,
+      "fees": 5.09837823,
+      "netPnL": -5.43489355,
+      "grossPositiveNetNegative": 11,
+      "feeDominanceClass": "FEE_DOMINANT"
+    },
+    "minimumEdgeToSurviveFees": {
+      "method": "Use existing fee model fields: expectedNetEdge = expectedGrossEdge - estimatedRoundTripFee",
+      "requiredCondition": "expectedGrossEdge > estimatedRoundTripFee",
+      "arbitraryConstantsUsed": false
+    }
+  },
+  "candidateQuality": {
+    "ranking": [
+      {
+        "feature": "momentum / shortMomentum",
+        "class": "FACT",
+        "evidence": "First-blocking distribution shows momentum-dominant policy blocks in latest run."
+      },
+      {
+        "feature": "technical",
+        "class": "FACT",
+        "evidence": "Technical is second-largest first-blocking component in latest run."
+      },
+      {
+        "feature": "confidence",
+        "class": "REPEATED_PATTERN",
+        "evidence": "Confidence appears as low-frequency blocker; repeated but sparse."
+      },
+      {
+        "feature": "regime",
+        "class": "HYPOTHESIS",
+        "evidence": "No direct first-blocking regime events in latest run."
+      },
+      {
+        "feature": "flow/sentiment/liquidity/volatility/EV/OI",
+        "class": "HYPOTHESIS",
+        "evidence": "No outcome-linked winner/loser sample in current run."
+      }
+    ]
+  },
+  "experiments": {
+    "regime": "BASELINE vs REGIME_AWARE (offline, one change each)",
+    "entry": "BASELINE_ENTRY vs ENTRY_QUALITY_FILTER (offline)",
+    "fee": "BASELINE vs FEE_AWARE using existing fee model",
+    "tdiCounterfactual": [
+      {
+        "gate": "technical only",
+        "sample": 290,
+        "baselineApproved": 0,
+        "counterfactualApproved": 13,
+        "baselineWait": 33,
+        "counterfactualWait": 20,
+        "netPnL": 0,
+        "expectancy": 0,
+        "verdict": "RESEARCH_CANDIDATE",
+        "note": "Trade outcomes remain unproven because closedTrades=0 in latest post-fix run."
+      },
+      {
+        "gate": "momentum only",
+        "sample": 290,
+        "baselineApproved": 0,
+        "counterfactualApproved": 19,
+        "baselineWait": 33,
+        "counterfactualWait": 14,
+        "netPnL": 0,
+        "expectancy": 0,
+        "verdict": "RESEARCH_CANDIDATE",
+        "note": "Trade outcomes remain unproven because closedTrades=0 in latest post-fix run."
+      },
+      {
+        "gate": "confidence only",
+        "sample": 290,
+        "baselineApproved": 0,
+        "counterfactualApproved": 1,
+        "baselineWait": 33,
+        "counterfactualWait": 32,
+        "netPnL": 0,
+        "expectancy": 0,
+        "verdict": "RESEARCH_CANDIDATE",
+        "note": "Trade outcomes remain unproven because closedTrades=0 in latest post-fix run."
+      },
+      {
+        "gate": "regime only",
+        "sample": 290,
+        "baselineApproved": 0,
+        "counterfactualApproved": 0,
+        "baselineWait": 33,
+        "counterfactualWait": 33,
+        "netPnL": 0,
+        "expectancy": 0,
+        "verdict": "NOT_EFFECTIVE",
+        "note": "Trade outcomes remain unproven because closedTrades=0 in latest post-fix run."
+      }
+    ],
+    "oos": {
+      "available": false,
+      "reason": "Insufficient rows for OOS split in latest run."
+    }
+  },
+  "aiQuality": {
+    "reachedAiRows": 290,
+    "evidenceQuality": "INSUFFICIENT",
+    "statement": "AI prediction quality evaluated only on AI-reached candidates; TDI-stopped candidates excluded."
+  },
+  "missedOpportunityValue": {
+    "counts": {
+      "NOT_DISCOVERED": 10,
+      "DISCOVERED_BUT_NOT_TRADED": 622,
+      "AI_REJECTED": 198
+    },
+    "positiveEstimatedRows": 0,
+    "analysisScope": "POST_ENTRY_ANALYSIS_ONLY"
+  },
+  "promotionGate": {
+    "status": "RESEARCH_ONLY",
+    "checks": [
+      "positive net expectancy improvement",
+      "no unacceptable drawdown increase",
+      "no safety regression",
+      "no look-ahead",
+      "no symbol overfit",
+      "no single-trade dependency",
+      "sufficient sample",
+      "OOS support where available"
+    ]
+  },
+  "levers": {
+    "PRIMARY_PROFIT_LEVER": {
+      "lever": "Reduce momentum-driven policy blocking only when expectedNetEdge remains positive",
+      "evidence": "TDI first-blocking counts: MOMENTUM=19, TECHNICAL=13, CONFIDENCE=1, REGIME=0",
+      "expectedImpact": "Potentially increases legitimate AI-reached opportunities; profitability impact unproven until closed trades appear.",
+      "risk": "Can increase low-quality entries if relaxed blindly.",
+      "confidence": "MEDIUM",
+      "validationRequirement": "Run single-gate counterfactual and require expectancy-safe OOS evidence before promotion."
+    },
+    "SECONDARY_PROFIT_LEVERS": [
+      {
+        "lever": "Fee-aware pre-trade edge validation",
+        "evidence": "Historical fees=5.09837823 vs grossPnL=-0.33651532 over 51 trades",
+        "expectedImpact": "Prevents gross-positive but net-negative trades.",
+        "risk": "May cut trade opportunities.",
+        "confidence": "MEDIUM",
+        "validationRequirement": "A/B on expectedNetEdge with no safety regression."
+      },
+      {
+        "lever": "Regime-aware strategy gating (offline first)",
+        "evidence": "Experiment harness exists but trade sample is zero.",
+        "expectedImpact": "Reduce mismatch entries in hostile regimes.",
+        "risk": "Overfitting to sparse data.",
+        "confidence": "LOW",
+        "validationRequirement": "Need >=20 closed trades and OOS support."
+      }
+    ],
+    "DO_NOT_CHANGE": [
+      "TDI thresholds directly in production",
+      "AI confidence thresholds",
+      "EV/risk/sizing limits",
+      "maxPositions",
+      "SL/TP and hard strategy enable/disable"
+    ]
+  },
+  "explicitAnswers": {
+    "q1_whatDestroysNetEdge": "Historical evidence shows fee drag dominates net edge; current run has no closed trades so active edge destruction is unobservable in-runtime.",
+    "q2_promisingStrategyRegime": "No profitability-proven combination in latest run; all strategy x regime cells remain NOT_ENOUGH_DATA for net edge.",
+    "q3_howMuchLostToFees": "Historical: grossPnL=-0.33651532, fees=5.09837823, netPnL=-5.43489355 on 51 trades; current run: fees=0 due zero trades.",
+    "q4_howMuchLostToEntryTiming": "Unquantified in latest run (no fills/closed trades). Entry timing remains RESEARCH_ONLY.",
+    "q5_winnerCorrelatedFeatures": "No winner sample in latest run; only blocker-side facts (momentum, technical) are repeatable.",
+    "q6_mostRestrictiveTdiGate": "MOMENTUM",
+    "q7_highestUpsideSingleChange": "Momentum-only gate relaxation is highest-upside research candidate by first-blocking frequency, pending expectancy-safe validation.",
+    "q8_changesMustNotBeMade": "Do not lower thresholds globally or force trade-count growth; do not deploy multi-change bundles without one-change evidence."
+  }
+}

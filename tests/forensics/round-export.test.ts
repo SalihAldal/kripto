@@ -58,11 +58,17 @@ describe("round forensic export", () => {
     expect(existsSync(path.join(result.rootDir, "round-summary.json"))).toBe(true);
     expect(existsSync(path.join(result.rootDir, "recovery-decisions.json"))).toBe(true);
     expect(existsSync(path.join(result.rootDir, "recovery-telemetry.json"))).toBe(true);
+    expect(existsSync(path.join(result.rootDir, "round-liveness.json"))).toBe(true);
+    expect(existsSync(path.join(result.rootDir, "selectionTimeBudgetBreakdown.json"))).toBe(true);
     expect(existsSync(path.join(result.rootDir, "candidate-trace.json"))).toBe(true);
     expect(existsSync(path.join(result.rootDir, "decision-trace.json"))).toBe(true);
     const summary = JSON.parse(readFileSync(path.join(result.rootDir, "round-summary.json"), "utf8"));
+    const liveness = JSON.parse(readFileSync(path.join(result.rootDir, "round-liveness.json"), "utf8"));
+    const budget = JSON.parse(readFileSync(path.join(result.rootDir, "selectionTimeBudgetBreakdown.json"), "utf8"));
     expect(summary.roundNo).toBe(14);
     expect(summary.failureCount).toBeGreaterThan(0);
     expect(summary.artifactRefs.scanner).toBe("scanner-summary.json");
+    expect(typeof liveness.remainingBudgetMs).toBe("number");
+    expect(budget.PRIMARY_TIME_CONSUMER).toBeTruthy();
   });
 });

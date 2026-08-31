@@ -1,0 +1,40 @@
+{
+  "variant": "VARIANT_D",
+  "basis": "existing timeout semantics and position-monitor close components only",
+  "components": [
+    {
+      "module": "src/server/execution/position-monitor.service.ts",
+      "function": "isExecutionTimedOut -> onClose(reason=TIMEOUT)",
+      "role": "runtime timeout trigger"
+    },
+    {
+      "module": "src/server/execution/execution-orchestrator.service.ts",
+      "function": "closePositionManually(reason=MANUAL_CLOSE)",
+      "role": "forced/system close path used by watchdog/pre-close"
+    },
+    {
+      "module": "src/server/forensics/exit-forensics.service.ts",
+      "function": "mapPositionMonitorExit",
+      "role": "semantic mapping MANUAL_CLOSE -> exitModel MANUAL_TIMEOUT"
+    }
+  ],
+  "precedence": {
+    "runtimePositionMonitor": "TP/SL + smart-exit checks + timeout + paper flatten",
+    "replayShadow": "same entry/path, timeout-oriented alternative exit timestamp where reconstructable",
+    "ambiguity": "EXIT_PRECEDENCE_AMBIGUOUS when exact trigger chronology unavailable"
+  },
+  "dataInputs": [
+    "entryTimestamp",
+    "entryPrice",
+    "quantity",
+    "maxDurationSec (if recorded)",
+    "historical post-entry path points",
+    "historical exit reason/model"
+  ],
+  "fallbackBehavior": "NOT_RECONSTRUCTABLE if path around timeout point missing",
+  "compatibility": "EXISTING_COMPONENTS_ONLY",
+  "researchOnlyNotes": [
+    "No production config/threshold changed",
+    "Counterfactual exits labeled COUNTERFACTUAL only"
+  ]
+}

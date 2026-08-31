@@ -1,0 +1,133 @@
+{
+  "splitMethod": "chronological 60/20/20",
+  "trainCutSource": "TRAIN only",
+  "EV_ONLY": [
+    {
+      "split": "TRAIN",
+      "sample": 149,
+      "highCount": 45,
+      "highExpectancy": -0.04844336,
+      "highNetPnL": -2.17995116,
+      "highWinRate": 0.177778,
+      "highLossRate": 0.822222,
+      "drawdown": 0.171961
+    },
+    {
+      "split": "VALIDATION",
+      "sample": 49,
+      "highCount": 22,
+      "highExpectancy": -0.04345499,
+      "highNetPnL": -0.95600985,
+      "highWinRate": 0.227273,
+      "highLossRate": 0.772727,
+      "drawdown": 0.140644
+    },
+    {
+      "split": "OOS",
+      "sample": 50,
+      "highCount": 12,
+      "highExpectancy": -0.0514033,
+      "highNetPnL": -0.6168396,
+      "highWinRate": 0.25,
+      "highLossRate": 0.75,
+      "drawdown": 0.14032455
+    }
+  ],
+  "LIQUIDITY_ONLY": [
+    {
+      "split": "TRAIN",
+      "sample": 149,
+      "highCount": 46,
+      "highExpectancy": -0.04214802,
+      "highNetPnL": -1.93880891,
+      "highWinRate": 0.086957,
+      "highLossRate": 0.913043,
+      "drawdown": 0.13806
+    },
+    {
+      "split": "VALIDATION",
+      "sample": 49,
+      "highCount": 7,
+      "highExpectancy": -0.06802165,
+      "highNetPnL": -0.47615154,
+      "highWinRate": 0.142857,
+      "highLossRate": 0.857143,
+      "drawdown": 0.1207675
+    },
+    {
+      "split": "OOS",
+      "sample": 50,
+      "highCount": 16,
+      "highExpectancy": -0.04834353,
+      "highNetPnL": -0.77349642,
+      "highWinRate": 0.25,
+      "highLossRate": 0.75,
+      "drawdown": 0.11244838
+    }
+  ],
+  "EV_X_LIQUIDITY": [
+    {
+      "split": "TRAIN",
+      "sample": 149,
+      "highCount": 47,
+      "highExpectancy": -0.0413091,
+      "highNetPnL": -1.94152788,
+      "highWinRate": 0.06383,
+      "highLossRate": 0.93617,
+      "drawdown": 0.1272834
+    },
+    {
+      "split": "VALIDATION",
+      "sample": 49,
+      "highCount": 13,
+      "highExpectancy": -0.06644052,
+      "highNetPnL": -0.86372672,
+      "highWinRate": 0.076923,
+      "highLossRate": 0.923077,
+      "drawdown": 0.12450375
+    },
+    {
+      "split": "OOS",
+      "sample": 50,
+      "highCount": 16,
+      "highExpectancy": -0.0476492,
+      "highNetPnL": -0.76238724,
+      "highWinRate": 0.25,
+      "highLossRate": 0.75,
+      "drawdown": 0.11128548
+    }
+  ],
+  "MOMENTUM_SCORE_BASELINE": [
+    {
+      "split": "TRAIN",
+      "sample": 149,
+      "highCount": 50,
+      "highExpectancy": -0.05220554,
+      "highNetPnL": -2.610277,
+      "highWinRate": 0.12,
+      "highLossRate": 0.88,
+      "drawdown": 0.189051
+    },
+    {
+      "split": "VALIDATION",
+      "sample": 49,
+      "highCount": 19,
+      "highExpectancy": -0.03749903,
+      "highNetPnL": -0.71248155,
+      "highWinRate": 0.263158,
+      "highLossRate": 0.736842,
+      "drawdown": 0.140644
+    },
+    {
+      "split": "OOS",
+      "sample": 50,
+      "highCount": 25,
+      "highExpectancy": -0.05386983,
+      "highNetPnL": -1.34674576,
+      "highWinRate": 0.24,
+      "highLossRate": 0.76,
+      "drawdown": 0.148152
+    }
+  ],
+  "lookaheadViolations": 0
+}

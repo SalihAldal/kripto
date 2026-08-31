@@ -31,6 +31,7 @@ export type ExitReplayResult = {
   tpLevel: number;
   slLevel: number;
   durationMs: number;
+  replayPrecedenceRule: "STOP_LOSS" | "TAKE_PROFIT";
 };
 
 function crossedLongTp(candle: ReplayCandle, tp: number) {
@@ -89,6 +90,7 @@ export function replayExitFromCandles(input: ExitReplayInput): ExitReplayResult 
           tpLevel: input.takeProfitPrice,
           slLevel: input.stopLossPrice,
           durationMs: Math.max(0, candle.timestamp - input.entryTimestamp),
+          replayPrecedenceRule: precedence,
         };
       }
       return {
@@ -101,6 +103,7 @@ export function replayExitFromCandles(input: ExitReplayInput): ExitReplayResult 
         tpLevel: input.takeProfitPrice,
         slLevel: input.stopLossPrice,
         durationMs: Math.max(0, candle.timestamp - input.entryTimestamp),
+        replayPrecedenceRule: precedence,
       };
     }
     if (slHit) {
@@ -114,6 +117,7 @@ export function replayExitFromCandles(input: ExitReplayInput): ExitReplayResult 
         tpLevel: input.takeProfitPrice,
         slLevel: input.stopLossPrice,
         durationMs: Math.max(0, candle.timestamp - input.entryTimestamp),
+        replayPrecedenceRule: precedence,
       };
     }
     if (tpHit) {
@@ -127,6 +131,7 @@ export function replayExitFromCandles(input: ExitReplayInput): ExitReplayResult 
         tpLevel: input.takeProfitPrice,
         slLevel: input.stopLossPrice,
         durationMs: Math.max(0, candle.timestamp - input.entryTimestamp),
+        replayPrecedenceRule: precedence,
       };
     }
   }
@@ -151,6 +156,7 @@ export function replayExitFromCandles(input: ExitReplayInput): ExitReplayResult 
       tpLevel: input.takeProfitPrice,
       slLevel: input.stopLossPrice,
       durationMs: Math.max(0, effectiveEndTimestamp - input.entryTimestamp),
+      replayPrecedenceRule: precedence,
     };
   }
   return null;

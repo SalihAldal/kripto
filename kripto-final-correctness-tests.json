@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-08-28T15:01:35.592Z",
+  "results": [
+    {
+      "id": 1,
+      "name": "isPaperApprovedLane uses resolved Paper profile",
+      "status": "PASS"
+    },
+    {
+      "id": 2,
+      "name": "selectPaperPumpLaneCandidates uses same profile",
+      "status": "PASS"
+    },
+    {
+      "id": 3,
+      "name": "no 50/70 mismatch",
+      "status": "PASS"
+    },
+    {
+      "id": 4,
+      "name": "usePaperProfile propagation",
+      "status": "PASS"
+    },
+    {
+      "id": 5,
+      "name": "TDI → AI routing",
+      "status": "PASS"
+    },
+    {
+      "id": 6,
+      "name": "TDI bypass detection",
+      "status": "PASS"
+    },
+    {
+      "id": 7,
+      "name": "candidateId consistency",
+      "status": "PASS"
+    },
+    {
+      "id": 8,
+      "name": "roundId consistency",
+      "status": "PASS"
+    },
+    {
+      "id": 9,
+      "name": "AI NO_TRADE classification",
+      "status": "PASS"
+    },
+    {
+      "id": 10,
+      "name": "NO_TRADE state machine",
+      "status": "PASS"
+    },
+    {
+      "id": 11,
+      "name": "no unnecessary downstream AI path",
+      "status": "PASS"
+    },
+    {
+      "id": 12,
+      "name": "no symbol binding on terminal NO_TRADE",
+      "status": "PASS"
+    },
+    {
+      "id": 13,
+      "name": "historical 42 profitable replay",
+      "status": "PASS"
+    },
+    {
+      "id": 14,
+      "name": "historical 206 loss replay",
+      "status": "PASS"
+    },
+    {
+      "id": 15,
+      "name": "2278 candidate replay",
+      "status": "PASS"
+    },
+    {
+      "id": 16,
+      "name": "37 top-gainer replay",
+      "status": "PASS"
+    },
+    {
+      "id": 17,
+      "name": "no AI VETO change",
+      "status": "PASS"
+    },
+    {
+      "id": 18,
+      "name": "no threshold change",
+      "status": "PASS"
+    }
+  ],
+  "allPass": true
+}

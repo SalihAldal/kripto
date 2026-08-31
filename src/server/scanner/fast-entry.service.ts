@@ -9,12 +9,13 @@ import { traceCandidateFailed, traceCandidateReject, traceCandidateWait } from "
 import { env } from "@/lib/config";
 import { getRuntimeExecutionContext } from "@/src/server/repositories/execution.repository";
 import { getAdaptiveExecutionPolicy } from "@/src/server/metrics/performance.service";
-import { runScannerPipeline } from "@/src/server/scanner/scanner.service";
 import { buildMarketContext } from "@/src/server/scanner/market-context-builder";
 import { scoreContext } from "@/src/server/scanner/signal-scoring.engine";
 import { formatAIRequest } from "@/src/server/scanner/ai-request-formatter";
 import { runAIConsensusFromInput } from "@/src/server/ai/analysis-orchestrator";
 import { getRuntimeStrategyParams } from "@/src/server/config/strategy-runtime.service";
+import { getOpportunityEngine } from "@/src/server/opportunity/opportunity-engine";
+import { getMicrostructureEngine } from "@/src/server/microstructure/microstructure-engine";
 import { resolveMinimumProtectedProfitPercent } from "@/src/server/execution/profit-thresholds";
 import { evaluateMomentumBreakout, resolveEffectiveShortMomentum } from "@/src/server/scanner/momentum-breakout.service";
 import { isFakeHourOnlyPump, isStrongHourPumpContext } from "@/src/server/trading-core/entry-filters/paper-entry-quality.service";
@@ -23,14 +24,13 @@ import {
   formatPumpEntrySafetyReason,
 } from "@/src/server/trading-core/entry-filters/pump-entry-safety.service";
 import {
-  ensurePumpEarlyCatcherStarted,
   getActivePumpEarlyCandidate,
   getCachedPumpCandidates,
   resolveLiveTopGainerPumpCandidates,
   resolvePumpRoundMaxWaitSec,
   type PumpEarlyCandidate,
 } from "@/src/server/scanner/pump-early-catcher.service";
-import type { ScannerCandidate, ScannerPipelineResult } from "@/src/types/scanner";
+import type { ScannerCandidate } from "@/src/types/scanner";
 import type { AsyncRuntimeTelemetry } from "@/src/server/execution/cooperative-async.service";
 import {
   resolveAiConsensusTimeoutMs,
@@ -38,6 +38,17 @@ import {
   startPeriodicRuntimeHeartbeat,
   withBoundedAwait,
 } from "@/src/server/execution/cooperative-async.service";
+import type { TopGainerMarketDataEvent } from "@/src/server/scanner/top-gainer-discovery.service";
+import {
+  resolveTopGainerPumpPriorityThreshold,
+  isPaperExecutionContext,
+  isTopGainerPumpSignal,
+} from "@/src/server/scanner/paper-lane-profile";
+
+export {
+  PAPER_TOP_GAINER_PRIORITY_THRESHOLD,
+  LIVE_TOP_GAINER_PRIORITY_THRESHOLD,
+} from "@/src/server/scanner/paper-lane-profile";
 
 export type FastEntryResult = {
   selected: ScannerCandidate | null;
@@ -100,6 +111,18 @@ export type FastEntryRuntimeHooks = {
   }) => void | Promise<void>;
   onHeartbeat?: () => void | Promise<void>;
   onProgress?: () => void | Promise<void>;
+  onRuntimeProgress?: (patch: {
+    lastScannerProgressAt?: string;
+    lastMarketDataProgressAt?: string;
+    lastAIProgressAt?: string;
+    scannerSymbolsProcessed?: number;
+    marketDataRequests?: number;
+    marketDataFailures?: number;
+    fallbackCount?: number;
+    degradedCandidates?: number;
+    aiProcessed?: number;
+  }) => void | Promise<void>;
+  onMarketDataEvent?: (event: TopGainerMarketDataEvent) => void | Promise<void>;
   asyncTelemetry?: AsyncRuntimeTelemetry;
   shouldAbort?: () => void;
   abortSignal?: AbortSignal;
@@ -126,6 +149,8 @@ function buildScannerPipelineRuntime(
     abortSignal: runtime?.abortSignal,
     onHeartbeat: runtime?.onHeartbeat,
     onProgress: runtime?.onProgress,
+    onRuntimeProgress: runtime?.onRuntimeProgress,
+    onMarketDataEvent: runtime?.onMarketDataEvent,
     telemetry: runtime?.asyncTelemetry,
     onCheckpoint: runtime?.onScannerCheckpoint,
     roundId: runtime?.roundId,
@@ -159,20 +184,15 @@ function isTryQuotedSymbol(symbol: string) {
   return symbol.toUpperCase().endsWith("TRY");
 }
 
-function isPaperApprovedLane(candidate: ScannerCandidate) {
-  const isPaper = env.EXECUTION_MODE === "paper";
+function isPaperApprovedLane(candidate: ScannerCandidate, usePaperProfile?: boolean) {
+  const isPaper = isPaperExecutionContext(usePaperProfile);
   const explanation = String(candidate.ai?.explanation ?? "").toLowerCase();
   const meta = candidate.context.metadata;
   const change24h = Number(meta.topGainerChange24h ?? candidate.context.change24h ?? 0);
   const shortMomentum = Number(meta.shortMomentumPercent ?? 0);
   const hourMomentum = Number(meta.hourMomentumPercent ?? 0);
   const shortFlow = Number(meta.shortFlowImbalance ?? 0);
-  const topGainerPump =
-    Boolean(meta.topGainerDiscovery ?? false) ||
-    Boolean(meta.pumpEarlyConfirmed ?? false) ||
-    Boolean(meta.pumpContinuationMode ?? false) ||
-    Boolean(meta.pumpIntradaySpike ?? false) ||
-    Number(meta.topGainerPriorityScore ?? 0) >= (isPaper ? 50 : 70);
+  const topGainerPump = isTopGainerPumpSignal(meta as Record<string, unknown>, usePaperProfile);
   // TRY: paper modda eşikler gevşetildi
   const metricPumpLane =
     topGainerPump &&
@@ -215,7 +235,7 @@ function isPaperApprovedLane(candidate: ScannerCandidate) {
     metricPumpLane ||
     steadyGainLane ||
     paperBasicLane ||
-    passesPaperLastResortQuality(candidate)
+    passesPaperLastResortQuality(candidate, usePaperProfile)
   );
 }
 
@@ -229,19 +249,14 @@ function resolveCandidateCompositeScore(candidate: ScannerCandidate) {
   return Number(candidate.ai?.finalConfidence ?? candidate.score.confidence ?? 0);
 }
 
-function summarizePaperPumpCandidate(candidate: ScannerCandidate) {
+function summarizePaperPumpCandidate(candidate: ScannerCandidate, usePaperProfile?: boolean) {
   const meta = candidate.context.metadata;
   const breakout = evaluateMomentumBreakout(candidate.context);
   const change24h = Number(meta.topGainerChange24h ?? candidate.context.change24h ?? 0);
   const tapeMomentum = Number(meta.shortMomentumPercent ?? 0);
   const hourMomentum = Number(meta.hourMomentumPercent ?? 0);
   const shortFlow = Number(meta.shortFlowImbalance ?? 0);
-  const topGainerPump =
-    Boolean(meta.topGainerDiscovery ?? false) ||
-    Boolean(meta.pumpEarlyConfirmed ?? false) ||
-    Boolean(meta.pumpContinuationMode ?? false) ||
-    Boolean(meta.pumpIntradaySpike ?? false) ||
-    Number(meta.topGainerPriorityScore ?? 0) >= 70;
+  const topGainerPump = isTopGainerPumpSignal(meta as Record<string, unknown>, usePaperProfile);
   const pumpSafety = evaluatePumpEntrySafety({
     context: candidate.context,
     tapeMomentum,
@@ -304,8 +319,8 @@ function isChopLikeCandidate(candidate: ScannerCandidate) {
   );
 }
 
-function passesPaperLastResortQuality(candidate: ScannerCandidate) {
-  const isPaper = env.EXECUTION_MODE === "paper";
+function passesPaperLastResortQuality(candidate: ScannerCandidate, usePaperProfile?: boolean) {
+  const isPaper = isPaperExecutionContext(usePaperProfile);
   if (!isPaper && isChopLikeCandidate(candidate)) return false;
   if (isPaper) {
     const isStable = ["USDTTRY", "USDCTRY", "BUSDTRY", "TUSDTRY", "DAITRY"].includes(
@@ -439,32 +454,7 @@ function momentumWindowOk(candidate: ScannerCandidate, relaxed: boolean) {
 }
 
 function withMomentumBreakoutOverride(candidate: ScannerCandidate): ScannerCandidate {
-  const breakout = evaluateMomentumBreakout(candidate.context);
-  if (!breakout.ok || !candidate.ai || breakout.direction === "NONE") return candidate;
-  if (candidate.ai.finalDecision === breakout.direction && !candidate.ai.rejected) return candidate;
-  const confidence = Math.max(
-    Number(candidate.ai.finalConfidence ?? 0),
-    Number(candidate.ai.analysisScorecard?.confidenceScore ?? 0),
-    Math.min(78, Math.max(58, breakout.score)),
-  );
-  return {
-    ...candidate,
-    ai: {
-      ...candidate.ai,
-      finalDecision: breakout.direction,
-      finalConfidence: confidence,
-      rejected: false,
-      explanation: `${candidate.ai.explanation ?? "ai no-trade"} | momentum-breakout=${breakout.direction}, stage=${breakout.stage}, score=${breakout.score}`,
-      analysisScorecard: candidate.ai.analysisScorecard
-        ? {
-            ...candidate.ai.analysisScorecard,
-            direction: breakout.direction,
-            confidenceScore: Math.max(Number(candidate.ai.analysisScorecard.confidenceScore ?? 0), confidence),
-            riskLevel: candidate.ai.analysisScorecard.riskLevel === "HIGH" && breakout.stage !== "LATE" ? "MEDIUM" : candidate.ai.analysisScorecard.riskLevel,
-          }
-        : candidate.ai.analysisScorecard,
-    },
-  };
+  return candidate;
 }
 
 function resolvePumpAdaptiveDurationSec(context: ScannerCandidate["context"], requested?: number) {
@@ -507,9 +497,18 @@ async function confirmPumpEarlyCandidate(input: {
     input.runtime?.shouldAbort?.();
     const liveContext = await withBoundedAwait(
       `pump-context:${input.base.context.symbol}`,
-      buildMarketContext(input.base.context.symbol, { lite: false, priority: "critical" }),
+      (signal) =>
+        buildMarketContext(input.base.context.symbol, {
+          lite: false,
+          priority: "critical",
+          signal,
+          timeoutMs: resolveMarketContextTimeoutMs(),
+          allowBackgroundIntelCapture: false,
+        }),
       resolveMarketContextTimeoutMs(),
       input.runtime?.asyncTelemetry,
+      undefined,
+      { signal: input.runtime?.abortSignal },
     );
   const adaptiveDurationSec = resolvePumpAdaptiveDurationSec(liveContext, input.maxDurationSec);
   const breakout = evaluateMomentumBreakout(liveContext);
@@ -621,9 +620,11 @@ async function confirmPumpEarlyCandidate(input: {
   await input.runtime?.onAiAnalysis?.(liveContext.symbol, "started");
   const ai = await withBoundedAwait(
     `pump-ai:${liveContext.symbol}`,
-    runAIConsensusFromInput(aiInput),
+    () => runAIConsensusFromInput(aiInput),
     resolveAiConsensusTimeoutMs(),
     input.runtime?.asyncTelemetry,
+    undefined,
+    { signal: input.runtime?.abortSignal },
   );
   await input.runtime?.onAiAnalysis?.(liveContext.symbol, "completed", ai.finalDecision);
   const riskVeto = Boolean(ai.roleScores?.find((row) => row.role === "AI-3_RISK")?.veto);
@@ -729,32 +730,7 @@ async function confirmPumpEarlyCandidate(input: {
     return null;
   }
   const aiBuy = ai.finalDecision === "BUY" && !ai.rejected && ai.finalConfidence >= (stillContinuation ? 40 : 45);
-  const highQualityOverride =
-    !aiBuy &&
-    ai.finalRiskScore <= (stillContinuation ? 72 : 64) &&
-    breakout.score >= (stillContinuation ? 75 : 72) &&
-    shortMomentum >= (stillContinuation ? 0.75 : 1.2) &&
-    shortFlow >= (stillContinuation ? 0.28 : 0.08);
-  const continuationOverride =
-    stillContinuation &&
-    !aiBuy &&
-    !riskVeto &&
-    change24h >= minChange24h &&
-    shortMomentum >= Math.max(minMomentum, 0.55) &&
-    ai.finalRiskScore <= 80 &&
-    String(liveContext.metadata.marketRegime ?? "RANGE_SIDEWAYS") !== "RANGE_SIDEWAYS";
-  const strongGainerBypass =
-    stillContinuation &&
-    !aiBuy &&
-    !riskVeto &&
-    change24h >= 28 &&
-    shortMomentum >= 0.55 &&
-    shortFlow >= 0.12 &&
-    liveContext.spreadPercent <= 0.32 &&
-    ai.finalRiskScore <= 82 &&
-    compositeAvg >= 62 &&
-    (technicalRole >= 52 || change24h >= 35);
-  if (!aiBuy && !highQualityOverride && !continuationOverride && !strongGainerBypass) {
+  if (!aiBuy) {
     tracePumpCandidateReject(
       input.base.context.symbol,
       "PUMP_NO_BUY_SIGNAL",
@@ -811,54 +787,33 @@ function selectTradableCandidates(
   policy: { minConfidence: number; requireUnanimous: boolean },
   options?: { relaxed?: boolean; paperMode?: boolean },
 ) {
-  const relaxed = options?.relaxed ?? false;
   const paperMode = options?.paperMode ?? false;
   const baseMinConfidence = env.AI_ULTRA_PRECISION_MODE
     ? Math.max(policy.minConfidence, env.AI_SPOT_MIN_CONFIDENCE_ULTRA)
     : policy.minConfidence;
-  const minConfidence = relaxed ? Math.max(50, baseMinConfidence - 25) : baseMinConfidence;
-  const maxSpike = relaxed ? 2.8 : 2.2;
+  const minConfidence = baseMinConfidence;
+  const maxSpike = 2.2;
   const baseMaxSpread = Math.max(0.12, env.SCANNER_MAX_SPREAD_PERCENT);
-  const maxSpread = relaxed ? Math.min(0.35, baseMaxSpread + 0.07) : Math.min(0.3, baseMaxSpread);
-  // tradeVelocity skoru bazi sembollerde oldukca dusuk scale donuyor; production'da asiri elememek icin esik yumusatildi.
-  const minVelocity = relaxed ? 0.015 : 0.035;
-  const minFlow = relaxed ? 0.012 : 0.02;
+  const maxSpread = Math.min(0.3, baseMaxSpread);
+  const minVelocity = 0.035;
+  const minFlow = 0.02;
 
-  const normalized = candidates
-    .map<ScannerCandidate | null>((candidate) => {
-      if (!candidate.ai) return null;
-      if (env.EXECUTION_MODE === "live" && env.BINANCE_PLATFORM === "tr" && candidate.ai.finalDecision !== "BUY") {
-        const breakout = evaluateMomentumBreakout(candidate.context);
-        if (!breakout.ok || breakout.direction !== "BUY") return null;
-      }
-      if (!candidate.ai.rejected && (candidate.ai.finalDecision === "BUY" || candidate.ai.finalDecision === "SELL")) {
-        return candidate;
-      }
-      const breakout = evaluateMomentumBreakout(candidate.context);
-      if (!breakout.ok) return null;
-      const regime = String(candidate.context.metadata.marketRegime ?? "RANGE_SIDEWAYS");
-      if (paperMode && regime === "RANGE_SIDEWAYS") return null;
-      if (paperMode && breakout.score < 58) return null;
-      if (paperMode) {
-        const roles = candidate.ai.roleScores ?? [];
-        const sentiment = Number(roles.find((row) => row.role === "AI-2_SENTIMENT")?.score ?? 0);
-        if (sentiment > 0 && sentiment < 58) return null;
-      }
-      return withMomentumBreakoutOverride(candidate);
-    })
-    .filter((x): x is ScannerCandidate => Boolean(x));
+  const normalized = candidates.filter((candidate) => {
+    if (candidate.score.status === "REJECTED" && !evaluateMomentumBreakout(candidate.context).ok) return false;
+    const regime = String(candidate.context.metadata.marketRegime ?? "RANGE_SIDEWAYS");
+    if (paperMode && regime === "RANGE_SIDEWAYS") return false;
+    return true;
+  });
 
   return normalized
     .map((candidate) => ({
       candidate,
-      window: evaluateProfitWindow(candidate, relaxed),
+      window: evaluateProfitWindow(candidate, false),
     }))
     .filter(({ candidate }) => {
-      const degraded = isAiOutputDegraded(candidate);
-      const candidateMinConfidence = degraded
-        ? Math.max(40, minConfidence - 16)
-        : minConfidence;
-      return (candidate.ai?.finalConfidence ?? 0) >= candidateMinConfidence;
+      const scannerConfidence = Number(candidate.score.confidence ?? 0);
+      const aiConfidence = Number(candidate.ai?.finalConfidence ?? 0);
+      return Math.max(scannerConfidence, aiConfidence) >= Math.max(40, minConfidence - 8);
     })
     .filter(({ candidate }) => candidate.context.fakeSpikeScore <= maxSpike)
     .filter(({ candidate }) => {
@@ -867,16 +822,15 @@ function selectTradableCandidates(
       const volume = Number(candidate.context.volume24h ?? 0);
       let adaptiveSpreadLimit = maxSpread;
       if (regime === "HIGH_VOLATILITY_CHAOS" || regime === "NEWS_DRIVEN_UNSTABLE") {
-        adaptiveSpreadLimit = Math.min(adaptiveSpreadLimit, relaxed ? 0.2 : 0.16);
+        adaptiveSpreadLimit = Math.min(adaptiveSpreadLimit, 0.16);
       }
       if (volume >= env.SCANNER_MIN_VOLUME_24H * 6 && tfAlignment >= 72) {
         adaptiveSpreadLimit = Math.min(0.35, adaptiveSpreadLimit + 0.04);
       }
-      const breakout = evaluateMomentumBreakout(candidate.context);
-      return candidate.context.spreadPercent <= adaptiveSpreadLimit || (breakout.ok && candidate.context.spreadPercent <= 0.22);
+      return candidate.context.spreadPercent <= adaptiveSpreadLimit;
     })
     .filter(({ candidate }) => Number(candidate.context.metadata.tradeVelocity ?? 0) >= minVelocity)
-    .filter(({ candidate }) => Math.abs(Number(candidate.context.metadata.shortFlowImbalance ?? 0)) >= minFlow)
+    .filter(({ candidate }) => Number(candidate.context.metadata.shortFlowImbalance ?? 0) >= minFlow)
     .filter(({ candidate }) => String(candidate.context.metadata.marketRegime ?? "RANGE_SIDEWAYS") !== "LOW_VOLUME_DEAD_MARKET")
     .filter(({ candidate }) => {
       const regime = String(candidate.context.metadata.marketRegime ?? "RANGE_SIDEWAYS");
@@ -887,10 +841,10 @@ function selectTradableCandidates(
     .filter(({ candidate }) => {
       const regime = String(candidate.context.metadata.marketRegime ?? "RANGE_SIDEWAYS");
       if (regime !== "LOW_VOLATILITY_CALM") return true;
-      const shortMomentum = Math.abs(Number(candidate.context.metadata.shortMomentumPercent ?? 0));
+      const shortMomentum = Number(candidate.context.metadata.shortMomentumPercent ?? 0);
       return shortMomentum >= 0.08;
     })
-    .filter(({ candidate, window }) => window.ok || momentumWindowOk(candidate, relaxed))
+    .filter(({ candidate, window }) => window.ok || momentumWindowOk(candidate, false))
     .filter(({ candidate }) =>
       policy.requireUnanimous ? isUnanimousDecision(candidate, candidate.ai?.finalDecision ?? "HOLD") : true,
     )
@@ -1190,7 +1144,11 @@ function selectPaperSteadyGainCandidates(candidates: ScannerCandidate[], minConf
     .sort((a, b) => rankForFastEntry(b) - rankForFastEntry(a));
 }
 
-function selectPaperPumpLaneCandidates(candidates: ScannerCandidate[], minConfidence: number) {
+function selectPaperPumpLaneCandidates(
+  candidates: ScannerCandidate[],
+  minConfidence: number,
+  usePaperProfile?: boolean,
+) {
   return candidates
     .filter((candidate) => candidate.ai && !candidate.ai.rejected)
     .filter((candidate) => isTryQuotedSymbol(candidate.context.symbol))
@@ -1205,12 +1163,7 @@ function selectPaperPumpLaneCandidates(candidates: ScannerCandidate[], minConfid
       const shortFlow = Number(meta.shortFlowImbalance ?? 0);
       const change24h = Number(meta.topGainerChange24h ?? candidate.context.change24h ?? 0);
       const marketRegime = String(meta.marketRegime ?? "RANGE_SIDEWAYS");
-      const topGainerPump =
-        Boolean(meta.topGainerDiscovery ?? false) ||
-        Boolean(meta.pumpEarlyConfirmed ?? false) ||
-        Boolean(meta.pumpContinuationMode ?? false) ||
-        Boolean(meta.pumpIntradaySpike ?? false) ||
-        Number(meta.topGainerPriorityScore ?? 0) >= 70;
+      const topGainerPump = isTopGainerPumpSignal(meta as Record<string, unknown>, usePaperProfile);
       const roleScores = ai.roleScores ?? [];
       const technical = Number(roleScores.find((x) => x.role === "AI-1_TECHNICAL")?.score ?? 0);
       const sentiment = Number(roleScores.find((x) => x.role === "AI-2_SENTIMENT")?.score ?? 0);
@@ -1316,7 +1269,16 @@ async function confirmFocusedCandidate(
   minConfidence: number,
 ) {
   try {
-    const context = await buildMarketContext(candidate.context.symbol);
+    const context = await withBoundedAwait(
+      `focus-context:${candidate.context.symbol}`,
+      (signal) =>
+        buildMarketContext(candidate.context.symbol, {
+          signal,
+          timeoutMs: resolveMarketContextTimeoutMs(),
+          allowBackgroundIntelCapture: false,
+        }),
+      resolveMarketContextTimeoutMs(),
+    );
     const score = scoreContext(context);
     const aiInput = await formatAIRequest(
       context,
@@ -1328,7 +1290,7 @@ async function confirmFocusedCandidate(
     );
     const ai = await withBoundedAwait(
       `focus-ai-consensus:${candidate.context.symbol}`,
-      runAIConsensusFromInput(aiInput),
+      () => runAIConsensusFromInput(aiInput),
       resolveAiConsensusTimeoutMs(),
     );
     if (ai.rejected) {
@@ -1419,7 +1381,16 @@ async function buildEmergencyCandidates(strategyParams?: Record<string, unknown>
 
   for (const symbol of symbols) {
     try {
-      const context = await buildMarketContext(symbol);
+      const context = await withBoundedAwait(
+        `emergency-context:${symbol}`,
+        (signal) =>
+          buildMarketContext(symbol, {
+            signal,
+            timeoutMs: resolveMarketContextTimeoutMs(),
+            allowBackgroundIntelCapture: false,
+          }),
+        resolveMarketContextTimeoutMs(),
+      );
       const score = scoreContext(context);
       const aiInput = await formatAIRequest(
         context,
@@ -1429,7 +1400,11 @@ async function buildEmergencyCandidates(strategyParams?: Record<string, unknown>
         },
         undefined,
       );
-      const ai = await runAIConsensusFromInput(aiInput);
+      const ai = await withBoundedAwait(
+        `emergency-ai:${symbol}`,
+        () => runAIConsensusFromInput(aiInput),
+        resolveAiConsensusTimeoutMs(),
+      );
       rows.push({
         rank: rows.length + 1,
         context,
@@ -1522,15 +1497,23 @@ async function selectPumpFastEntry(input: {
   );
   recordPumpScanEvent({
     kind: "start",
+    phase: "start",
     scope: "cache",
+    reasonCode: "PUMP_SCAN_COMPLETE",
+    fallbackUsed: "none",
+    source: "cache",
     message: "Pump fast entry selection started",
     meta: { excludedCount: input.excludedSymbols.size },
   });
   const cached = getCachedPumpCandidates(24);
   recordPumpScanEvent({
     kind: "cache_scan",
+    phase: "cacheScan",
     scope: "cache",
     candidateCount: cached.length,
+    reasonCode: cached.length > 0 ? "PUMP_SCAN_COMPLETE" : "PUMP_SCAN_CACHE_FALLBACK",
+    fallbackUsed: cached.length > 0 ? "none" : "live_pump_scan",
+    source: "cache",
     message: `Pump cache scan complete (${cached.length} candidates)`,
   });
   const cachedHit = await tryList(cached, "cache");
@@ -1558,22 +1541,57 @@ async function selectPumpFastEntry(input: {
     try {
       liveCandidates = await runBoundedLivePumpScan(
         "resolveLiveTopGainerPumpCandidates",
-        () => resolveLiveTopGainerPumpCandidates({ limit: 24 }),
+        (signal) =>
+          resolveLiveTopGainerPumpCandidates({
+            limit: 24,
+            abortSignal: signal,
+            selectionDeadlineMs: input.runtime?.selectionDeadlineMs,
+            maxSymbolsToEvaluate: Math.max(24, Math.min(72, env.PUMP_CONTINUATION_SCAN_LIMIT)),
+            onProgress: async (processed, total) => {
+              await input.runtime?.onPumpScan?.("live", total, Math.max(0, total - processed));
+            },
+          }),
         {
           selectionDeadlineMs: input.runtime?.selectionDeadlineMs,
           telemetry: input.runtime?.asyncTelemetry,
           scope: "live",
+          abortSignal: input.runtime?.abortSignal,
         },
       );
     } catch (error) {
       if (error instanceof PumpScanFailedError) {
         recordPumpScanEvent({
-          kind: "failed",
+          kind: error.blockKind === "timer" ? "timeout" : "failed",
+          phase: error.blockKind === "timer" ? "timeout" : undefined,
           scope: "live",
           blockKind: error.blockKind,
+          reasonCode:
+            error.blockKind === "timer"
+              ? "PUMP_SCAN_TIMEOUT"
+              : error.blockKind === "network"
+                ? "PUMP_SCAN_NETWORK_ERROR"
+                : "PUMP_SCAN_ERROR",
+          fallbackUsed: "scanner_rotation",
+          source: "live",
           message: error.message,
         });
-        throw error;
+        traceCandidateWait({
+          symbol: "PUMP_SCAN",
+          stage: "scanner",
+          reasonCode:
+            error.blockKind === "timer" ? "PUMP_SCAN_TIMEOUT" : "PUMP_SCAN_NETWORK_ERROR",
+          reasonDetail: `${error.message} -> fallback=scanner_rotation`,
+        });
+        recordPumpScanEvent({
+          kind: "fallback",
+          phase: "fallback",
+          scope: "live",
+          reasonCode: "PUMP_SCAN_CACHE_FALLBACK",
+          fallbackUsed: "scanner_rotation",
+          source: "rotation",
+          message: "Pump live scan failed; falling back to normal rotation scanner",
+        });
+        return null;
       }
       throw error;
     }
@@ -1598,7 +1616,11 @@ async function selectPumpFastEntry(input: {
   }
   recordPumpScanEvent({
     kind: "end",
+    phase: "end",
     scope: "live",
+    reasonCode: "PUMP_SCAN_EMPTY",
+    fallbackUsed: "safe_empty",
+    source: "live",
     message: "Pump fast entry selection finished without match",
   });
   traceCandidateWait({
@@ -1611,7 +1633,6 @@ async function selectPumpFastEntry(input: {
 }
 
 export async function getBestFastEntry(options?: FastEntryOptions): Promise<FastEntryResult> {
-  ensurePumpEarlyCatcherStarted();
   const originalCycleLimit = env.SCANNER_CYCLE_SYMBOL_LIMIT;
   const requestedScanLimit = Number(options?.scanLimit ?? env.EXECUTION_MANUAL_SCAN_SYMBOL_LIMIT);
   const manualCycleLimit = Math.min(
@@ -1635,8 +1656,6 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
     requireUnanimous: Boolean(policy.requireUnanimous ?? env.EXECUTION_FAST_REQUIRE_UNANIMOUS),
   };
   const usePaperProfile = options?.forcePaperProfile || env.EXECUTION_MODE === "paper";
-  const executionMode = usePaperProfile ? "paper" : env.EXECUTION_MODE;
-  const strategyParams = { ...runtimeStrategy, executionMode };
   if (!usePaperProfile && Number(options?.maxDurationSec ?? 0) > 0 && Number(options?.maxDurationSec ?? 0) <= 3600) {
     effectivePolicy.minConfidence = Math.min(effectivePolicy.minConfidence, 55);
     effectivePolicy.requireUnanimous = false;
@@ -1648,355 +1667,51 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
   if (effectivePolicy.requireUnanimous === undefined || effectivePolicy.requireUnanimous === null) {
     effectivePolicy.requireUnanimous = false;
   }
-  const focusMinConfidence = usePaperProfile
-    ? Math.max(48, effectivePolicy.minConfidence - 4)
-    : effectivePolicy.minConfidence;
-
   const excludedSymbols = new Set((options?.excludeSymbols ?? []).map((x) => x.trim().toUpperCase()).filter(Boolean));
-  const maxScanCycles = Math.max(1, Math.min(8, Number(options?.scanCycles ?? 3)));
-  let scan: ScannerPipelineResult | null = null;
-  let lastResult: FastEntryResult | null = null;
 
-  const pumpHit = options?.skipInitialPumpPass
-    ? null
-    : await selectPumpFastEntry({
-        excludedSymbols,
-        runtimeStrategy: strategyParams,
-        maxDurationSec: options?.maxDurationSec,
-        minConfidence: effectivePolicy.minConfidence,
-        includeLiveScan: true,
-        runtime: options?.runtime,
-      });
-  if (pumpHit) return pumpHit;
+  await options?.runtime?.ensureActive?.();
+  options?.runtime?.shouldAbort?.();
+  await options?.runtime?.onFullScan?.(1, 1);
 
-  const tradableOptions = { paperMode: usePaperProfile };
-  const useScannerAttach = !(options?.runtime?.forceFreshScanner ?? false);
-
-  for (let cycle = 0; cycle < maxScanCycles; cycle += 1) {
-    await options?.runtime?.ensureActive?.();
-    options?.runtime?.shouldAbort?.();
-    await options?.runtime?.onFullScan?.(cycle + 1, maxScanCycles);
-    if (!scan || scan.candidates.length === 0 || cycle > 0) {
-      scan = await runScannerPipeline(undefined, {
-        includeAi: true,
-        persist: false,
-        persistRejected: false,
-        executionMode,
-        runtime: buildScannerPipelineRuntime(options?.runtime, useScannerAttach),
-      });
-    }
-    if (scan.totalSymbols === 0 || scan.candidates.length === 0) {
-      scan = await runScannerPipeline(undefined, {
-        includeAi: true,
-        persist: false,
-        persistRejected: false,
-        executionMode,
-        runtime: buildScannerPipelineRuntime(options?.runtime, false),
-      });
-    }
-    const candidatePoolRaw =
-      scan.candidates.length > 0 ? scan.candidates : await buildEmergencyCandidates(strategyParams);
-    const candidatePool =
-      excludedSymbols.size > 0
-        ? candidatePoolRaw.filter((row) => !excludedSymbols.has(row.context.symbol.toUpperCase()))
-        : candidatePoolRaw;
-
-    const primary = selectTradableCandidates(candidatePool, effectivePolicy, tradableOptions);
-    let tradable = usePaperProfile
-      ? primary.filter(isPaperApprovedLane)
-      : primary;
-    let fallbackUsed = false;
-    if (!usePaperProfile && !env.AI_ULTRA_DISABLE_RELAXED_FALLBACK && tradable.length === 0 && candidatePool.length > 0) {
-      const relaxed = selectTradableCandidates(
-        candidatePool,
-        {
-            minConfidence: Math.max(46, effectivePolicy.minConfidence - 10),
-          requireUnanimous: false,
-        },
-        { relaxed: true, paperMode: usePaperProfile },
-      );
-      if (relaxed.length > 0) {
-        tradable = relaxed;
-      }
-    }
-    if (!usePaperProfile && !env.AI_ULTRA_DISABLE_RELAXED_FALLBACK && tradable.length === 0) {
-      const focusedPoolRaw = (await buildEmergencyCandidates(strategyParams)).filter(
-        (row) => !excludedSymbols.has(row.context.symbol.toUpperCase()),
-      );
-      const focusedPool = focusedPoolRaw.filter(
-        (x) =>
-          isTryQuotedSymbol(x.context.symbol) &&
-          Number(x.context.volume24h ?? 0) >= env.SCANNER_MIN_VOLUME_24H * 2,
-      );
-      const chaosAdaptive = resolveChaosAdaptiveMinConfidence(
-        effectivePolicy.minConfidence,
-        focusedPool.length > 0 ? focusedPool : focusedPoolRaw,
-      );
-      if (focusedPool.length > 0) {
-        const focusedTradable = selectTradableCandidates(
-          focusedPool,
-          {
-            minConfidence: Math.max(46, chaosAdaptive.minConfidence - 8),
-            requireUnanimous: false,
-          },
-          { relaxed: true, paperMode: usePaperProfile },
-        );
-        if (focusedTradable.length > 0) {
-          tradable = focusedTradable;
-          fallbackUsed = true;
-        }
-      }
-    }
-    if (!usePaperProfile && !env.AI_ULTRA_DISABLE_RELAXED_FALLBACK && tradable.length === 0) {
-      const recovery = selectRecoveryCandidatesFromRoleSignals(candidatePool, effectivePolicy.minConfidence);
-      if (recovery.length > 0) {
-        tradable = recovery;
-        fallbackUsed = true;
-      }
-    }
-    if (tradable.length === 0 && candidatePool.length <= 2) {
-      if (!usePaperProfile && !env.AI_ULTRA_DISABLE_RELAXED_FALLBACK) {
-      const lowCountRelaxed = selectTradableCandidates(
-        candidatePool,
-        { ...effectivePolicy, minConfidence: Math.max(50, effectivePolicy.minConfidence - 8) },
-        { relaxed: true, paperMode: usePaperProfile },
-      );
-      if (lowCountRelaxed.length > 0) {
-        tradable = lowCountRelaxed;
-      }
-      }
-    }
-
-    if (tradable.length === 0 && usePaperProfile) {
-      const pumpRetry = await selectPumpFastEntry({
-        excludedSymbols,
-        runtimeStrategy: strategyParams,
-        maxDurationSec: options?.maxDurationSec,
-        minConfidence: effectivePolicy.minConfidence,
-        includeLiveScan: true,
-      });
-      if (pumpRetry) return pumpRetry;
-    }
-
-    if (!usePaperProfile && tradable.length === 0 && candidatePool.length < 3) {
-      const retryScan = await runScannerPipeline(undefined, {
-        includeAi: true,
-        persist: false,
-        persistRejected: false,
-        executionMode,
-      });
-      const retryPoolRaw =
-        retryScan.candidates.length > 0 ? retryScan.candidates : await buildEmergencyCandidates(strategyParams);
-      const retryPool =
-        excludedSymbols.size > 0
-          ? retryPoolRaw.filter((row) => !excludedSymbols.has(row.context.symbol.toUpperCase()))
-          : retryPoolRaw;
-      const retryTradable = selectTradableCandidates(retryPool, effectivePolicy, tradableOptions);
-      if (retryTradable.length > 0) {
-        const focusSelected = await pickFocusedCandidate(
-          retryTradable,
-          strategyParams,
-          focusMinConfidence,
-          { allowExisting: usePaperProfile },
-        );
-        if (focusSelected) {
-          return {
-            selected: focusSelected,
-            diagnostics: {
-              candidateCount: retryPool.length,
-              tradableCount: retryTradable.length,
-              scannedTotal: retryScan.totalSymbols,
-              qualifiedTotal: retryScan.qualifiedSymbols,
-              minConfidence: effectivePolicy.minConfidence,
-              requireUnanimous: effectivePolicy.requireUnanimous,
-            },
-            scannedAt: retryScan.scannedAt,
-            evaluated: retryScan.aiEvaluatedSymbols,
-          };
-        }
-      }
-      tradable = retryTradable;
-    }
-
-    const fallbackScanned = scan.totalSymbols > 0 ? scan.totalSymbols : candidatePool.length;
-    const fallbackQualified = scan.qualifiedSymbols > 0 ? scan.qualifiedSymbols : candidatePool.length;
-    const diagnostics = {
-      candidateCount: candidatePool.length,
-      tradableCount: tradable.length,
-      scannedTotal: fallbackScanned,
-      qualifiedTotal: fallbackQualified,
-      minConfidence: effectivePolicy.minConfidence,
-      requireUnanimous: effectivePolicy.requireUnanimous,
-    };
-
-    if (tradable.length === 0 && usePaperProfile) {
-      const pumpBeforeSteady = await selectPumpFastEntry({
-        excludedSymbols,
-        runtimeStrategy: strategyParams,
-        maxDurationSec: options?.maxDurationSec,
-        minConfidence: effectivePolicy.minConfidence,
-        includeLiveScan: true,
-      });
-      if (pumpBeforeSteady) return pumpBeforeSteady;
-
-      const pumpMetricLane = selectPaperPumpLaneCandidates(candidatePool, effectivePolicy.minConfidence);
-      if (pumpMetricLane.length > 0) {
-        return {
-          selected: pumpMetricLane[0],
-          reason: "Paper pump metric lane: top-gainer/momentum candidate.",
-          diagnostics: {
-            ...diagnostics,
-            tradableCount: pumpMetricLane.length,
-          },
-          scannedAt: scan.scannedAt,
-          evaluated: scan.aiEvaluatedSymbols,
-        };
-      }
-
-      const steadyGain = selectPaperSteadyGainCandidates(candidatePool, effectivePolicy.minConfidence);
-      if (steadyGain.length > 0) {
-        return {
-          selected: steadyGain[0],
-          reason: "Paper steady-gain lane: 1h quality target (~0.85-1%).",
-          diagnostics: {
-            ...diagnostics,
-            tradableCount: steadyGain.length,
-          },
-          scannedAt: scan.scannedAt,
-          evaluated: scan.aiEvaluatedSymbols,
-        };
-      }
-
-      const lastResort = candidatePool
-        .filter(passesPaperLastResortQuality)
-        .sort((a, b) => rankForFastEntry(b) - rankForFastEntry(a));
-      if (lastResort.length > 0) {
-        return {
-          selected: lastResort[0],
-          reason: "Paper last-resort lane: quality fallback (non pump/steady).",
-          diagnostics: {
-            ...diagnostics,
-            tradableCount: lastResort.length,
-          },
-          scannedAt: scan.scannedAt,
-          evaluated: scan.aiEvaluatedSymbols,
-        };
-      }
-
-      const pumpDiagnostics = candidatePool
-        .slice()
-        .sort((a, b) => rankForFastEntry(b) - rankForFastEntry(a))
-        .slice(0, 3)
-        .map((candidate) => summarizePaperPumpCandidate(candidate));
-      logger.info(
-        {
-          reason: "paper-no-trade",
-          scanned: diagnostics.scannedTotal ?? 0,
-          candidates: diagnostics.candidateCount,
-          sample: pumpDiagnostics,
-        },
-        "Paper pump lane empty; diagnostics snapshot",
-      );
-
-      lastResult = {
-        selected: null,
-        reason:
-          `Paper NO_TRADE: pump ve steady-gain adayi yok (tur ${cycle + 1}/${maxScanCycles}, scanned=${diagnostics.scannedTotal ?? 0}, candidates=${diagnostics.candidateCount}).`,
-        diagnostics: {
-          ...diagnostics,
-          tradableCount: 0,
-        },
-        scannedAt: scan.scannedAt,
-        evaluated: scan.aiEvaluatedSymbols,
-      };
-      traceScanCycleWait(
-        candidatePool,
-        "PAPER_NO_TRADE",
-        lastResult.reason,
-      );
-      continue;
-    }
-
-    if (tradable.length === 0) {
-      const noTradeDiagnostics = buildNoTradeDiagnostics(
-        candidatePool,
-        diagnostics.minConfidence,
-        scan.totalSymbols,
-        scan.qualifiedSymbols,
-      );
-      lastResult = {
-        selected: null,
-        reason:
-          `No suitable short-horizon candidate (tradable=${diagnostics.tradableCount}/${diagnostics.candidateCount}, scanned=${diagnostics.scannedTotal ?? 0}, qualified=${diagnostics.qualifiedTotal ?? 0}, minConf=${diagnostics.minConfidence}, unanimous=${diagnostics.requireUnanimous ? "on" : "off"})` +
-          ` | noTradeDecision=${noTradeDiagnostics.rejectionBreakdown?.noTradeDecision ?? 0}` +
-          ` lowConf=${noTradeDiagnostics.rejectionBreakdown?.lowConfidence ?? 0}` +
-          ` highSpread=${noTradeDiagnostics.rejectionBreakdown?.highSpread ?? 0}`,
-        diagnostics: {
-          ...diagnostics,
-          rejectionBreakdown: noTradeDiagnostics.rejectionBreakdown,
-          sampleRejected: noTradeDiagnostics.sampleRejected,
-        },
-        scannedAt: scan.scannedAt,
-        evaluated: scan.aiEvaluatedSymbols,
-      };
-      traceScanCycleWait(candidatePool, "NO_TRADABLE_CANDIDATE", lastResult.reason);
-      continue;
-    }
-
-    const focusSelected = await pickFocusedCandidate(
-      tradable,
-      strategyParams,
-      focusMinConfidence,
-      { allowExisting: usePaperProfile },
-    );
-    if (!focusSelected) {
-      lastResult = {
-        selected: null,
-        reason: "Focus confirmation failed for selected candidates.",
-        diagnostics,
-        scannedAt: scan.scannedAt,
-        evaluated: scan.aiEvaluatedSymbols,
-      };
-      traceScanCycleWait(tradable, "FOCUS_CONFIRM_FAILED", lastResult.reason);
-      continue;
-    }
-    if (usePaperProfile && !isPaperApprovedLane(focusSelected)) {
-      lastResult = {
-        selected: null,
-        reason: "Paper NO_TRADE: scanner adayi pump/steady-gain degil.",
-        diagnostics,
-        scannedAt: scan.scannedAt,
-        evaluated: scan.aiEvaluatedSymbols,
-      };
-      traceScanCycleWait([focusSelected], "PAPER_LANE_MISMATCH", lastResult.reason);
-      continue;
-    }
+  const opportunity = getOpportunityEngine().scan();
+  const micro = getMicrostructureEngine().evaluate(opportunity.ranked);
+  const microPool = getMicrostructureEngine()
+    .toScannerCandidates()
+    .filter((row) => !excludedSymbols.has(row.context.symbol.toUpperCase()));
+  if (microPool.length > 0) {
+    const selected = microPool[0] ?? null;
     return {
-      selected: focusSelected,
-      diagnostics,
-      reason: fallbackUsed ? "Focused major-pair fallback selected candidate." : undefined,
-      scannedAt: scan.scannedAt,
-      evaluated: scan.aiEvaluatedSymbols,
-    };
-  }
-
-  return (
-    lastResult ?? {
-      selected: null,
-      reason:
-        "Paper NO_TRADE: pump ve steady-gain adayi yok (tum tarama turlari bitti). Kaybetmektense tur atlandi.",
+      selected,
+      reason: selected
+        ? `microstructure:${String(selected.context.metadata.primaryLane ?? "EARLY")}`
+        : "Microstructure produced no tradable candidate",
       diagnostics: {
-        candidateCount: 0,
-        tradableCount: 0,
-        scannedTotal: 0,
-        qualifiedTotal: 0,
+        candidateCount: microPool.length,
+        tradableCount: microPool.filter((row) => row.context.tradable).length,
+        scannedTotal: opportunity.universeSize,
+        qualifiedTotal: micro.executionReadyCount + micro.confirmedCount,
         minConfidence: effectivePolicy.minConfidence,
         requireUnanimous: effectivePolicy.requireUnanimous,
       },
-      scannedAt: new Date().toISOString(),
+      scannedAt: new Date(opportunity.scannedAt).toISOString(),
       evaluated: 0,
-    }
-  );
+    };
+  }
+
+  return {
+    selected: null,
+    reason: "Microstructure engine produced no confirmed candidate",
+    diagnostics: {
+      candidateCount: 0,
+      tradableCount: 0,
+      scannedTotal: opportunity.universeSize,
+      qualifiedTotal: 0,
+      minConfidence: effectivePolicy.minConfidence,
+      requireUnanimous: effectivePolicy.requireUnanimous,
+    },
+    scannedAt: new Date(opportunity.scannedAt).toISOString(),
+    evaluated: 0,
+  };
   } finally {
     if (shouldAdjustManualScan) {
       (env as unknown as { SCANNER_CYCLE_SYMBOL_LIMIT: number }).SCANNER_CYCLE_SYMBOL_LIMIT = originalCycleLimit;
@@ -2004,6 +1719,7 @@ export async function getBestFastEntry(options?: FastEntryOptions): Promise<Fast
   }
 }
 
+/** SHADOW_ONLY: must not feed canonical execution. Production selection uses getBestFastEntry → OpportunityEngine. */
 export async function getPumpFastEntry(input: {
   excludeSymbols?: string[];
   maxDurationSec?: number;
@@ -2011,7 +1727,6 @@ export async function getPumpFastEntry(input: {
   includeLiveScan?: boolean;
   runtime?: FastEntryRuntimeHooks;
 }): Promise<FastEntryResult> {
-  ensurePumpEarlyCatcherStarted();
   const runtimeStrategy = await getRuntimeStrategyParams();
   const excludedSymbols = new Set((input.excludeSymbols ?? []).map((x) => x.trim().toUpperCase()).filter(Boolean));
   return (

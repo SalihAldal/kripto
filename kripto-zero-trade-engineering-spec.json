@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-08-28T14:49:58.619Z",
+  "engineeringDecision": "FIX_LANE_SELECTOR_APPROVAL_PARITY",
+  "fixes": [
+    {
+      "file": "src/server/scanner/fast-entry.service.ts",
+      "function": "selectPaperPumpLaneCandidates",
+      "condition": "topGainerPriorityScore >= 70",
+      "currentBehavior": "Always requires priority >= 70 even in paper profile",
+      "expectedBehavior": "Use paper threshold 50 to match isPaperApprovedLane metricPumpLane branch",
+      "minimalFix": "Pass usePaperProfile into selector; use isPaper ? 50 : 70 for priority gate"
+    },
+    {
+      "file": "src/server/scanner/fast-entry.service.ts",
+      "function": "isPaperApprovedLane",
+      "condition": "const isPaper = env.EXECUTION_MODE === 'paper'",
+      "currentBehavior": "Ignores forcePaperProfile; dry-run+paper profile uses live thresholds",
+      "expectedBehavior": "isPaper = usePaperProfile || env.EXECUTION_MODE === 'paper'",
+      "minimalFix": "Thread usePaperProfile boolean into isPaperApprovedLane"
+    }
+  ],
+  "policyExperiment": {
+    "id": "LAST_RESORT_SINGLE_CANDIDATE_AB",
+    "description": "When pump+steady empty, admit highest rankForFastEntry candidate passing passesPaperLastResortQuality only",
+    "doNotChange": [
+      "TDI",
+      "AI_VETO",
+      "EV",
+      "scanner business rules",
+      "thresholds"
+    ]
+  },
+  "productionChangeRecommended": false
+}

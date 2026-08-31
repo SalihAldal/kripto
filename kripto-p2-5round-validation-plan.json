@@ -1,0 +1,29 @@
+{
+  "mode": "PAPER",
+  "rounds": 5,
+  "maxRoundMinutes": 30,
+  "aiMode": "REAL_AI",
+  "constraints": {
+    "forceTrade": false,
+    "thresholdRelaxation": false,
+    "bypassTdi": false,
+    "bypassAiVeto": false,
+    "bypassRisk": false,
+    "bypassSizing": false
+  },
+  "telemetry": [
+    "round summary",
+    "scanner funnel",
+    "TDI funnel",
+    "AI parity",
+    "execution-ready count",
+    "orders/fills/trades",
+    "entry timing",
+    "exit forensics",
+    "fee reconciliation",
+    "PnL",
+    "runtime health",
+    "shadow/Variant_D status"
+  ],
+  "command": "pnpm tsx scripts/run-5round-paper-validation.ts --rounds=5 --max-round-minutes=30 --mode=PAPER --ai=REAL_AI --no-force-trade --no-threshold-relax --emit-forensics --emit-funnel --emit-pnl --emit-runtime"
+}

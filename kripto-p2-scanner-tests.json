@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-08-23T13:00:28.640Z",
+  "suite": "tests/scanner-reject-telemetry.test.ts",
+  "total": 17,
+  "passed": 17,
+  "failed": 0,
+  "status": "PASS",
+  "cases": [
+    "spread below threshold",
+    "spread above threshold",
+    "momentumBreakout true",
+    "momentumBreakout false",
+    "missing spread",
+    "stale spread",
+    "missing momentum",
+    "generic rejection telemetry",
+    "exact reject reason",
+    "37 cohort replay",
+    "false-negative classification",
+    "losing cohort control",
+    "no TDI changes",
+    "no AI VETO changes",
+    "no risk/sizing changes",
+    "shadow does not alter scanner outcome",
+    "qualification forensics exact reason"
+  ]
+}

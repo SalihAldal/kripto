@@ -1,0 +1,47 @@
+[
+  {
+    "rank": 1,
+    "problem": "EXIT_PROBLEM",
+    "evidence": "Primary cause EXIT_PROBLEM appears in 121 losing trades",
+    "affectedTrades": 121,
+    "netPnLImpact": -19.40639196999999,
+    "confidence": "HIGH",
+    "recommendedExperiment": "EXIT_MODEL forensic replay: reason-specific hold/close policy A/B"
+  },
+  {
+    "rank": 2,
+    "problem": "STRATEGY_WEAKNESS",
+    "evidence": "Primary cause STRATEGY_WEAKNESS appears in 13 losing trades",
+    "affectedTrades": 13,
+    "netPnLImpact": -0.9075867599999999,
+    "confidence": "MEDIUM",
+    "recommendedExperiment": "STRATEGY_REGIME selective enablement shadow A/B"
+  },
+  {
+    "rank": 3,
+    "problem": "FEE_EROSION",
+    "evidence": "Primary cause FEE_EROSION appears in 6 losing trades",
+    "affectedTrades": 6,
+    "netPnLImpact": -0.33816403,
+    "confidence": "LOW",
+    "recommendedExperiment": "FEE_AWARE selective block shadow experiment"
+  },
+  {
+    "rank": 4,
+    "problem": "REGIME_MISMATCH",
+    "evidence": "Primary cause REGIME_MISMATCH appears in 0 losing trades",
+    "affectedTrades": 0,
+    "netPnLImpact": 0,
+    "confidence": "LOW",
+    "recommendedExperiment": "REGIME_AWARE gating shadow experiment"
+  },
+  {
+    "rank": 5,
+    "problem": "EDGE_DECAY",
+    "evidence": "Primary cause EDGE_DECAY appears in 0 losing trades",
+    "affectedTrades": 0,
+    "netPnLImpact": 0,
+    "confidence": "LOW",
+    "recommendedExperiment": "ENTRY_QUALITY delayed-entry guard shadow experiment"
+  }
+]

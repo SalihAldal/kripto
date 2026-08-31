@@ -1,0 +1,192 @@
+{
+  "reportId": "kripto-job-reconciliation-and-5round-gate-2026-08-19",
+  "generatedAt": "2026-08-19T10:53:30.000Z",
+  "constraints": {
+    "applicationCodeChanged": false,
+    "runtimePolicyChanged": false,
+    "tdiThresholdChanged": false,
+    "aiPromptChanged": false,
+    "strategyChanged": false,
+    "sizingChanged": false,
+    "riskChanged": false,
+    "evChanged": false,
+    "slTpChanged": false,
+    "maxPositionsChanged": false,
+    "scannerPolicyChanged": false,
+    "selectionBudgetChanged": false,
+    "aiVetoPolicyChanged": false
+  },
+  "staleJobInventory": [
+    {
+      "jobId": "cmsz9dsy80009unlw9c26k8hb",
+      "beforeStatus": "RUNNING",
+      "stopRequested": true,
+      "activeRoundId": null,
+      "ownerStatus": "NO_LIVE_OWNER",
+      "leaseStatus": "SCHEDULER_LEASE_STALE",
+      "classification": "STALE_STOPPING_JOB",
+      "afterStatus": "STOPPED",
+      "afterTerminalState": "bekliyor",
+      "afterActiveRound": null,
+      "afterLease": "STALE_METADATA_ONLY",
+      "afterLock": "NONE",
+      "reconciledAt": "2026-08-19T09:35:08.958Z"
+    },
+    {
+      "jobId": "cmsz7lzqi0009uneosnuhv08d",
+      "beforeStatus": "RUNNING",
+      "stopRequested": true,
+      "activeRoundId": null,
+      "ownerStatus": "NO_LIVE_OWNER",
+      "leaseStatus": "SCHEDULER_LEASE_STALE",
+      "classification": "STALE_STOPPING_JOB",
+      "afterStatus": "STOPPED",
+      "afterTerminalState": "bekliyor",
+      "afterActiveRound": null,
+      "afterLease": "STALE_METADATA_ONLY",
+      "afterLock": "NONE",
+      "reconciledAt": "2026-08-19T09:35:09.042Z"
+    }
+  ],
+  "reconciliation": {
+    "mechanism": "stopAutoRoundJob(userId) existing native safe flow",
+    "idempotentCheck": {
+      "secondRunCreatesDuplicates": false,
+      "duplicateRounds": false,
+      "duplicateTerminalization": false,
+      "duplicateTrades": false,
+      "duplicatePnl": false,
+      "duplicateRecoveryEvents": false
+    },
+    "postProof": {
+      "runningJobsForUser": 0,
+      "runningRoundsForUser": 0,
+      "stoppedButOpenLease": 0,
+      "activeWorkerLocks": 0,
+      "duplicatePaperJobs": 0
+    },
+    "artifact": "job-reconciliation.json"
+  },
+  "preflight": {
+    "attemptId": "final-5round-clean-preflight-1787132132688",
+    "overallVerdict": "READY",
+    "checks": {
+      "postgres": "PASS",
+      "binance": "PASS",
+      "clock": "PASS",
+      "realAi": "PASS",
+      "emergencyStop": "PASS",
+      "activeJobs": "PASS",
+      "duplicateJobs": "PASS",
+      "zombieRounds": "PASS",
+      "workerLocks": "PASS",
+      "resolvedConfig": "PASS"
+    }
+  },
+  "fiveRoundGate": {
+    "validationId": "5round-2026-08-19T09-35-59-680Z",
+    "jobId": "cmszwci4l0009unywvfufbuj9",
+    "started": true,
+    "completedFiveRounds": false,
+    "jobFinalStatus": "STOPPED",
+    "rounds": [
+      {
+        "roundNo": 1,
+        "terminal": true,
+        "state": "tur_basarisiz",
+        "durationMs": 1201000,
+        "firstBlockingStage": "SELECTION_TIMEOUT",
+        "candidateCount": 111,
+        "ai": { "remote": 129, "degraded": 133 },
+        "tdi": { "approved": 0, "wait": 20, "rejected": 152 },
+        "execution": { "orders": 0, "fills": 0, "trades": 0 }
+      },
+      {
+        "roundNo": 2,
+        "terminal": true,
+        "state": "tur_basarisiz",
+        "durationMs": 1269000,
+        "firstBlockingStage": "AI_VETO",
+        "candidateCount": 213,
+        "ai": { "remote": 165, "degraded": 135 },
+        "tdi": { "approved": 1, "wait": 44, "rejected": 452 },
+        "execution": { "orders": 0, "fills": 0, "trades": 0 }
+      },
+      {
+        "roundNo": 3,
+        "terminal": true,
+        "state": "tur_basarisiz",
+        "durationMs": 1200000,
+        "firstBlockingStage": "SELECTION_TIMEOUT",
+        "candidateCount": 164,
+        "ai": { "remote": 165, "degraded": 135 },
+        "tdi": { "approved": 1, "wait": 44, "rejected": 455 },
+        "execution": { "orders": 0, "fills": 0, "trades": 0 }
+      },
+      {
+        "roundNo": 4,
+        "terminal": false,
+        "state": "tariyor",
+        "durationMs": 0,
+        "firstBlockingStage": "NON_TERMINAL_RUNTIME_INTERRUPTION",
+        "candidateCount": 0,
+        "ai": { "remote": 0, "degraded": 0 },
+        "tdi": { "approved": 0, "wait": 0, "rejected": 0 },
+        "execution": { "orders": 0, "fills": 0, "trades": 0 }
+      },
+      {
+        "roundNo": 5,
+        "terminal": false,
+        "state": "NOT_STARTED",
+        "durationMs": 0,
+        "firstBlockingStage": "NOT_REACHED",
+        "candidateCount": 0,
+        "ai": { "remote": 0, "degraded": 0 },
+        "tdi": { "approved": 0, "wait": 0, "rejected": 0 },
+        "execution": { "orders": 0, "fills": 0, "trades": 0 }
+      }
+    ],
+    "criticalFailures": [
+      { "code": "JOB_TIMEOUT", "message": "Job still RUNNING after 75 minutes" },
+      { "code": "ROUND_NOT_TERMINAL", "message": "Round 4 state=tariyor" },
+      { "code": "ZOMBIE_ROUNDS", "message": "1 zombie run(s) after job end" }
+    ],
+    "manualSafetyStopApplied": true,
+    "manualSafetyStopReason": "RUNNING_ZOMBIE_CONDITION_AFTER_VALIDATION_MONITOR_EXIT"
+  },
+  "artifactCompleteness": {
+    "round1": "COMPLETE",
+    "round2": "COMPLETE",
+    "round3": "COMPLETE",
+    "round4": "PARTIAL_MISSING_CRITICAL_FILES",
+    "round5": "NOT_STARTED",
+    "details": {
+      "round4Missing": [
+        "round-liveness.json",
+        "selectionTimeBudgetBreakdown.json",
+        "pump-scan-lifecycle.json",
+        "tdi-decisions.json",
+        "tdi-sensitivity.json",
+        "entry-timing.json",
+        "execution-trace.json",
+        "exit-forensics.json",
+        "replay-exit-diagnostics.json",
+        "fee-aware-entry-policy.json",
+        "pnl-ledger.json"
+      ]
+    }
+  },
+  "finalVerdict": {
+    "STALE_JOBS_CLEARED": "YES",
+    "CLEAN_PREFLIGHT": "YES",
+    "FIVE_ROUNDS_STARTED": "YES",
+    "FIVE_ROUNDS_COMPLETED": "NO",
+    "RUNTIME_STABLE": "NO",
+    "AI_PARITY": "FAIL",
+    "SCANNER_STABLE": "PARTIAL",
+    "TDI_RECONCILED": "PARTIAL",
+    "READY_FOR_30_50_ROUNDS": "CONDITIONAL",
+    "READY_FOR_50_ROUND_PAPER": "NO"
+  }
+}
+

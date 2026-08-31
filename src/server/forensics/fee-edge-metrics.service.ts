@@ -1,5 +1,6 @@
 import { env } from "@/lib/config";
 import type { FeeEdgeMetricsSnapshot } from "@/src/server/forensics/forensic.types";
+import { resolveBinanceTakerFeeRate } from "@/src/server/execution/fee-profile";
 
 function round(value: number, digits = 8) {
   return Number(value.toFixed(digits));
@@ -16,7 +17,7 @@ export function computeFeeEdgeMetrics(input: {
   const quantity = Number(input.quantity);
   const takeProfitPercent = Number(input.takeProfitPercent);
   const stopLossPercent = Number(input.stopLossPercent);
-  const takerFeeRate = Number(input.takerFeeRate ?? env.BINANCE_TAKER_FEE_RATE ?? 0.0015);
+  const takerFeeRate = resolveEffectiveTakerFeeRate(input.takerFeeRate);
 
   const notional = Math.max(0, entryPrice * quantity);
   const estimatedEntryFee = notional * takerFeeRate;
@@ -54,9 +55,61 @@ export function computeFeeEdgeMetrics(input: {
     expectedNetAfterFeesAtTp: round(expectedNetAfterFeesAtTp),
     expectedNetAfterFeesAtSl: round(expectedNetAfterFeesAtSl),
     expectedNetPnL: round(expectedNetPnL),
+    expectedGrossEdge: round(expectedGrossAtTp),
+    expectedNetEdge: round(expectedNetAfterFeesAtTp),
+    feeToGrossEdgeRatio: round(feeToExpectedGrossRatio, 4),
+    minimumGrossMoveToCoverFees: round(minimumGrossToCoverFees),
+    edgeAfterFees: round(expectedNetAfterFeesAtTp),
     takeProfitPercent: round(takeProfitPercent, 4),
     stopLossPercent: round(stopLossPercent, 4),
+    feeEdgeClass: classifyFeeEdge({
+      expectedGross: expectedGrossAtTp,
+      expectedNet: expectedNetAfterFeesAtTp,
+      fee: estimatedRoundTripFees,
+      ratio: expectedGrossToFeeRatio,
+    }),
+    feeClassification: classifyFeeEdge({
+      expectedGross: expectedGrossAtTp,
+      expectedNet: expectedNetAfterFeesAtTp,
+      fee: estimatedRoundTripFees,
+      ratio: expectedGrossToFeeRatio,
+    }),
   };
+}
+
+export type FeeEdgeClass = "FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN";
+
+export function classifyFeeEdge(input: {
+  expectedGross: number;
+  expectedNet: number;
+  fee: number;
+  ratio?: number;
+}): FeeEdgeClass {
+  const expectedGross = Number(input.expectedGross);
+  const expectedNet = Number(input.expectedNet);
+  const fee = Number(input.fee);
+  const ratio = Number(
+    Number.isFinite(Number(input.ratio))
+      ? input.ratio
+      : fee > 0
+        ? expectedGross / fee
+        : Number.POSITIVE_INFINITY,
+  );
+  if (!Number.isFinite(expectedGross) || !Number.isFinite(expectedNet) || !Number.isFinite(fee) || !Number.isFinite(ratio)) {
+    return "UNKNOWN";
+  }
+  if (expectedGross <= 0 || expectedNet <= 0 || ratio < 1) return "FEE_EROSION";
+  if (ratio < 1.5) return "FEE_BORDERLINE";
+  return "FEE_SAFE";
+}
+
+export function resolveEffectiveTakerFeeRate(override?: number) {
+  if (Number.isFinite(Number(override)) && Number(override) > 0) {
+    return Number(override);
+  }
+  const profileRate = resolveBinanceTakerFeeRate();
+  if (Number.isFinite(profileRate) && profileRate > 0) return profileRate;
+  return Number(env.BINANCE_TAKER_FEE_RATE ?? 0.0015);
 }
 
 export function reconcileFeeStatus(input: {

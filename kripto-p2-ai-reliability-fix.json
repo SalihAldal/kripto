@@ -1,0 +1,339 @@
+{
+  "generatedAt": "2026-08-23T17:10:38.930Z",
+  "fix": "FIX_AI_RELIABILITY",
+  "files": [
+    "src/server/ai/ai-provider-health.service.ts",
+    "src/server/ai/analysis-orchestrator.ts",
+    "src/server/ai/consensus-engine.ts",
+    "src/server/forensics/forensic-bridge.service.ts",
+    "src/server/execution/execution-orchestrator.service.ts"
+  ],
+  "verdict": {
+    "AI_PROVIDER_HEALTH_GATE": "PASS",
+    "ALL_DEGRADED_PATH": "SAFE",
+    "DEGRADED_EXPERT_VOTE_PROTECTION": "PASS",
+    "CANDIDATE_ISOLATION": "PASS",
+    "RETRY_BOUNDARIES": "PASS",
+    "AI_STARTED_ORPHANS": 0,
+    "AI_NO_RESPONSE_BEHAVIOR": "When no remote-healthy providers remain, candidate returns AI_PROVIDER_DEGRADED (candidate-local) instead of synthesizing consensus from local fallback outputs.",
+    "AI_DECISION_CONFLICT_BEHAVIOR": "Degraded/unavailable provider outputs are labeled UNAVAILABLE_EVIDENCE and excluded from consensus vote math; conflicts only evaluated on healthy remote evidence.",
+    "AI_VETO_PRESERVED": "YES",
+    "EV_LOGIC_CHANGED": "NO",
+    "RISK_SIZING_CHANGED": "NO",
+    "TESTS": "PASS",
+    "DETERMINISTIC_REPLAY": "PASS",
+    "FIX_IMPLEMENTED": "YES",
+    "READY_FOR_CONTROLLED_PAPER": "YES",
+    "EV_FOLLOWUP_REQUIRED": "YES",
+    "NEXT_ENGINEERING_TASK": "Run controlled paper after AI reliability fix; separately audit EV ordering anomalies (689 cases) without threshold changes."
+  },
+  "replay": {
+    "beforeDegraded": {
+      "finalDecision": "NO_TRADE",
+      "finalConfidence": 0,
+      "finalRiskScore": 100,
+      "score": 0,
+      "explanation": "No healthy provider result",
+      "outputs": [
+        {
+          "providerId": "p1",
+          "providerName": "p1",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        },
+        {
+          "providerId": "p2",
+          "providerName": "p2",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        },
+        {
+          "providerId": "p3",
+          "providerName": "p3",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        }
+      ],
+      "rejected": true,
+      "rejectReason": "No healthy provider result",
+      "generatedAt": "2026-08-23T17:10:38.928Z"
+    },
+    "afterDegraded": {
+      "finalDecision": "NO_TRADE",
+      "finalConfidence": 0,
+      "finalRiskScore": 100,
+      "score": 0,
+      "explanation": "AI_PROVIDER_DEGRADED: all lane providers unavailable/degraded; consensus suppressed (ALL_DEGRADED)",
+      "outputs": [
+        {
+          "providerId": "p1",
+          "providerName": "p1",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        },
+        {
+          "providerId": "p2",
+          "providerName": "p2",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        },
+        {
+          "providerId": "p3",
+          "providerName": "p3",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        }
+      ],
+      "rejected": true,
+      "rejectReason": "AI_PROVIDER_DEGRADED",
+      "generatedAt": "2026-08-23T17:10:38.930Z",
+      "consensusTelemetry": {
+        "aiProviderHealth": "ALL_DEGRADED",
+        "aiProviderHealthCounts": {
+          "HEALTHY": 0,
+          "DEGRADED": 3,
+          "TIMEOUT": 0,
+          "UNAVAILABLE": 0,
+          "RATE_LIMITED": 0,
+          "INVALID_RESPONSE": 0,
+          "ABORTED": 0
+        },
+        "aiDegradedCount": 3,
+        "aiTimeoutCount": 0,
+        "aiUnavailableCount": 0,
+        "aiInvalidResponseCount": 0,
+        "aiRetryCount": 0,
+        "aiAllProvidersDegradedCount": 3,
+        "aiPath": "ALL_DEGRADED"
+      }
+    },
+    "beforePartial": {
+      "finalDecision": "NO_TRADE",
+      "finalConfidence": 60,
+      "finalRiskScore": 35,
+      "score": 0,
+      "explanation": "Consensus=NO_TRADE, buy:0, sell:0, hold:0, no_trade:1, score:0, weightedVote=insufficient, strict=on, degraded=no, remoteHealthy:1/1",
+      "outputs": [
+        {
+          "providerId": "p1",
+          "providerName": "p1",
+          "ok": true,
+          "latencyMs": 8,
+          "remoteOk": true,
+          "output": {
+            "decision": "NO_TRADE",
+            "confidence": 60,
+            "riskScore": 35,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "remote",
+            "metadata": {
+              "remote": true,
+              "remoteOk": true,
+              "healthState": "HEALTHY",
+              "unavailableEvidence": false,
+              "expertEvidenceState": "AVAILABLE"
+            }
+          },
+          "healthState": "HEALTHY"
+        },
+        {
+          "providerId": "p2",
+          "providerName": "p2",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        },
+        {
+          "providerId": "p3",
+          "providerName": "p3",
+          "ok": true,
+          "latencyMs": 4,
+          "remoteOk": false,
+          "degraded": true,
+          "output": {
+            "decision": "BUY",
+            "confidence": 75,
+            "riskScore": 30,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "local",
+            "metadata": {
+              "remote": false,
+              "healthState": "DEGRADED",
+              "unavailableEvidence": true,
+              "expertEvidenceState": "UNAVAILABLE_EVIDENCE"
+            }
+          },
+          "healthState": "DEGRADED"
+        }
+      ],
+      "rejected": true,
+      "rejectReason": "Consensus or confidence threshold not met",
+      "generatedAt": "2026-08-23T17:10:38.930Z"
+    },
+    "afterPartial": {
+      "finalDecision": "NO_TRADE",
+      "finalConfidence": 60,
+      "finalRiskScore": 35,
+      "score": 0,
+      "explanation": "Consensus=NO_TRADE, buy:0, sell:0, hold:0, no_trade:1, score:0, weightedVote=insufficient, strict=on, degraded=no, remoteHealthy:1/1",
+      "outputs": [
+        {
+          "providerId": "p1",
+          "providerName": "p1",
+          "ok": true,
+          "latencyMs": 8,
+          "remoteOk": true,
+          "output": {
+            "decision": "NO_TRADE",
+            "confidence": 60,
+            "riskScore": 35,
+            "targetPrice": 10,
+            "stopPrice": 9,
+            "estimatedDurationSec": 120,
+            "reasoningShort": "remote",
+            "metadata": {
+              "remote": true,
+              "remoteOk": true,
+              "healthState": "HEALTHY",
+              "unavailableEvidence": false,
+              "expertEvidenceState": "AVAILABLE"
+            }
+          },
+          "healthState": "HEALTHY"
+        }
+      ],
+      "rejected": true,
+      "rejectReason": "Consensus or confidence threshold not met",
+      "generatedAt": "2026-08-23T17:10:38.930Z"
+    }
+  }
+}

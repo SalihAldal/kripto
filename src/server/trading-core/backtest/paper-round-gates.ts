@@ -1,5 +1,6 @@
 import { env } from "@/lib/config";
 import type { MarketContext, ScannerScore } from "@/src/types/scanner";
+import { isTopGainerPumpSignal } from "@/src/server/scanner/paper-lane-profile";
 import {
   evaluatePaperEntryQuality,
   formatPaperEntryQualityReason,
@@ -10,6 +11,9 @@ import {
   evaluatePumpEntrySafety,
   formatPumpEntrySafetyReason,
 } from "@/src/server/trading-core/entry-filters/pump-entry-safety.service";
+import { resolveMtfAlignmentContract } from "@/src/server/decision-engine/decision-contract.service";
+
+export { resolveMtfAlignmentContract } from "@/src/server/decision-engine/decision-contract.service";
 
 export type PaperRoundHorizonProfile = {
   label: string;
@@ -153,7 +157,10 @@ function clamp(min: number, value: number, max: number) {
 export function buildPaperRoundAiProxy(context: MarketContext, score: ScannerScore): PaperRoundAiProxy {
   const shortMomentum = Number(context.metadata.shortMomentumPercent ?? 0);
   const shortFlow = Number(context.metadata.shortFlowImbalance ?? 0);
-  const mtfAlignment = Number(context.metadata.mtfAlignmentScore ?? 0);
+  const mtfContract = resolveMtfAlignmentContract({
+    contextAlignment: context.metadata.mtfAlignmentScore,
+  });
+  const mtfAlignment = mtfContract.score ?? 0;
   const bullish = shortMomentum > 0 || shortFlow > 0 || context.momentumPercent > 0;
   const technical = clamp(
     0,
@@ -194,7 +201,7 @@ export function buildPaperRoundAiProxy(context: MarketContext, score: ScannerSco
     analysisScorecard: { confidenceScore: Number(confidence.toFixed(2)), riskScore: Number((100 - risk).toFixed(2)) },
     decisionPayload: {
       timeframeAnalysis: {
-        alignmentScore: Number(context.metadata.mtfAlignmentScore ?? 0),
+        alignmentScore: mtfAlignment,
       },
     },
   };
@@ -203,12 +210,7 @@ export function buildPaperRoundAiProxy(context: MarketContext, score: ScannerSco
 export function resolvePaperRoundLane(context: MarketContext, ai: PaperRoundAiProxy): "pump-lane" | "steady-gain" | "other" {
   const explanation = ai.explanation;
   const change24h = Number(context.metadata.topGainerChange24h ?? context.change24h ?? 0);
-  const topGainerPump =
-    Boolean(context.metadata.topGainerDiscovery ?? false) ||
-    Boolean(context.metadata.pumpEarlyConfirmed ?? false) ||
-    Boolean(context.metadata.pumpContinuationMode ?? false) ||
-    Boolean(context.metadata.pumpIntradaySpike ?? false) ||
-    Number(context.metadata.topGainerPriorityScore ?? 0) >= 70;
+  const topGainerPump = isTopGainerPumpSignal(context.metadata as Record<string, unknown>, true);
   if (
     topGainerPump &&
     (explanation.includes("PUMP_CONTINUATION") ||
@@ -237,7 +239,12 @@ export function evaluatePaperRoundGate(input: {
   const riskScore = Number(ai.finalRiskScore ?? ai.analysisScorecard?.riskScore ?? 0);
   const scannerScore = Number(input.score.score ?? 0);
   const scannerConfidence = Number(input.score.confidence ?? 0);
-  const mtfAlignment = Number(ai.decisionPayload?.timeframeAnalysis?.alignmentScore ?? context.metadata.mtfAlignmentScore ?? 0);
+  const mtfContract = resolveMtfAlignmentContract({
+    aiAlignment: ai.decisionPayload?.timeframeAnalysis?.alignmentScore,
+    contextAlignment: context.metadata.mtfAlignmentScore,
+  });
+  const mtfAlignment = mtfContract.score;
+  const mtfUnavailable = mtfAlignment === null;
   const shortMomentum = Number(context.metadata.shortMomentumPercent ?? 0);
   const hourMomentum = Number(context.metadata.hourMomentumPercent ?? 0);
   const effectiveShortMomentum = Math.max(shortMomentum, hourMomentum);
@@ -266,12 +273,7 @@ export function evaluatePaperRoundGate(input: {
     if (parts.length > 0) return parts.reduce((sum, value) => sum + value, 0) / parts.length;
     return confidence;
   })();
-  const topGainerPump =
-    Boolean(context.metadata.topGainerDiscovery ?? false) ||
-    Boolean(context.metadata.pumpEarlyConfirmed ?? false) ||
-    Boolean(context.metadata.pumpContinuationMode ?? false) ||
-    Boolean(context.metadata.pumpIntradaySpike ?? false) ||
-    Number(context.metadata.topGainerPriorityScore ?? 0) >= 70;
+  const topGainerPump = isTopGainerPumpSignal(context.metadata as Record<string, unknown>, true);
   const change24h = Number(context.metadata.topGainerChange24h ?? context.change24h ?? 0);
   const pumpLaneCandidate =
     topGainerPump &&
@@ -282,7 +284,7 @@ export function evaluatePaperRoundGate(input: {
   const strongPumpContinuation = topGainerPump && effectiveShortMomentum >= 0.12 && shortFlow >= 0.02;
   const targetEdgeAfterSpread = input.targetProfitPct - context.spreadPercent * 2;
   const dataDegraded =
-    mtfAlignment <= 0 &&
+    (mtfUnavailable || mtfAlignment <= 0) &&
     Math.abs(shortMomentum) < 0.02 &&
     (Math.abs(shortFlow) >= 0.95 || Math.abs(shortFlow) <= 0.001);
   const learningMemory = input.learningMemory ?? { hardBlock: false, minConfidenceDelta: 0, sameSymbolLossCount: 0 };
@@ -310,7 +312,7 @@ export function evaluatePaperRoundGate(input: {
       (change24h < 28 ||
         effectiveShortMomentum < 0.55 ||
         shortFlow < 0.12 ||
-        mtfAlignment < 50 ||
+        (!mtfUnavailable && mtfAlignment < 50) ||
         compositeAvg < 62);
     const weakPumpRocketEntry =
       rocketPump &&
@@ -411,20 +413,20 @@ export function evaluatePaperRoundGate(input: {
     !strongPumpContinuation &&
     (compositeAvg < 66 ||
       sentimentRoleScore < 62 ||
-      mtfAlignment < 50 ||
+      (!mtfUnavailable && mtfAlignment < 50) ||
       shortMomentum < 0.035 ||
       shortFlow < 0.015);
   const riskySteadyGainQuality =
     steadyGainCandidate &&
     (compositeAvg < 64 ||
       sentimentRoleScore < 58 ||
-      mtfAlignment < 45 ||
+      (!mtfUnavailable && mtfAlignment < 45) ||
       shortMomentum < 0.025 ||
       shortFlow < 0.012);
   const riskySteadyGainRangeSideways =
     steadyGainCandidate &&
     rangeSideways &&
-    (mtfAlignment < 48 || compositeAvg < 70);
+    ((!mtfUnavailable && mtfAlignment < 48) || compositeAvg < 70);
   const riskySteadyGainNoEdge =
     steadyGainCandidate &&
     (targetEdgeAfterSpread < 0.45 ||
@@ -443,13 +445,13 @@ export function evaluatePaperRoundGate(input: {
     riskyRangeBreakout ? `range/chop fallback riskli (composite=${compositeAvg.toFixed(1)})` : "",
     riskyLearningMicroRange ? "learning-micro RANGE_SIDEWAYS paper blok" : "",
     riskyNonPumpQuality
-      ? `non-pump kalite dusuk (composite=${compositeAvg.toFixed(1)}, sentiment=${sentimentRoleScore.toFixed(1)}, mtf=${mtfAlignment.toFixed(1)})`
+      ? `non-pump kalite dusuk (composite=${compositeAvg.toFixed(1)}, sentiment=${sentimentRoleScore.toFixed(1)}, mtf=${mtfUnavailable ? "UNAVAILABLE" : mtfAlignment.toFixed(1)})`
       : "",
     riskySteadyGainQuality
-      ? `steady-gain kalite dusuk (composite=${compositeAvg.toFixed(1)}, mtf=${mtfAlignment.toFixed(1)})`
+      ? `steady-gain kalite dusuk (composite=${compositeAvg.toFixed(1)}, mtf=${mtfUnavailable ? "UNAVAILABLE" : mtfAlignment.toFixed(1)})`
       : "",
     riskySteadyGainRangeSideways
-      ? `steady-gain RANGE blok (mtf=${mtfAlignment.toFixed(1)}, composite=${compositeAvg.toFixed(1)})`
+      ? `steady-gain RANGE blok (mtf=${mtfUnavailable ? "UNAVAILABLE" : mtfAlignment.toFixed(1)}, composite=${compositeAvg.toFixed(1)})`
       : "",
     riskySteadyGainNoEdge
       ? `steady-gain edge yetersiz (targetEdge=${targetEdgeAfterSpread.toFixed(3)}%, momentum=${shortMomentum.toFixed(3)})`
@@ -466,14 +468,20 @@ export function evaluatePaperRoundGate(input: {
     scannerConfidence < profile.minScannerConfidence
       ? `scanner confidence ${scannerConfidence.toFixed(2)} < ${profile.minScannerConfidence}`
       : "",
-    mtfAlignment < profile.minMtfAlignment && !dataDegraded && profile.minMtfAlignment > 0
+    mtfUnavailable ? "MTF UNAVAILABLE (explicit contract)" : "",
+    mtfAlignment !== null && mtfAlignment < profile.minMtfAlignment && !dataDegraded && profile.minMtfAlignment > 0
       ? `MTF ${mtfAlignment.toFixed(2)} < ${profile.minMtfAlignment}`
       : "",
     riskScore > profile.maxRiskScore ? `risk ${riskScore.toFixed(2)} > ${profile.maxRiskScore}` : "",
     context.spreadPercent > profile.maxSpreadPercent ? `spread ${context.spreadPercent.toFixed(4)}% > ${profile.maxSpreadPercent}%` : "",
     context.fakeSpikeScore > profile.maxFakeSpikeScore ? `fake spike ${context.fakeSpikeScore.toFixed(2)} > ${profile.maxFakeSpikeScore}` : "",
+    String(context.metadata.pumpRiskStatus ?? "AVAILABLE") !== "AVAILABLE"
+      ? "pump risk UNAVAILABLE (explicit contract)"
+      : "",
     context.pumpRisk > profile.maxPumpRisk && !strongPumpContinuation
-      ? `pump risk ${context.pumpRisk.toFixed(2)} > ${profile.maxPumpRisk}`
+      ? `pump risk ${context.pumpRisk.toFixed(2)} > ${profile.maxPumpRisk}${
+          Boolean(context.metadata.pumpRiskCapped) ? ` (raw=${Number(context.metadata.pumpRiskRawScore ?? 0).toFixed(2)}, capped)` : ""
+        }`
       : "",
     context.volatilityPercent > profile.maxVolatilityPercent && !strongPumpContinuation
       ? `volatility ${context.volatilityPercent.toFixed(4)}% > ${profile.maxVolatilityPercent}%`

@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-08-28T15:06:06.505Z",
+  "jobId": "cmtc4c2ds0009un70ir6hlcqm",
+  "dryRunRound": 2,
+  "dryRunSymbol": "CHZTRY",
+  "methodology": "READ_ONLY replay of artifacts/_50round-db-export.json — no engine, no live data",
+  "roundSummary": {
+    "candidatesInRound": 40,
+    "scannerAiReached": 40,
+    "executionAiReached": 0,
+    "tdiEntered": 0,
+    "tdiSkipped": 1,
+    "selectedSymbol": "CHZTRY",
+    "selectedFinalState": "SCANNER_AI_PRE_TDI_BLOCK",
+    "failReason": "NON_EXECUTABLE_DECISION: NO_TRADE (CHZTRY)",
+    "confidence": 16.61
+  },
+  "stageSemanticsProof": {
+    "scanner_ai_reached_means": "Scanner pipeline includeAi=true evaluated candidate.ai",
+    "scanner_ai_reached_does_not_mean": "execution_ai_reached (hybrid/TDI path in executeAnalyzeAndTrade)",
+    "tdi_skipped_means": "Selection gate blocked before executeAnalyzeAndTrade; TDI legitimately not entered",
+    "tdi_entered_zero_expected_when": "All selected candidates blocked at scanner AI selection gate",
+    "round2Proof": {
+      "scannerAiReached": 40,
+      "executionAiReached": 0,
+      "tdiSkippedForCHZTRY": true,
+      "aiDecision": "NO_TRADE",
+      "confidence": 16.61
+    }
+  },
+  "scopeIssues": [],
+  "readinessCriteria": {
+    "dryRunStageTelemetryCoherent": true,
+    "candidateIdScopeCorrect": true,
+    "roundIdScopeCorrect": true,
+    "scannerAiVsExecutionAiSemanticsCorrect": true,
+    "tdiSkipSemanticsCorrect": true,
+    "noTradeStateCorrectInCode": true,
+    "historicalDbSymbolBindingPreFix": 30,
+    "noDuplicateStageRecords": true,
+    "noPolicyChangeRequired": true
+  },
+  "verdict": {
+    "DRY_RUN": "PASS",
+    "SCANNER_AI_SCOPE": "PASS",
+    "TDI_SKIP_SCOPE": "PASS",
+    "EXECUTION_AI_SCOPE": "PASS",
+    "CANDIDATE_SCOPE": "PASS",
+    "ROUND_SCOPE": "PASS",
+    "AI_NO_TRADE_CLASSIFICATION": {
+      "AI_POLICY": 29,
+      "AI_RELIABILITY": 1,
+      "DATA_QUALITY": 0,
+      "INSUFFICIENT_CONTEXT": 1,
+      "UNKNOWN": 0
+    },
+    "LANE_EMPTY_CLASSIFICATION": {
+      "pump_lane_empty": 18,
+      "steady_gain_empty": 18,
+      "last_resort_empty": 18,
+      "first_failing_condition": "PUMP_STEADY_LAST_RESORT_ALL_EMPTY",
+      "policy_intentional": true
+    },
+    "TELEMETRY_CONSISTENCY": "PASS",
+    "STATE_MACHINE": "PASS",
+    "POLICY_CHANGED": "NO",
+    "THRESHOLDS_CHANGED": "NO",
+    "PAPER_STARTED": "NO",
+    "READY_FOR_30_ROUND_PAPER": "YES",
+    "REMAINING_BLOCKER": "Policy: scanner AI NO_TRADE (31 rounds) + lane-empty (18 rounds) — telemetry truthful; zero-trade is policy not bug",
+    "NEXT_STEP": "Proceed with 30-round paper campaign; verify first live round export shows scanner_ai + tdi_skip stages and cleared symbol on terminal NO_TRADE",
+    "FINAL_CLASSIFICATION": "MIXED",
+    "ENGINEERING_CAUSE": "Historical telemetry mislabeled scanner_ai as execution_ai; corrected in funnel trace service (fixed)",
+    "POLICY_CAUSE": "31/50 rounds: scanner AI NO_TRADE at selection gate; 18/50: intentional lane-empty terminal"
+  }
+}

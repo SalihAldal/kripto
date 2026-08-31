@@ -1,0 +1,139 @@
+{
+  "runId": "p1-exit-fee-5round-2026-08-17T17-40-03-899Z",
+  "sessionId": "cmsxircm50007unj4l3g0zinv",
+  "job": {
+    "status": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "finishedAt": "2026-08-17T17:44:36.175Z"
+  },
+  "rounds": [
+    {
+      "roundNo": 1,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)",
+      "artifacts": {
+        "pnlLedger": true,
+        "feePolicy": true,
+        "exitForensics": true,
+        "replayExitDiagnostics": true
+      },
+      "tradeCount": 0,
+      "exitReasonCounts": {},
+      "exitModelCounts": {},
+      "allEndOfReplay": false,
+      "feeReconciliation": {
+        "pass": 0,
+        "fail": 0,
+        "unknown": 0
+      },
+      "grossPositiveNetNegativeCount": 0,
+      "feePolicySamples": 0,
+      "feeEdgeClasses": {},
+      "replayDiagnosticsRows": 0,
+      "replayDiagnosticsSample": [],
+      "aiVetoBypassCount": 0,
+      "pnlSummary": {
+        "grossPnL": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "winRate": 0,
+        "profitFactor": 0,
+        "expectancy": 0,
+        "maxDrawdown": 0,
+        "averageWin": 0,
+        "averageLoss": 0,
+        "consecutiveLosses": 0,
+        "tradeCount": 0
+      }
+    }
+  ],
+  "summary": {
+    "rounds": 1,
+    "totalTrades": 0,
+    "nonEndOfReplayExitCount": 0,
+    "feeReconciliationFailCount": 0,
+    "grossPositiveNetNegativeCount": 0,
+    "aiVetoBypassCount": 0
+  },
+  "validationStatus": "EXIT_VALIDATION_BLOCKED",
+  "validationReason": "All observed exits remained END_OF_REPLAY or no trades closed; real position-monitor exit evidence not yet present.",
+  "lastStatus": {
+    "active": null,
+    "jobs": [
+      {
+        "id": "cmsxircm50007unj4l3g0zinv",
+        "status": "FAILED",
+        "totalRounds": 5,
+        "completedRounds": 0,
+        "failedRounds": 1,
+        "currentRound": 1,
+        "lastError": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)"
+      },
+      {
+        "id": "cmsxhtm4x0007unugfjldfh89",
+        "status": "RUNNING",
+        "totalRounds": 2,
+        "completedRounds": 0,
+        "failedRounds": 1,
+        "currentRound": 1,
+        "lastError": "Zombie round reconciled before paper start; prior=tariyor; scheduler=SCHEDULER_LEASE_STALE; round=ROUND_HEARTBEAT_WITHOUT_SCHEDULER"
+      },
+      {
+        "id": "cmsxgoteo000jun34o8rz4lym",
+        "status": "STOPPED",
+        "totalRounds": 2,
+        "completedRounds": 0,
+        "failedRounds": 1,
+        "currentRound": 1,
+        "lastError": null
+      },
+      {
+        "id": "cmsuh6jox000zun90ifwbrjdw",
+        "status": "RUNNING",
+        "totalRounds": 5,
+        "completedRounds": 0,
+        "failedRounds": 1,
+        "currentRound": 1,
+        "lastError": "Zombie round reconciled before paper start; prior=tariyor; scheduler=SCHEDULER_LEASE_STALE; round=ROUND_HEARTBEAT_WITHOUT_SCHEDULER"
+      },
+      {
+        "id": "cmsuf7zij0007une4u1q4cqu4",
+        "status": "COMPLETED",
+        "totalRounds": 2,
+        "completedRounds": 0,
+        "failedRounds": 2,
+        "currentRound": 2,
+        "lastError": "AI_GATE_BLOCK: NO_TRADE"
+      },
+      {
+        "id": "cmsud4nf7001eungwnhftv9k6",
+        "status": "STOPPED",
+        "totalRounds": 50,
+        "completedRounds": 0,
+        "failedRounds": 3,
+        "currentRound": 3,
+        "lastError": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE)"
+      },
+      {
+        "id": "cmstltuqn0007un9ksbk3xn9c",
+        "status": "FAILED",
+        "totalRounds": 97,
+        "completedRounds": 0,
+        "failedRounds": 46,
+        "currentRound": 46,
+        "lastError": "PUMP_SCAN_FAILED: resolveLiveTopGainerPumpCandidates exceeded 90000ms (timer)"
+      },
+      {
+        "id": "cmstkgy6j0022unm8lannq6cg",
+        "status": "STOPPED",
+        "totalRounds": 100,
+        "completedRounds": 0,
+        "failedRounds": 3,
+        "currentRound": 2,
+        "lastError": null
+      }
+    ]
+  }
+}

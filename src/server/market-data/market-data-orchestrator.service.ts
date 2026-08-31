@@ -15,14 +15,12 @@ import type {
   MarketDataTelemetry,
   MarketDataTicker,
 } from "@/src/server/market-data/market-data.types";
-
-const PRIORITY_RANK: Record<MarketDataPriority, number> = {
-  critical: 5,
-  high: 4,
-  normal: 3,
-  low: 2,
-  ui: 1,
-};
+import {
+  MARKET_DATA_RATE_BUDGET_CODE,
+  MarketDataUnavailableError,
+} from "@/src/server/market-data/market-data-unavailable.error";
+import { recordPublicMarketRestCall } from "@/src/server/market-data/spine/rest-call-audit";
+import { getSharedRestLimiter } from "@/src/server/market-data/spine/shared-rest-limiter";
 
 const WEIGHT_ESTIMATE: Record<MarketDataKind, number> = {
   ticker: 2,
@@ -36,6 +34,7 @@ const WEIGHT_ESTIMATE: Record<MarketDataKind, number> = {
 const WEIGHT_BUDGET_PER_MINUTE = 5_500;
 const BACKOFF_INITIAL_MS = 3_000;
 const BACKOFF_MAX_MS = 120_000;
+const EXCHANGE_CALL_TIMEOUT_MS = 20_000;
 
 type CacheRow<T> = { value: T; at: number; volume24h?: number };
 
@@ -122,11 +121,15 @@ function currentWeightUsage(now = Date.now()) {
   return weightWindow.length;
 }
 
-function canSpendWeight(kind: MarketDataKind, priority: MarketDataPriority) {
+function canSpendWeight(kind: MarketDataKind, _priority: MarketDataPriority) {
+  if (isBackoffActive()) return false;
   const usage = currentWeightUsage();
   const estimate = WEIGHT_ESTIMATE[kind];
-  if (usage + estimate <= WEIGHT_BUDGET_PER_MINUTE) return true;
-  return PRIORITY_RANK[priority] >= PRIORITY_RANK.high;
+  return usage + estimate <= WEIGHT_BUDGET_PER_MINUTE;
+}
+
+export function canSpendMarketDataWeight(kind: MarketDataKind, priority: MarketDataPriority = "normal") {
+  return canSpendWeight(kind, priority);
 }
 
 function spendWeight(kind: MarketDataKind) {
@@ -148,12 +151,28 @@ function is429Error(error: unknown) {
   return message.includes("http 429") || message.includes("too much request weight") || message.includes("too many requests");
 }
 
+function is418Error(error: unknown) {
+  const message = (error as Error)?.message?.toLowerCase?.() ?? "";
+  return message.includes("http 418") || message.includes("ip banned") || message.includes("banned until");
+}
+
 function register429(error: unknown) {
   telemetry.rateLimited429 += 1;
   last429At = Date.now();
   const retryMs = parseRetryAfterMs((error as Error)?.message ?? "");
-  backoffMs = Math.min(retryMs > 0 ? retryMs : Math.max(BACKOFF_INITIAL_MS, backoffMs * 2 || BACKOFF_INITIAL_MS), BACKOFF_MAX_MS);
+  const base = retryMs > 0 ? retryMs : Math.max(BACKOFF_INITIAL_MS, backoffMs * 2 || BACKOFF_INITIAL_MS);
+  const jitter = Math.floor(Math.random() * Math.max(250, base * 0.25));
+  backoffMs = Math.min(base + jitter, BACKOFF_MAX_MS);
   backoffUntil = Date.now() + backoffMs;
+  void getSharedRestLimiter().register429({ retryAfterMs: retryMs });
+}
+
+function register418(error: unknown) {
+  const retryMs = parseRetryAfterMs((error as Error)?.message ?? "");
+  const banMatch = (error as Error)?.message?.match(/\b(\d{13})\b/);
+  const banUntil = banMatch?.[1] ? Number(banMatch[1]) : undefined;
+  void getSharedRestLimiter().register418({ retryAfterMs: retryMs, banUntil });
+  backoffUntil = Math.max(backoffUntil, banUntil && banUntil > Date.now() ? banUntil : Date.now() + 15 * 60_000);
 }
 
 function clearBackoffOnSuccess() {
@@ -170,10 +189,7 @@ function isBackoffActive() {
 function readCache<T>(map: Map<string, CacheRow<T>>, key: string, maxAgeMs: number) {
   const row = map.get(key);
   if (!row) return null;
-  if (Date.now() - row.at > maxAgeMs) {
-    map.delete(key);
-    return null;
-  }
+  if (Date.now() - row.at > maxAgeMs) return null;
   return row.value;
 }
 
@@ -194,12 +210,53 @@ async function coalesce<T>(key: string, factory: () => Promise<T>): Promise<T> {
   return promise;
 }
 
-async function fetchFromExchange<T>(kind: MarketDataKind, fn: () => Promise<T>): Promise<T> {
+function waitForAbort(signal?: AbortSignal): Promise<never> | null {
+  if (!signal) return null;
+  if (signal.aborted) {
+    return Promise.reject(new Error(String(signal.reason ?? "Aborted")));
+  }
+  return new Promise((_, reject) => {
+    signal.addEventListener("abort", () => reject(new Error(String(signal.reason ?? "Aborted"))), {
+      once: true,
+    });
+  });
+}
+
+async function fetchFromExchange<T>(
+  kind: MarketDataKind,
+  fn: () => Promise<T>,
+  options?: { signal?: AbortSignal; timeoutMs?: number; label?: string; symbol?: string },
+): Promise<T> {
   const started = Date.now();
+  const timeoutMs = Math.max(1_000, options?.timeoutMs ?? EXCHANGE_CALL_TIMEOUT_MS);
+  recordPublicMarketRestCall({
+    kind: kind === "contextBundle" ? "other" : kind,
+    source: "MarketDataOrchestrator",
+    symbol: options?.symbol,
+    recovery: true,
+  });
+  const budget = await getSharedRestLimiter().canSpend(WEIGHT_ESTIMATE[kind] || 1);
+  if (!budget.ok) {
+    throw new MarketDataUnavailableError("Market data weight budget exhausted", {
+      code: MARKET_DATA_RATE_BUDGET_CODE,
+      kind,
+    });
+  }
   try {
     telemetry.exchangeCalls += 1;
     spendWeight(kind);
-    const result = await fn();
+    await getSharedRestLimiter().spend(WEIGHT_ESTIMATE[kind] || 1);
+    const abortPromise = waitForAbort(options?.signal);
+    const result = await Promise.race([
+      fn(),
+      new Promise<never>((_, reject) => {
+        setTimeout(
+          () => reject(new Error(`${options?.label ?? kind} timeout after ${timeoutMs}ms`)),
+          timeoutMs,
+        );
+      }),
+      ...(abortPromise ? [abortPromise] : []),
+    ]);
     clearBackoffOnSuccess();
     latencySamples.push(Date.now() - started);
     if (latencySamples.length > 500) latencySamples.shift();
@@ -209,6 +266,7 @@ async function fetchFromExchange<T>(kind: MarketDataKind, fn: () => Promise<T>):
     return result;
   } catch (error) {
     if (is429Error(error)) register429(error);
+    if (is418Error(error)) register418(error);
     throw error;
   }
 }
@@ -247,11 +305,19 @@ export class MarketDataOrchestrator {
       }
     }
 
-    if (!canSpendWeight("ticker", priority) && tickerCache.has(normalized)) {
-      telemetry.duplicateAvoided += 1;
-      telemetry.cacheHits += 1;
-      updateHitRatio();
-      return tickerCache.get(normalized)!.value;
+    if (!canSpendWeight("ticker", priority)) {
+      const stale = tickerCache.get(normalized)?.value;
+      if (stale) {
+        telemetry.duplicateAvoided += 1;
+        telemetry.cacheHits += 1;
+        updateHitRatio();
+        return stale;
+      }
+      throw new MarketDataUnavailableError("Market data weight budget exhausted", {
+        code: MARKET_DATA_RATE_BUDGET_CODE,
+        symbol: normalized,
+        kind: "ticker",
+      });
     }
 
     return coalesce(`ticker:${normalized}`, async () => {
@@ -263,7 +329,11 @@ export class MarketDataOrchestrator {
       }
       try {
         const provider = getExchangeProvider();
-        const row = await fetchFromExchange("ticker", () => provider.getTicker(normalized));
+        const row = await fetchFromExchange("ticker", () => provider.getTicker(normalized), {
+          signal: options.signal,
+          timeoutMs: options.timeoutMs,
+          label: `ticker:${normalized}`,
+        });
         const mapped: MarketDataTicker = {
           symbol: row.symbol,
           price: row.price,
@@ -319,11 +389,19 @@ export class MarketDataOrchestrator {
       }
     }
 
-    if (!canSpendWeight("klines", priority) && klinesCache.has(key)) {
-      telemetry.duplicateAvoided += 1;
-      telemetry.cacheHits += 1;
-      updateHitRatio();
-      return klinesCache.get(key)!.value;
+    if (!canSpendWeight("klines", priority)) {
+      const stale = klinesCache.get(key)?.value;
+      if (stale?.length) {
+        telemetry.duplicateAvoided += 1;
+        telemetry.cacheHits += 1;
+        updateHitRatio();
+        return stale;
+      }
+      throw new MarketDataUnavailableError("Market data weight budget exhausted", {
+        code: MARKET_DATA_RATE_BUDGET_CODE,
+        symbol: normalized,
+        kind: "klines",
+      });
     }
 
     return coalesce(`klines:${key}`, async () => {
@@ -334,7 +412,11 @@ export class MarketDataOrchestrator {
         return freshCached;
       }
       const provider = getExchangeProvider();
-      const rows = await fetchFromExchange("klines", () => provider.getKlines(normalized, interval, limit));
+      const rows = await fetchFromExchange("klines", () => provider.getKlines(normalized, interval, limit), {
+        signal: options.signal,
+        timeoutMs: options.timeoutMs,
+        label: `klines:${normalized}:${interval}`,
+      });
       writeCache(klinesCache, key, rows, cachedVolume);
       updateHitRatio();
       return rows;
@@ -384,16 +466,28 @@ export class MarketDataOrchestrator {
       }
     }
 
-    if (!canSpendWeight("orderBook", priority) && orderBookCache.has(key)) {
-      telemetry.duplicateAvoided += 1;
-      telemetry.cacheHits += 1;
-      updateHitRatio();
-      return orderBookCache.get(key)!.value;
+    if (!canSpendWeight("orderBook", priority)) {
+      const stale = orderBookCache.get(key)?.value ?? snapshot?.orderBook;
+      if (stale) {
+        telemetry.duplicateAvoided += 1;
+        telemetry.cacheHits += 1;
+        updateHitRatio();
+        return stale;
+      }
+      throw new MarketDataUnavailableError("Market data weight budget exhausted", {
+        code: MARKET_DATA_RATE_BUDGET_CODE,
+        symbol: normalized,
+        kind: "orderBook",
+      });
     }
 
     return coalesce(`orderBook:${key}`, async () => {
       const provider = getExchangeProvider();
-      const book = await fetchFromExchange("orderBook", () => provider.getOrderBook(normalized, limit));
+      const book = await fetchFromExchange("orderBook", () => provider.getOrderBook(normalized, limit), {
+        signal: options.signal,
+        timeoutMs: options.timeoutMs,
+        label: `orderBook:${normalized}`,
+      });
       writeCache(orderBookCache, key, book, cachedVolume);
       updateHitRatio();
       return book;
@@ -442,9 +536,28 @@ export class MarketDataOrchestrator {
       }
     }
 
+    if (!canSpendWeight("recentTrades", priority)) {
+      const stale = recentTradesCache.get(key)?.value ?? snapshot?.recentTrades;
+      if (stale?.length) {
+        telemetry.duplicateAvoided += 1;
+        telemetry.cacheHits += 1;
+        updateHitRatio();
+        return stale;
+      }
+      throw new MarketDataUnavailableError("Market data weight budget exhausted", {
+        code: MARKET_DATA_RATE_BUDGET_CODE,
+        symbol: normalized,
+        kind: "recentTrades",
+      });
+    }
+
     return coalesce(`recentTrades:${key}`, async () => {
       const provider = getExchangeProvider();
-      const rows = await fetchFromExchange("recentTrades", () => provider.getRecentTrades(normalized, limit));
+      const rows = await fetchFromExchange("recentTrades", () => provider.getRecentTrades(normalized, limit), {
+        signal: options.signal,
+        timeoutMs: options.timeoutMs,
+        label: `recentTrades:${normalized}`,
+      });
       writeCache(recentTradesCache, key, rows, cachedVolume);
       updateHitRatio();
       return rows;
@@ -466,6 +579,17 @@ export class MarketDataOrchestrator {
       updateHitRatio();
       return exchangeInfoCache.value;
     }
+    if (!canSpendWeight("exchangeInfo", priority)) {
+      if (exchangeInfoCache) {
+        telemetry.cacheHits += 1;
+        updateHitRatio();
+        return exchangeInfoCache.value;
+      }
+      throw new MarketDataUnavailableError("Market data weight budget exhausted", {
+        code: MARKET_DATA_RATE_BUDGET_CODE,
+        kind: "exchangeInfo",
+      });
+    }
     return coalesce("exchangeInfo", async () => {
       if (exchangeInfoCache && Date.now() - exchangeInfoCache.at <= maxAgeMs) {
         telemetry.cacheHits += 1;
@@ -473,7 +597,11 @@ export class MarketDataOrchestrator {
         return exchangeInfoCache.value;
       }
       const provider = getExchangeProvider();
-      const info = await fetchFromExchange("exchangeInfo", () => provider.getExchangeInfo());
+      const info = await fetchFromExchange("exchangeInfo", () => provider.getExchangeInfo(), {
+        signal: options.signal,
+        timeoutMs: options.timeoutMs,
+        label: "exchangeInfo",
+      });
       exchangeInfoCache = { value: info, at: Date.now() };
       updateHitRatio();
       return info;
@@ -485,6 +613,8 @@ export class MarketDataOrchestrator {
     lite?: boolean;
     priority?: MarketDataPriority;
     maxAgeMs?: number;
+    signal?: AbortSignal;
+    timeoutMs?: number;
   }): Promise<MarketContextBundle> {
     const normalized = input.symbol.toUpperCase();
     const priority = input.priority ?? "normal";
@@ -493,7 +623,12 @@ export class MarketDataOrchestrator {
     recordKind("contextBundle");
 
     return coalesce(`contextBundle:${normalized}:${lite ? "lite" : "full"}:${priority}`, async () => {
-      const ticker = await this.getTicker(normalized, { priority, maxAgeMs: input.maxAgeMs });
+      const ticker = await this.getTicker(normalized, {
+        priority,
+        maxAgeMs: input.maxAgeMs,
+        signal: input.signal,
+        timeoutMs: input.timeoutMs,
+      });
       const resolvedSymbol = ticker.symbol.toUpperCase();
       const volume = ticker.volume24h;
       const needs24hKlines = !Number.isFinite(ticker.change24h) || Math.abs(Number(ticker.change24h)) < 0.2;
@@ -501,21 +636,35 @@ export class MarketDataOrchestrator {
       const hourMaxAge = resolveAdaptiveTtlMs({ kind: "klines", volume24h: volume, priority, interval: "1h" });
 
       const [klines1m, orderBook, recentTrades, klines1h] = await Promise.all([
-        this.getKlines(resolvedSymbol, "1m", 80, { priority, maxAgeMs: klinesMaxAge }),
+        this.getKlines(resolvedSymbol, "1m", 80, {
+          priority,
+          maxAgeMs: klinesMaxAge,
+          signal: input.signal,
+          timeoutMs: input.timeoutMs,
+        }),
         lite
           ? Promise.resolve(null)
           : this.getOrderBook(resolvedSymbol, 30, {
               priority,
               maxAgeMs: resolveAdaptiveTtlMs({ kind: "orderBook", volume24h: volume, priority }),
+              signal: input.signal,
+              timeoutMs: input.timeoutMs,
             }),
         lite
           ? Promise.resolve(null)
           : this.getRecentTrades(resolvedSymbol, 150, {
               priority,
               maxAgeMs: resolveAdaptiveTtlMs({ kind: "recentTrades", volume24h: volume, priority }),
+              signal: input.signal,
+              timeoutMs: input.timeoutMs,
             }),
         needs24hKlines
-          ? this.getKlines(resolvedSymbol, "1h", 26, { priority, maxAgeMs: hourMaxAge })
+          ? this.getKlines(resolvedSymbol, "1h", 26, {
+              priority,
+              maxAgeMs: hourMaxAge,
+              signal: input.signal,
+              timeoutMs: input.timeoutMs,
+            })
           : Promise.resolve([] as KlineItem[]),
       ]);
 
@@ -552,6 +701,12 @@ export class MarketDataOrchestrator {
     backoffUntil = 0;
     backoffMs = 0;
     last429At = 0;
+  }
+
+  seedWeightUsageForTests(count: number) {
+    const now = Date.now();
+    for (let i = 0; i < count; i += 1) weightWindow.push(now);
+    telemetry.estimatedWeight = currentWeightUsage(now);
   }
 }
 

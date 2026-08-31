@@ -30,6 +30,7 @@ type RunRow = {
 const jobs = new Map<string, JobRow>();
 const runs = new Map<string, RunRow>();
 const idempotencyIndex = new Map<string, string>();
+const failJobUpdateManyOnce = new Set<string>();
 let seq = 0;
 let txLock: Promise<void> = Promise.resolve();
 
@@ -139,6 +140,10 @@ function createTx() {
       }) => {
         const row = jobs.get(where.id);
         if (!row) return { count: 0 };
+        if (failJobUpdateManyOnce.has(where.id)) {
+          failJobUpdateManyOnce.delete(where.id);
+          return { count: 0 };
+        }
         if (where.persistVersion !== undefined && row.persistVersion !== where.persistVersion) {
           return { count: 0 };
         }
@@ -228,11 +233,16 @@ function ownership(jobId: string, roundNo: number): RoundOwnershipRecord {
   };
 }
 
+function armJobVersionConflictOnce(jobId: string) {
+  failJobUpdateManyOnce.add(jobId);
+}
+
 describe("auto round database integrity", () => {
   beforeEach(() => {
     jobs.clear();
     runs.clear();
     idempotencyIndex.clear();
+    failJobUpdateManyOnce.clear();
     seq = 0;
     txLock = Promise.resolve();
   });
@@ -272,6 +282,25 @@ describe("auto round database integrity", () => {
       expect(jobs.get(jobId)?.activeRunId).toBe(active[0]?.id);
     },
   );
+
+  it("transactionallyBeginRound retries transient job version conflict", async () => {
+    const jobId = "job-begin-retry";
+    seedJob(jobId);
+    armJobVersionConflictOnce(jobId);
+
+    const result = await transactionallyBeginRound({
+      jobId,
+      roundNo: 1,
+      ownerId: "owner-a",
+      ownership: ownership(jobId, 1),
+      state: "tariyor",
+    });
+
+    expect(["created", "attached"]).toContain(result.action);
+    const active = Array.from(runs.values()).filter((row) => row.jobId === jobId && row.roundNo === 1 && !row.endedAt);
+    expect(active.length).toBe(1);
+    expect(active[0]?.id).toBe(result.run.id);
+  });
 
   it("transactionallyFailRound increments failedRounds once", async () => {
     const jobId = "job-fail";
@@ -447,5 +476,92 @@ describe("auto round database integrity", () => {
     expect((jobMeta.activeRound as Record<string, unknown>).step).toBe("scanning");
     expect((runMeta.runtime as Record<string, unknown>).heavy).toBe(true);
     expect(jobMeta.runtime).toBeUndefined();
+  });
+
+  it("ignores heartbeat patch when job is already terminal", async () => {
+    const jobId = "job-terminal-guard";
+    seedJob(jobId);
+    const begin = await transactionallyBeginRound({
+      jobId,
+      roundNo: 5,
+      ownerId: "owner-a",
+      ownership: ownership(jobId, 5),
+      state: "tariyor",
+    });
+    const runId = begin.run.id;
+    jobs.set(jobId, {
+      ...(jobs.get(jobId) as JobRow),
+      activeState: "tur_basarisiz",
+    });
+
+    const result = await idempotentPatchJobActiveRound({
+      jobId,
+      runId,
+      roundNo: 5,
+      heartbeatAt: new Date(Date.now() + 5_000).toISOString(),
+      step: "SCANNING",
+      message: "late heartbeat",
+      activeState: "tariyor",
+    });
+
+    expect(result.action).toBe("terminal_ignored");
+    expect(jobs.get(jobId)?.activeState).toBe("tur_basarisiz");
+  });
+
+  it("transactionallyBeginRound maps P2002 to optimistic retry without querying aborted tx", async () => {
+    const jobId = "job-p2002";
+    seedJob(jobId);
+    const roundNo = 7;
+    const idempotencyKey = buildActiveRoundIdempotencyKey(jobId, roundNo);
+
+    runs.set("existing-run", {
+      id: "existing-run",
+      jobId,
+      roundNo,
+      state: "tariyor",
+      idempotencyKey,
+      persistVersion: 0,
+      endedAt: null,
+      result: null,
+      failReason: null,
+      symbol: null,
+      metadata: null,
+    });
+    idempotencyIndex.set(idempotencyKey, "existing-run");
+
+    const result = await transactionallyBeginRound({
+      jobId,
+      roundNo,
+      ownerId: "owner-a",
+      ownership: ownership(jobId, roundNo),
+      state: "tariyor",
+    });
+
+    expect(result.action).toBe("attached");
+    expect(result.run.id).toBe("existing-run");
+    expect(Array.from(runs.values()).filter((row) => row.jobId === jobId && row.roundNo === roundNo).length).toBe(1);
+  });
+
+  it("retries active round heartbeat patch after transient version conflict", async () => {
+    const jobId = "job-active-patch-retry";
+    seedJob(jobId);
+    const begin = await transactionallyBeginRound({
+      jobId,
+      roundNo: 6,
+      ownerId: "owner-a",
+      ownership: ownership(jobId, 6),
+      state: "tariyor",
+    });
+    armJobVersionConflictOnce(jobId);
+    const result = await idempotentPatchJobActiveRound({
+      jobId,
+      runId: begin.run.id,
+      roundNo: 6,
+      heartbeatAt: new Date().toISOString(),
+      step: "AI_ANALYSIS",
+      message: "retry test",
+    });
+
+    expect(result.action).toBe("patched");
   });
 });

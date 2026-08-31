@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-08-21T23:46:33.283Z",
+  "edgeQuality": {
+    "status": "NOT_PROVEN",
+    "netExpectancy": 0,
+    "note": "Current 5-round has 0 trades; positive net edge not proven."
+  },
+  "feeEfficiency": {
+    "status": "NEGATIVE_HISTORICAL",
+    "historical": {
+      "grossPnL": -0.33651532,
+      "fees": 5.09837823,
+      "netPnL": -5.43489355,
+      "grossPositiveNetNegative": 11
+    },
+    "current": {
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0
+    }
+  },
+  "entryQuality": {
+    "status": "NOT_PROVEN",
+    "reason": "No executed entries in latest 5-round sample"
+  },
+  "exitQuality": {
+    "status": "EXIT_EDGE_NOT_PROVEN",
+    "historicalExitMode": "END_OF_REPLAY_DOMINANT",
+    "currentClosedTrades": 0
+  },
+  "strategyQuality": {
+    "status": "NEGATIVE_HISTORICAL",
+    "historicalByStrategy": [
+      {
+        "strategy": "Mean Reversion",
+        "trades": 39,
+        "netPnL": -3.93
+      },
+      {
+        "strategy": "Volatility Breakout",
+        "trades": 9,
+        "netPnL": -1.46
+      },
+      {
+        "strategy": "Trend Following",
+        "trades": 3,
+        "netPnL": -0.04
+      }
+    ],
+    "current": "NOT_ENOUGH_DATA"
+  },
+  "regimeQuality": {
+    "status": "NOT_ENOUGH_DATA",
+    "reason": "strategy-regime matrix sparse / zero closed trades current"
+  },
+  "AIQuality": {
+    "executionParity": "PASS",
+    "remoteHealth": "PASS",
+    "predictiveQuality": "UNKNOWN",
+    "note": "AI predictive quality cannot be validated without realized outcomes"
+  },
+  "executionQuality": {
+    "status": "NOT_EXERCISED",
+    "runtimeStable": "YES",
+    "zombieCount": 0,
+    "aiOrphanCount": 0
+  },
+  "sampleQuality": {
+    "currentRoundCount": 5,
+    "validRounds": 5,
+    "currentTradeCount": 0,
+    "oosSupport": "NO",
+    "classification": "INSUFFICIENT_SAMPLE"
+  }
+}

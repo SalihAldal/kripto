@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-08-22T20:21:00.526Z",
+  "source": "artifacts/forensics/cmt3h5yz10009unskr2vu94gx/rounds",
+  "totalCandidates": 2278,
+  "path": [
+    "scanner",
+    "context",
+    "strategy",
+    "tdi",
+    "hybrid",
+    "master",
+    "ai",
+    "risk",
+    "sizing",
+    "execution"
+  ],
+  "baseline": {
+    "approved": 50,
+    "wait": 919,
+    "reject": 1309
+  },
+  "blockerDistribution": {
+    "MOMENTUM": 664,
+    "OTHER": 1135,
+    "TECHNICAL": 397,
+    "RISK": 74,
+    "CONFIDENCE": 8
+  },
+  "suspectedMomentumDefaultRows": 508
+}

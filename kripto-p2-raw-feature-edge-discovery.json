@@ -1,0 +1,186 @@
+{
+  "generatedAt": "2026-08-22T15:00:36.549Z",
+  "constraints": {
+    "noPaperRun": true,
+    "noMarketData": true,
+    "noProductionChange": true,
+    "untouched": [
+      "TDI thresholds",
+      "momentum thresholds",
+      "confidence thresholds",
+      "technical thresholds",
+      "sizing",
+      "EV",
+      "risk",
+      "AI",
+      "scanner",
+      "strategy rules",
+      "SL/TP",
+      "TIME_EXIT",
+      "fee model",
+      "Variant_D",
+      "momentumScore formula"
+    ]
+  },
+  "dataset": {
+    "historicalTradesUsed": 248,
+    "currentCandidatesUsed": 2278,
+    "historicalProfitable": 42,
+    "historicalLoss": 206,
+    "historicalBreakeven": 0,
+    "pairedTotals": {
+      "totalHistoricalTrades": 346,
+      "validPairedTrades": 173
+    },
+    "evidenceClassCounts": {
+      "INFERRED": 248
+    }
+  },
+  "topFeatures": [
+    {
+      "feature": "momentumScore",
+      "oosExpectancy": 0.02061414625,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "confidence",
+      "oosExpectancy": 0.02061414625,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "learningScore",
+      "oosExpectancy": 0,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "bullishCount",
+      "oosExpectancy": 0,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "shortFlow",
+      "oosExpectancy": -0.02442313,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "recentTradesImbalance",
+      "oosExpectancy": -0.02442313,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "EV",
+      "oosExpectancy": -0.03703475,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "liquidity",
+      "oosExpectancy": -0.04199744285714286,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "volume",
+      "oosExpectancy": -0.04199744285714286,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "volumeRatio",
+      "oosExpectancy": -0.04199744285714286,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "volatility",
+      "oosExpectancy": -0.04251549380952381,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "technicalScore",
+      "oosExpectancy": -0.04559231142857143,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "executionScore",
+      "oosExpectancy": -0.04559231142857143,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "openInterest",
+      "oosExpectancy": -0.04890475833333333,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "shortMomentum",
+      "oosExpectancy": -0.04961453,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "orderBookImbalance",
+      "oosExpectancy": -0.05083073066666667,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "spread",
+      "oosExpectancy": -0.057408702631578955,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "sentimentScore",
+      "oosExpectancy": -0.059188006315789486,
+      "stability": 1,
+      "sample": 50
+    },
+    {
+      "feature": "trendAlignment",
+      "oosExpectancy": -0.07044020142857144,
+      "stability": 1,
+      "sample": 50
+    }
+  ],
+  "topInteraction": {
+    "interaction": "EV×liquidity",
+    "countValidation": 5,
+    "countOOS": 1,
+    "validationNetExpectancy": -0.04965359,
+    "oosNetExpectancy": 0.094689,
+    "bestRegion": "HIGH-HIGH",
+    "worstRegion": "OTHER",
+    "class": "WEAK_INTERACTION"
+  },
+  "currentRanking": {
+    "top10": 230,
+    "top20": 459,
+    "top30": 688
+  },
+  "finalVerdict": {
+    "TOP_RAW_FEATURE": "momentumScore",
+    "TOP_RAW_FEATURE_OOS_EXPECTANCY": 0.02061415,
+    "POSITIVE_NET_REGION": "YES",
+    "TOP_INTERACTION": "EV×liquidity",
+    "TOP_INTERACTION_OOS_EXPECTANCY": 0.094689,
+    "PROFITABLE_CAPTURE": 39,
+    "LOSING_CAPTURE": 54,
+    "CURRENT_2278_RESEARCH_HIGH_EDGE": 688,
+    "FEATURE_CALIBRATION_STATUS": "WEAK",
+    "STRONGEST_RESEARCH_CANDIDATE": "FEATURE_REWEIGHTING_CANDIDATE",
+    "OOS_SUPPORTED": "PARTIAL",
+    "ROBUSTNESS": "ROBUST",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO",
+    "NEXT_STEP": "RUN_TARGETED_SHADOW_ON_RESEARCH_EDGE_RANK_ONLY"
+  }
+}

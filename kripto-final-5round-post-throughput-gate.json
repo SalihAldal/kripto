@@ -1,0 +1,64 @@
+{
+  "validationId": "final-5round-post-throughput-gate-2026-08-19T12:29",
+  "status": "BLOCKED_PRESTART",
+  "started": false,
+  "reason": "ACTIVE_DUPLICATE_JOB_SAFETY_CONFLICT",
+  "preflight": {
+    "attemptId": "final-5round-post-throughput-preflight-1787131832762",
+    "overallVerdict": "READY",
+    "canStart": true,
+    "database": "PASS",
+    "binance": "PASS",
+    "clockSync": "PASS",
+    "aiProviders": "PASS",
+    "emergencyStop": "PASS",
+    "zombieRounds": "PASS",
+    "workerLocks": "PASS"
+  },
+  "criticalBlockers": [
+    {
+      "code": "ACTIVE_JOB_CONFLICT",
+      "detail": "RUNNING jobs with stopRequested=true remained in user scope"
+    }
+  ],
+  "runningForUser": [
+    {
+      "id": "cmsz9dsy80009unlw9c26k8hb",
+      "status": "RUNNING",
+      "currentRound": 1,
+      "stopRequested": true
+    },
+    {
+      "id": "cmsz7lzqi0009uneosnuhv08d",
+      "status": "RUNNING",
+      "currentRound": 2,
+      "stopRequested": true
+    }
+  ],
+  "rounds": [],
+  "comparisonWithPrevious": {
+    "previousBaseline": {
+      "candidatesPerMinute": 12.3972,
+      "aiCandidatesPerMinute": 2.5994,
+      "remoteCalls": 578,
+      "degradedCalls": 22
+    },
+    "current": "N/A (run not started due to safety block)"
+  },
+  "finalVerdict": {
+    "FIVE_ROUNDS_COMPLETED": "NO",
+    "SELECTION_THROUGHPUT": "FAIL",
+    "AI_REMOTE_HEALTH": "FAIL",
+    "TDI_RECONCILIATION": "FAIL",
+    "SCANNER_RUNTIME": "FAIL",
+    "ROUND_LIVENESS": "FAIL",
+    "AI_PARITY": "FAIL",
+    "EXIT_RUNTIME_PROVEN": "NO",
+    "FEE_RECONCILIATION_PROVEN": "NO",
+    "TRADE_LIFECYCLE_PROVEN": "NO",
+    "PROFITABILITY_PROVEN": "NOT_PROVEN",
+    "READY_FOR_30_50_ROUNDS": "NO",
+    "READY_FOR_50_ROUND_PAPER": "NO"
+  }
+}
+

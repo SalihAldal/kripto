@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-08-22T21:18:34.385Z",
+  "sessionTargets": [
+    "cmt4udz4u0009un3k9mndd8ki",
+    "cmt4udz4u0009unk424ndkh5m",
+    "cmt4iulcx0009unk424ndkh5m"
+  ],
+  "scannedRounds": 4,
+  "totalCandidates": 314,
+  "orphanCriteria": {
+    "status": "STARTED",
+    "graceMs": 180000,
+    "additionalRule": "snapshot historical and owner no longer live"
+  },
+  "before": {
+    "orphanCount": 53
+  },
+  "after": {
+    "orphanCount": 0
+  },
+  "rounds": [
+    {
+      "sessionId": "cmt4udz4u0009un3k9mndd8ki",
+      "roundId": "1",
+      "runId": "cmt4udzah000pun3k9jmby62o",
+      "filePath": "artifacts/forensics/cmt4udz4u0009un3k9mndd8ki/rounds/1/ai-progress.json",
+      "total": 65,
+      "terminal": 55,
+      "started": 10,
+      "orphanBefore": 10,
+      "orphanAfter": 0,
+      "sampleOrphans": [
+        "APETRY",
+        "AUDIOTRY",
+        "AITRY",
+        "ARBTRY",
+        "MUBARAKTRY"
+      ]
+    },
+    {
+      "sessionId": "cmt4iulcx0009unk424ndkh5m",
+      "roundId": "1",
+      "runId": "cmt4iulhe000nunk4nos2jsa9",
+      "filePath": "artifacts/forensics/cmt4iulcx0009unk424ndkh5m/rounds/1/ai-progress.json",
+      "total": 85,
+      "terminal": 60,
+      "started": 25,
+      "orphanBefore": 25,
+      "orphanAfter": 0,
+      "sampleOrphans": [
+        "LAZIOTRY",
+        "KSMTRY",
+        "PHATRY",
+        "POLYXTRY",
+        "MITOTRY"
+      ]
+    },
+    {
+      "sessionId": "cmt4iulcx0009unk424ndkh5m",
+      "roundId": "2",
+      "runId": "cmt4jhd4f0cgqunk4mx6nb4au",
+      "filePath": "artifacts/forensics/cmt4iulcx0009unk424ndkh5m/rounds/2/ai-progress.json",
+      "total": 78,
+      "terminal": 60,
+      "started": 18,
+      "orphanBefore": 18,
+      "orphanAfter": 0,
+      "sampleOrphans": [
+        "KERNELTRY",
+        "OGTRY",
+        "NILTRY",
+        "INITTRY",
+        "OPGTRY"
+      ]
+    },
+    {
+      "sessionId": "cmt4iulcx0009unk424ndkh5m",
+      "roundId": "3",
+      "runId": "cmt4k4xnh0os9unk4b5v8zkyd",
+      "filePath": "artifacts/forensics/cmt4iulcx0009unk424ndkh5m/rounds/3/ai-progress.json",
+      "total": 86,
+      "terminal": 86,
+      "started": 0,
+      "orphanBefore": 0,
+      "orphanAfter": 0,
+      "sampleOrphans": []
+    }
+  ]
+}

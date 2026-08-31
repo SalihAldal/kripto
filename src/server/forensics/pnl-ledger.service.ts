@@ -1,5 +1,6 @@
 import type { PnlLedgerEntry, PnlLedgerSummary } from "@/src/server/forensics/forensic.types";
 import {
+  classifyFeeEdge,
   computeClosedTradeFeeRatio,
   reconcileFeeStatus,
 } from "@/src/server/forensics/fee-edge-metrics.service";
@@ -24,6 +25,23 @@ export function buildPnlLedgerSummary(entries: PnlLedgerEntry[]): PnlLedgerSumma
   const grossPnL = entries.reduce((acc, row) => acc + row.grossPnL, 0);
   const totalFees = entries.reduce((acc, row) => acc + row.totalFee, 0);
   const netPnL = entries.reduce((acc, row) => acc + row.netPnL, 0);
+  const grossPositiveNetNegativeCount = entries.filter((row) => row.grossPnL > 0 && row.netPnL < 0).length;
+  const feeClassBreakdown = entries.reduce<
+    Partial<Record<"FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN", number>>
+  >((acc, row) => {
+    const key = row.feeEdgeClass ?? "UNKNOWN";
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
+  const exitModelBreakdown = entries.reduce<Partial<Record<"POSITION_MONITOR" | "REPLAY_WINDOW" | "MANUAL_TIMEOUT", number>>>(
+    (acc, row) => {
+      const key = row.exitModel;
+      if (!key) return acc;
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
   const wins = entries.filter((row) => row.netPnL > 0);
   const losses = entries.filter((row) => row.netPnL < 0);
   const winRate = (wins.length / entries.length) * 100;
@@ -63,6 +81,9 @@ export function buildPnlLedgerSummary(entries: PnlLedgerEntry[]): PnlLedgerSumma
     averageLoss: Number(averageLoss.toFixed(8)),
     consecutiveLosses,
     tradeCount: entries.length,
+    grossPositiveNetNegativeCount,
+    feeClassBreakdown,
+    exitModelBreakdown,
   };
 }
 
@@ -78,6 +99,7 @@ export function reconcileRoundPnl(entries: PnlLedgerEntry[], expectedNet: number
 
 export function createPnlLedgerEntry(input: {
   tradeId: string;
+  positionId?: string;
   symbol: string;
   side: "LONG" | "SHORT";
   entryPrice: number;
@@ -99,6 +121,12 @@ export function createPnlLedgerEntry(input: {
       : (input.entryPrice - input.exitPrice) * input.quantity;
   const totalFee = input.entryFee + input.exitFee + (input.slippageCost ?? 0);
   const netPnL = gross - totalFee;
+  const feeEdgeClass = classifyFeeEdge({
+    expectedGross: gross,
+    expectedNet: netPnL,
+    fee: totalFee,
+  });
+  const grossPositiveNetNegative = gross > 0 && netPnL < 0;
   const feeReconciliationStatus = reconcileFeeStatus({
     grossPnL: gross,
     entryFee: input.entryFee,
@@ -109,6 +137,7 @@ export function createPnlLedgerEntry(input: {
   });
   return {
     tradeId: input.tradeId,
+    positionId: input.positionId,
     symbol: input.symbol.toUpperCase(),
     roundId: input.roundId,
     sessionId: input.sessionId,
@@ -118,6 +147,8 @@ export function createPnlLedgerEntry(input: {
     totalFee: Number(totalFee.toFixed(8)),
     netPnL: Number(netPnL.toFixed(8)),
     feeToGrossRatio: computeClosedTradeFeeRatio({ grossPnL: gross, totalFee }),
+    feeEdgeClass,
+    grossPositiveNetNegative,
     feeReconciliationStatus,
     exitReason: input.exitReason,
     exitModel: input.exitModel,

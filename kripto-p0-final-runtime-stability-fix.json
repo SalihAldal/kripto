@@ -1,0 +1,98 @@
+{
+  "report": "KRIPTO_P0_FINAL_RUNTIME_STABILITY_FIX",
+  "timestamp": "2026-08-19T00:00:00.000Z",
+  "scope": {
+    "marketDataResilience": true,
+    "scannerFailureIsolation": true,
+    "transientDbReadResilience": true,
+    "criticalWriteSemanticsPreserved": true,
+    "aiMemoryNoOpinionFallback": true,
+    "watchdogDependencyDegradedState": true
+  },
+  "rootCause": {
+    "binance": "Intermittent TR public market-data endpoint instability on /api/v3/ticker/24hr and related requests (network/rate-limit/auth-envelope style failures).",
+    "prisma": "Transient connectivity failures (P1001/P1002 class) during non-critical intelligence reads propagated into runtime instability."
+  },
+  "changes": {
+    "files": [
+      "src/server/scanner/top-gainer-discovery.service.ts",
+      "src/server/scanner/scanner.service.ts",
+      "src/server/scanner/fast-entry.service.ts",
+      "src/server/execution/round-selection.service.ts",
+      "src/server/execution/round-runtime.types.ts",
+      "src/server/execution/round-runtime.service.ts",
+      "src/server/execution/round-progress-state.service.ts",
+      "src/server/ai/ai-performance.service.ts",
+      "src/server/ai/analysis-orchestrator.ts",
+      "src/server/db/transient-prisma-error.ts"
+    ],
+    "marketDataReasonCodes": [
+      "MARKET_DATA_TIMEOUT",
+      "MARKET_DATA_NETWORK_ERROR",
+      "MARKET_DATA_RATE_LIMIT",
+      "MARKET_DATA_UNAVAILABLE",
+      "MARKET_DATA_STALE",
+      "MARKET_DATA_ABORTED"
+    ],
+    "runtimeInstrumentation": [
+      "lastScannerProgressAt",
+      "lastMarketDataProgressAt",
+      "lastAIProgressAt",
+      "lastPersistAt",
+      "scannerSymbolsProcessed",
+      "pumpSymbolsProcessed",
+      "marketDataRequests",
+      "marketDataFailures",
+      "fallbackCount",
+      "dbTransientFailures"
+    ]
+  },
+  "tests": {
+    "executed": [
+      "tests/top-gainer-discovery.test.ts",
+      "tests/round-progress-state.test.ts",
+      "tests/ai-performance-resilience.test.ts",
+      "tests/round-runtime.test.ts"
+    ],
+    "result": "PASS"
+  },
+  "runtimeValidation": {
+    "requestedRounds": 2,
+    "jobId": "cmsz7lzqi0009uneosnuhv08d",
+    "status": "INCOMPLETE",
+    "observations": [
+      "Round selection progressed deeply through scanner and AI stages.",
+      "Runtime reached currentRound=2 before manual stop command.",
+      "Validation process exceeded 20 minute per-round objective and became non-productive.",
+      "Manual safe stop was applied to avoid RUNNING zombie."
+    ]
+  },
+  "beforeAfterMetrics": {
+    "before": {
+      "scannerEventGapMs": {
+        "p50": 11526,
+        "p95": 39086,
+        "p99": 167426,
+        "max": 217188
+      }
+    },
+    "after": {
+      "scannerEventGapMs": null,
+      "marketDataFailures": "instrumented",
+      "fallbackCount": "instrumented",
+      "dbTransientFailures": "instrumented",
+      "patchJobActiveRoundTimeoutCount": 0,
+      "roundCompletion": "not completed"
+    }
+  },
+  "readiness": {
+    "RUNTIME_STABILITY": "PARTIAL",
+    "SCANNER_RUNTIME": "PARTIAL",
+    "DB_RESILIENCE": "PASS",
+    "AI_PARITY": "PASS",
+    "TDI": "PASS",
+    "TWO_ROUNDS_COMPLETED": "NO",
+    "READY_FOR_5_ROUNDS": "CONDITIONAL",
+    "READY_FOR_30_50_ROUNDS": "NO"
+  }
+}

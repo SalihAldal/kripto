@@ -26,6 +26,9 @@ export function evaluatePromotionGate(input: {
   minSampleSize?: number;
   acceptanceTest: string;
   singleSymbolDominanceThreshold?: number;
+  outOfSampleSupport?: { supported: boolean; expectancyImproved: boolean; drawdownSafe: boolean } | null;
+  topSymbolContributionPct?: number;
+  top1TradeContributionPct?: number;
 }): PromotionGateEvaluation {
   const minSample = input.minSampleSize ?? 20;
   const criteria: PromotionGateEvaluation["criteria"] = [];
@@ -68,15 +71,39 @@ export function evaluatePromotionGate(input: {
     detail: `required=${minSample} actual=${input.sampleSize}`,
   });
 
+  const oosPassed = input.outOfSampleSupport?.supported ?? false;
   criteria.push({
     rule: "Out-of-sample validation if available",
-    passed: false,
-    detail: "No OOS split available in current session bundle",
+    passed: oosPassed,
+    detail: input.outOfSampleSupport
+      ? `expectancyImproved=${input.outOfSampleSupport.expectancyImproved} drawdownSafe=${input.outOfSampleSupport.drawdownSafe}`
+      : "No OOS split available in current session bundle",
+  });
+
+  const symbolDominanceThreshold = input.singleSymbolDominanceThreshold ?? 0.7;
+  const symbolDominancePassed =
+    input.topSymbolContributionPct === undefined || input.topSymbolContributionPct <= symbolDominanceThreshold;
+  criteria.push({
+    rule: "No symbol overfit concentration",
+    passed: symbolDominancePassed,
+    detail:
+      input.topSymbolContributionPct === undefined
+        ? "No positive pnl concentration observed"
+        : `topSymbolContributionPct=${round(input.topSymbolContributionPct, 4)} threshold=${symbolDominanceThreshold}`,
+  });
+  const topTradePassed = input.top1TradeContributionPct === undefined || input.top1TradeContributionPct <= 0.55;
+  criteria.push({
+    rule: "No single-trade dependence",
+    passed: topTradePassed,
+    detail:
+      input.top1TradeContributionPct === undefined
+        ? "No positive pnl concentration observed"
+        : `top1TradeContributionPct=${round(input.top1TradeContributionPct, 4)} threshold=0.55`,
   });
 
   const passedCount = criteria.filter((row) => row.passed).length;
   let status: PromotionGateStatus = "REJECTED";
-  if (passedCount >= 5 && expectancyImproved && drawdownOk && input.sampleSize >= minSample) {
+  if (passedCount >= 7 && expectancyImproved && drawdownOk && input.sampleSize >= minSample && oosPassed) {
     status = "PROMOTABLE";
   } else if (passedCount >= 3) {
     status = "RESEARCH_ONLY";

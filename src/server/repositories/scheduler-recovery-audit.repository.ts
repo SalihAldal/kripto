@@ -11,6 +11,7 @@ const RECOVERY_STATE_KEY = "recoveryState";
 const MAX_AUDIT_EVENTS = 100;
 const RECOVERY_WINDOW_MS = 60 * 60 * 1000;
 const MAX_RECOVERIES_PER_WINDOW = 12;
+const NO_ACTION_COALESCE_WINDOW_MS = 60_000;
 
 function defaultRecoveryState(): RecoveryState {
   return {
@@ -97,7 +98,7 @@ export async function appendRecoveryAuditEvent(input: {
   return prisma.$transaction(async (tx) => {
     const job = await tx.autoRoundJob.findUnique({
       where: { id: input.jobId },
-      select: { metadata: true },
+      select: { metadata: true, persistVersion: true },
     });
     if (!job) return null;
 
@@ -111,16 +112,34 @@ export async function appendRecoveryAuditEvent(input: {
       timestamp: new Date().toISOString(),
     };
 
+    if (event.action === "NO_ACTION" && event.result === "skipped" && audit.length > 0) {
+      const latest = audit[0];
+      const latestTs = new Date(latest.timestamp).getTime();
+      const nowTs = new Date(event.timestamp).getTime();
+      const sameDecision =
+        latest.action === "NO_ACTION" &&
+        latest.result === "skipped" &&
+        latest.failure === event.failure &&
+        latest.component === event.component;
+      if (sameDecision && Number.isFinite(latestTs) && Number.isFinite(nowTs) && nowTs - latestTs < NO_ACTION_COALESCE_WINDOW_MS) {
+        return { event, state };
+      }
+    }
+
     const incrementCounter =
-      event.action !== "NO_ACTION" && event.result !== "skipped";
+      event.action !== "NO_ACTION" &&
+      event.result !== "skipped" &&
+      !(event.result === "success" && event.action === "RECONCILE" && event.failure === "REGISTRY_INTEGRITY");
     const nextRecoveryCount = state.recoveryCount + (incrementCounter ? 1 : 0);
     const nextRecoveryFailure = state.recoveryFailure + (event.result === "failure" && incrementCounter ? 1 : 0);
     const nextRecoverySuccess = state.recoverySuccess + (event.result === "success" && incrementCounter ? 1 : 0);
+    const registryReconcileSuccess =
+      event.result === "success" && event.action === "RECONCILE" && event.failure === "REGISTRY_INTEGRITY";
     const nextState: RecoveryState = {
       ...state,
       recoveryCount: nextRecoveryCount,
       recoverySuccess: nextRecoverySuccess,
-      recoveryFailure: nextRecoveryFailure,
+      recoveryFailure: registryReconcileSuccess ? 0 : nextRecoveryFailure,
       lastRecoveryAt: incrementCounter ? event.timestamp : state.lastRecoveryAt,
       lastCause: incrementCounter ? event.failure : state.lastCause,
       lastDurationMs: incrementCounter ? event.durationMs : state.lastDurationMs,
@@ -132,9 +151,10 @@ export async function appendRecoveryAuditEvent(input: {
     };
 
     const nextAudit = [event, ...audit].slice(0, MAX_AUDIT_EVENTS);
-    await tx.autoRoundJob.update({
-      where: { id: input.jobId },
+    const updated = await tx.autoRoundJob.updateMany({
+      where: { id: input.jobId, persistVersion: job.persistVersion },
       data: {
+        persistVersion: { increment: 1 },
         metadata: {
           ...meta,
           [RECOVERY_AUDIT_KEY]: nextAudit,
@@ -142,9 +162,19 @@ export async function appendRecoveryAuditEvent(input: {
         } as never,
       },
     });
+    if (updated.count !== 1) {
+      const latest = await tx.autoRoundJob.findUnique({
+        where: { id: input.jobId },
+        select: { metadata: true },
+      });
+      return {
+        event,
+        state: latest ? readRecoveryStateFromMetadata(latest.metadata) : nextState,
+      };
+    }
 
     return { event, state: nextState };
-  });
+  }, { timeoutMs: 20_000, maxWaitMs: 10_000 });
 }
 
 export async function pingDatabaseConnectivity() {

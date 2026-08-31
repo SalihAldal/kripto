@@ -1,0 +1,1666 @@
+{
+  "generatedAt": "2026-08-22T11:28:16.017Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionBehaviorChange": true
+  },
+  "sampleQuality": {
+    "pairedTrades": 173,
+    "highConfidence": 173,
+    "mediumConfidence": 0,
+    "lowConfidence": 0,
+    "tradesPerStrategy": [
+      {
+        "strategy": "Mean Reversion",
+        "tradeCount": 147,
+        "winRate": 0.19727891156462585,
+        "grossPnL": -17.161414759999996,
+        "fees": 0,
+        "netPnL": -17.161414759999996,
+        "expectancy": -0.11674431809523807,
+        "profitFactor": 0.09457814784573089,
+        "maxDrawdown": -17.161414759999992,
+        "sampleStatus": "SUFFICIENT",
+        "lossContributionPct": 0.9228948129000698
+      },
+      {
+        "strategy": "Other",
+        "tradeCount": 26,
+        "winRate": 0.15384615384615385,
+        "grossPnL": -1.4337864700000003,
+        "fees": 0,
+        "netPnL": -1.4337864700000003,
+        "expectancy": -0.055145633461538474,
+        "profitFactor": 0.15564687796898144,
+        "maxDrawdown": -1.4337864700000003,
+        "sampleStatus": "SUFFICIENT",
+        "lossContributionPct": 0.07710518709993011
+      }
+    ],
+    "tradesPerRegime": [
+      {
+        "regime": "LOW_VOLATILITY",
+        "tradeCount": 29,
+        "winRate": 0.27586206896551724,
+        "grossPnL": -11.023537019999997,
+        "fees": 0,
+        "netPnL": -11.023537019999997,
+        "expectancy": -0.3801219662068965,
+        "profitFactor": 0.03704315981911306,
+        "sampleStatus": "SUFFICIENT"
+      },
+      {
+        "regime": "RANGE",
+        "tradeCount": 118,
+        "winRate": 0.17796610169491525,
+        "grossPnL": -6.13787774,
+        "fees": 0,
+        "netPnL": -6.13787774,
+        "expectancy": -0.05201591305084746,
+        "profitFactor": 0.1823208235239352,
+        "sampleStatus": "SUFFICIENT"
+      },
+      {
+        "regime": "UNKNOWN",
+        "tradeCount": 20,
+        "winRate": 0.15,
+        "grossPnL": -1.2672170100000002,
+        "fees": 0,
+        "netPnL": -1.2672170100000002,
+        "expectancy": -0.06336085050000001,
+        "profitFactor": 0.14027810775064908,
+        "sampleStatus": "SUFFICIENT"
+      },
+      {
+        "regime": "HIGH_VOLATILITY",
+        "tradeCount": 6,
+        "winRate": 0.16666666666666666,
+        "grossPnL": -0.16656946,
+        "fees": 0,
+        "netPnL": -0.16656946,
+        "expectancy": -0.027761576666666666,
+        "profitFactor": 0.2567309639378813,
+        "sampleStatus": "NOT_ENOUGH_DATA"
+      }
+    ],
+    "topSymbols": [
+      {
+        "symbol": "1000SATSTRY",
+        "tradeCount": 1,
+        "winRate": 0,
+        "netPnL": -9.8952037,
+        "fees": 0,
+        "expectancy": -9.8952037
+      },
+      {
+        "symbol": "BTCTRY",
+        "tradeCount": 5,
+        "winRate": 0,
+        "netPnL": -0.48278011,
+        "fees": 0,
+        "expectancy": -0.09655602199999999
+      },
+      {
+        "symbol": "ALLOTRY",
+        "tradeCount": 11,
+        "winRate": 0.36363636363636365,
+        "netPnL": -0.3962325,
+        "fees": 0,
+        "expectancy": -0.03602113636363636
+      },
+      {
+        "symbol": "NEARTRY",
+        "tradeCount": 4,
+        "winRate": 0,
+        "netPnL": -0.38627179999999994,
+        "fees": 0,
+        "expectancy": -0.09656794999999999
+      },
+      {
+        "symbol": "BABYTRY",
+        "tradeCount": 5,
+        "winRate": 0.4,
+        "netPnL": -0.315755,
+        "fees": 0,
+        "expectancy": -0.063151
+      },
+      {
+        "symbol": "BIOTRY",
+        "tradeCount": 3,
+        "winRate": 0,
+        "netPnL": -0.29917119999999997,
+        "fees": 0,
+        "expectancy": -0.09972373333333333
+      },
+      {
+        "symbol": "PORTALTRY",
+        "tradeCount": 3,
+        "winRate": 0,
+        "netPnL": -0.26686867000000003,
+        "fees": 0,
+        "expectancy": -0.08895622333333335
+      },
+      {
+        "symbol": "INJTRY",
+        "tradeCount": 3,
+        "winRate": 0,
+        "netPnL": -0.23074299999999998,
+        "fees": 0,
+        "expectancy": -0.07691433333333332
+      },
+      {
+        "symbol": "OPGTRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.22309400000000001,
+        "fees": 0,
+        "expectancy": -0.11154700000000001
+      },
+      {
+        "symbol": "LUNCTRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.21121696,
+        "fees": 0,
+        "expectancy": -0.10560848
+      },
+      {
+        "symbol": "ZBTTRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.20465250000000001,
+        "fees": 0,
+        "expectancy": -0.10232625000000001
+      },
+      {
+        "symbol": "CFGTRY",
+        "tradeCount": 3,
+        "winRate": 0,
+        "netPnL": -0.2041558,
+        "fees": 0,
+        "expectancy": -0.06805193333333333
+      },
+      {
+        "symbol": "JTOTRY",
+        "tradeCount": 4,
+        "winRate": 0,
+        "netPnL": -0.203289,
+        "fees": 0,
+        "expectancy": -0.05082225
+      },
+      {
+        "symbol": "MEMETRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.19963555,
+        "fees": 0,
+        "expectancy": -0.099817775
+      },
+      {
+        "symbol": "ETHTRY",
+        "tradeCount": 4,
+        "winRate": 0,
+        "netPnL": -0.1948317,
+        "fees": 0,
+        "expectancy": -0.048707925
+      },
+      {
+        "symbol": "GPSTRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.18370509999999998,
+        "fees": 0,
+        "expectancy": -0.09185254999999999
+      },
+      {
+        "symbol": "UNITRY",
+        "tradeCount": 3,
+        "winRate": 1,
+        "netPnL": 0.183053,
+        "fees": 0,
+        "expectancy": 0.061017666666666664
+      },
+      {
+        "symbol": "ETHFITRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.17572500000000002,
+        "fees": 0,
+        "expectancy": -0.08786250000000001
+      },
+      {
+        "symbol": "SAGATRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.1694469,
+        "fees": 0,
+        "expectancy": -0.08472345
+      },
+      {
+        "symbol": "EIGENTRY",
+        "tradeCount": 2,
+        "winRate": 0,
+        "netPnL": -0.16622878000000002,
+        "fees": 0,
+        "expectancy": -0.08311439000000001
+      }
+    ],
+    "concentratedSymbolEffect": false
+  },
+  "lossAttribution": [
+    {
+      "cause": "EXIT_PROBLEM",
+      "tradeCount": 121,
+      "grossPnL": -19.40639196999999,
+      "fees": 0,
+      "netPnL": -19.40639196999999,
+      "lossContribution": 19.40639196999999,
+      "shareOfTotalLoss": 0.9396793444400919,
+      "averageLoss": -0.16038340471074372
+    },
+    {
+      "cause": "STRATEGY_WEAKNESS",
+      "tradeCount": 13,
+      "grossPnL": -0.9075867599999999,
+      "fees": 0,
+      "netPnL": -0.9075867599999999,
+      "lossContribution": 0.9075867599999999,
+      "shareOfTotalLoss": 0.043946372565168146,
+      "averageLoss": -0.06981436615384615
+    },
+    {
+      "cause": "FEE_EROSION",
+      "tradeCount": 6,
+      "grossPnL": -0.33816403,
+      "fees": 0,
+      "netPnL": -0.33816403,
+      "lossContribution": 0.33816403,
+      "shareOfTotalLoss": 0.016374282994739475,
+      "averageLoss": -0.05636067166666667
+    }
+  ],
+  "feeAttribution": {
+    "current173": {
+      "dataset": "CURRENT_PAIRED_173",
+      "tradeCount": 173,
+      "grossPnL": -18.595201229999994,
+      "totalFees": 0,
+      "netPnL": -18.595201229999994,
+      "grossPositiveNetNegative": 0,
+      "feeDominantLosses": 6,
+      "feeMeaningfulLosses": 27,
+      "feeSecondaryLosses": 107
+    },
+    "historicalReference51": {
+      "dataset": "HISTORICAL_REFERENCE_51",
+      "tradeCount": 51,
+      "grossPnL": -0.33651532,
+      "totalFees": 5.09837823,
+      "netPnL": -5.43489355,
+      "grossPositiveNetNegative": null,
+      "feeDominantLosses": null,
+      "feeMeaningfulLosses": null,
+      "feeSecondaryLosses": null
+    },
+    "feeContributionPct": 0
+  },
+  "entryAttribution": [
+    {
+      "entryQuality": "NORMAL",
+      "tradeCount": 15,
+      "avgEntryDelay": 1.7333333333333334,
+      "medianEntryDelay": 1,
+      "avgNetPnL": -0.05655608066666666,
+      "expectancy": -0.05655608066666666,
+      "winRate": 0.13333333333333333,
+      "grossPnL": -0.84834121,
+      "fees": 0,
+      "netPnL": -0.84834121
+    },
+    {
+      "entryQuality": "GOOD_ENTRY",
+      "tradeCount": 149,
+      "avgEntryDelay": 1.3825503355704698,
+      "medianEntryDelay": 1,
+      "avgNetPnL": -0.11759666436241605,
+      "expectancy": -0.11759666436241605,
+      "winRate": 0.18791946308724833,
+      "grossPnL": -17.52190298999999,
+      "fees": 0,
+      "netPnL": -17.52190298999999
+    },
+    {
+      "entryQuality": "EDGE_DECAY",
+      "tradeCount": 9,
+      "avgEntryDelay": 0.8888888888888888,
+      "medianEntryDelay": 1,
+      "avgNetPnL": -0.024995225555555556,
+      "expectancy": -0.024995225555555556,
+      "winRate": 0.3333333333333333,
+      "grossPnL": -0.22495703,
+      "fees": 0,
+      "netPnL": -0.22495703
+    }
+  ],
+  "strategyAttribution": [
+    {
+      "strategy": "Mean Reversion",
+      "tradeCount": 147,
+      "winRate": 0.19727891156462585,
+      "grossPnL": -17.161414759999996,
+      "fees": 0,
+      "netPnL": -17.161414759999996,
+      "expectancy": -0.11674431809523807,
+      "profitFactor": 0.09457814784573089,
+      "maxDrawdown": -17.161414759999992,
+      "sampleStatus": "SUFFICIENT",
+      "lossContributionPct": 0.9228948129000698
+    },
+    {
+      "strategy": "Other",
+      "tradeCount": 26,
+      "winRate": 0.15384615384615385,
+      "grossPnL": -1.4337864700000003,
+      "fees": 0,
+      "netPnL": -1.4337864700000003,
+      "expectancy": -0.055145633461538474,
+      "profitFactor": 0.15564687796898144,
+      "maxDrawdown": -1.4337864700000003,
+      "sampleStatus": "SUFFICIENT",
+      "lossContributionPct": 0.07710518709993011
+    }
+  ],
+  "regimeAttribution": [
+    {
+      "regime": "LOW_VOLATILITY",
+      "tradeCount": 29,
+      "winRate": 0.27586206896551724,
+      "grossPnL": -11.023537019999997,
+      "fees": 0,
+      "netPnL": -11.023537019999997,
+      "expectancy": -0.3801219662068965,
+      "profitFactor": 0.03704315981911306,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "regime": "RANGE",
+      "tradeCount": 118,
+      "winRate": 0.17796610169491525,
+      "grossPnL": -6.13787774,
+      "fees": 0,
+      "netPnL": -6.13787774,
+      "expectancy": -0.05201591305084746,
+      "profitFactor": 0.1823208235239352,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "regime": "UNKNOWN",
+      "tradeCount": 20,
+      "winRate": 0.15,
+      "grossPnL": -1.2672170100000002,
+      "fees": 0,
+      "netPnL": -1.2672170100000002,
+      "expectancy": -0.06336085050000001,
+      "profitFactor": 0.14027810775064908,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "regime": "HIGH_VOLATILITY",
+      "tradeCount": 6,
+      "winRate": 0.16666666666666666,
+      "grossPnL": -0.16656946,
+      "fees": 0,
+      "netPnL": -0.16656946,
+      "expectancy": -0.027761576666666666,
+      "profitFactor": 0.2567309639378813,
+      "sampleStatus": "NOT_ENOUGH_DATA"
+    }
+  ],
+  "strategyRegimeMatrix": [
+    {
+      "strategy": "Mean Reversion",
+      "regime": "LOW_VOLATILITY",
+      "tradeCount": 29,
+      "winRate": 0.27586206896551724,
+      "grossPnL": -11.023537019999997,
+      "fees": 0,
+      "netPnL": -11.023537019999997,
+      "expectancy": -0.3801219662068965,
+      "profitFactor": 0.03704315981911306,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "strategy": "Mean Reversion",
+      "regime": "RANGE",
+      "tradeCount": 118,
+      "winRate": 0.17796610169491525,
+      "grossPnL": -6.13787774,
+      "fees": 0,
+      "netPnL": -6.13787774,
+      "expectancy": -0.05201591305084746,
+      "profitFactor": 0.1823208235239352,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "strategy": "Other",
+      "regime": "UNKNOWN",
+      "tradeCount": 20,
+      "winRate": 0.15,
+      "grossPnL": -1.2672170100000002,
+      "fees": 0,
+      "netPnL": -1.2672170100000002,
+      "expectancy": -0.06336085050000001,
+      "profitFactor": 0.14027810775064908,
+      "sampleStatus": "SUFFICIENT"
+    },
+    {
+      "strategy": "Other",
+      "regime": "HIGH_VOLATILITY",
+      "tradeCount": 6,
+      "winRate": 0.16666666666666666,
+      "grossPnL": -0.16656946,
+      "fees": 0,
+      "netPnL": -0.16656946,
+      "expectancy": -0.027761576666666666,
+      "profitFactor": 0.2567309639378813,
+      "sampleStatus": "NOT_ENOUGH_DATA"
+    }
+  ],
+  "symbolAttribution": [
+    {
+      "symbol": "1000SATSTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -9.8952037,
+      "fees": 0,
+      "expectancy": -9.8952037
+    },
+    {
+      "symbol": "BTCTRY",
+      "tradeCount": 5,
+      "winRate": 0,
+      "netPnL": -0.48278011,
+      "fees": 0,
+      "expectancy": -0.09655602199999999
+    },
+    {
+      "symbol": "ALLOTRY",
+      "tradeCount": 11,
+      "winRate": 0.36363636363636365,
+      "netPnL": -0.3962325,
+      "fees": 0,
+      "expectancy": -0.03602113636363636
+    },
+    {
+      "symbol": "NEARTRY",
+      "tradeCount": 4,
+      "winRate": 0,
+      "netPnL": -0.38627179999999994,
+      "fees": 0,
+      "expectancy": -0.09656794999999999
+    },
+    {
+      "symbol": "BABYTRY",
+      "tradeCount": 5,
+      "winRate": 0.4,
+      "netPnL": -0.315755,
+      "fees": 0,
+      "expectancy": -0.063151
+    },
+    {
+      "symbol": "BIOTRY",
+      "tradeCount": 3,
+      "winRate": 0,
+      "netPnL": -0.29917119999999997,
+      "fees": 0,
+      "expectancy": -0.09972373333333333
+    },
+    {
+      "symbol": "PORTALTRY",
+      "tradeCount": 3,
+      "winRate": 0,
+      "netPnL": -0.26686867000000003,
+      "fees": 0,
+      "expectancy": -0.08895622333333335
+    },
+    {
+      "symbol": "INJTRY",
+      "tradeCount": 3,
+      "winRate": 0,
+      "netPnL": -0.23074299999999998,
+      "fees": 0,
+      "expectancy": -0.07691433333333332
+    },
+    {
+      "symbol": "OPGTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.22309400000000001,
+      "fees": 0,
+      "expectancy": -0.11154700000000001
+    },
+    {
+      "symbol": "LUNCTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.21121696,
+      "fees": 0,
+      "expectancy": -0.10560848
+    },
+    {
+      "symbol": "ZBTTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.20465250000000001,
+      "fees": 0,
+      "expectancy": -0.10232625000000001
+    },
+    {
+      "symbol": "CFGTRY",
+      "tradeCount": 3,
+      "winRate": 0,
+      "netPnL": -0.2041558,
+      "fees": 0,
+      "expectancy": -0.06805193333333333
+    },
+    {
+      "symbol": "JTOTRY",
+      "tradeCount": 4,
+      "winRate": 0,
+      "netPnL": -0.203289,
+      "fees": 0,
+      "expectancy": -0.05082225
+    },
+    {
+      "symbol": "MEMETRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.19963555,
+      "fees": 0,
+      "expectancy": -0.099817775
+    },
+    {
+      "symbol": "ETHTRY",
+      "tradeCount": 4,
+      "winRate": 0,
+      "netPnL": -0.1948317,
+      "fees": 0,
+      "expectancy": -0.048707925
+    },
+    {
+      "symbol": "GPSTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.18370509999999998,
+      "fees": 0,
+      "expectancy": -0.09185254999999999
+    },
+    {
+      "symbol": "UNITRY",
+      "tradeCount": 3,
+      "winRate": 1,
+      "netPnL": 0.183053,
+      "fees": 0,
+      "expectancy": 0.061017666666666664
+    },
+    {
+      "symbol": "ETHFITRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.17572500000000002,
+      "fees": 0,
+      "expectancy": -0.08786250000000001
+    },
+    {
+      "symbol": "SAGATRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.1694469,
+      "fees": 0,
+      "expectancy": -0.08472345
+    },
+    {
+      "symbol": "EIGENTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.16622878000000002,
+      "fees": 0,
+      "expectancy": -0.08311439000000001
+    },
+    {
+      "symbol": "FIDATRY",
+      "tradeCount": 4,
+      "winRate": 0.25,
+      "netPnL": -0.16505445,
+      "fees": 0,
+      "expectancy": -0.0412636125
+    },
+    {
+      "symbol": "HEMITRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.15676184999999998,
+      "fees": 0,
+      "expectancy": -0.07838092499999999
+    },
+    {
+      "symbol": "SENTTRY",
+      "tradeCount": 3,
+      "winRate": 0.3333333333333333,
+      "netPnL": -0.15438015,
+      "fees": 0,
+      "expectancy": -0.05146005
+    },
+    {
+      "symbol": "IDTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.147516,
+      "fees": 0,
+      "expectancy": -0.147516
+    },
+    {
+      "symbol": "CTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.1433322,
+      "fees": 0,
+      "expectancy": -0.1433322
+    },
+    {
+      "symbol": "MMTTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.14188,
+      "fees": 0,
+      "expectancy": -0.14188
+    },
+    {
+      "symbol": "FDUSDTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.13806,
+      "fees": 0,
+      "expectancy": -0.13806
+    },
+    {
+      "symbol": "SAHARATRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.12925385,
+      "fees": 0,
+      "expectancy": -0.12925385
+    },
+    {
+      "symbol": "SAPIENTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.1270404,
+      "fees": 0,
+      "expectancy": -0.1270404
+    },
+    {
+      "symbol": "FORMTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.12678999999999999,
+      "fees": 0,
+      "expectancy": -0.06339499999999999
+    },
+    {
+      "symbol": "TIATRY",
+      "tradeCount": 4,
+      "winRate": 0.25,
+      "netPnL": -0.12591639999999998,
+      "fees": 0,
+      "expectancy": -0.031479099999999996
+    },
+    {
+      "symbol": "MORPHOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.12280235,
+      "fees": 0,
+      "expectancy": -0.12280235
+    },
+    {
+      "symbol": "WLDTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.119714,
+      "fees": 0,
+      "expectancy": -0.119714
+    },
+    {
+      "symbol": "PIXELTRY",
+      "tradeCount": 2,
+      "winRate": 1,
+      "netPnL": 0.118238,
+      "fees": 0,
+      "expectancy": 0.059119
+    },
+    {
+      "symbol": "BONKTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.11128548,
+      "fees": 0,
+      "expectancy": -0.11128548
+    },
+    {
+      "symbol": "ATMTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.1098775,
+      "fees": 0,
+      "expectancy": -0.1098775
+    },
+    {
+      "symbol": "JUPTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.1094715,
+      "fees": 0,
+      "expectancy": -0.1094715
+    },
+    {
+      "symbol": "XRPTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.104911,
+      "fees": 0,
+      "expectancy": -0.0524555
+    },
+    {
+      "symbol": "HEITRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.1021647,
+      "fees": 0,
+      "expectancy": -0.1021647
+    },
+    {
+      "symbol": "IOTRY",
+      "tradeCount": 1,
+      "winRate": 1,
+      "netPnL": 0.1012722,
+      "fees": 0,
+      "expectancy": 0.1012722
+    },
+    {
+      "symbol": "PENGUTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.099006,
+      "fees": 0,
+      "expectancy": -0.099006
+    },
+    {
+      "symbol": "KATTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0972624,
+      "fees": 0,
+      "expectancy": -0.0972624
+    },
+    {
+      "symbol": "TAOTRY",
+      "tradeCount": 3,
+      "winRate": 0.3333333333333333,
+      "netPnL": -0.096235,
+      "fees": 0,
+      "expectancy": -0.032078333333333334
+    },
+    {
+      "symbol": "LINKTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.092951,
+      "fees": 0,
+      "expectancy": -0.0464755
+    },
+    {
+      "symbol": "SPKTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.0925627,
+      "fees": 0,
+      "expectancy": -0.04628135
+    },
+    {
+      "symbol": "SOLTRY",
+      "tradeCount": 7,
+      "winRate": 0.2857142857142857,
+      "netPnL": -0.08788085,
+      "fees": 0,
+      "expectancy": -0.012554407142857143
+    },
+    {
+      "symbol": "ONTTRY",
+      "tradeCount": 2,
+      "winRate": 0,
+      "netPnL": -0.081082,
+      "fees": 0,
+      "expectancy": -0.040541
+    },
+    {
+      "symbol": "ICPTRY",
+      "tradeCount": 1,
+      "winRate": 1,
+      "netPnL": 0.0801504,
+      "fees": 0,
+      "expectancy": 0.0801504
+    },
+    {
+      "symbol": "LDOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0792858,
+      "fees": 0,
+      "expectancy": -0.0792858
+    },
+    {
+      "symbol": "USUALTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0764148,
+      "fees": 0,
+      "expectancy": -0.0764148
+    },
+    {
+      "symbol": "WLFITRY",
+      "tradeCount": 1,
+      "winRate": 1,
+      "netPnL": 0.0746298,
+      "fees": 0,
+      "expectancy": 0.0746298
+    },
+    {
+      "symbol": "STOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0741884,
+      "fees": 0,
+      "expectancy": -0.0741884
+    },
+    {
+      "symbol": "AEVOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.074022,
+      "fees": 0,
+      "expectancy": -0.074022
+    },
+    {
+      "symbol": "OPTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.07024,
+      "fees": 0,
+      "expectancy": -0.07024
+    },
+    {
+      "symbol": "PYTHTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0693308,
+      "fees": 0,
+      "expectancy": -0.0693308
+    },
+    {
+      "symbol": "MITOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0688894,
+      "fees": 0,
+      "expectancy": -0.0688894
+    },
+    {
+      "symbol": "ORDITRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.068379,
+      "fees": 0,
+      "expectancy": -0.068379
+    },
+    {
+      "symbol": "ALGOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0681936,
+      "fees": 0,
+      "expectancy": -0.0681936
+    },
+    {
+      "symbol": "DYDXTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.06816886,
+      "fees": 0,
+      "expectancy": -0.06816886
+    },
+    {
+      "symbol": "XECTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.06781986,
+      "fees": 0,
+      "expectancy": -0.06781986
+    },
+    {
+      "symbol": "GUNTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.066186,
+      "fees": 0,
+      "expectancy": -0.066186
+    },
+    {
+      "symbol": "LUNATRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.066006,
+      "fees": 0,
+      "expectancy": -0.066006
+    },
+    {
+      "symbol": "BERATRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.06554509,
+      "fees": 0,
+      "expectancy": -0.06554509
+    },
+    {
+      "symbol": "RENDERTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.063954,
+      "fees": 0,
+      "expectancy": -0.063954
+    },
+    {
+      "symbol": "APETRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0635579,
+      "fees": 0,
+      "expectancy": -0.0635579
+    },
+    {
+      "symbol": "POLTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0629475,
+      "fees": 0,
+      "expectancy": -0.0629475
+    },
+    {
+      "symbol": "AIGENSYNTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0626675,
+      "fees": 0,
+      "expectancy": -0.0626675
+    },
+    {
+      "symbol": "DYMTRY",
+      "tradeCount": 1,
+      "winRate": 1,
+      "netPnL": 0.0578592,
+      "fees": 0,
+      "expectancy": 0.0578592
+    },
+    {
+      "symbol": "ACHTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0562001,
+      "fees": 0,
+      "expectancy": -0.0562001
+    },
+    {
+      "symbol": "GRTTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0557145,
+      "fees": 0,
+      "expectancy": -0.0557145
+    },
+    {
+      "symbol": "HOMETRY",
+      "tradeCount": 3,
+      "winRate": 0.3333333333333333,
+      "netPnL": -0.05349899999999999,
+      "fees": 0,
+      "expectancy": -0.017832999999999998
+    },
+    {
+      "symbol": "MEGATRY",
+      "tradeCount": 4,
+      "winRate": 0.5,
+      "netPnL": -0.051892350000000004,
+      "fees": 0,
+      "expectancy": -0.012973087500000001
+    },
+    {
+      "symbol": "NIGHTTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.049974,
+      "fees": 0,
+      "expectancy": -0.049974
+    },
+    {
+      "symbol": "OPENTRY",
+      "tradeCount": 1,
+      "winRate": 1,
+      "netPnL": 0.048156,
+      "fees": 0,
+      "expectancy": 0.048156
+    },
+    {
+      "symbol": "CHZTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0475125,
+      "fees": 0,
+      "expectancy": -0.0475125
+    },
+    {
+      "symbol": "REDTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.046809,
+      "fees": 0,
+      "expectancy": -0.046809
+    },
+    {
+      "symbol": "TRXTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.038517,
+      "fees": 0,
+      "expectancy": -0.038517
+    },
+    {
+      "symbol": "BOMETRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0302802,
+      "fees": 0,
+      "expectancy": -0.0302802
+    },
+    {
+      "symbol": "AVNTTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.030222,
+      "fees": 0,
+      "expectancy": -0.030222
+    },
+    {
+      "symbol": "ASTERTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.030219,
+      "fees": 0,
+      "expectancy": -0.030219
+    },
+    {
+      "symbol": "SIGNTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.02976,
+      "fees": 0,
+      "expectancy": -0.02976
+    },
+    {
+      "symbol": "SUITRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0287,
+      "fees": 0,
+      "expectancy": -0.0287
+    },
+    {
+      "symbol": "STXTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.027297,
+      "fees": 0,
+      "expectancy": -0.027297
+    },
+    {
+      "symbol": "KAITOTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.02554,
+      "fees": 0,
+      "expectancy": -0.02554
+    },
+    {
+      "symbol": "FLOKITRY",
+      "tradeCount": 1,
+      "winRate": 1,
+      "netPnL": 0.02329278,
+      "fees": 0,
+      "expectancy": 0.02329278
+    },
+    {
+      "symbol": "SANDTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.0210829,
+      "fees": 0,
+      "expectancy": -0.0210829
+    },
+    {
+      "symbol": "DOGETRY",
+      "tradeCount": 2,
+      "winRate": 0.5,
+      "netPnL": -0.014632000000000006,
+      "fees": 0,
+      "expectancy": -0.007316000000000003
+    },
+    {
+      "symbol": "AVAXTRY",
+      "tradeCount": 1,
+      "winRate": 0,
+      "netPnL": -0.009162,
+      "fees": 0,
+      "expectancy": -0.009162
+    },
+    {
+      "symbol": "XLMTRY",
+      "tradeCount": 2,
+      "winRate": 0.5,
+      "netPnL": -0.008740999999999999,
+      "fees": 0,
+      "expectancy": -0.004370499999999999
+    },
+    {
+      "symbol": "FETTRY",
+      "tradeCount": 4,
+      "winRate": 0.5,
+      "netPnL": 0.0029590000000000033,
+      "fees": 0,
+      "expectancy": 0.0007397500000000008
+    },
+    {
+      "symbol": "STRAXTRY",
+      "tradeCount": 5,
+      "winRate": 0.6,
+      "netPnL": -0.001061499999999986,
+      "fees": 0,
+      "expectancy": -0.00021229999999999722
+    }
+  ],
+  "aiAttribution": [],
+  "tdiAttribution": [],
+  "missedOpportunities": {
+    "totalCandidates": 33076,
+    "totalTrades": 346,
+    "discoveredButNotTraded": 32730,
+    "note": "No deterministic realized-PnL assigned to unexecuted candidates."
+  },
+  "feeAwareImpact": {
+    "blockedCount": 9,
+    "avoidedNetLoss": 0.33816403,
+    "profitableTradeBlocked": 3,
+    "rows": [
+      {
+        "candidateId": null,
+        "tradeId": "cmpwyr5fi04lounfcqrqjbirr",
+        "symbol": "SIGNTRY",
+        "strategy": "Mean Reversion",
+        "regime": "LOW_VOLATILITY",
+        "expectedGrossEdge": 0.0248,
+        "expectedNetEdge": -0.00496,
+        "feeToGrossRatio": 1.2,
+        "actualBaselineGrossPnL": -0.02976,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": -0.02976,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "avoidedNetLoss"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmpxftncl0r14unp0rmg52z5t",
+        "symbol": "OPENTRY",
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "expectedGrossEdge": 0.0287361,
+        "expectedNetEdge": -0.0009909,
+        "feeToGrossRatio": 1.0345,
+        "actualBaselineGrossPnL": 0.048156,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": 0.048156,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "profitableTradeBlocked"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmpxs1fq91nbuunp0ichr7mhe",
+        "symbol": "HEMITRY",
+        "strategy": "Mean Reversion",
+        "regime": "LOW_VOLATILITY",
+        "expectedGrossEdge": 0.02523307,
+        "expectedNetEdge": -0.00504661,
+        "feeToGrossRatio": 1.2,
+        "actualBaselineGrossPnL": -0.09345478,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": -0.09345478,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "avoidedNetLoss"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmpzev8d200f1unpw6k2kzkvs",
+        "symbol": "LINKTRY",
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "expectedGrossEdge": 0.018095,
+        "expectedNetEdge": -0.003619,
+        "feeToGrossRatio": 1.2,
+        "actualBaselineGrossPnL": -0.047675,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": -0.047675,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "avoidedNetLoss"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmq5ixobm2dkrkr66hyxcwe0s",
+        "symbol": "MITOTRY",
+        "strategy": "Mean Reversion",
+        "regime": "LOW_VOLATILITY",
+        "expectedGrossEdge": 0.025123,
+        "expectedNetEdge": -0.0050246,
+        "feeToGrossRatio": 1.2,
+        "actualBaselineGrossPnL": -0.0688894,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": -0.0688894,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "avoidedNetLoss"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmq6crl9y8kqmkr66tzcuhpaf",
+        "symbol": "CFGTRY",
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "expectedGrossEdge": 0.02665461,
+        "expectedNetEdge": -0.00341829,
+        "feeToGrossRatio": 1.1282,
+        "actualBaselineGrossPnL": -0.07730195,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": -0.07730195,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "avoidedNetLoss"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmq7xg3g05xbnkr95qfqhvr5i",
+        "symbol": "SANDTRY",
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "expectedGrossEdge": 0.02959088,
+        "expectedNetEdge": -0.00007912,
+        "feeToGrossRatio": 1.0027,
+        "actualBaselineGrossPnL": -0.0210829,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": -0.0210829,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "avoidedNetLoss"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmq6lpxyka748kr662rzb3ubk",
+        "symbol": "BABYTRY",
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "expectedGrossEdge": 0.024325,
+        "expectedNetEdge": -0.004865,
+        "feeToGrossRatio": 1.2,
+        "actualBaselineGrossPnL": 0.012747,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": 0.012747,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "profitableTradeBlocked"
+      },
+      {
+        "candidateId": null,
+        "tradeId": "cmq95xolm4zi0krot2unu0530",
+        "symbol": "UNITRY",
+        "strategy": "Mean Reversion",
+        "regime": "LOW_VOLATILITY",
+        "expectedGrossEdge": 0.02298,
+        "expectedNetEdge": -0.004596,
+        "feeToGrossRatio": 1.2,
+        "actualBaselineGrossPnL": 0.052304,
+        "actualBaselineFees": 0,
+        "actualBaselineNetPnL": 0.052304,
+        "feeAwareDecision": "BLOCK",
+        "blockOutcome": "profitableTradeBlocked"
+      }
+    ]
+  },
+  "temporalOos": {
+    "baseline": [
+      {
+        "split": "TRAIN",
+        "tradeCount": 103,
+        "netPnL": -14.943674490000003,
+        "expectancy": -0.1450842183495146,
+        "profitFactor": 0.0668539365842077,
+        "winRate": 0.18446601941747573,
+        "drawdown": -14.943674490000003
+      },
+      {
+        "split": "VALIDATION",
+        "tradeCount": 34,
+        "netPnL": -1.7706417499999998,
+        "expectancy": -0.052077698529411756,
+        "profitFactor": 0.2055233045377096,
+        "winRate": 0.17647058823529413,
+        "drawdown": -1.7706417499999998
+      },
+      {
+        "split": "OOS",
+        "tradeCount": 36,
+        "netPnL": -1.8808849900000002,
+        "expectancy": -0.05224680527777778,
+        "profitFactor": 0.21927780408177794,
+        "winRate": 0.2222222222222222,
+        "drawdown": -1.94770499
+      }
+    ],
+    "feeAwareCounterfactual": [
+      {
+        "split": "TRAIN",
+        "tradeCount": 103,
+        "blocked": 9,
+        "netPnL": -14.71871746,
+        "expectancy": -0.1429001695145631,
+        "profitFactor": 0.06107448660385129,
+        "winRate": 0.1553398058252427,
+        "drawdown": -14.71871746
+      },
+      {
+        "split": "VALIDATION",
+        "tradeCount": 34,
+        "blocked": 0,
+        "netPnL": -1.7706417499999998,
+        "expectancy": -0.052077698529411756,
+        "profitFactor": 0.2055233045377096,
+        "winRate": 0.17647058823529413,
+        "drawdown": -1.7706417499999998
+      },
+      {
+        "split": "OOS",
+        "tradeCount": 36,
+        "blocked": 0,
+        "netPnL": -1.8808849900000002,
+        "expectancy": -0.05224680527777778,
+        "profitFactor": 0.21927780408177794,
+        "winRate": 0.2222222222222222,
+        "drawdown": -1.94770499
+      }
+    ],
+    "entryQuality": [
+      {
+        "entryQuality": "GOOD_ENTRY",
+        "tradeCount": 36,
+        "expectancy": -0.05224680527777778
+      }
+    ],
+    "regimeAware": [
+      {
+        "regime": "RANGE",
+        "tradeCount": 11,
+        "expectancy": -0.05489783909090909
+      },
+      {
+        "regime": "LOW_VOLATILITY",
+        "tradeCount": 7,
+        "expectancy": -0.06218962
+      },
+      {
+        "regime": "UNKNOWN",
+        "tradeCount": 12,
+        "expectancy": -0.056259329999999996
+      },
+      {
+        "regime": "HIGH_VOLATILITY",
+        "tradeCount": 6,
+        "expectancy": -0.027761576666666666
+      }
+    ],
+    "strategyRegime": [
+      {
+        "strategy": "Mean Reversion",
+        "regime": "LOW_VOLATILITY",
+        "tradeCount": 29,
+        "winRate": 0.27586206896551724,
+        "grossPnL": -11.023537019999997,
+        "fees": 0,
+        "netPnL": -11.023537019999997,
+        "expectancy": -0.3801219662068965,
+        "profitFactor": 0.03704315981911306,
+        "sampleStatus": "SUFFICIENT"
+      },
+      {
+        "strategy": "Mean Reversion",
+        "regime": "RANGE",
+        "tradeCount": 118,
+        "winRate": 0.17796610169491525,
+        "grossPnL": -6.13787774,
+        "fees": 0,
+        "netPnL": -6.13787774,
+        "expectancy": -0.05201591305084746,
+        "profitFactor": 0.1823208235239352,
+        "sampleStatus": "SUFFICIENT"
+      },
+      {
+        "strategy": "Other",
+        "regime": "UNKNOWN",
+        "tradeCount": 20,
+        "winRate": 0.15,
+        "grossPnL": -1.2672170100000002,
+        "fees": 0,
+        "netPnL": -1.2672170100000002,
+        "expectancy": -0.06336085050000001,
+        "profitFactor": 0.14027810775064908,
+        "sampleStatus": "SUFFICIENT"
+      }
+    ],
+    "status": "PARTIAL"
+  },
+  "edgeDiscovery": [
+    {
+      "pattern": "MR + RANGE + FEE_SAFE + delay<=3s",
+      "tradeCount": 108,
+      "netPnL": -5.65879314,
+      "expectancy": -0.05239623277777778,
+      "winRate": 0.17592592592592593,
+      "classification": "FACT"
+    },
+    {
+      "pattern": "MR + LOW_VOLATILITY + FEE_SAFE",
+      "tradeCount": 20,
+      "netPnL": -10.644747469999997,
+      "expectancy": -0.5322373734999999,
+      "winRate": 0.3,
+      "classification": "REPEATED_PATTERN"
+    },
+    {
+      "pattern": "MR + RANGE + STOP_LOSS|MANUAL_CLOSE",
+      "tradeCount": 106,
+      "netPnL": -7.05936714,
+      "expectancy": -0.06659780320754717,
+      "winRate": 0.08490566037735849,
+      "classification": "FACT"
+    },
+    {
+      "pattern": "FEE_EROSION class",
+      "tradeCount": 9,
+      "netPnL": -0.22495703,
+      "expectancy": -0.024995225555555556,
+      "winRate": 0.3333333333333333,
+      "classification": "HYPOTHESIS"
+    },
+    {
+      "pattern": "Entry EDGE_DECAY/CHASING",
+      "tradeCount": 9,
+      "netPnL": -0.22495703,
+      "expectancy": -0.024995225555555556,
+      "winRate": 0.3333333333333333,
+      "classification": "HYPOTHESIS"
+    }
+  ],
+  "experimentCandidates": [
+    {
+      "rank": 1,
+      "problem": "EXIT_PROBLEM",
+      "evidence": "Primary cause EXIT_PROBLEM appears in 121 losing trades",
+      "affectedTrades": 121,
+      "netPnLImpact": -19.40639196999999,
+      "confidence": "HIGH",
+      "recommendedExperiment": "EXIT_MODEL forensic replay: reason-specific hold/close policy A/B"
+    },
+    {
+      "rank": 2,
+      "problem": "STRATEGY_WEAKNESS",
+      "evidence": "Primary cause STRATEGY_WEAKNESS appears in 13 losing trades",
+      "affectedTrades": 13,
+      "netPnLImpact": -0.9075867599999999,
+      "confidence": "MEDIUM",
+      "recommendedExperiment": "STRATEGY_REGIME selective enablement shadow A/B"
+    },
+    {
+      "rank": 3,
+      "problem": "FEE_EROSION",
+      "evidence": "Primary cause FEE_EROSION appears in 6 losing trades",
+      "affectedTrades": 6,
+      "netPnLImpact": -0.33816403,
+      "confidence": "LOW",
+      "recommendedExperiment": "FEE_AWARE selective block shadow experiment"
+    },
+    {
+      "rank": 4,
+      "problem": "REGIME_MISMATCH",
+      "evidence": "Primary cause REGIME_MISMATCH appears in 0 losing trades",
+      "affectedTrades": 0,
+      "netPnLImpact": 0,
+      "confidence": "LOW",
+      "recommendedExperiment": "REGIME_AWARE gating shadow experiment"
+    },
+    {
+      "rank": 5,
+      "problem": "EDGE_DECAY",
+      "evidence": "Primary cause EDGE_DECAY appears in 0 losing trades",
+      "affectedTrades": 0,
+      "netPnLImpact": 0,
+      "confidence": "LOW",
+      "recommendedExperiment": "ENTRY_QUALITY delayed-entry guard shadow experiment"
+    }
+  ],
+  "profitabilityWaterfall": {
+    "grossStrategyEdge": -18.595201229999994,
+    "feeDrag": 0,
+    "entryDrag": 0,
+    "exitDrag": 19.40639196999999,
+    "regimeDrag": 0,
+    "strategyDrag": 0.9075867599999999,
+    "finalNetEdge": -18.595201229999994,
+    "unattributed": 0
+  },
+  "top5ProfitabilityProblems": [
+    {
+      "rank": 1,
+      "problem": "EXIT_PROBLEM",
+      "evidence": "Primary cause EXIT_PROBLEM appears in 121 losing trades",
+      "affectedTrades": 121,
+      "netPnLImpact": -19.40639196999999,
+      "confidence": "HIGH",
+      "recommendedExperiment": "EXIT_MODEL forensic replay: reason-specific hold/close policy A/B"
+    },
+    {
+      "rank": 2,
+      "problem": "STRATEGY_WEAKNESS",
+      "evidence": "Primary cause STRATEGY_WEAKNESS appears in 13 losing trades",
+      "affectedTrades": 13,
+      "netPnLImpact": -0.9075867599999999,
+      "confidence": "MEDIUM",
+      "recommendedExperiment": "STRATEGY_REGIME selective enablement shadow A/B"
+    },
+    {
+      "rank": 3,
+      "problem": "FEE_EROSION",
+      "evidence": "Primary cause FEE_EROSION appears in 6 losing trades",
+      "affectedTrades": 6,
+      "netPnLImpact": -0.33816403,
+      "confidence": "LOW",
+      "recommendedExperiment": "FEE_AWARE selective block shadow experiment"
+    },
+    {
+      "rank": 4,
+      "problem": "REGIME_MISMATCH",
+      "evidence": "Primary cause REGIME_MISMATCH appears in 0 losing trades",
+      "affectedTrades": 0,
+      "netPnLImpact": 0,
+      "confidence": "LOW",
+      "recommendedExperiment": "REGIME_AWARE gating shadow experiment"
+    },
+    {
+      "rank": 5,
+      "problem": "EDGE_DECAY",
+      "evidence": "Primary cause EDGE_DECAY appears in 0 losing trades",
+      "affectedTrades": 0,
+      "netPnLImpact": 0,
+      "confidence": "LOW",
+      "recommendedExperiment": "ENTRY_QUALITY delayed-entry guard shadow experiment"
+    }
+  ],
+  "reportAnswers": {
+    "q1_largest_source_negative_expectancy": "EXIT (0.939679)",
+    "q2_fee_loss_pct": 0,
+    "q3_entry_loss_pct": 0,
+    "q4_regime_loss_pct": 0,
+    "q5_strategy_loss_pct": 0.043946372565168146,
+    "q6_exit_loss_pct": 0.9396793444400919,
+    "q7_fee_aware_materially_improving": "NEUTRAL",
+    "q8_entry_timing_material_hurt": "SECONDARY",
+    "q9_one_strategy_most_losses": "Mean Reversion",
+    "q10_one_regime_most_losses": "LOW_VOLATILITY",
+    "q11_ai_predictive_quality": "UNKNOWN",
+    "q12_tdi_too_conservative": "UNKNOWN",
+    "q13_strongest_positive_pattern": "NONE",
+    "q14_strongest_negative_pattern": "MR + LOW_VOLATILITY + FEE_SAFE",
+    "q15_first_experiment": "EXIT_MODEL forensic replay: reason-specific hold/close policy A/B",
+    "q16_should_not_change": "TDI/technical/momentum/confidence thresholds, sizing, EV, risk, maxPositions, AI prompts/VETO, strategy rules, SL/TP, fee schedule, scanner thresholds",
+    "q17_missing_evidence": "Executed trades için runtime TDI verdict ve rich AI decision snapshot coverage düşük; fee(gercek) kolonları 173 paired sette fiilen 0."
+  },
+  "finalVerdict": {
+    "CURRENT_PAIRED_TRADES": 173,
+    "BASELINE_NET_PNL": -18.59520123,
+    "BASELINE_NET_EXPECTANCY": -0.10748671,
+    "PRIMARY_LOSS_DRIVER": "EXIT",
+    "PRIMARY_LOSS_DRIVER_SHARE": 0.939679,
+    "FEE_IMPACT": "SECONDARY",
+    "ENTRY_IMPACT": "SECONDARY",
+    "REGIME_IMPACT": "SECONDARY",
+    "STRATEGY_IMPACT": "SECONDARY",
+    "EXIT_IMPACT": "DOMINANT",
+    "FEE_AWARE_EFFECT": "NEUTRAL",
+    "TDI_EFFECTIVENESS": "UNKNOWN",
+    "AI_PREDICTIVE_QUALITY": "UNKNOWN",
+    "POSITIVE_NET_PATTERN": "NONE",
+    "NEGATIVE_NET_PATTERN": "MR + LOW_VOLATILITY + FEE_SAFE",
+    "FIRST_EXPERIMENT": "EXIT_MODEL forensic replay: reason-specific hold/close policy A/B",
+    "OOS_SUPPORTED": "PARTIAL",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+  }
+}

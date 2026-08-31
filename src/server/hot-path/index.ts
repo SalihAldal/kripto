@@ -3,3 +3,7 @@ export * from "@/src/server/hot-path/hot-path.registry";
 export * from "@/src/server/hot-path/hot-path-audit.service";
 export * from "@/src/server/hot-path/legacy-worker-freeze.service";
 export * from "@/src/server/hot-path/worker-orchestrator.service";
+export * from "@/src/server/hot-path/canonical-pipeline";
+export * from "@/src/server/hot-path/worker-ownership.service";
+export * from "@/src/server/hot-path/candidate-pipeline-trace.service";
+export * from "@/src/server/hot-path/execution-attempt-lock.service";

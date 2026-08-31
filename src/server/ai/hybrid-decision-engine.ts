@@ -1,10 +1,12 @@
 import { env } from "@/lib/config";
 import { logger } from "@/lib/logger";
 import { bridgeHybridEv, bridgeTdiDecision } from "@/src/server/forensics/forensic-bridge.service";
+import { classifyHybridEvTelemetry } from "@/src/server/ai/ev-telemetry.service";
 import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
 import { resolveIndicatorSnapshot, type IndicatorSnapshot } from "@/src/server/ai/indicator-suite";
 import { computeShortTermScore } from "@/src/server/ai/short-term-score.service";
-import { resolveMinimumProtectedProfitPercent } from "@/src/server/execution/profit-thresholds";
+import { scoreMomentumImpulse } from "@/src/server/decision-engine/experts/momentum-expert.utils";
+import { resolveMtfAlignmentContract } from "@/src/server/decision-engine/decision-contract.service";
 import {
   resolveLowMomentumInput,
   resolveMomentumSupportive,
@@ -12,6 +14,7 @@ import {
   resolvePaperMomentumWaiver,
   resolveTechStrongButOthersWeak,
 } from "@/src/server/ai/hybrid-momentum-gates";
+import { resolveMinimumProtectedProfitPercent } from "@/src/server/execution/profit-thresholds";
 import type { AIAnalysisInput, AIDecision, AIConsensusResult, AIProviderResult, AIRoleScore, AIDecisionPayload } from "@/src/types/ai";
 
 function clamp(value: number, min: number, max: number) {
@@ -740,10 +743,15 @@ export function buildHybridDecision(input: {
   const effectiveCompositeDelta = paperRelaxed ? Math.min(0, regimePolicy.minCompositeDelta) : regimePolicy.minCompositeDelta;
   const compositeOk = composite >= runtimeMinCompositeScore + effectiveCompositeDelta;
   const mtf = input.analysisInput.multiTimeframe;
+  const mtfContract = resolveMtfAlignmentContract({
+    aiAlignment: mtf?.alignmentScore,
+    contextAlignment: input.analysisInput.marketSignals?.mtfAlignmentScore,
+  });
+  const mtfUnavailable = mtfContract.status === "UNAVAILABLE";
   const mtfConflict = Boolean(mtf?.conflict);
   const mtfTrendAligned = Boolean(mtf?.trendAligned);
   const mtfEntrySuitable = Boolean(mtf?.entrySuitable);
-  const mtfAlignmentScore = Number(mtf?.alignmentScore ?? 0);
+  const mtfAlignmentScore = mtfContract.score ?? 0;
   const regimeStabilityScore = Number(input.analysisInput.marketSignals?.regimeStabilityScore ?? 50);
   const regimeTransitionProbability = Number(input.analysisInput.marketSignals?.regimeTransitionProbability ?? 0);
   const regimeFlipRisk = Number(input.analysisInput.marketSignals?.regimeFlipRisk ?? 0);
@@ -752,14 +760,14 @@ export function buildHybridDecision(input: {
   const regimeChopWarning = Boolean(input.analysisInput.marketSignals?.regimeChopWarning ?? false);
   const regimeUnstableBreakout = Boolean(input.analysisInput.marketSignals?.regimeUnstableBreakoutCondition ?? false);
   const mtfRejectReason = paperRelaxed
-    ? (mtfConflict && mtfAlignmentScore < 40
+    ? (mtfConflict && !mtfUnavailable && mtfAlignmentScore < 40
         ? `Multi-timeframe conflict: ${mtf?.reason ?? "trend mismatch"}`
         : undefined)
     : (mtfConflict
         ? `Multi-timeframe conflict: ${mtf?.reason ?? "trend mismatch"}`
-        : !mtfTrendAligned
+        : !mtfUnavailable && !mtfTrendAligned
           ? `Multi-timeframe trend uyumsuz: ${mtf?.reason ?? "trend not aligned"}`
-          : !mtfEntrySuitable && mtfAlignmentScore < 62
+          : !mtfUnavailable && !mtfEntrySuitable && mtfAlignmentScore < 62
             ? `Entry timeframe uygun degil: ${mtf?.reason ?? "entry mismatch"}`
             : undefined);
   const pullbackTolerance = Math.max(0.05, Number(env.EXECUTION_PULLBACK_TOLERANCE_PERCENT ?? 0.35));
@@ -1456,6 +1464,15 @@ export function buildHybridDecision(input: {
   }
 
   const forensicCandidateId = createCandidateId(input.analysisInput.symbol, "hybrid");
+  const evTelemetry = classifyHybridEvTelemetry({
+    finalDecision,
+    composite: Number(composite.toFixed(4)),
+    threshold: runtimeMinCompositeScore,
+    compositeOk,
+    rejectReason,
+    riskVeto,
+    noTradeReasonList,
+  });
   bridgeHybridEv({
     candidateId: forensicCandidateId,
     symbol: input.analysisInput.symbol,
@@ -1465,23 +1482,19 @@ export function buildHybridDecision(input: {
     winProbability: confidence,
     expectedProfit: target && lastPrice > 0 ? Math.abs(((target - lastPrice) / lastPrice) * 100) : undefined,
     expectedLoss: stop && lastPrice > 0 ? Math.abs(((lastPrice - stop) / lastPrice) * 100) : undefined,
-    verdict:
-      finalDecision === "BUY"
-        ? "APPROVED"
-        : finalDecision === "HOLD"
-          ? "WAIT"
-          : rejectReason || noTradeReasonList.length > 0
-            ? "REJECTED"
-            : "UNKNOWN",
-    reasonCode:
-      finalDecision === "BUY"
-        ? "EV_PASS"
-        : finalDecision === "HOLD"
-          ? "EV_WAIT"
-          : rejectReason
-            ? "EV_REJECT"
-            : "EV_UNKNOWN",
+    verdict: evTelemetry.verdict,
+    reasonCode: evTelemetry.reasonCode,
   });
+  const shortMomentum = Number(input.analysisInput.marketSignals?.shortMomentumPercent ?? 0);
+  const shortFlow = Number(input.analysisInput.marketSignals?.shortFlowImbalance ?? 0);
+  const momentumScore = scoreMomentumImpulse(input.analysisInput);
+  const blockingConditions = unique([
+    technicalWeak ? "TECHNICAL" : null,
+    momentumWeak ? "MOMENTUM" : null,
+    (Boolean(mtfRejectReason) || mtfConflict) ? "MTF_ALIGNMENT" : null,
+    (riskVeto || hardReject || rrBad || futuresTrapRisk || futuresSqueezeRisk || manipulationRisk) ? "RISK" : null,
+    (finalDecision === "HOLD" && !technicalWeak && !momentumWeak && !riskVeto && !hardReject) ? "CONFIDENCE" : null,
+  ].filter((x): x is "TECHNICAL" | "MOMENTUM" | "MTF_ALIGNMENT" | "RISK" | "CONFIDENCE" => Boolean(x)));
   bridgeTdiDecision({
     candidateId: forensicCandidateId,
     symbol: input.analysisInput.symbol,
@@ -1489,7 +1502,43 @@ export function buildHybridDecision(input: {
       finalDecision === "BUY" ? "APPROVED" : finalDecision === "HOLD" ? "WAIT" : "REJECTED",
     hybridDecision: finalDecision,
     consensusScore: Number(composite.toFixed(4)),
+    technicalScore: Number(technical.score.toFixed(2)),
+    momentumScore: Number(momentumScore.toFixed(2)),
+    sentimentScore: Number(sentiment.score.toFixed(2)),
+    shortMomentum: Number(shortMomentum.toFixed(4)),
+    shortFlow: Number(shortFlow.toFixed(4)),
+    executionScore: Number(tradeQualityScore.toFixed(2)),
     confidence,
+    bullishCount: directionalVotes.buy,
+    learningScore: undefined,
+    liquidity: Number(input.analysisInput.volume24h ?? NaN),
+    volatility: Number(input.analysisInput.volatility ?? NaN),
+    expectedValue: Number(composite.toFixed(4)),
+    openInterest: Number(input.analysisInput.marketSignals?.openInterest ?? NaN),
+    marketContext: String(input.analysisInput.marketRegime?.reason ?? ""),
+    simulation: paperRelaxed ? "PAPER" : "LIVE",
+    trendData: String(input.analysisInput.multiTimeframe?.dominantTrend ?? input.analysisInput.marketRegime?.mode ?? "UNKNOWN"),
+    thresholds: {
+      technicalMinScore: Number((runtimeMinTechScore + regimePolicy.minTechDelta).toFixed(2)),
+      sentimentMinScore: Number((runtimeMinSentimentScore + regimePolicy.minSentimentDelta).toFixed(2)),
+      compositeMinScore: Number((runtimeMinCompositeScore + effectiveCompositeDelta).toFixed(2)),
+      confidenceMinScore: Number((paperRelaxed ? 25 : 55).toFixed(2)),
+    },
+    regime: regimePolicy.mode,
+    regimeDelta: {
+      technical: regimePolicy.minTechDelta,
+      sentiment: regimePolicy.minSentimentDelta,
+      composite: effectiveCompositeDelta,
+    },
+    paperRelaxed,
+    reasonCode:
+      finalDecision === "BUY"
+        ? "TDI_APPROVED"
+        : finalDecision === "HOLD"
+          ? "TDI_WAIT_NEUTRAL"
+          : "TDI_REJECTED",
+    firstBlockingCondition: blockingConditions[0],
+    blockingConditions,
     evBelowThreshold: finalDecision !== "BUY" && Number(composite.toFixed(4)) < runtimeMinCompositeScore,
     strategy: String(input.analysisInput.marketRegime?.selectedStrategy ?? "UNKNOWN"),
     reasonDetail:

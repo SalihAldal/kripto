@@ -1,0 +1,199 @@
+{
+  "generatedAt": "2026-08-22T11:50:27.214Z",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noProductionExitChange": true
+  },
+  "productionCompatibilityAudit": {
+    "status": "PARTIAL",
+    "variantDComponentMapping": [
+      {
+        "rule": "SYSTEM_TIMEOUT semantics",
+        "sourceFile": "src/server/forensics/exit-forensics.service.ts",
+        "function": "mapPositionMonitorExit",
+        "currentComponent": "MANUAL_CLOSE -> MANUAL_TIMEOUT mapping",
+        "runtimeInput": "closeReason from settlement pipeline",
+        "missingDependency": "semantic normalization to SYSTEM_TIMEOUT label in live shadow layer",
+        "compatibility": "PARTIALLY_COMPATIBLE"
+      },
+      {
+        "rule": "Timeout trigger runtime",
+        "sourceFile": "src/server/execution/position-monitor.service.ts",
+        "function": "isExecutionTimedOut + onClose(reason=TIMEOUT)",
+        "currentComponent": "position-monitor timeout close",
+        "runtimeInput": "openedAt, maxDurationSec, mark price, extension policy",
+        "missingDependency": "exit-shadow branch hooked to same runtime tick",
+        "compatibility": "PARTIALLY_COMPATIBLE"
+      },
+      {
+        "rule": "Forced/system close path",
+        "sourceFile": "src/server/execution/execution-orchestrator.service.ts",
+        "function": "closePositionManually(reason=MANUAL_CLOSE)",
+        "currentComponent": "forced close pre-close/watchdog cleanup",
+        "runtimeInput": "positionId, reason, mode",
+        "missingDependency": "shadow-only transition capture tied to tradeId/positionId",
+        "compatibility": "PARTIALLY_COMPATIBLE"
+      }
+    ],
+    "semanticConclusion": "MISNAMED_SYSTEM_TIMEOUT"
+  },
+  "systemTimeoutSemantics": {
+    "confirmedHistoricalClass": "SYSTEM_TIMEOUT",
+    "livePaperConfirmed": false,
+    "reason": "No live Variant_D shadow session executed in this task."
+  },
+  "liveShadowEvidence": {
+    "liveTradesObserved": 0,
+    "systemTimeoutLiveCount": 0,
+    "systemTimeoutBaselineNetPnl": 0,
+    "variantDShadowNetDelta": 0,
+    "direction": "NOT_PROVEN",
+    "outsideMrLowVolDirection": "NOT_PROVEN",
+    "shadowTelemetryStatus": "SHADOW_EXIT_NOT_EXERCISED",
+    "runtimeSignals": {
+      "recentPaperClosed": 0,
+      "shadowDecisionCount24h": 0,
+      "decisionDiffCount24h": 0
+    }
+  },
+  "historicalContext": {
+    "historicalReplayNetDelta": 17.00464466,
+    "historicalReplayExpectancyDelta": 0.10432297,
+    "historicalReplayDrawdownDelta": 16.82043466,
+    "historicalOosDelta": 0.04352356
+  },
+  "temporalHoldout": {
+    "historicalTrainValidationOos": {
+      "generatedAt": "2026-08-22T11:41:27.459Z",
+      "baseline": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 103,
+          "netPnL": -14.943674490000003,
+          "expectancy": -0.1450842183495146,
+          "profitFactor": 0.0668539365842077,
+          "winRate": 0.18446601941747573,
+          "drawdown": -14.943674490000003
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 34,
+          "netPnL": -1.7706417499999998,
+          "expectancy": -0.052077698529411756,
+          "profitFactor": 0.2055233045377096,
+          "winRate": 0.17647058823529413,
+          "drawdown": -1.7706417499999998
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 36,
+          "netPnL": -1.8808849900000002,
+          "expectancy": -0.05224680527777778,
+          "profitFactor": 0.21927780408177794,
+          "winRate": 0.2222222222222222,
+          "drawdown": -1.94770499
+        }
+      ],
+      "variantD": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 97,
+          "netPnL": -0.5676389999999998,
+          "expectancy": -0.005851948453608245,
+          "profitFactor": 0.7260983420823683,
+          "winRate": 0.26804123711340205,
+          "drawdown": -0.7941989999999999
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 32,
+          "netPnL": -0.16796000000000005,
+          "expectancy": -0.005248750000000002,
+          "profitFactor": 0.8031226556639159,
+          "winRate": 0.28125,
+          "drawdown": -0.37692000000000003
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 34,
+          "netPnL": -0.29659040000000003,
+          "expectancy": -0.008723247058823531,
+          "profitFactor": 0.7171262607650009,
+          "winRate": 0.38235294117647056,
+          "drawdown": -0.46999040000000003
+        }
+      ],
+      "oosExpectancyDelta": 0.04352355821895425
+    },
+    "liveShadowHoldout": {
+      "observedTrades": 0,
+      "status": "NOT_PROVEN"
+    },
+    "consistency": "NOT_PROVEN"
+  },
+  "runtimeSafety": {
+    "runtimeRegression": "NO",
+    "shadowDegraded": false,
+    "notes": [
+      "No new runtime shadow observer executed",
+      "No execution blocking or additional worker contention introduced"
+    ]
+  },
+  "lookaheadAudit": {
+    "generatedAt": "2026-08-22T11:50:27.214Z",
+    "scope": "VARIANT_D_LIVE_SHADOW_VALIDATION",
+    "shadowLookaheadViolation": 0,
+    "status": "PASS",
+    "runtimeAllowedInputs": [
+      "current position state",
+      "current market state/tick",
+      "existing exit configuration and timers"
+    ],
+    "forbiddenInputs": [
+      "future candles after hypothetical shadow exit",
+      "future realized pnl",
+      "future AI/regime labels"
+    ],
+    "note": "No live shadow observer executed in this task; violation count remains zero."
+  },
+  "promotionGate": {
+    "historicalReplayPositive": true,
+    "historicalOosPositive": true,
+    "liveShadowPositive": false,
+    "liveShadowAvailable": false,
+    "status": "RESEARCH_ONLY",
+    "blocker": "Live shadow holdout evidence missing (0 observed shadow-exit trades) and production compatibility still partial."
+  },
+  "reportMustAnswer": {
+    "q1_systemTimeoutConfirmedLivePaper": "NOT_PROVEN",
+    "q2_systemTimeoutPositions": 0,
+    "q3_systemTimeoutBaselineNetPnl": 0,
+    "q4_variantDWouldDo": "NOT_PROVEN",
+    "q5_shadowCounterfactualDelta": 0,
+    "q6_liveDirectionImproves": "NOT_PROVEN",
+    "q7_outsideMrLowVolImproves": "NOT_PROVEN",
+    "q8_timeoutLossReduction": "NOT_PROVEN",
+    "q9_baselineBehaviorPreserved": "YES",
+    "q10_runtimeDegradation": "NO",
+    "q11_consistentWithHistoricalOos": "NOT_PROVEN",
+    "q12_productionCompatible": "PARTIAL",
+    "q13_moveToPromotable": "NO",
+    "q14_nextStep": "Enable exit-level Variant_D shadow observer (observe-only) in paper runtime, then run <=5 controlled rounds to collect real live-shadow holdout evidence."
+  },
+  "finalVerdict": {
+    "LIVE_TRADES_OBSERVED": 0,
+    "SYSTEM_TIMEOUT_LIVE_COUNT": 0,
+    "SYSTEM_TIMEOUT_BASELINE_NET_PNL": 0,
+    "VARIANT_D_SHADOW_NET_DELTA": 0,
+    "HISTORICAL_OOS_DELTA": 0.04352356,
+    "LIVE_SHADOW_DIRECTION": "NOT_PROVEN",
+    "OUTSIDE_MR_LOWVOL_DIRECTION": "NOT_PROVEN",
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "RUNTIME_REGRESSION": "NO",
+    "PRODUCTION_COMPONENT_COMPATIBILITY": "PARTIAL",
+    "VARIANT_D_STATUS": "RESEARCH_ONLY",
+    "FIRST_NEXT_STEP": "Enable exit-level Variant_D shadow observer (observe-only) in paper runtime, then run <=5 controlled rounds to collect real live-shadow holdout evidence.",
+    "PRODUCTION_CHANGE_RECOMMENDED": "NO"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "gate": "KRIPTO FINAL 5-ROUND CONTROLLED PAPER GATE",
+  "validationId": "5round-2026-08-19T06-40-48-478Z",
+  "sessionId": "cmszq381m0009unq0g7suctl8",
+  "objectiveRounds": 5,
+  "preflight": {
+    "attemptId": "final-5round-gate-preflight-2026-08-19T06-40-35-953Z",
+    "overallVerdict": "READY",
+    "canStart": true,
+    "database": "PASS",
+    "binanceTR": "PASS",
+    "clockSync": {
+      "status": "PASS",
+      "clockSkewMs": 1562,
+      "apiLatencyMs": 150
+    },
+    "aiProviders": {
+      "status": "PASS",
+      "count": 3
+    },
+    "emergencyStop": "PASS",
+    "activeJobs": "PASS",
+    "zombieRounds": "PASS",
+    "workerLocks": "PASS",
+    "duplicatePaperJobs": "PASS",
+    "resolvedConfig": {
+      "status": "PASS",
+      "executionMode": "paper",
+      "exchange": "binance"
+    }
+  },
+  "job": {
+    "status": "FAILED",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "finishedAt": "2026-08-19T07:00:52.627Z",
+    "lastError": "scanner-ai pool aborted: Selection budget elapsed (1200s >= 1200s)"
+  },
+  "rounds": [
+    {
+      "roundNumber": 1,
+      "roundId": "1",
+      "symbol": "LINEATRY",
+      "durationMs": 1200268,
+      "durationMinutes": 20.0,
+      "terminalState": "tur_basarisiz",
+      "failReason": "scanner-ai pool aborted: Selection budget elapsed (1200s >= 1200s)",
+      "scanner": {
+        "scannerCandidates": 248,
+        "rotationCandidates": null,
+        "priorityCandidates": null,
+        "priorityRescuedCount": null,
+        "fallbackCount": 10,
+        "pumpScanTimeoutCount": 0,
+        "marketDataFailures": 20,
+        "discoverySource": null
+      },
+      "tdi": {
+        "APPROVED": 0,
+        "WAIT": 22,
+        "REJECTED": 0,
+        "firstBlockingCondition": "scanner-ai pool aborted: Selection budget elapsed (1200s >= 1200s)",
+        "policyBlockCount": 0,
+        "dataQualityBlockCount": 0
+      },
+      "sizing": {
+        "passed": 0,
+        "rejected": 0
+      },
+      "ai": {
+        "calls": 69,
+        "remoteCalls": 0,
+        "degradedCalls": 94,
+        "success": 52,
+        "failed": 0,
+        "NO_TRADE": 0,
+        "HOLD": 0,
+        "REJECT": 480,
+        "WAIT": 0,
+        "BUY": 0,
+        "SELL": 0
+      },
+      "execution": {
+        "executionReady": 0,
+        "riskPassed": 0,
+        "riskRejected": 0,
+        "aiGateVerdict": {},
+        "orders": 0,
+        "fills": 0,
+        "simulatedTrades": 0
+      },
+      "entry": {
+        "entryTimingRecords": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "TAKE_PROFIT": 0,
+        "STOP_LOSS": 0,
+        "STRATEGY_EXIT": 0,
+        "TIME_EXIT": 0,
+        "END_OF_REPLAY": 0
+      },
+      "fees": {
+        "estimatedEntryFee": 0,
+        "estimatedExitFee": 0,
+        "estimatedRoundTripFee": 0,
+        "expectedGrossEdge": 0,
+        "expectedNetEdge": 0,
+        "feeToGrossEdgeRatio": 0
+      },
+      "postTrade": {
+        "grossPnL": 0,
+        "entryFee": 0,
+        "exitFee": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "equationCheck": "PASS"
+      },
+      "runtime": {
+        "patchJobActiveRound": {
+          "p50Ms": 7,
+          "p95Ms": 18,
+          "p99Ms": 19,
+          "maxMs": 41
+        },
+        "patchJobActiveRoundTimeoutCount": 0,
+        "persistQueueDepth": 1,
+        "persistQueueWaitMs": 0,
+        "retryCount": 0,
+        "dbTransientFailures": 0,
+        "lastMeaningfulProgressAt": "2026-08-19T07:00:51.114Z",
+        "lastHeartbeatAt": "2026-08-19T07:00:51.114Z"
+      },
+      "liveness": {
+        "runningZombie": false,
+        "startedAiOrphan": false,
+        "pendingPoolWorker": false,
+        "unboundedRetry": false,
+        "manualStop": false
+      },
+      "artifactCompleteness": {
+        "coreRoundArtifactsExported": true,
+        "roundLivenessJsonPresent": false
+      }
+    }
+  ],
+  "aggregate": {
+    "executedRounds": 1,
+    "terminalRounds": 1,
+    "manualStops": 0,
+    "aiVetoBypassCount": 0,
+    "runningZombies": 0,
+    "startedAiOrphans": 0,
+    "rangeErrors": 0,
+    "criticalPnlMismatch": 0,
+    "profitability": "NOT_PROVEN",
+    "firstBlockingStagePerRound": {
+      "1": "SELECTION_BUDGET_EXCEEDED"
+    }
+  },
+  "failuresAndWarnings": [
+    "5-round target not completed (1/5).",
+    "Job ended FAILED after round 1 due to selection budget expiry.",
+    "Requested round artifact round-liveness.json was not present in round directory."
+  ],
+  "finalVerdict": {
+    "FIVE_ROUNDS_COMPLETED": "NO",
+    "RUNTIME_STABLE": "NO",
+    "AI_PARITY": "NO",
+    "SCANNER_STABLE": "NO",
+    "TDI_CORRECT": "NO",
+    "EXIT_RUNTIME_PROVEN": "NO",
+    "FEE_RECONCILIATION_PROVEN": "NO",
+    "TRADE_LIFECYCLE_PROVEN": "NO",
+    "PROFITABILITY_PROVEN": "NOT_PROVEN",
+    "READY_FOR_30_50_ROUNDS": "NO",
+    "READY_FOR_50_ROUND_PAPER": "NO"
+  }
+}

@@ -18,6 +18,7 @@ for (const line of fs.readFileSync(".env", "utf8").split(/\r?\n/)) {
 
 const INTERVAL_MS = Number(process.env.WATCH_INTERVAL_SEC ?? 90) * 1000;
 const DURATION_MS = Number(process.env.WATCH_DURATION_MIN ?? 180) * 60_000;
+const TARGET_ROUND = Number(process.env.TARGET_ROUND ?? 0);
 const EXTEND_ON_ACTIVE = process.env.WATCH_EXTEND_ON_ACTIVE !== "false";
 const STALE_HEARTBEAT_MS = Number(process.env.STALE_HEARTBEAT_SEC ?? 240) * 1000;
 const LOG_PATH = path.join(process.cwd(), "artifacts", "monitor", "live-paper-watch.jsonl");
@@ -43,7 +44,7 @@ async function snapshot(retry = 3) {
   for (let attempt = 1; attempt <= retry; attempt += 1) {
     try {
       const job = await prisma.autoRoundJob.findFirst({
-        where: { status: "RUNNING" },
+        where: { status: { in: ["RUNNING", "FAILED"] } },
         orderBy: { startedAt: "desc" },
         include: { rounds: { where: { endedAt: null }, orderBy: { roundNo: "desc" }, take: 3 } },
       });
@@ -75,8 +76,16 @@ async function detectBlockers(input: Awaited<ReturnType<typeof snapshot>>): Prom
   const { job, zombieOther, heartbeatAgeMs, activeRound } = input;
 
   if (!job) {
-    blockers.push({ code: "NO_RUNNING_JOB", severity: "warn", message: "No RUNNING paper job found" });
+    blockers.push({ code: "NO_RUNNING_JOB", severity: "warn", message: "No RUNNING/FAILED paper job found" });
     return blockers;
+  }
+
+  if (job.status === "FAILED") {
+    blockers.push({
+      code: "JOB_FAILED",
+      severity: "critical",
+      message: String(job.lastError ?? "Job FAILED"),
+    });
   }
 
   if (job.stopRequested) {
@@ -170,6 +179,32 @@ async function attemptRecovery(
 ) {
   const actions: string[] = [];
 
+  if (blockers.some((b) => b.code === "JOB_FAILED")) {
+    const row = await prisma.autoRoundJob.findUnique({ where: { id: jobId } });
+    if (row?.status === "FAILED") {
+      const nextRound = Math.max(row.currentRound, row.failedRounds + 1);
+      await prisma.autoRoundJob
+        .update({
+          where: { id: jobId },
+          data: {
+            status: "RUNNING",
+            activeState: "tariyor",
+            lastError: null,
+            finishedAt: null,
+            currentRound: nextRound,
+            activeRunId: null,
+            metadata: {
+              ...((row.metadata as Record<string, unknown>) ?? {}),
+              activeRound: null,
+              consecutiveFilterRejections: 0,
+            } as never,
+          },
+        })
+        .then(() => actions.push(`resumed FAILED job at round ${nextRound}`))
+        .catch((e) => actions.push(`resume FAILED failed: ${(e as Error).message}`));
+    }
+  }
+
   if (blockers.some((b) => b.code === "STALE_JOB_ERROR_FIELD")) {
     await prisma.autoRoundJob
       .update({ where: { id: jobId }, data: { lastError: null } })
@@ -183,7 +218,8 @@ async function attemptRecovery(
         b.code === "STALE_HEARTBEAT" ||
         b.code === "RECOVERY_RESTART_STAGE" ||
         b.code === "JOB_LAST_ERROR" ||
-        b.code === "SCHEDULER_NEVER_STARTED",
+        b.code === "SCHEDULER_NEVER_STARTED" ||
+        b.code === "JOB_FAILED",
     )
   ) {
     actions.push(spawnSchedulerHolder(jobId));
@@ -263,6 +299,21 @@ async function runWatchWindow(started: number, baseCycle: number) {
       };
       appendLog(entry);
       console.log(JSON.stringify(entry));
+
+      if (
+        TARGET_ROUND > 0 &&
+        snap.job &&
+        (snap.job.currentRound ?? 0) >= TARGET_ROUND
+      ) {
+        appendLog({
+          event: "watch_target_reached",
+          at: new Date().toISOString(),
+          targetRound: TARGET_ROUND,
+          currentRound: snap.job.currentRound,
+        });
+        console.log(JSON.stringify({ event: "watch_target_reached", targetRound: TARGET_ROUND, currentRound: snap.job.currentRound }));
+        break;
+      }
     } catch (e) {
       appendLog({ event: "watch_tick_error", cycle, at: new Date().toISOString(), error: (e as Error).message });
       console.log(JSON.stringify({ event: "watch_tick_error", cycle, error: (e as Error).message }));

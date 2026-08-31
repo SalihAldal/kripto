@@ -25,7 +25,10 @@ export type PreTradeValidationResult = {
 export async function validatePreTrade(input: PreTradeValidationInput): Promise<PreTradeValidationResult> {
   const reasons: string[] = [];
   const ticker = await getTicker(input.symbol);
-  const marketPrice = input.priceHint ?? ticker.price;
+  const hinted = Number(input.priceHint ?? 0);
+  const tickerPrice = Number(ticker.price ?? 0);
+  const hintDriftPct = hinted > 0 && tickerPrice > 0 ? Math.abs(((tickerPrice - hinted) / hinted) * 100) : 0;
+  const marketPrice = hinted > 0 && hintDriftPct <= 5 ? hinted : tickerPrice;
 
   const pausedState = await getPausedState(input.userId).catch(() => ({
     paused: false,

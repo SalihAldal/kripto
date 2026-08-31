@@ -100,6 +100,76 @@ describe("P2-6 fee-aware entry experiment", () => {
     expect(classifyFeeEdgeExperiment(1.2, 0.5)).toBe("FEE_BORDERLINE");
     expect(classifyFeeEdgeExperiment(0.5, -0.1)).toBe("FEE_EROSION");
   });
+
+  it("builds fee-aware entry experiment report without runtime blocking", () => {
+    const report = buildFeeAwareEntryExperiment({
+      rows: [
+        {
+          tradeId: "t1",
+          symbol: "A",
+          strategy: "RANGE_MEAN_REVERSION",
+          regime: "RANGE",
+          netPnL: 0.5,
+          grossPnL: 0.8,
+          totalFee: 0.2,
+          feeMetrics: {
+            generatedAt: "t",
+            entryPrice: 10,
+            quantity: 1,
+            notional: 10,
+            takerFeeRate: 0.001,
+            estimatedEntryFee: 0.01,
+            estimatedExitFee: 0.01,
+            estimatedRoundTripFees: 0.02,
+            estimatedRoundTripFee: 0.02,
+            expectedGrossAtTp: 0.04,
+            expectedGrossPnL: 0.04,
+            expectedGrossAtSl: 0.02,
+            expectedGrossToFeeRatio: 2,
+            feeToExpectedGrossRatio: 0.5,
+            minimumGrossToCoverFees: 0.02,
+            expectedNetAfterFeesAtTp: 0.02,
+            expectedNetAfterFeesAtSl: -0.04,
+            expectedNetPnL: 0.02,
+            takeProfitPercent: 2,
+            stopLossPercent: 1,
+            feeEdgeClass: "FEE_SAFE",
+          },
+        },
+      ],
+    });
+    expect(report.blockingEnabledInProduction).toBe(false);
+    expect((report.classificationSummary.FEE_SAFE ?? 0) + (report.classificationSummary.FEE_BORDERLINE ?? 0) + (report.classificationSummary.FEE_EROSION ?? 0)).toBeGreaterThan(0);
+  });
+});
+
+describe("P2-7 entry timing experiment", () => {
+  it("counts late entry classes in offline experiment", () => {
+    const report = buildEntryTimingExperiment({
+      rows: [
+        {
+          tradeId: "t1",
+          symbol: "A",
+          strategy: "RANGE_MEAN_REVERSION",
+          regime: "RANGE",
+          netPnL: -0.2,
+          grossPnL: -0.1,
+          totalFee: 0.1,
+          entryTiming: {
+            candidateId: "c1",
+            symbol: "A",
+            entryTimestamp: "t",
+            entryDelayMs: 120_000,
+            priceAtEntry: 10,
+            classification: "CHASING",
+            reasonDetail: "late",
+          },
+        },
+      ],
+    });
+    expect(report.lateEntryCount).toBe(1);
+    expect(report.promotionStatus).not.toBe("PROMOTABLE");
+  });
 });
 
 describe("P2-8 AI x strategy interaction", () => {
@@ -145,6 +215,11 @@ describe("P2 full bundle", () => {
     expect(p2.feeAwareEntryExperiment.blockingEnabledInProduction).toBe(false);
     expect(p2.promotionGate.promoted).toBe(false);
     expect(p2.promotionDecisions.every((d) => d.status !== "PROMOTABLE" || p2.promotionGate.status === "PROMOTABLE")).toBe(true);
+    expect(p2.baselineMetrics).toBeDefined();
+    expect(p2.outOfSampleEvaluation).toBeDefined();
+    expect(p2.profitConcentration).toBeDefined();
+    expect(p2.candidateQualityFactors).toBeDefined();
+    expect(p2.trendFollowingValidation).toBeDefined();
   });
 });
 

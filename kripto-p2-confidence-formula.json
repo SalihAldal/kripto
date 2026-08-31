@@ -1,0 +1,32 @@
+{
+  "sourceFiles": [
+    "src/server/decision-engine/conflict-detection.service.ts",
+    "src/server/decision-engine/master-decision-engine.service.ts",
+    "src/server/ai/hybrid-decision-engine.ts"
+  ],
+  "baselineModel": {
+    "policy": "CURRENT_TDI (artifact verdict + current fields)",
+    "confidenceThresholds": {
+      "wait": 40,
+      "buy": 62
+    },
+    "unchangedRules": [
+      "technical gate",
+      "momentum gate",
+      "execution gate",
+      "bullishCount gate",
+      "consensus/EV gate"
+    ]
+  },
+  "correctionModel": {
+    "name": "CONFIDENCE_INTERACTION_CORRECTION",
+    "allowedChange": "Only neutralize inferred duplicated interaction penalty where LEARNING + MOMENTUM combined penalty is detected (no threshold changes).",
+    "interactionPenaltyRestore": {
+      "shared_signal_double_count": 6,
+      "learning_overweight_with_momentum": 4,
+      "momentum_duplication": 3
+    },
+    "unchangedThresholds": true,
+    "forceBuy": false
+  }
+}

@@ -1,276 +1,204 @@
-# KRIPTO P2 — Profitability Optimization Report
+# KRIPTO P2 — Strategy + Regime + Edge Profitability Optimization
 
-**References:** `CRYPTO_PROFITABILITY_FORENSIC_REPORT.md`, `KRIPTO_P0_PROFITABILITY_FOUNDATION_REPORT.md`, `KRIPTO_P1_PROFITABILITY_ENGINEERING_REPORT.md`  
-**Validation artifact:** `kripto-p2-profitability-optimization.json`  
-**Date:** 2026-08-15  
+Date: 2026-08-17  
+Primary outputs: `kripto-p2-profitability-optimization.json`, `kripto-strategy-regime-matrix.csv`, `kripto-profitability-experiments.csv`
 
----
+## Final Profitability Verdict
 
-## Verdict
+**NOT_PROVEN**
 
-| Gate | Result |
-|------|--------|
-| P2 slot/TDI analysis (unit tests) | **PASS** (34/34 targeted) |
-| Strategy A/B harness (single-change) | **PASS** |
-| Regime × strategy matrix | **PASS** |
-| Fee/timing experiments (offline) | **PASS** |
-| AI × strategy forensic research | **PASS** |
-| Experiment registry | **PASS** |
-| Promotion gate (no auto-promote) | **PASS** |
-| Production changes applied | **NONE** |
-| Live 3-round smoke | **PENDING** |
+Rationale: P2 research infrastructure and artifact chain are working, but current post-fix controlled run produced 0 closed trades in the only completed round window. There is not enough post-fix trade evidence yet to claim repeatable positive net edge.
 
-**Overall P2 acceptance:** **PASS** (research complete; zero production promotions)
+## 1) Current Baseline
 
----
+Source: `artifacts/forensics/cmsxj8zqh0007un4ksq8ygspa/rounds/1/baseline-metrics.json`
 
-## 1. TDI Slot Analysis (P2-1)
+- tradeCount: 0
+- winRate: 0
+- grossPnL: 0
+- fees: 0
+- netPnL: 0
+- profitFactor: 0
+- expectancy: 0
+- maxDrawdown: 0
+- averageWin / averageLoss / averageHold / medianHold: 0
 
-**Architecture preserved:** `maxPositions = 3` (unchanged)
+Interpretation: post-P0/P1/P1-fix baseline is observable, but statistically empty in this validation snapshot.
 
-**New artifact:** `slot-allocation-analysis.json`
+## 2) Strategy × Regime Matrix
 
-For every NO_SLOT candidate records:
-- candidateId, symbol, rank, score, reasonCode, strategy, regime, EV
-- Classification: `JUSTIFIED_NO_SLOT` | `POSSIBLE_MISSED_SLOT` | `UNKNOWN`
-- Evidence array (post-entry move used **only** in forensic section)
+- JSON: `strategy-regime-matrix-p2.json`
+- CSV: `kripto-strategy-regime-matrix.csv`
+- Sparse cells are marked `NOT_ENOUGH_DATA`.
+- No production rule is promoted from sparse cells.
 
-**Historical context:** 87/102 TDI WAIT, many score-73 candidates — analyzed, not used to lower thresholds.
+## 3) Mean Reversion Analysis
 
----
+Historical evidence remains negative, but post-fix sample is insufficient for causal promotion decisions.
 
-## 2. Slot Experiment (P2-1A)
+Separation framework is implemented via artifacts:
 
-**Artifact:** `slot-allocation-experiment.json`
+- `MR_REGIME_MISMATCH` (regime gating experiment)
+- `MR_ENTRY_PROBLEM` (entry timing experiment)
+- `MR_FEE_PROBLEM` (fee-aware experiment)
+- `MR_EXIT_PROBLEM` (exit-forensics + exit-fee-interaction)
+- `MR_STRATEGY_WEAKNESS` (only if reproduced with sufficient sample)
 
-| Variant | Description |
-|---------|-------------|
-| BASELINE | maxPositions=3 (offline sim) |
-| EXPERIMENT | maxPositions=4 (offline sim) |
+Current state: **RESEARCH_ONLY**
 
-Metrics: tradeCount, winRate, grossPnL, fees, netPnL, expectancy, profitFactor, drawdown, capitalUtilization, missedOpportunities, riskExposure.
+## 4) Volatility Breakout Analysis
 
-**Promotion:** RESEARCH_ONLY — no real risk increase, production unchanged.
+- Validation artifact: `volatility-breakout-validation.json`
+- Success/failure pattern mapping remains research-only due low effective post-fix sample.
+- No automatic disable/promotion applied.
 
----
+## 5) Trend Following Analysis
 
-## 3. TDI Sensitivity (P2-2)
+New artifact: `trend-following-validation.json`
 
-**Artifact:** `tdi-sensitivity.json`
+- Verdict logic: `NOT_PROVEN` when trend/momentum trade sample < 10
+- Current state: **NOT_PROVEN**
 
-- Score distribution (min, max, mean, p50, p75, p90)
-- Approval / WAIT / NO_SLOT rates
-- Offline sensitivity at threshold ±2 (no production change)
-- Recommendation: `NO_CHANGE` or `INSUFFICIENT_DATA`
+## 6) Candidate Quality Analysis
 
-**Production TDI threshold NOT modified.**
+New artifact: `candidate-quality-factors.json`
 
----
+Compares winners vs losers on available decision-time factors:
 
-## 4. Volatility Breakout Validation (P2-3)
+- net/gross/fee profile
+- fee-to-gross ratio
+- entry delay and movement-to-entry
+- TDI score
+- expected gross-to-fee ratio
 
-**Artifact:** `volatility-breakout-validation.json`
+Evidence class output:
 
-Historical n=3 (2W/1L) treated as **INSUFFICIENT_DATA** (minimum n=20).
+- `FACT` / `REPEATED_PATTERN` / `HYPOTHESIS`
 
-Enhanced with regime breakdown cells labeled `NOT_ENOUGH_DATA` when sparse.
+## 7) EV Calibration
 
-**Not promoted** despite tiny positive sample — by design.
+- Artifact: `ev-calibration.json`
+- No threshold change is promoted from sparse/unknown EV buckets.
+- If bucket sample insufficient, calibration is effectively blocked by evidence quality.
 
----
+## 8) TDI Calibration
 
-## 5. Strategy A/B Results (P2-4)
+- Artifact: `tdi-sensitivity.json`
+- Classification path retained: `GOOD_FILTER` / `OVERLY_CONSERVATIVE` / `MISALIGNED` / `UNKNOWN` via evidence
+- No threshold mutation in production from current sample.
 
-**Single-change experiments only** (via `p2-experiment-services.ts`):
+## 9) AI Predictive Quality
 
-| experimentId | Variant |
-|--------------|---------|
-| mr-regime-filter | MR regime gating |
-| breakout-regime-preference | Breakout regime filter |
-| fee-aware-entry | Fee floor (offline) |
-| entry-timing-protection | POSSIBLY_LATE block (offline) |
+- Artifact: `ai-strategy-interaction.json`
+- AI execution parity remains protected (NO_TRADE bypass remains guarded by VETO path).
+- Predictive quality remains evidence-limited in this run.
 
-Combined multi-change bundle marked **MULTI_CHANGE_RESEARCH_ONLY** — not for promotion.
+## 10) Regime Gating Experiment
 
-**Artifact:** `profitability-experiments.json`, `strategy-comparison-report.json`
+- Single-change MR regime experiment remains active in A/B harness.
+- Promotion gate now evaluates single-change candidate instead of multi-change bundle for promotability decision.
+- Status: **RESEARCH_ONLY**
 
----
+## 11) Entry Quality Experiment
 
-## 6. Strategy × Regime Matrix (P2-5)
+- Artifact: `entry-timing-experiment.json`
+- Uses existing timing classes (`POSSIBLY_LATE`, `CHASING`, `EDGE_DECAY`) offline.
+- No arbitrary runtime timing threshold introduced.
 
-**Artifacts:** `strategy-regime-matrix.json`, `strategy-regime-matrix-p2.json`
+## 12) Fee-Aware Profitability Experiment
 
-Cells with n < 5 labeled **`NOT_ENOUGH_DATA`**.
+- Artifact: `fee-aware-entry-experiment.json`
+- Classification: `FEE_SAFE`, `FEE_BORDERLINE`, `FEE_EROSION`
+- Blocking remains disabled in production.
+- Status: **RESEARCH_ONLY**
 
-Example research cells:
-- Mean Reversion × RANGE
-- Mean Reversion × HIGH_VOLATILITY
-- Volatility Breakout × TREND
+## 13) Strategy A/B Harness
 
-No rules created from sparse cells.
+- Single-change experiments exported in `single-change-experiments.json`
+- Experiment registry exported in `profitability-experiments.json` and `kripto-profitability-experiments.csv`
+- Breakout regime preference now appears in experiment registry.
 
----
+## 14) Out-of-Sample Validation
 
-## 7. Fee-Aware Entry Experiment (P2-6)
+New artifact: `out-of-sample-evaluation.json`
 
-**Artifact:** `fee-aware-entry-experiment.json`
+- 70/30 chronological split when sufficient rows exist.
+- If insufficient sample, OOS gate explicitly fails with reason.
+- Current status in this run: unavailable/insufficient evidence.
 
-Classifications: `FEE_SAFE`, `FEE_BORDERLINE`, `FEE_EROSION`
+## 15) Profit Promotion Gate
 
-Compares baseline vs fee-floor experiment offline.
+Promotion gate now includes:
 
-**Production blocking:** disabled (`blockingEnabledInProduction: false`)
+- expectancy improvement
+- drawdown control
+- sample threshold
+- OOS support
+- symbol concentration control
+- single-trade dependence control
 
----
+Auto-promotion remains disabled (`promoted: false`) unless all strict criteria pass.
 
-## 8. Entry Timing Experiment (P2-7)
+## 16) Profit Concentration
 
-**Artifact:** `entry-timing-experiment.json`
+New artifact: `profit-concentration.json`
 
-| Baseline | Experiment |
-|----------|------------|
-| CURRENT_ENTRY | CONTROLLED_ENTRY_PROTECTION |
+Reports:
 
-Blocks `POSSIBLY_LATE` entries **offline only**. Decision-time data only; no look-ahead.
+- top1 trade contribution
+- top3 contribution
+- top symbol contribution
+- top strategy contribution
+- top regime contribution
+- classification: `REAL_EDGE` vs `SINGLE_TRADE_LUCK`
 
----
+## 17) Loss Attribution Before vs After Fixes
 
-## 9. AI × Strategy Interaction (P2-8)
+- Historical reference (pre/post older sample): net negative with heavy fee drag and replay-window distortion.
+- Current post-fix controlled run sample: zero closed trades in completed round window.
 
-**Artifact:** `ai-strategy-interaction.json`
+Conclusion: attribution delta is **inconclusive** in this run; framework exists, evidence not yet sufficient.
 
-Analyzes AI APPROVE / NO_TRADE / REJECT by strategy and regime.
+## 18) Do-Not-Touch Classification
 
-**AI prompts NOT modified. AI decisions NOT overridden.**
+- `DO_NOT_CHANGE_YET`: AI confidence thresholds, TDI thresholds, EV thresholds, sizing/risk limits, maxPositions, AI prompts, SL/TP, strategy hard on/off, symbol allowlists.
+- `RESEARCH`: MR regime gating, breakout regime preference, entry timing protection, fee-aware filter.
+- `CHANGE` (implemented observability only): baseline/OOS/concentration/candidate-factor/CSV/export and promotion-gate strictness.
 
-Forensic research only unless statistically supported experiment passes promotion gate.
+## 19) Current Profitability Verdict
 
----
+**NOT_PROVEN**
 
-## 10. Opportunity Value (P2-9)
+Not enough post-fix closed-trade evidence yet for `MIXED`, `PROMISING`, or `POSITIVE_OBSERVATION`.
 
-**Artifact:** `opportunity-value.json`
+## 20) Required Validation Design
 
-Post-entry movement used **only** in `POST_ENTRY_ANALYSIS` scope.
+Defined staged gates in `kripto-p2-profitability-optimization.json`:
 
-Stages ranked: SCANNER, TDI, SLOT, SIZING, AI, RISK, EXECUTION.
+- 5–10 rounds: minTrades 5 + non-replay exit + fee reconciliation + AI parity + required artifacts
+- 30–50 rounds: minTrades 20 + matrix/concentration baseline artifacts
+- 100+ rounds: minTrades 60 + OOS + promotion-gate evidence
 
-Never fed back into live decision path.
+## 21) Tests
 
----
+Executed targeted suites:
 
-## 11. Experiment Registry (P2-11)
+- `tests/forensics/p2-profitability-optimization.test.ts` (13)
+- `tests/forensics/p2-tdi-slot-strategy.test.ts` (11)
+- `tests/forensics/p1-profitability-engineering.test.ts` (11)
+- `tests/forensics/round-export.test.ts` (1)
 
-**Artifact:** `profitability-experiments.json`
+Total: 36 passing tests in targeted run.
 
-Each experiment records:
-- experimentId, baseline, variant, hypothesis, parameters
-- sample, metrics, risk, result, promotionStatus
+## 22) Controlled Validation Outcome
 
-`safetyPreserved`: aiGate, riskGate, sizingGate, executionIntegrity, pnlReconciliation = true
+Script: `scripts/run-p2-profitability-optimization-validation.ts` (5 rounds max)
 
----
+- Session: `cmsxj8zqh0007un4ksq8ygspa`
+- Round 1 generated complete P2 artifact set (JSON + CSV)
+- Remaining rounds were not completed in this run window
+- No auto-promotion and no safety bypass detected
 
-## 12. Promotion Decisions (P2-10)
+## Promotion Decisions Summary
 
-**Artifacts:** `promotion-gate.json`, `promotion-decisions.json`
-
-| Change | Status |
-|--------|--------|
-| Slot 3 vs 4 | RESEARCH_ONLY |
-| Fee-aware entry | RESEARCH_ONLY |
-| Entry timing protection | RESEARCH_ONLY |
-| TDI threshold | NO_CHANGE / REJECTED |
-| Volatility Breakout n=3 | REJECTED |
-| Combined multi-change | RESEARCH_ONLY |
-
-**Runtime `promoted: false` always.**
-
----
-
-## 13. Tests
-
-```
-tests/forensics/p2-profitability-optimization.test.ts  → 11/11
-tests/forensics/p2-tdi-slot-strategy.test.ts           → 11/11
-tests/forensics/p1-profitability-engineering.test.ts   → 11/11
-tests/forensics/round-export.test.ts                   → 1/1
-Total: 34/34 PASS
-```
-
----
-
-## 14. Controlled Validation
-
-Script: `npx tsx scripts/run-p2-profitability-optimization-validation.ts`
-
-- Max **3 rounds**
-- Verifies P2 artifacts, no auto-promotion, safety preserved
-- Does **not** optimize for profitability
-
----
-
-## 15. Final Recommended Production Changes
-
-**None at this time.**
-
-All experiments remain research-only pending:
-- n ≥ 20 sample
-- Positive net expectancy improvement
-- Acceptable drawdown
-- OOS confirmation
-- No symbol overfit
-
----
-
-## Changes That Must Remain Research-Only
-
-1. MR regime filter
-2. Fee-aware entry floor
-3. Entry timing protection
-4. Slot 4 simulation
-5. TDI threshold adjustment
-6. Volatility Breakout promotion from n=3
-
----
-
-## Preserved (Unchanged)
-
-- Sizing threshold 45
-- Risk limits
-- maxPositions = 3
-- AI prompts / VETO gate
-- EV thresholds
-- SL/TP values
-- Emergency stop
-- Binance API safety
-
----
-
-## Files Added/Changed
-
-| File | Purpose |
-|------|---------|
-| `slot-allocation-analysis.service.ts` | P2-1 NO_SLOT classification |
-| `slot-allocation-experiment.service.ts` | P2-1A 3 vs 4 offline |
-| `tdi-sensitivity.service.ts` | P2-2 threshold research |
-| `ai-strategy-interaction.service.ts` | P2-8 AI × strategy |
-| `opportunity-value.service.ts` | P2-9 post-entry value |
-| `p2-experiment-services.ts` | Fee/timing/A/B helpers |
-| `experiment-registry.service.ts` | P2-11 registry |
-| `p2-forensic-report.service.ts` | Unified P2 bundle |
-| `volatility-breakout-validation.service.ts` | Regime breakdown |
-| `promotion-gate.service.ts` | NOT_ENOUGH_DATA cells |
-| `round-forensic-export.service.ts` | 10 new P2 artifacts |
-| `tests/forensics/p2-profitability-optimization.test.ts` | P2 acceptance tests |
-| `scripts/run-p2-profitability-optimization-validation.ts` | Live smoke |
-
----
-
-## Remaining Blockers
-
-1. No experiment meets PROMOTABLE criteria (sample + OOS)
-2. Live 3-round artifact export validation pending
-3. Repeatable STRATEGY + REGIME + ENTRY + AI + FEE edge not yet proven at scale
-
-**Objective status:** Research infrastructure complete; profitability optimization awaits evidence, not trade-count chasing.
+All strategy/entry/fee variants remain **RESEARCH_ONLY** in production until sufficient sample + OOS support is achieved.

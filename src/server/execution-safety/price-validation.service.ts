@@ -1,11 +1,19 @@
 import { getTicker } from "@/services/binance.service";
 import { MAX_PRICE_DRIFT_PCT, PRICE_CACHE_TTL_MS } from "@/src/server/execution-safety/execution-safety.types";
 import type { PreTradeSafetyInput, SafetyValidationStageResult } from "@/src/server/execution-safety/execution-safety.types";
+import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
 
 const priceCache = new Map<string, { price: number; at: number }>();
 
 function round(value: number) {
   return Number(value.toFixed(8));
+}
+
+export function computePriceDriftPct(referencePrice: number, latestPrice: number) {
+  if (!Number.isFinite(referencePrice) || referencePrice <= 0 || !Number.isFinite(latestPrice) || latestPrice <= 0) {
+    return 100;
+  }
+  return Math.abs(((latestPrice - referencePrice) / referencePrice) * 100);
 }
 
 export async function validatePriceSafety(input: PreTradeSafetyInput): Promise<SafetyValidationStageResult> {
@@ -35,8 +43,12 @@ export async function validatePriceSafety(input: PreTradeSafetyInput): Promise<S
     reasons.push("Exchange data is stale");
   }
 
-  const localPrice = input.priceHint;
-  const driftPct = localPrice > 0 ? Math.abs(((livePrice - localPrice) / localPrice) * 100) : 100;
+  const marketSnapshotPrice =
+    getMarketDataDaemon()
+      .getMarketSnapshot()
+      .find((row) => row.symbol.toUpperCase() === cacheKey)?.lastPrice ?? 0;
+  const localPrice = marketSnapshotPrice > 0 ? marketSnapshotPrice : input.priceHint;
+  const driftPct = computePriceDriftPct(localPrice, livePrice);
   if (driftPct > MAX_PRICE_DRIFT_PCT) {
     reasons.push(`Price drift exceeds tolerance (${driftPct.toFixed(3)}%)`);
   }
@@ -71,9 +83,11 @@ export async function validatePriceSafety(input: PreTradeSafetyInput): Promise<S
     metadata: {
       livePrice: round(livePrice),
       localPrice: round(localPrice),
+      inputPriceHint: round(input.priceHint),
       driftPct: round(driftPct),
       spreadPct,
       stale: isStale,
+      localPriceSource: marketSnapshotPrice > 0 ? "market_snapshot" : "price_hint",
     },
   };
 }

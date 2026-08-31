@@ -1,0 +1,170 @@
+{
+  "generatedAt": "2026-08-22T11:37:15.130Z",
+  "variants": [
+    {
+      "variant": "BASELINE",
+      "status": "PARTIAL",
+      "splits": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 103,
+          "netPnL": -14.943674490000003,
+          "expectancy": -0.1450842183495146,
+          "profitFactor": 0.0668539365842077,
+          "winRate": 0.18446601941747573,
+          "drawdown": -14.943674490000003
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 34,
+          "netPnL": -1.7706417499999998,
+          "expectancy": -0.052077698529411756,
+          "profitFactor": 0.2055233045377096,
+          "winRate": 0.17647058823529413,
+          "drawdown": -1.7706417499999998
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 36,
+          "netPnL": -1.8808849900000002,
+          "expectancy": -0.05224680527777778,
+          "profitFactor": 0.21927780408177794,
+          "winRate": 0.2222222222222222,
+          "drawdown": -1.94770499
+        }
+      ]
+    },
+    {
+      "variant": "VARIANT_A",
+      "status": "PARTIAL",
+      "splits": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 97,
+          "netPnL": -0.5847721199999999,
+          "expectancy": -0.00602857855670103,
+          "profitFactor": 0.7220809970247367,
+          "winRate": 0.29896907216494845,
+          "drawdown": -0.7427182199999999
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 32,
+          "netPnL": -0.27977828000000005,
+          "expectancy": -0.008743071250000001,
+          "profitFactor": 0.6601002526970552,
+          "winRate": 0.3125,
+          "drawdown": -0.4488571700000001
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 34,
+          "netPnL": -0.23706903999999998,
+          "expectancy": -0.006972618823529411,
+          "profitFactor": 0.7720867809989959,
+          "winRate": 0.38235294117647056,
+          "drawdown": -0.4477724
+        }
+      ]
+    },
+    {
+      "variant": "VARIANT_B",
+      "status": "PARTIAL",
+      "splits": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 59,
+          "netPnL": -2.7740126000000007,
+          "expectancy": -0.047017162711864416,
+          "profitFactor": 0.13472780536604503,
+          "winRate": 0.11864406779661017,
+          "drawdown": -2.7740126000000007
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 19,
+          "netPnL": -1.2861717899999998,
+          "expectancy": -0.06769325210526315,
+          "profitFactor": 0.03907728506617217,
+          "winRate": 0.05263157894736842,
+          "drawdown": -1.3384757899999997
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 21,
+          "netPnL": -0.26453366,
+          "expectancy": -0.012596840952380953,
+          "profitFactor": 0.6924926703998074,
+          "winRate": 0.42857142857142855,
+          "drawdown": -0.34468406
+        }
+      ]
+    },
+    {
+      "variant": "VARIANT_C",
+      "status": "PARTIAL",
+      "splits": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 97,
+          "netPnL": -0.5847721199999999,
+          "expectancy": -0.00602857855670103,
+          "profitFactor": 0.7220809970247367,
+          "winRate": 0.29896907216494845,
+          "drawdown": -0.7427182199999999
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 32,
+          "netPnL": -0.27977828000000005,
+          "expectancy": -0.008743071250000001,
+          "profitFactor": 0.6601002526970552,
+          "winRate": 0.3125,
+          "drawdown": -0.4488571700000001
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 34,
+          "netPnL": -0.23706903999999998,
+          "expectancy": -0.006972618823529411,
+          "profitFactor": 0.7720867809989959,
+          "winRate": 0.38235294117647056,
+          "drawdown": -0.4477724
+        }
+      ]
+    },
+    {
+      "variant": "VARIANT_D",
+      "status": "PARTIAL",
+      "splits": [
+        {
+          "split": "TRAIN",
+          "tradeCount": 97,
+          "netPnL": -0.5676389999999998,
+          "expectancy": -0.005851948453608245,
+          "profitFactor": 0.7260983420823683,
+          "winRate": 0.26804123711340205,
+          "drawdown": -0.7941989999999999
+        },
+        {
+          "split": "VALIDATION",
+          "tradeCount": 32,
+          "netPnL": -0.16796000000000005,
+          "expectancy": -0.005248750000000002,
+          "profitFactor": 0.8031226556639159,
+          "winRate": 0.28125,
+          "drawdown": -0.37692000000000003
+        },
+        {
+          "split": "OOS",
+          "tradeCount": 34,
+          "netPnL": -0.29659040000000003,
+          "expectancy": -0.008723247058823531,
+          "profitFactor": 0.7171262607650009,
+          "winRate": 0.38235294117647056,
+          "drawdown": -0.46999040000000003
+        }
+      ]
+    }
+  ]
+}

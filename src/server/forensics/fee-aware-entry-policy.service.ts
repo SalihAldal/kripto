@@ -1,4 +1,5 @@
 import type { FeeAwareEntryPolicyEvaluation, FeeEdgeMetricsSnapshot } from "@/src/server/forensics/forensic.types";
+import { classifyFeeEdge } from "@/src/server/forensics/fee-edge-metrics.service";
 
 export const FEE_AWARE_ENTRY_POLICY_VERSION = "fee-aware-v1";
 
@@ -34,10 +35,18 @@ export function evaluateFeeAwareEntryPolicy(input: {
   return {
     policyVersion: FEE_AWARE_ENTRY_POLICY_VERSION,
     verdict,
+    feeEdgeClass: classifyFeeEdge({
+      expectedGross: input.metrics.expectedGrossAtTp,
+      expectedNet: input.metrics.expectedNetAfterFeesAtTp,
+      fee: input.metrics.estimatedRoundTripFees,
+      ratio,
+    }),
     expectedGrossToFeeRatio: ratio,
     minimumGrossToCoverFees: input.metrics.minimumGrossToCoverFees,
     estimatedRoundTripFees: input.metrics.estimatedRoundTripFees,
     expectedNetAfterFeesAtTp: input.metrics.expectedNetAfterFeesAtTp,
+    minGrossToFeeRatio: minRatio,
+    minGrossToFeeRatioSource: "fee-aware-entry-policy.minGrossToFeeRatio(default=1)",
     blockingEnabled,
     reasonCode,
     reasonDetail,

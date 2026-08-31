@@ -1,0 +1,112 @@
+{
+  "generatedAt": "2026-08-27T19:59:21.585Z",
+  "verdict": {
+    "P0_OPEN": 0,
+    "P1_ENGINEERING_OPEN": 0,
+    "P1_POLICY_OPEN": 0,
+    "P0_FIXED": 10,
+    "P1_ENGINEERING_FIXED": 3,
+    "50ROUND_DETERMINISTIC_STRESS": "PASS",
+    "DB_RESILIENCE": "PASS",
+    "25P02": "FIXED",
+    "PERSIST_VERSION_CONFLICT": "FIXED",
+    "SCHEDULER_OWNERSHIP": "PASS",
+    "HEARTBEAT": "PASS",
+    "RECOVERY_CONVERGENCE": "PASS",
+    "STATE_MACHINE": "PASS",
+    "AI_LIFECYCLE": "PASS",
+    "AI_STARTED_ORPHANS": 0,
+    "SCANNER_RESILIENCE": "PASS",
+    "EXECUTION_LIFECYCLE": "PASS",
+    "EXIT_SETTLEMENT": "PASS",
+    "PNL_INTEGRITY": "PASS",
+    "TELEMETRY": "PASS",
+    "ARTIFACT_COMPLETENESS": "PASS",
+    "LOOKAHEAD": "PASS",
+    "REGRESSION_TESTS": "PASS",
+    "POLICY_CHANGES": "NO",
+    "THRESHOLD_CHANGES": "NO",
+    "AI_VETO_CHANGED": "NO",
+    "PAPER_STARTED": "NO",
+    "READY_FOR_50_ROUND_PAPER": "YES",
+    "REMAINING_BLOCKER": "None for deterministic endurance — real 50-round overnight campaign not executed in this task",
+    "NEXT_STEP": "Separate task may start real 50-round Paper campaign with overnight monitoring"
+  },
+  "stressScenarios": [
+    {
+      "id": 1,
+      "scenario": "50 sequential business-reject rounds",
+      "result": "PASS"
+    },
+    {
+      "id": 2,
+      "scenario": "50 rounds transient version conflict",
+      "result": "PASS"
+    },
+    {
+      "id": 3,
+      "scenario": "50 rounds P2002 idempotent attach",
+      "result": "PASS"
+    },
+    {
+      "id": 4,
+      "scenario": "50 rounds idempotent double-fail",
+      "result": "PASS"
+    },
+    {
+      "id": 5,
+      "scenario": "concurrent terminal writers",
+      "result": "PASS"
+    },
+    {
+      "id": 6,
+      "scenario": "AI timeout injection 50 candidates",
+      "result": "PASS"
+    },
+    {
+      "id": 7,
+      "scenario": "provider down injection",
+      "result": "PASS"
+    },
+    {
+      "id": 8,
+      "scenario": "registry duplicate consolidate",
+      "result": "PASS"
+    },
+    {
+      "id": 9,
+      "scenario": "recovery idempotency 5x reconcile",
+      "result": "PASS"
+    },
+    {
+      "id": 10,
+      "scenario": "scheduler 50 concurrent spawn",
+      "result": "PASS"
+    },
+    {
+      "id": 11,
+      "scenario": "mixed business gates isolation",
+      "result": "PASS"
+    },
+    {
+      "id": 12,
+      "scenario": "heartbeat AI_ACTIVE no false stall",
+      "result": "PASS"
+    },
+    {
+      "id": 13,
+      "scenario": "NO_TRADE non-executable",
+      "result": "PASS"
+    },
+    {
+      "id": 14,
+      "scenario": "PnL settlement synthetic",
+      "result": "PASS"
+    },
+    {
+      "id": 15,
+      "scenario": "MTF UNAVAILABLE contract",
+      "result": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+{
+  "generatedAt": "2026-08-17T23:40:37.805Z",
+  "objective": "KRIPTO P0/P1 runtime timeout + TDI zero-approval blocker fix",
+  "blockerA": {
+    "rootCauseClassification": [
+      "MULTIPLE_WRITERS",
+      "TRANSACTION_CONTENTION",
+      "CONNECTION_POOL"
+    ],
+    "baselineSession": {
+      "sessionId": "cmsxrlu1v0009unrkcmzvymcn",
+      "rounds": [
+        {
+          "roundNo": 1,
+          "durationMs": 934821,
+          "scannerCandidates": 21,
+          "tdiApproved": 0,
+          "tdiWait": 3,
+          "tdiRejected": 25,
+          "executionReady": 0,
+          "aiCalls": 42,
+          "orders": 0,
+          "trades": 0,
+          "patchJobActiveRoundSamples": 46,
+          "patchJobActiveRoundTimeouts": 0,
+          "artifactsPresent": {
+            "transactionDuration": true,
+            "tdiDecisions": true,
+            "decisionTrace": true
+          }
+        },
+        {
+          "roundNo": 2,
+          "durationMs": 867109,
+          "scannerCandidates": 16,
+          "tdiApproved": 0,
+          "tdiWait": 6,
+          "tdiRejected": 52,
+          "executionReady": 0,
+          "aiCalls": 87,
+          "orders": 0,
+          "trades": 0,
+          "patchJobActiveRoundSamples": 47,
+          "patchJobActiveRoundTimeouts": 1,
+          "artifactsPresent": {
+            "transactionDuration": true,
+            "tdiDecisions": true,
+            "decisionTrace": true
+          }
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 723532,
+          "scannerCandidates": 4,
+          "tdiApproved": 0,
+          "tdiWait": 6,
+          "tdiRejected": 64,
+          "executionReady": 0,
+          "aiCalls": 105,
+          "orders": 0,
+          "trades": 0,
+          "patchJobActiveRoundSamples": 50,
+          "patchJobActiveRoundTimeouts": 7,
+          "artifactsPresent": {
+            "transactionDuration": true,
+            "tdiDecisions": true,
+            "decisionTrace": true
+          }
+        }
+      ],
+      "aggregate": {
+        "scannerCandidates": 41,
+        "tdiApproved": 0,
+        "tdiWait": 15,
+        "tdiRejected": 141,
+        "executionReady": 0,
+        "aiCalls": 234,
+        "orders": 0,
+        "trades": 0,
+        "aiBypassCount": 0,
+        "runtimePatchSampleCount": 143,
+        "runtimePatchP50Ms": 82,
+        "runtimePatchP95Ms": 21533,
+        "runtimePatchP99Ms": 74269,
+        "runtimePatchTimeoutCount": 8,
+        "tdiWaitReasonDistribution": {
+          "NEUTRAL": 15
+        },
+        "tdiFirstBlockingDistribution": {
+          "OTHER": 15
+        }
+      },
+      "runtimePatchTimeoutRows": [
+        {
+          "roundNo": 2,
+          "durationMs": 21533,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 21327 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 143927,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 110529 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 63738,
+          "reason": "Transaction API error: Unable to start a transaction in the given time."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 74269,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction not found. Transaction ID is invalid, refers to an old closed transaction Prisma doesn't have information about anymore, or was obtained before disconnecting."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 72313,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 17111 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 72187,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 18870 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 49707,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 43133 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 3,
+          "durationMs": 48674,
+          "reason": "\nInvalid `tx.autoRoundJob.findUnique()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:372:39\n\n  369   metadataPatch?: Record<string, unknown>;\n  370 }) {\n  371   return runInstrumentedTransaction(\"auto-round.patchJobActiveRound\", async (tx) => {\n→ 372     const job = await tx.autoRoundJob.findUnique(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 43030 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        }
+      ]
+    },
+    "postFixValidationSession": {
+      "sessionId": "cmsxuaect0009unioi4gvkxcb",
+      "rounds": [
+        {
+          "roundNo": 1,
+          "durationMs": 1207663,
+          "scannerCandidates": 102,
+          "tdiApproved": 0,
+          "tdiWait": 3,
+          "tdiRejected": 159,
+          "executionReady": 0,
+          "aiCalls": 244,
+          "orders": 0,
+          "trades": 0,
+          "patchJobActiveRoundSamples": 49,
+          "patchJobActiveRoundTimeouts": 0,
+          "artifactsPresent": {
+            "transactionDuration": true,
+            "tdiDecisions": true,
+            "decisionTrace": true
+          }
+        },
+        {
+          "roundNo": 2,
+          "durationMs": 906388,
+          "scannerCandidates": 70,
+          "tdiApproved": 0,
+          "tdiWait": 10,
+          "tdiRejected": 269,
+          "executionReady": 0,
+          "aiCalls": 300,
+          "orders": 0,
+          "trades": 0,
+          "patchJobActiveRoundSamples": 50,
+          "patchJobActiveRoundTimeouts": 2,
+          "artifactsPresent": {
+            "transactionDuration": true,
+            "tdiDecisions": true,
+            "decisionTrace": true
+          }
+        }
+      ],
+      "aggregate": {
+        "scannerCandidates": 172,
+        "tdiApproved": 0,
+        "tdiWait": 13,
+        "tdiRejected": 428,
+        "executionReady": 0,
+        "aiCalls": 544,
+        "orders": 0,
+        "trades": 0,
+        "aiBypassCount": 0,
+        "runtimePatchSampleCount": 99,
+        "runtimePatchP50Ms": 21,
+        "runtimePatchP95Ms": 986,
+        "runtimePatchP99Ms": 14742,
+        "runtimePatchTimeoutCount": 2,
+        "tdiWaitReasonDistribution": {
+          "NEUTRAL": 12,
+          "BELOW_THRESHOLD": 1
+        },
+        "tdiFirstBlockingDistribution": {
+          "TECHNICAL": 6,
+          "MOMENTUM": 6,
+          "CONFIDENCE": 1
+        }
+      },
+      "runtimePatchTimeoutRows": [
+        {
+          "roundNo": 2,
+          "durationMs": 9583,
+          "reason": "\nInvalid `tx.autoRoundJob.updateMany()` invocation in\nC:\\Users\\salih\\Desktop\\kripto-main\\src\\server\\repositories\\auto-round-integrity.repository.ts:393:43\n\n  390   },\n  391 });\n  392 \n→ 393 const updated = await tx.autoRoundJob.updateMany(\nTransaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 8000 ms, however 9100 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction."
+        },
+        {
+          "roundNo": 2,
+          "durationMs": 14742,
+          "reason": ""
+        }
+      ]
+    },
+    "fixSummary": [
+      "Round runtime persistence is serialized with queue-backed writes to prevent overlapping heartbeat/transition writes.",
+      "Heartbeat persistence timeout is downgraded to non-fatal degraded mode with explicit PERSIST_TIMEOUT telemetry.",
+      "Transition persistence timeout maps to RoundSelectionAbortError(PERSIST_TIMEOUT) to fail selection safely without killing scheduler loop.",
+      "Heartbeat write amplification reduced by logging only coarse state transitions and limiting persisted timeline on non-coarse updates.",
+      "Bounded prisma writes retried with short backoff for transient timeout pressure."
+    ]
+  },
+  "blockerB": {
+    "waitReasonDistribution": {
+      "NEUTRAL": 12,
+      "BELOW_THRESHOLD": 1
+    },
+    "firstBlockingConditionDistribution": {
+      "TECHNICAL": 6,
+      "MOMENTUM": 6,
+      "CONFIDENCE": 1
+    },
+    "baselineZeroApproval": {
+      "scannerCandidates": 41,
+      "tdiWait": 15,
+      "tdiApproved": 0
+    },
+    "postFixSnapshot": {
+      "scannerCandidates": 172,
+      "tdiWait": 13,
+      "tdiApproved": 0,
+      "executionReady": 0
+    },
+    "reconciliation": {
+      "zeroBuyRootCause": "Primary cause is strict decision policy (hybrid/master not emitting BUY frequently); no threshold relaxation was applied. Observability was improved with firstBlockingCondition tracing and REJECTED counting fix.",
+      "correctnessFixesApplied": [
+        "Added firstBlockingCondition and blockingConditions fields to TDI decision records.",
+        "Added firstBlockingDistribution to TDI sensitivity output.",
+        "Fixed REJECTED verdict aggregation bug in trade evidence report script."
+      ]
+    }
+  },
+  "tests": {
+    "runtime": [
+      "tests/round-runtime.test.ts: heartbeat timeout is non-fatal",
+      "tests/round-runtime.test.ts: transition timeout maps to PERSIST_TIMEOUT",
+      "tests/round-runtime.test.ts: concurrent transitions are serialized (no overlap)"
+    ],
+    "tdi": [
+      "tests/forensics/tdi-sensitivity-reconciliation.test.ts: first blocker distribution captured",
+      "tests/p0-tdi-buy-bottleneck.test.ts: existing momentum/consensus regressions remain passing"
+    ]
+  },
+  "controlled2RoundValidation": {
+    "sessionId": "cmsxuaect0009unioi4gvkxcb",
+    "jobStatus": "COMPLETED",
+    "completedRounds": 0,
+    "failedRounds": 2,
+    "rounds": [
+      {
+        "roundNo": 1,
+        "state": "tur_basarisiz",
+        "failReason": "Tur secim suresi doldu (1200s)",
+        "startedAt": "2026-08-17T23:02:53.183Z",
+        "endedAt": "2026-08-17T23:23:00.805Z"
+      },
+      {
+        "roundNo": 2,
+        "state": "tur_basarisiz",
+        "failReason": "AI_GATE_BLOCK: AI_VETO",
+        "startedAt": "2026-08-17T23:23:00.945Z",
+        "endedAt": "2026-08-17T23:38:07.082Z"
+      }
+    ],
+    "runtimeMetrics": {
+      "patchJobActiveRound": {
+        "p50Ms": 21,
+        "p95Ms": 986,
+        "p99Ms": 14742,
+        "timeoutCount": 2
+      }
+    },
+    "funnel": {
+      "scannerCandidates": 172,
+      "tdiApproved": 0,
+      "tdiWait": 13,
+      "executionReady": 0,
+      "aiCalls": 544,
+      "orders": 0,
+      "trades": 0
+    }
+  },
+  "finalVerdict": {
+    "RUNTIME_STABILITY": "FAIL",
+    "TDI_APPROVAL_HEALTH": "PARTIAL",
+    "AI_PARITY": "PASS",
+    "READY_FOR_5_ROUND": "NO",
+    "READY_FOR_30_50_ROUND": "NO"
+  },
+  "remainingBlockers": [
+    "Round 1 in controlled validation still consumed full selection budget without producing an execution-ready candidate.",
+    "Runtime still shows high-latency patch samples under load (p99 should continue to be watched).",
+    "A separate Prisma engine empty-response incident appeared in a parallel AI-performance query path and should be isolated."
+  ]
+}

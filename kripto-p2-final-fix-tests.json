@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "suites": [
+    "tests/forensics/round-scope-consistency.test.ts",
+    "tests/forensics/round-export.test.ts",
+    "tests/forensics/p2-final-scanner-ai-recovery-fix.test.ts"
+  ],
+  "scenarios": 17
+}

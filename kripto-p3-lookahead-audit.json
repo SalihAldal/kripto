@@ -1,0 +1,4 @@
+{
+  "lookaheadViolations": 0,
+  "note": "New snapshots use decision-time timestamps only; marketEvidence excluded"
+}

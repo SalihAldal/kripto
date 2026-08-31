@@ -42,11 +42,20 @@ export * from "@/src/server/forensics/p2-forensic-report.service";
 export * from "@/src/server/forensics/slot-allocation-analysis.service";
 export * from "@/src/server/forensics/slot-allocation-experiment.service";
 export * from "@/src/server/forensics/tdi-sensitivity.service";
+export * from "@/src/server/forensics/tdi-data-quality.service";
+export * from "@/src/server/forensics/tdi-policy-forensic.service";
 export * from "@/src/server/forensics/ai-strategy-interaction.service";
 export * from "@/src/server/forensics/opportunity-value.service";
 export * from "@/src/server/forensics/p2-experiment-services";
 export * from "@/src/server/forensics/experiment-registry.service";
+export * from "@/src/server/forensics/baseline-metrics.service";
+export * from "@/src/server/forensics/oos-split.service";
+export * from "@/src/server/forensics/profit-concentration.service";
+export * from "@/src/server/forensics/candidate-quality-factor-analysis.service";
+export * from "@/src/server/forensics/trend-following-analysis.service";
+export * from "@/src/server/forensics/forensic-csv-export.service";
 export * from "@/src/server/forensics/paper-preflight.service";
+export * from "@/src/server/forensics/variant-d-shadow-observer.service";
 export {
   evaluateAiExecutionGate,
   evaluateAiExecutionReadiness,

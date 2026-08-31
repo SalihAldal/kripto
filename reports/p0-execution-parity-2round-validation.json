@@ -1,0 +1,39 @@
+{
+  "runId": "p0-exec-parity-2026-08-17T16-41-56-392Z",
+  "sessionId": "cmsxgoteo000jun34o8rz4lym",
+  "stoppedStaleJobId": "cmsuh6jox000zun90ifwbrjdw",
+  "job": {
+    "status": "STOPPED",
+    "activeState": "bekliyor",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "finishedAt": "2026-08-17T16:59:28.003Z"
+  },
+  "rounds": [
+    {
+      "roundNo": 1,
+      "symbol": "EDUTRY",
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "SIM_TIGHT_FILTER_15m: non-pump kalite dusuk (composite=52.2, sentiment=37.2, mtf=57.9) | AI role consensus zayif (tech=53.5, sentiment=37.2, risk=65.8) | EMA trend uyumsuz (EMA50=1.7874, EMA200=1.7886) | BTC EMA20 altinda (BTCTRY) | Kalite skoru dusuk (39/100 < 52)",
+      "scannerCount": 0,
+      "candidateCount": 2,
+      "tdiApproved": 0,
+      "tdiWait": 5,
+      "tdiRejected": 27,
+      "executionReady": 0,
+      "aiInvoked": 2,
+      "aiDecisions": {
+        "hold": 10,
+        "noTrade": 22,
+        "buy": 0
+      },
+      "riskRows": 0,
+      "orders": 0,
+      "aiGateBlocks": 0,
+      "aiVetoBypass": 0
+    }
+  ],
+  "historicalNoTradeExecutedAfter": 0,
+  "aiVetoParity": "PASS"
+}

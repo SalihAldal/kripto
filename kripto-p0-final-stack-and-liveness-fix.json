@@ -1,0 +1,90 @@
+{
+  "task": "KRIPTO P0 FINAL AI STACK OVERFLOW + LONG-LOOP HANG FIX",
+  "rootCause": {
+    "summary": "Stack overflow originated in Prisma JSON argument serialization during decision observability persistence, not in AI business formulas.",
+    "offendingCallPath": [
+      "runAIConsensusFromInput",
+      "observeAiDecision",
+      "upsertDecisionLogRecord",
+      "prisma serializeJsonQuery.serializeArgumentsValue/serializeArgumentsObject/serializeArgumentsArray"
+    ]
+  },
+  "fixes": {
+    "stackSafety": [
+      "Added AI_STACK_DEPTH_GUARD error type",
+      "Added phase traces with stack depth telemetry",
+      "Guarded heavy phases: indicator snapshot, specialists, hybrid decision, scorecard, short-term report, master adjudication",
+      "Preserved consensus result even if observeAiDecision throws"
+    ],
+    "serializationSafety": [
+      "Added bounded and cycle-safe JSON sanitizer in decision observability service",
+      "Reduced risk of deep/circular payload crash before Prisma persistence"
+    ],
+    "liveness": [
+      "Extended runtime progress model with meaningful timestamps/counters",
+      "Expanded progress state classification",
+      "Added round-hang snapshot artifact writer"
+    ]
+  },
+  "tests": {
+    "executed": [
+      "tests/ai-stack-overflow.test.ts",
+      "tests/ai-cancellation.test.ts",
+      "tests/round-progress-state.test.ts"
+    ],
+    "status": "PASS"
+  },
+  "validation": {
+    "command": "SCANNER_AI_CONCURRENCY=2 pnpm tsx scripts/_p1-scanner-entry-2round-validation.ts",
+    "runA_prePatch": {
+      "maximumCallStackExceededCount": 12,
+      "aiEvaluationSkippedCount": 6
+    },
+    "runB_postPatch": {
+      "maximumCallStackExceededCount": 0,
+      "aiEvaluationSkippedCount": 0
+    },
+    "twoRoundsCompleted": false,
+    "manualStopRequired": true,
+    "manualStopReason": "Round-1 entered non-productive RUNNING window; safety stop applied to avoid zombie run.",
+    "hangSnapshot": "artifacts/forensics/job-cmsz9hkmi0009un9wvgfystkf/rounds/1/round-hang-snapshot.json"
+  },
+  "beforeAfter": {
+    "rangeErrorCount": {
+      "before": 12,
+      "after": 0
+    },
+    "aiOrphanCount": {
+      "before": 0,
+      "after": 0
+    },
+    "roundOrphanCount": {
+      "before": 1,
+      "after": 1
+    },
+    "roundCompletion": {
+      "before": "0/2",
+      "after": "0/2"
+    },
+    "manualStopCount": {
+      "before": 1,
+      "after": 1
+    }
+  },
+  "remainingBlockers": [
+    "2/2 terminal round completion proof missing",
+    "Automatic stall terminalization still not fully preventing manual intervention in long-loop edge case"
+  ],
+  "verdict": {
+    "AI_STACK_STABILITY": "PASS",
+    "ROUND_LIVENESS": "PARTIAL",
+    "SCANNER_RUNTIME": "PARTIAL",
+    "DB_RESILIENCE": "PASS",
+    "AI_PARITY": "PASS",
+    "TWO_ROUNDS_COMPLETED": "NO",
+    "MANUAL_STOP_REQUIRED": "YES",
+    "READY_FOR_5_ROUNDS": "CONDITIONAL",
+    "READY_FOR_30_50_ROUNDS": "NO",
+    "READY_FOR_50_ROUND_PAPER": "NO"
+  }
+}

@@ -1,0 +1,5400 @@
+{
+  "generatedAt": "2026-08-22T00:02:51.523Z",
+  "scope": "DIRECT_NATIVE_KRIPTO_REPOSITORY_ONLY",
+  "constraints": {
+    "noNewPaperRun": true,
+    "noNewMarketData": true,
+    "noTradingBehaviorChange": true
+  },
+  "runInventory": [
+    {
+      "runId": "cmss1x1m30007unf4j3so2ekx",
+      "sessionId": "cmss1x1m30007unf4j3so2ekx",
+      "jobId": "cmss1x1m30007unf4j3so2ekx",
+      "date": "2026-08-13T21:49:49.929Z",
+      "lastDate": "2026-08-13T21:49:50.186Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmst21ldd0007unbgm1ngckq6",
+      "sessionId": "cmst21ldd0007unbgm1ngckq6",
+      "jobId": "cmst21ldd0007unbgm1ngckq6",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 5,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmst5e8830007und066nb9se1",
+      "sessionId": "cmst5e8830007und066nb9se1",
+      "jobId": "cmst5e8830007und066nb9se1",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmst7hc5k0007unsgnsvne5y4",
+      "sessionId": "cmst7hc5k0007unsgnsvne5y4",
+      "jobId": "cmst7hc5k0007unsgnsvne5y4",
+      "date": "2026-08-14T17:13:25.996Z",
+      "lastDate": "2026-08-14T17:34:40.732Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 106,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmst8nza40007unvsi2211emo",
+      "sessionId": "cmst8nza40007unvsi2211emo",
+      "jobId": "cmst8nza40007unvsi2211emo",
+      "date": "2026-08-14T17:46:32.300Z",
+      "lastDate": "2026-08-14T18:40:35.416Z",
+      "roundCount": 4,
+      "tradeCount": 0,
+      "artifactCompleteness": 0.75,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 346,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstce95w0007unronp6bkn7p",
+      "sessionId": "cmstce95w0007unronp6bkn7p",
+      "jobId": "cmstce95w0007unronp6bkn7p",
+      "date": "2026-08-14T19:30:55.451Z",
+      "lastDate": "2026-08-14T19:36:33.299Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 6,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstdt3ww0007uncgmjwgvf6p",
+      "sessionId": "cmstdt3ww0007uncgmjwgvf6p",
+      "jobId": "cmstdt3ww0007uncgmjwgvf6p",
+      "date": "2026-08-14T20:10:28.141Z",
+      "lastDate": "2026-08-14T20:31:51.872Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 99,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstfd2yx0007unlo6j9pjk3l",
+      "sessionId": "cmstfd2yx0007unlo6j9pjk3l",
+      "jobId": "cmstfd2yx0007unlo6j9pjk3l",
+      "date": "2026-08-14T20:54:00.081Z",
+      "lastDate": "2026-08-14T21:01:25.324Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 11,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstfn3sp0007unroag6wq0y6",
+      "sessionId": "cmstfn3sp0007unroag6wq0y6",
+      "jobId": "cmstfn3sp0007unroag6wq0y6",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstfrnqz0007unusktsdehqt",
+      "sessionId": "cmstfrnqz0007unusktsdehqt",
+      "jobId": "cmstfrnqz0007unusktsdehqt",
+      "date": "2026-08-14T21:05:19.734Z",
+      "lastDate": "2026-08-14T21:14:25.923Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 46,
+      "feeEvaluationCount": 1
+    },
+    {
+      "runId": "cmstg76eb0007undcg1a00659",
+      "sessionId": "cmstg76eb0007undcg1a00659",
+      "jobId": "cmstg76eb0007undcg1a00659",
+      "date": "2026-08-14T21:17:23.535Z",
+      "lastDate": "2026-08-14T21:31:17.689Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 57,
+      "feeEvaluationCount": 1
+    },
+    {
+      "runId": "cmstgsgfo0007un5k3mm6d33d",
+      "sessionId": "cmstgsgfo0007un5k3mm6d33d",
+      "jobId": "cmstgsgfo0007un5k3mm6d33d",
+      "date": "2026-08-14T21:33:56.363Z",
+      "lastDate": "2026-08-14T21:48:08.521Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 79,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsthcs630007un7432s7fnnq",
+      "sessionId": "cmsthcs630007un7432s7fnnq",
+      "jobId": "cmsthcs630007un7432s7fnnq",
+      "date": "2026-08-14T21:49:44.641Z",
+      "lastDate": "2026-08-14T21:58:34.388Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 32,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstipo0p0007un1o31ozf8jh",
+      "sessionId": "cmstipo0p0007un1o31ozf8jh",
+      "jobId": "cmstipo0p0007un1o31ozf8jh",
+      "date": "2026-08-14T22:27:45.518Z",
+      "lastDate": "2026-08-14T22:31:45.103Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 6,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstj3tn70007un4w7b7pocgz",
+      "sessionId": "cmstj3tn70007un4w7b7pocgz",
+      "jobId": "cmstj3tn70007un4w7b7pocgz",
+      "date": "2026-08-14T22:38:45.951Z",
+      "lastDate": "2026-08-14T22:48:41.217Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 40,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstjckww0007unsg4v4iff2q",
+      "sessionId": "cmstjckww0007unsg4v4iff2q",
+      "jobId": "cmstjckww0007unsg4v4iff2q",
+      "date": "2026-08-14T22:45:34.715Z",
+      "lastDate": "2026-08-14T22:51:55.329Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 17,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstjiruf0007unr8e78nizga",
+      "sessionId": "cmstjiruf0007unr8e78nizga",
+      "jobId": "cmstjiruf0007unr8e78nizga",
+      "date": "2026-08-14T22:50:23.372Z",
+      "lastDate": "2026-08-14T23:10:39.736Z",
+      "roundCount": 3,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 246,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstkgy6j0022unm8lannq6cg",
+      "sessionId": "cmstkgy6j0022unm8lannq6cg",
+      "jobId": "cmstkgy6j0022unm8lannq6cg",
+      "date": "2026-08-14T23:16:58.780Z",
+      "lastDate": "2026-08-14T23:53:42.002Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 7,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmstltuqn0007un9ksbk3xn9c",
+      "sessionId": "cmstltuqn0007un9ksbk3xn9c",
+      "jobId": "cmstltuqn0007un9ksbk3xn9c",
+      "date": "2026-08-15T00:25:11.096Z",
+      "lastDate": "2026-08-15T07:35:00.703Z",
+      "roundCount": 46,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 19148,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsud4nf7001eungwnhftv9k6",
+      "sessionId": "cmsud4nf7001eungwnhftv9k6",
+      "jobId": "cmsud4nf7001eungwnhftv9k6",
+      "date": "2026-08-15T12:39:15.042Z",
+      "lastDate": "2026-08-15T13:24:14.561Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 10,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsuf7zij0007une4u1q4cqu4",
+      "sessionId": "cmsuf7zij0007une4u1q4cqu4",
+      "jobId": "cmsuf7zij0007une4u1q4cqu4",
+      "date": "2026-08-15T13:37:47.862Z",
+      "lastDate": "2026-08-15T14:10:41.692Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 184,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsuh6jox000zun90ifwbrjdw",
+      "sessionId": "cmsuh6jox000zun90ifwbrjdw",
+      "jobId": "cmsuh6jox000zun90ifwbrjdw",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxgoteo000jun34o8rz4lym",
+      "sessionId": "cmsxgoteo000jun34o8rz4lym",
+      "jobId": "cmsxgoteo000jun34o8rz4lym",
+      "date": "2026-08-17T16:42:11.176Z",
+      "lastDate": "2026-08-17T16:59:27.898Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 46,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxhtm4x0007unugfjldfh89",
+      "sessionId": "cmsxhtm4x0007unugfjldfh89",
+      "jobId": "cmsxhtm4x0007unugfjldfh89",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxircm50007unj4l3g0zinv",
+      "sessionId": "cmsxircm50007unj4l3g0zinv",
+      "jobId": "cmsxircm50007unj4l3g0zinv",
+      "date": "2026-08-17T17:40:08.620Z",
+      "lastDate": "2026-08-17T17:44:35.966Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 6,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxj8zqh0007un4ksq8ygspa",
+      "sessionId": "cmsxj8zqh0007un4ksq8ygspa",
+      "jobId": "cmsxj8zqh0007un4ksq8ygspa",
+      "date": "2026-08-17T17:53:51.756Z",
+      "lastDate": "2026-08-17T17:59:43.053Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 10,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxk9ruy0007un7o1bw1gzbc",
+      "sessionId": "cmsxk9ruy0007un7o1bw1gzbc",
+      "jobId": "cmsxk9ruy0007un7o1bw1gzbc",
+      "date": "2026-08-17T18:22:27.909Z",
+      "lastDate": "2026-08-17T19:31:54.431Z",
+      "roundCount": 4,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 453,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxnjwi90007unqwzfr3oxdi",
+      "sessionId": "cmsxnjwi90007unqwzfr3oxdi",
+      "jobId": "cmsxnjwi90007unqwzfr3oxdi",
+      "date": "2026-08-17T19:54:19.275Z",
+      "lastDate": "2026-08-17T20:17:14.112Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 78,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxpchd50009un34ekvojvgq",
+      "sessionId": "cmsxpchd50009un34ekvojvgq",
+      "jobId": "cmsxpchd50009un34ekvojvgq",
+      "date": "2026-08-17T20:44:32.319Z",
+      "lastDate": "2026-08-17T20:59:22.178Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 40,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxr404g0009uni89ah87mez",
+      "sessionId": "cmsxr404g0009uni89ah87mez",
+      "jobId": "cmsxr404g0009uni89ah87mez",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxrlu1v0009unrkcmzvymcn",
+      "sessionId": "cmsxrlu1v0009unrkcmzvymcn",
+      "jobId": "cmsxrlu1v0009unrkcmzvymcn",
+      "date": "2026-08-17T21:47:47.828Z",
+      "lastDate": "2026-08-17T22:29:56.244Z",
+      "roundCount": 3,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 236,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxuaect0009unioi4gvkxcb",
+      "sessionId": "cmsxuaect0009unioi4gvkxcb",
+      "jobId": "cmsxuaect0009unioi4gvkxcb",
+      "date": "2026-08-17T23:02:53.183Z",
+      "lastDate": "2026-08-17T23:38:07.333Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 673,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxx9h680009unmgzid9xa9g",
+      "sessionId": "cmsxx9h680009unmgzid9xa9g",
+      "jobId": "cmsxx9h680009unmgzid9xa9g",
+      "date": "2026-08-18T00:26:10.843Z",
+      "lastDate": "2026-08-18T01:08:46.967Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 836,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsxzth2q0009un70ik4b0upy",
+      "sessionId": "cmsxzth2q0009un70ik4b0upy",
+      "jobId": "cmsxzth2q0009un70ik4b0upy",
+      "date": "2026-08-18T01:37:41.245Z",
+      "lastDate": "2026-08-18T01:57:45.325Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 807,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsyd5spj000bund4xns2j4yh",
+      "sessionId": "cmsyd5spj000bund4xns2j4yh",
+      "jobId": "cmsyd5spj000bund4xns2j4yh",
+      "date": "2026-08-18T07:51:11.282Z",
+      "lastDate": "2026-08-18T08:24:48.935Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 845,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsyvkfru000bun7c79ybbsfs",
+      "sessionId": "cmsyvkfru000bun7c79ybbsfs",
+      "jobId": "cmsyvkfru000bun7c79ybbsfs",
+      "date": "2026-08-18T16:46:33.108Z",
+      "lastDate": "2026-08-18T17:08:25.180Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 784,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsyyp5xv000bunp4lhexsx0z",
+      "sessionId": "cmsyyp5xv000bunp4lhexsx0z",
+      "jobId": "cmsyyp5xv000bunp4lhexsx0z",
+      "date": "2026-08-18T17:54:09.210Z",
+      "lastDate": "2026-08-18T18:34:15.484Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 425,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsz34vq30009unwgtfg999lf",
+      "sessionId": "cmsz34vq30009unwgtfg999lf",
+      "jobId": "cmsz34vq30009unwgtfg999lf",
+      "date": "2026-08-18T19:58:18.504Z",
+      "lastDate": "2026-08-18T20:06:20.503Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 21,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsz4f7td0009uniwl6ip6khj",
+      "sessionId": "cmsz4f7td0009uniwl6ip6khj",
+      "jobId": "cmsz4f7td0009uniwl6ip6khj",
+      "date": "2026-08-18T20:34:21.614Z",
+      "lastDate": "2026-08-18T20:55:44.484Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 154,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsz5uuwt0009un4kql4mlvim",
+      "sessionId": "cmsz5uuwt0009un4kql4mlvim",
+      "jobId": "cmsz5uuwt0009un4kql4mlvim",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsz7lzqi0009uneosnuhv08d",
+      "sessionId": "cmsz7lzqi0009uneosnuhv08d",
+      "jobId": "cmsz7lzqi0009uneosnuhv08d",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 0.5,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 280,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsz9dsy80009unlw9c26k8hb",
+      "sessionId": "cmsz9dsy80009unlw9c26k8hb",
+      "jobId": "cmsz9dsy80009unlw9c26k8hb",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmsz9hkmi0009un9wvgfystkf",
+      "sessionId": "cmsz9hkmi0009un9wvgfystkf",
+      "jobId": "cmsz9hkmi0009un9wvgfystkf",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmszafzhn0009unww38mk64uh",
+      "sessionId": "cmszafzhn0009unww38mk64uh",
+      "jobId": "cmszafzhn0009unww38mk64uh",
+      "date": "2026-08-18T23:22:53.814Z",
+      "lastDate": "2026-08-18T23:55:49.689Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 983,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmszq381m0009unq0g7suctl8",
+      "sessionId": "cmszq381m0009unq0g7suctl8",
+      "jobId": "cmszq381m0009unq0g7suctl8",
+      "date": "2026-08-19T06:40:52.220Z",
+      "lastDate": "2026-08-19T07:00:52.488Z",
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 500,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmszro1690009un8swzbh2dau",
+      "sessionId": "cmszro1690009un8swzbh2dau",
+      "jobId": "cmszro1690009un8swzbh2dau",
+      "date": "2026-08-19T07:25:02.738Z",
+      "lastDate": "2026-08-19T08:04:21.461Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 1000,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmszwci4l0009unywvfufbuj9",
+      "sessionId": "cmszwci4l0009unywvfufbuj9",
+      "jobId": "cmszwci4l0009unywvfufbuj9",
+      "date": "2026-08-19T09:36:02.848Z",
+      "lastDate": "2026-08-19T10:37:13.299Z",
+      "roundCount": 4,
+      "tradeCount": 0,
+      "artifactCompleteness": 0.75,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 1252,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmszzpjdg0009unfceoh6xwcr",
+      "sessionId": "cmszzpjdg0009unfceoh6xwcr",
+      "jobId": "cmszzpjdg0009unfceoh6xwcr",
+      "date": "2026-08-19T11:10:09.888Z",
+      "lastDate": "2026-08-19T11:31:28.175Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 0.5,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 402,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmt2z5o240009unnkwc03ama7",
+      "sessionId": "cmt2z5o240009unnkwc03ama7",
+      "jobId": "cmt2z5o240009unnkwc03ama7",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmt3epoap0009un5od3he1qce",
+      "sessionId": "cmt3epoap0009un5od3he1qce",
+      "jobId": "cmt3epoap0009un5od3he1qce",
+      "date": "2026-08-21T20:33:29.136Z",
+      "lastDate": "2026-08-21T21:12:53.667Z",
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": 1000,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "cmt3h5yz10009unskr2vu94gx",
+      "sessionId": "cmt3h5yz10009unskr2vu94gx",
+      "jobId": "cmt3h5yz10009unskr2vu94gx",
+      "date": "2026-08-21T21:42:08.730Z",
+      "lastDate": "2026-08-21T23:26:44.972Z",
+      "roundCount": 5,
+      "tradeCount": 0,
+      "artifactCompleteness": 1,
+      "dataSource": "artifacts/forensics",
+      "status": "CANONICAL",
+      "candidateCount": 2434,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmsz9hkmi0009un9wvgfystkf",
+      "sessionId": "job-cmsz9hkmi0009un9wvgfystkf",
+      "jobId": "job-cmsz9hkmi0009un9wvgfystkf",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmszq381m0009unq0g7suctl8",
+      "sessionId": "job-cmszq381m0009unq0g7suctl8",
+      "jobId": "job-cmszq381m0009unq0g7suctl8",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmszro1690009un8swzbh2dau",
+      "sessionId": "job-cmszro1690009un8swzbh2dau",
+      "jobId": "job-cmszro1690009un8swzbh2dau",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmszwci4l0009unywvfufbuj9",
+      "sessionId": "job-cmszwci4l0009unywvfufbuj9",
+      "jobId": "job-cmszwci4l0009unywvfufbuj9",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmszzpjdg0009unfceoh6xwcr",
+      "sessionId": "job-cmszzpjdg0009unfceoh6xwcr",
+      "jobId": "job-cmszzpjdg0009unfceoh6xwcr",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 2,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmt2z5o240009unnkwc03ama7",
+      "sessionId": "job-cmt2z5o240009unnkwc03ama7",
+      "jobId": "job-cmt2z5o240009unnkwc03ama7",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmt3epoap0009un5od3he1qce",
+      "sessionId": "job-cmt3epoap0009un5od3he1qce",
+      "jobId": "job-cmt3epoap0009un5od3he1qce",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 1,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "job-cmt3h5yz10009unskr2vu94gx",
+      "sessionId": "job-cmt3h5yz10009unskr2vu94gx",
+      "jobId": "job-cmt3h5yz10009unskr2vu94gx",
+      "date": null,
+      "lastDate": null,
+      "roundCount": 5,
+      "tradeCount": 0,
+      "artifactCompleteness": 0,
+      "dataSource": "artifacts/forensics",
+      "status": "INCOMPLETE",
+      "candidateCount": 0,
+      "feeEvaluationCount": 0
+    },
+    {
+      "runId": "HISTORICAL_REFERENCE_51",
+      "sessionId": "HISTORICAL_REFERENCE_51",
+      "jobId": null,
+      "date": null,
+      "roundCount": null,
+      "tradeCount": 51,
+      "artifactCompleteness": null,
+      "dataSource": "kripto-p1-exit-fee-profitability.json",
+      "status": "HISTORICAL_REFERENCE",
+      "candidateCount": null,
+      "feeEvaluationCount": null
+    }
+  ],
+  "historicalReference51": {
+    "trades": 51,
+    "grossPnL": -0.33651532,
+    "fees": 5.09837823,
+    "netPnL": -5.43489355,
+    "grossPositiveNetNegative": 11,
+    "feeDominanceClass": "FEE_DOMINANT"
+  },
+  "historicalReconstruction": {
+    "historicalReferenceTradeCount": 51,
+    "reconstructedTradeRowsFromHistoricalReference": 0,
+    "reason": "Historical 51-trade reference is available as aggregate forensic summary; no full per-trade canonical IDs in that record for deterministic one-to-one reconstruction."
+  },
+  "totals": {
+    "totalHistoricalCandidates": 33076,
+    "totalHistoricalTrades": 346,
+    "totalRunsDiscovered": 60,
+    "totalForensicsFilesScanned": 6886
+  },
+  "pairedDataset": {
+    "candidatePairs": 2,
+    "validPairedSampleForQuant": 2,
+    "executedPairedTrades": 0,
+    "baselineExecuted": 0,
+    "feeAwareExecuted": 0,
+    "baselineClosedTrades": 0,
+    "feeAwareClosedTrades": 0,
+    "blockedProfitableTrades": 0
+  },
+  "metrics": {
+    "baselineNetPnl": 0,
+    "feeAwareCounterfactualNetPnl": 0,
+    "baselineNetExpectancy": 0,
+    "feeAwareNetExpectancy": 0,
+    "baselineFees": 0,
+    "feeAwareExpectedFees": 0,
+    "grossPositiveNetNegativeBaseline": 0,
+    "grossPositiveNetNegativeFeeAware": 0,
+    "opportunityRetention": 1,
+    "tradeReductionRate": 0
+  },
+  "dataQuality": [
+    {
+      "dataset": "candidateTable",
+      "rows": 33076,
+      "matched": 2,
+      "unmatched": 2,
+      "duplicates": 629,
+      "conflicts": 557,
+      "missingCandidateId": 0,
+      "missingTradeId": 0,
+      "missingTimestamp": 0
+    },
+    {
+      "dataset": "tradeTable",
+      "rows": 346,
+      "matched": 0,
+      "unmatched": 346,
+      "duplicates": 0,
+      "conflicts": 0,
+      "missingCandidateId": 248,
+      "missingTradeId": 0,
+      "missingTimestamp": 0
+    }
+  ],
+  "conflicts": [
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|1|960ae286-87f3-4153-9b0f-f1df0c8c31e3",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|1|960ae286-87f3-4153-9b0f-f1df0c8c31e3",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|2|960ae286-87f3-4153-9b0f-f1df0c8c31e3",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|2|960ae286-87f3-4153-9b0f-f1df0c8c31e3",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|3|960ae286-87f3-4153-9b0f-f1df0c8c31e3",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|3|960ae286-87f3-4153-9b0f-f1df0c8c31e3",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|3|execution:CRVTRY:d7303ead",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmst8nza40007unvsi2211emo|3|execution:CRVTRY:d7303ead",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstfrnqz0007unusktsdehqt|1|execution:USTCTRY:a2882f11",
+      "sourceA": "fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstfrnqz0007unusktsdehqt|1|execution:USTCTRY:a2882f11",
+      "sourceA": "decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstfrnqz0007unusktsdehqt|1|execution:USTCTRY:a2882f11",
+      "sourceA": "decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstfrnqz0007unusktsdehqt|1|execution:USTCTRY:a2882f11",
+      "sourceA": "decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstfrnqz0007unusktsdehqt|1|execution:USTCTRY:a2882f11",
+      "sourceA": "decision-trace+decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstfrnqz0007unusktsdehqt|1|execution:USTCTRY:a2882f11",
+      "sourceA": "decision-trace+decision-trace+decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "decision-trace+decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "decision-trace+decision-trace+decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstg76eb0007undcg1a00659|1|execution:ALLOTRY:aca84455",
+      "sourceA": "decision-trace+decision-trace+decision-trace+decision-trace+decision-trace+decision-trace+fee-aware-entry-policy",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "higher source completeness"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmsthcs630007un7432s7fnnq|1|execution:USUALTRY:d90ac46f",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmsthcs630007un7432s7fnnq|1|execution:USUALTRY:d90ac46f",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstjiruf0007unr8e78nizga|1|3508bad5-ae9a-4615-854f-e8e2edc08c32",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstjiruf0007unr8e78nizga|1|3508bad5-ae9a-4615-854f-e8e2edc08c32",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstjiruf0007unr8e78nizga|2|3508bad5-ae9a-4615-854f-e8e2edc08c32",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstjiruf0007unr8e78nizga|2|3508bad5-ae9a-4615-854f-e8e2edc08c32",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstjiruf0007unr8e78nizga|3|3508bad5-ae9a-4615-854f-e8e2edc08c32",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstjiruf0007unr8e78nizga|3|3508bad5-ae9a-4615-854f-e8e2edc08c32",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|4|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|4|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|5|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|5|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|6|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|6|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|6|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|6|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|7|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|7|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|7|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|7|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|8|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|8|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|8|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|8|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|8|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|8|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|9|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|9|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|9|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|9|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|9|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|9|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|10|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|11|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|12|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|13|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|14|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|15|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|16|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|17|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|18|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|19|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|20|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|21|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|22|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|23|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|24|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|25|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|26|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|27|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|28|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|29|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|30|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|31|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|32|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|33|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|34|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|35|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|36|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|37|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|38|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|39|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|40|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|41|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|42|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|43|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|44|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|45|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|c3bcd256-f852-45fd-82e5-ab825ffba21c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:CFGTRY:2754f58c",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|afc19a10-d2b0-4c03-bf6f-bc46e09cef65",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:SAGATRY:bbf2e13a",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:NEIROTRY:d5125878",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:LINKTRY:811f1535",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:RADTRY:a1a17daa",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmstltuqn0007un9ksbk3xn9c|46|execution:TSTTRY:fec39796",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmsuf7zij0007une4u1q4cqu4|2|execution:CHIPTRY:0b287aa8",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmsuf7zij0007une4u1q4cqu4|2|execution:CHIPTRY:0b287aa8",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmsxuaect0009unioi4gvkxcb|2|execution:BTCTRY:50667151",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    },
+    {
+      "conflictType": "DUPLICATE_CANDIDATE",
+      "key": "cmsxuaect0009unioi4gvkxcb|2|execution:BTCTRY:50667151",
+      "sourceA": "decision-trace",
+      "sourceB": "decision-trace",
+      "chosenSource": "decision-trace",
+      "reason": "existing source kept by priority"
+    }
+  ],
+  "temporalOos": {
+    "available": false,
+    "reason": "INSUFFICIENT_EXECUTED_PAIRED_TRADES",
+    "split": null,
+    "metrics": null
+  },
+  "lookAheadGuarantee": {
+    "status": "YES",
+    "rule": "Only decision-time fields present in stored records are used for fee-aware reconstruction."
+  },
+  "finalAnswers": {
+    "TOTAL_HISTORICAL_CANDIDATES": 33076,
+    "TOTAL_HISTORICAL_TRADES": 346,
+    "VALID_PAIRED_SAMPLE": 2,
+    "EXECUTED_PAIRED_TRADES": 0,
+    "BASELINE_NET_PNL": 0,
+    "FEE_AWARE_COUNTERFACTUAL_NET_PNL": 0,
+    "BASELINE_NET_EXPECTANCY": 0,
+    "FEE_AWARE_NET_EXPECTANCY": 0,
+    "GROSS_POSITIVE_NET_NEGATIVE_BASELINE": 0,
+    "GROSS_POSITIVE_NET_NEGATIVE_FEE_AWARE": 0,
+    "OPPORTUNITY_RETENTION": 1,
+    "TRADE_REDUCTION_RATE": 0,
+    "OOS_SUPPORTED": "NO",
+    "FEE_AWARE_STATUS": "RESEARCH_ONLY",
+    "BEST_NEXT_STEP": "Backfill decision-time fee metrics into executions/pnl ledger for historical rounds so paired executed sample can exceed OOS threshold."
+  }
+}

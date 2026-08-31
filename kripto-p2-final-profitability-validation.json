@@ -1,0 +1,488 @@
+{
+  "generatedAt": "2026-08-18T20:59:45.015Z",
+  "scope": "DIRECT_NATIVE_KRIPTO_REPOSITORY_ONLY",
+  "phase": "FINAL_CONTROLLED_VALIDATION",
+  "baseline": {
+    "current": {
+      "candidateCount": 132,
+      "approvedCount": 0,
+      "executionReady": 0,
+      "tradeCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "winRate": 0,
+      "expectancy": 0,
+      "profitFactor": 0,
+      "drawdown": 0,
+      "entryQuality": {
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "note": "No execution path reached entry classification."
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "note": "No closed trade in latest post-fix run."
+      },
+      "fee": {
+        "FEE_SAFE": 0,
+        "FEE_BORDERLINE": 0,
+        "FEE_EROSION": 0,
+        "note": "No executed trade in latest post-fix run."
+      },
+      "ai": {
+        "decision": "INSUFFICIENT",
+        "gate": "VETO",
+        "bypass": 0
+      }
+    },
+    "historicalBeforeP2": {
+      "trades": 51,
+      "grossPnL": -0.33651532,
+      "fees": 5.09837823,
+      "netPnL": -5.43489355,
+      "grossPositiveNetNegative": 11
+    }
+  },
+  "variant": {
+    "configuration": "P2 fee-aware profitability guard (mode enabled) with no threshold tuning",
+    "metrics": {
+      "candidateCount": 132,
+      "approvedCount": 0,
+      "executionReady": 0,
+      "tradeCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "winRate": 0,
+      "expectancy": 0,
+      "profitFactor": 0,
+      "drawdown": 0,
+      "entryQuality": {
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "note": "No execution path reached entry classification."
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "note": "No closed trade in latest post-fix run."
+      },
+      "fee": {
+        "FEE_SAFE": 0,
+        "FEE_BORDERLINE": 0,
+        "FEE_EROSION": 0,
+        "note": "No executed trade in latest post-fix run."
+      },
+      "ai": {
+        "decision": "INSUFFICIENT",
+        "gate": "VETO",
+        "bypass": 0
+      }
+    }
+  },
+  "offlineReplay": {
+    "deterministicReplayPossible": false,
+    "limitation": "No per-trade closed execution rows available in current post-fix artifacts; offline baseline/variant comparison is limited to aggregate evidence and zero-trade current baseline.",
+    "baseline": {
+      "candidateCount": 132,
+      "approvedCount": 0,
+      "executionReady": 0,
+      "tradeCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "winRate": 0,
+      "expectancy": 0,
+      "profitFactor": 0,
+      "drawdown": 0,
+      "entryQuality": {
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "note": "No execution path reached entry classification."
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "note": "No closed trade in latest post-fix run."
+      },
+      "fee": {
+        "FEE_SAFE": 0,
+        "FEE_BORDERLINE": 0,
+        "FEE_EROSION": 0,
+        "note": "No executed trade in latest post-fix run."
+      },
+      "ai": {
+        "decision": "INSUFFICIENT",
+        "gate": "VETO",
+        "bypass": 0
+      }
+    },
+    "variant": {
+      "candidateCount": 132,
+      "approvedCount": 0,
+      "executionReady": 0,
+      "tradeCount": 0,
+      "wins": 0,
+      "losses": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0,
+      "winRate": 0,
+      "expectancy": 0,
+      "profitFactor": 0,
+      "drawdown": 0,
+      "entryQuality": {
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "note": "No execution path reached entry classification."
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "note": "No closed trade in latest post-fix run."
+      },
+      "fee": {
+        "FEE_SAFE": 0,
+        "FEE_BORDERLINE": 0,
+        "FEE_EROSION": 0,
+        "note": "No executed trade in latest post-fix run."
+      },
+      "ai": {
+        "decision": "INSUFFICIENT",
+        "gate": "VETO",
+        "bypass": 0
+      }
+    },
+    "attribution": []
+  },
+  "paperValidation": {
+    "baseline": {
+      "mode": "shadow",
+      "runId": "p1-exit-fee-1round-2026-08-18T20-33-53-977Z",
+      "sessionId": "cmsz4f7td0009uniwl6ip6khj",
+      "status": "EXIT_RUNTIME_NOT_EXERCISED",
+      "criticalFailures": [],
+      "job": {
+        "id": "cmsz4f7td0009uniwl6ip6khj",
+        "status": "COMPLETED",
+        "completedRounds": 0,
+        "failedRounds": 1,
+        "lastError": "Tur secim suresi doldu (1200s)",
+        "finishedAt": "2026-08-18T20:55:45.380Z"
+      },
+      "round": {
+        "roundNo": 1,
+        "state": "tur_basarisiz",
+        "result": "failed",
+        "failReason": "Tur secim suresi doldu (1200s)",
+        "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\cmsz4f7td0009uniwl6ip6khj\\rounds\\1",
+        "artifacts": {
+          "exitForensics": true,
+          "replayExitDiagnostics": true,
+          "feeAwareEntryPolicy": true,
+          "pnlLedger": true
+        }
+      },
+      "scannerCandidates": 68,
+      "rotationCandidates": 16,
+      "priorityCandidates": 16,
+      "priorityRescuedCount": 0,
+      "tdi": {
+        "APPROVED": 0,
+        "WAIT": 9,
+        "REJECTED": 93,
+        "firstBlockingCondition": {
+          "MOMENTUM": 5,
+          "TECHNICAL": 4
+        }
+      },
+      "ai": {
+        "calls": 51,
+        "remote": 0,
+        "degraded": 26,
+        "decisionCounts": {
+          "NO_TRADE": 0,
+          "HOLD": 0,
+          "REJECT": 0,
+          "WAIT": 0,
+          "BUY": 0,
+          "SELL": 0,
+          "UNKNOWN": 51
+        }
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "closedTrades": 0,
+        "riskPassed": 0,
+        "riskRejected": 0
+      },
+      "entry": {
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "entryDelay": {
+          "p50": 0,
+          "p95": 0
+        }
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "TAKE_PROFIT": 0,
+        "STOP_LOSS": 0,
+        "STRATEGY_EXIT": 0,
+        "TIME_EXIT": 0,
+        "END_OF_REPLAY": 0
+      },
+      "fees": {
+        "grossPnL": 0,
+        "entryFees": 0,
+        "exitFees": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "feeClassification": {
+          "FEE_SAFE": 0,
+          "FEE_BORDERLINE": 0,
+          "FEE_EROSION": 0
+        }
+      },
+      "runtimeHealth": {
+        "patchJobActiveRoundTimeoutCount": 1,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "schedulerCrashes": 0,
+        "recoveryEvents": 0,
+        "zombieRounds": 0,
+        "aiStartedOrphans": 0,
+        "dbFailures": 0,
+        "watchdogDecision": "FAIL_ROUND"
+      }
+    },
+    "variant": {
+      "mode": "enabled",
+      "runId": "p1-exit-fee-1round-2026-08-18T20-56-40-095Z",
+      "sessionId": "cmsz585hc0009uniweey6rdds",
+      "status": "EXIT_RUNTIME_NOT_EXERCISED",
+      "criticalFailures": [
+        "CRITICAL_ROUND_NOT_CREATED"
+      ],
+      "job": {
+        "id": "cmsz585hc0009uniweey6rdds",
+        "status": "FAILED",
+        "completedRounds": 0,
+        "failedRounds": 0,
+        "lastError": "transactionallyBeginRound job version conflict",
+        "finishedAt": "2026-08-18T20:56:50.763Z"
+      },
+      "round": null,
+      "scannerCandidates": 0,
+      "rotationCandidates": 0,
+      "priorityCandidates": 0,
+      "priorityRescuedCount": 0,
+      "tdi": {
+        "APPROVED": 0,
+        "WAIT": 0,
+        "REJECTED": 0,
+        "firstBlockingCondition": {}
+      },
+      "ai": {
+        "calls": 0,
+        "remote": 0,
+        "degraded": 0,
+        "decisionCounts": {
+          "NO_TRADE": 0,
+          "HOLD": 0,
+          "REJECT": 0,
+          "WAIT": 0,
+          "BUY": 0,
+          "SELL": 0,
+          "UNKNOWN": 0
+        }
+      },
+      "execution": {
+        "executionReady": 0,
+        "orders": 0,
+        "fills": 0,
+        "closedTrades": 0,
+        "riskPassed": 0,
+        "riskRejected": 0
+      },
+      "entry": {
+        "GOOD_ENTRY": 0,
+        "NORMAL": 0,
+        "CHASING": 0,
+        "EDGE_DECAY": 0,
+        "entryDelay": {
+          "p50": 0,
+          "p95": 0
+        }
+      },
+      "exit": {
+        "POSITION_MONITOR": 0,
+        "REPLAY_WINDOW": 0,
+        "TAKE_PROFIT": 0,
+        "STOP_LOSS": 0,
+        "STRATEGY_EXIT": 0,
+        "TIME_EXIT": 0,
+        "END_OF_REPLAY": 0
+      },
+      "fees": {
+        "grossPnL": 0,
+        "entryFees": 0,
+        "exitFees": 0,
+        "totalFees": 0,
+        "netPnL": 0,
+        "feeClassification": {
+          "FEE_SAFE": 0,
+          "FEE_BORDERLINE": 0,
+          "FEE_EROSION": 0
+        }
+      },
+      "runtimeHealth": {
+        "patchJobActiveRoundTimeoutCount": 0,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "schedulerCrashes": 0,
+        "recoveryEvents": 0,
+        "zombieRounds": 0,
+        "aiStartedOrphans": 0,
+        "dbFailures": 0,
+        "watchdogDecision": null,
+        "lastError": "transactionallyBeginRound job version conflict"
+      }
+    }
+  },
+  "profitImprovementAttribution": {
+    "rows": [],
+    "summary": "No candidate-level PnL attribution possible (closedTrades=0 baseline and variant)."
+  },
+  "profitabilityMetrics": {
+    "baseline": {
+      "grossPnL": 0,
+      "totalFees": 0,
+      "netPnL": 0,
+      "tradeCount": 0,
+      "winRate": 0,
+      "expectancy": 0,
+      "profitFactor": 0,
+      "averageWin": 0,
+      "averageLoss": 0,
+      "maxDrawdown": 0,
+      "medianHold": 0,
+      "averageHold": 0,
+      "feePerTrade": 0,
+      "grossPositiveNetNegative": 11
+    },
+    "variant": {
+      "grossPnL": 0,
+      "totalFees": 0,
+      "netPnL": 0,
+      "tradeCount": 0,
+      "winRate": 0,
+      "expectancy": 0,
+      "profitFactor": 0,
+      "averageWin": 0,
+      "averageLoss": 0,
+      "maxDrawdown": 0,
+      "medianHold": 0,
+      "averageHold": 0,
+      "feePerTrade": 0,
+      "grossPositiveNetNegative": 0
+    },
+    "delta": {
+      "netPnLDelta": 0,
+      "expectancyDelta": 0,
+      "profitFactorDelta": 0,
+      "drawdownDelta": 0,
+      "winRateDelta": 0,
+      "feesDelta": 0,
+      "tradeCountDelta": 0,
+      "aiBypassDelta": 0
+    }
+  },
+  "lossAttributionBeforeAfter": {
+    "beforeP2": {
+      "EXECUTION_SEMANTICS": "UNKNOWN",
+      "ENTRY_LATE": "UNKNOWN",
+      "ENTRY_AFTER_EDGE_DECAY": "UNKNOWN",
+      "REGIME_MISMATCH": "UNKNOWN",
+      "STRATEGY_WEAKNESS": "UNKNOWN",
+      "AI_MISJUDGMENT": "UNKNOWN",
+      "FEE_DRAG": "HIGH",
+      "EXIT_PROBLEM": "UNKNOWN",
+      "REPLAY_WINDOW_DISTORTION": "HISTORICAL_SIGNAL",
+      "RISK": "UNKNOWN",
+      "DATA_QUALITY": "LOW"
+    },
+    "afterP2": {
+      "EXECUTION_SEMANTICS": "NOT_PROVEN",
+      "ENTRY_LATE": "NOT_PROVEN",
+      "ENTRY_AFTER_EDGE_DECAY": "NOT_PROVEN",
+      "REGIME_MISMATCH": "NOT_PROVEN",
+      "STRATEGY_WEAKNESS": "NOT_PROVEN",
+      "AI_MISJUDGMENT": "NOT_PROVEN",
+      "FEE_DRAG": "NOT_PROVEN",
+      "EXIT_PROBLEM": "NOT_PROVEN",
+      "REPLAY_WINDOW_DISTORTION": "NOT_PROVEN",
+      "RISK": "NOT_PROVEN",
+      "DATA_QUALITY": "CLEAN"
+    },
+    "didMainDriverImprove": "NOT_PROVEN"
+  },
+  "safetyChecks": {
+    "aiVetoBypass": true,
+    "riskBypass": false,
+    "sizingBypass": false,
+    "emergencyStopBypass": false,
+    "clockSafetyBypass": false,
+    "pnlMismatch": false,
+    "runtimeCriticalFailure": true
+  },
+  "oos": {
+    "status": "OOS_NOT_AVAILABLE",
+    "reason": "No closed-trade sample in current post-fix data and no held-out validation subset with executable rows."
+  },
+  "profitConcentration": {
+    "status": "NOT_APPLICABLE",
+    "reason": "Net PnL is not positive."
+  },
+  "promotionDecision": {
+    "classification": "RESEARCH_ONLY",
+    "reason": "Offline replay cannot prove improvement and paper variant encountered critical runtime failure before round creation."
+  },
+  "remainingWeaknesses": [
+    "Zero closed trades in baseline and variant windows",
+    "Variant run failed with transactionallyBeginRound job version conflict",
+    "No deterministic candidate-level PnL replay rows for baseline vs variant attribution"
+  ],
+  "finalVerdict": {
+    "P2_VALIDATION": "PARTIAL",
+    "VARIANT_RESULT": "NOT_PROVEN",
+    "NET_EDGE_IMPROVED": "NOT_PROVEN",
+    "SAFETY_REGRESSION": "NONE",
+    "READY_FOR_30_50_ROUNDS": "NO",
+    "READY_FOR_100_PLUS_TRADE_VALIDATION": "NO",
+    "PROFITABILITY_CONFIRMED": "NOT_PROVEN"
+  }
+}

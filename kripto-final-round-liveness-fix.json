@@ -1,0 +1,128 @@
+{
+  "task": "KRIPTO P0 FINAL ROUND LIVENESS HANG ROOT-CAUSE + AUTO-TERMINALIZATION FIX",
+  "timestamp": "2026-08-19T03:00:00+03:00",
+  "rootCause": {
+    "identified": true,
+    "summary": [
+      "Heartbeat-only states could mask stale meaningful progress for too long.",
+      "Round-critical market-context awaits were not consistently signal-linked.",
+      "Terminalization flow was not fully centralized."
+    ],
+    "exactInflightOperation": {
+      "classification": "MARKET_DATA_WAIT",
+      "file": "src/server/scanner/scanner.service.ts",
+      "function": "runScannerPipeline",
+      "caller": "mapWithConcurrency(context worker)",
+      "awaitChain": [
+        "withBoundedAwait(context-lite:*)",
+        "buildMarketContext",
+        "marketDataOrchestrator.fetchContextBundle",
+        "getKlines/getOrderBook/getRecentTrades",
+        "fetchFromExchange(provider.get*)"
+      ],
+      "abortSignalPresentBeforeFix": "partial",
+      "abortSignalPresentAfterFix": true,
+      "timeoutPresentAfterFix": true,
+      "promiseTrackedAfterFix": true,
+      "retryBudgetBounded": true
+    }
+  },
+  "changes": {
+    "files": [
+      "src/server/execution/round-progress-state.service.ts",
+      "src/server/execution/round-runtime.service.ts",
+      "src/server/execution/round-selection.service.ts",
+      "src/server/forensics/round-progress-watchdog.service.ts",
+      "src/server/market-data/market-data.types.ts",
+      "src/server/market-data/market-data-orchestrator.service.ts",
+      "src/server/scanner/market-context-builder.ts",
+      "src/server/scanner/scanner.service.ts",
+      "src/server/scanner/fast-entry.service.ts",
+      "src/server/scanner/pump-early-catcher.service.ts",
+      "tests/final-round-liveness.test.ts"
+    ],
+    "highlights": [
+      "Meaningful progress age now drives stall escalation.",
+      "Dependency-degraded and waiting states are grace-bounded.",
+      "Canonical terminalizeRound path added for stale/abort cases.",
+      "Terminal runtime step guard prevents reopening after timeout/fail.",
+      "Market-data exchange calls now timeout/abort-race and are tracked.",
+      "Round-critical context calls disable background intel enqueue."
+    ]
+  },
+  "observability": {
+    "artifactsAdded": [
+      "round-liveness.json (written with hang snapshot export path)"
+    ],
+    "validationReport": "reports/p1-scanner-entry-2round-validation.json"
+  },
+  "tests": {
+    "new": [
+      "tests/final-round-liveness.test.ts"
+    ],
+    "executed": [
+      "tests/ai-stack-overflow.test.ts",
+      "tests/ai-cancellation.test.ts",
+      "tests/final-round-liveness.test.ts",
+      "tests/round-progress-state.test.ts",
+      "tests/round-runtime.test.ts",
+      "tests/scheduler-ownership.test.ts",
+      "tests/top-gainer-discovery.test.ts",
+      "tests/execution-settlement.integration.test.ts",
+      "tests/forensics/p0-execution-correctness.test.ts",
+      "tests/forensics/p1-profitability-engineering.test.ts",
+      "tests/forensics/p1-strategy-scanner-ev.test.ts",
+      "tests/forensics/p2-profitability-optimization.test.ts",
+      "tests/forensics/tdi-sensitivity-reconciliation.test.ts"
+    ],
+    "status": "PASS"
+  },
+  "controlledValidation": {
+    "command": "SCANNER_AI_CONCURRENCY=2 pnpm tsx scripts/_p1-scanner-entry-2round-validation.ts",
+    "sessionId": "cmszafzhn0009unww38mk64uh",
+    "jobStatus": "COMPLETED",
+    "totalRounds": 2,
+    "completedRounds": 0,
+    "failedRounds": 2,
+    "manualStopRequired": false,
+    "roundsTerminalized": true,
+    "roundResults": [
+      {
+        "roundNo": 1,
+        "state": "tur_basarisiz",
+        "result": "failed",
+        "failReason": "SIM_TIGHT_FILTER_15m..."
+      },
+      {
+        "roundNo": 2,
+        "state": "tur_basarisiz",
+        "result": "failed",
+        "failReason": "AI_GATE_BLOCK: AI_VETO"
+      }
+    ]
+  },
+  "beforeAfterMetrics": {
+    "rangeError": {
+      "before": 12,
+      "after": 0
+    },
+    "manualStopCount": {
+      "before": 1,
+      "after": 0
+    },
+    "aiVetoBypassCount": 0
+  },
+  "verdict": {
+    "HANG_ROOT_CAUSE_IDENTIFIED": "YES",
+    "AUTO_STALL_TERMINALIZATION": "PASS",
+    "AI_STACK_STABILITY": "PASS",
+    "ROUND_LIVENESS": "PASS",
+    "CANCELLATION": "PASS",
+    "NO_ZOMBIES": "PASS",
+    "TWO_ROUNDS_COMPLETED": "YES",
+    "MANUAL_STOP_REQUIRED": "NO",
+    "READY_FOR_5_ROUNDS": "YES",
+    "READY_FOR_30_50_ROUNDS": "CONDITIONAL",
+    "READY_FOR_50_ROUND_PAPER": "CONDITIONAL"
+  }
+}

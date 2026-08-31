@@ -1,0 +1,9 @@
+{
+  "fix": "FIX_AI_DECISION_AGGREGATION",
+  "file": "src/server/decision-engine/master-decision-engine.service.ts",
+  "helper": "mapMasterConsensusDecision in conflict-detection.service.ts",
+  "change": "When preservedHybridBuy=true, set finalConsensusDecision=BUY to match finalDecision",
+  "thresholdsChanged": false,
+  "vetoDisabled": false,
+  "tdiBypassed": false
+}

@@ -1,0 +1,543 @@
+{
+  "generatedAt": "2026-08-22T14:09:54.171Z",
+  "sources": {
+    "historical": "DATABASE.learningTrade",
+    "currentPaper": "C:\\Users\\salih\\Desktop\\kripto-main\\kripto-5round-paper-validation.json",
+    "sessionId": "cmt3h5yz10009unskr2vu94gx",
+    "rounds": 5
+  },
+  "counts": {
+    "historicalTrades": 248,
+    "profitableTrades": 42,
+    "lossTrades": 206,
+    "breakevenTrades": 0,
+    "currentPaperCandidates": 2278
+  },
+  "tdiSuppression": {
+    "profitableWouldPass": 0,
+    "profitableWouldWait": 42,
+    "profitableWouldReject": 0,
+    "primarySuppression": {
+      "blocker": "CONFIDENCE",
+      "count": 1143,
+      "share": 0.501756,
+      "medianScoreGap": null,
+      "avgScoreGap": null
+    },
+    "blockerRank": [
+      {
+        "blocker": "UNKNOWN",
+        "count": 42,
+        "share": 1,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      }
+    ],
+    "momentumBlockShare": 0.291484,
+    "technicalBlockShare": 0.174276,
+    "confidenceBlockShare": 0.501756,
+    "blockedNearThresholdBreakdown": {
+      "PASS": 42
+    }
+  },
+  "distributions": {
+    "numeric": [
+      {
+        "field": "technicalScore",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 56.74,
+          "p25": 47.98,
+          "p75": 63.59,
+          "min": 27.33,
+          "max": 82.16
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "momentumScore",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 18.78,
+          "p25": 0,
+          "p75": 32.77,
+          "min": 0,
+          "max": 40.61
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "sentimentScore",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 47.01,
+          "p25": 44.31,
+          "p75": 59.16,
+          "min": 17.92,
+          "max": 82.31
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "shortMomentum",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": -0.6707,
+          "max": 0.5
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "shortFlow",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": -1,
+          "max": 1
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "confidence",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 19.44,
+          "p25": 13.16,
+          "p75": 30.47,
+          "min": 6.33,
+          "max": 55.7
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "bullishCount",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 3,
+          "p25": 1,
+          "p75": 5,
+          "min": 0,
+          "max": 6
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "executionScore",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 60.55,
+          "p25": 55.56,
+          "p75": 81.86,
+          "min": 22.81,
+          "max": 100
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      },
+      {
+        "field": "EV",
+        "profitable": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "loss": {
+          "count": 0,
+          "median": null,
+          "p25": null,
+          "p75": null,
+          "min": null,
+          "max": null
+        },
+        "currentPaper": {
+          "count": 2278,
+          "median": 57.0282,
+          "p25": 52.0908,
+          "p75": 63.2372,
+          "min": 31.4415,
+          "max": 71.9576
+        },
+        "medianDiff": null,
+        "overlap": null,
+        "separationScore": null,
+        "separationClass": "NO_EVIDENCE"
+      }
+    ]
+  },
+  "stageReach": {
+    "currentPaper": {
+      "scanner": 30,
+      "marketContext": 580,
+      "strategy": 2442,
+      "EV": 0,
+      "TDI": 1554,
+      "AI": 103,
+      "risk": 0,
+      "sizing": 0,
+      "execution": 0
+    }
+  },
+  "strategySuppression": [
+    {
+      "strategy": "MEAN_REVERSION",
+      "historicalProfitableTrades": 38,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 1,
+      "currentTdiRejectRate": 0,
+      "firstBlockerDistribution": [
+        {
+          "blocker": "UNKNOWN",
+          "count": 38
+        }
+      ]
+    },
+    {
+      "strategy": "VOLATILITY_BREAKOUT",
+      "historicalProfitableTrades": 4,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 1,
+      "currentTdiRejectRate": 0,
+      "firstBlockerDistribution": [
+        {
+          "blocker": "UNKNOWN",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "strategy": "TREND_FOLLOWING",
+      "historicalProfitableTrades": 0,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 0,
+      "currentTdiRejectRate": 0,
+      "firstBlockerDistribution": []
+    },
+    {
+      "strategy": "OTHER",
+      "historicalProfitableTrades": 0,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 0,
+      "currentTdiRejectRate": 0,
+      "firstBlockerDistribution": []
+    }
+  ],
+  "regimeSuppression": [
+    {
+      "regime": "RANGE",
+      "historicalProfitableTrades": 29,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 1,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    },
+    {
+      "regime": "TREND",
+      "historicalProfitableTrades": 0,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 0,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    },
+    {
+      "regime": "HIGH_VOLATILITY",
+      "historicalProfitableTrades": 1,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 1,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    },
+    {
+      "regime": "LOW_VOLATILITY",
+      "historicalProfitableTrades": 9,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 1,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    },
+    {
+      "regime": "CHAOS",
+      "historicalProfitableTrades": 0,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 0,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    },
+    {
+      "regime": "LOW_LIQUIDITY",
+      "historicalProfitableTrades": 0,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 0,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    },
+    {
+      "regime": "UNKNOWN",
+      "historicalProfitableTrades": 0,
+      "currentTdiPassRate": 0,
+      "currentTdiWaitRate": 0,
+      "currentTdiRejectRate": 0,
+      "firstBlocker": "UNKNOWN"
+    }
+  ],
+  "historicalCounterfactual": {
+    "wouldBeBlockedProfitableTrades": 42,
+    "totalHistoricalNetPnLSuppressed": 2.45373448,
+    "averageSuppressedNetPnL": 0.05842225
+  },
+  "distributionShift": {
+    "classification": "NO_SHIFT",
+    "averageSeparationScore": 0
+  },
+  "upstreamVsTdi": "TDI_FILTERING",
+  "zeroApprovalExplanation": {
+    "explained": "YES",
+    "currentTdiApproved": 0,
+    "dominantAxis": "CONFIDENCE"
+  },
+  "oos": {
+    "trainCount": 29,
+    "oosCount": 13,
+    "trainPassRate": 0,
+    "oosPassRate": 0,
+    "supported": "YES"
+  },
+  "topBottlenecks": [
+    {
+      "rank": 1,
+      "bottleneck": "CONFIDENCE",
+      "affectedHistoricalProfitableProfiles": 1143,
+      "affectedCurrentCandidates": 1143,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.5017559262510974,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 2,
+      "bottleneck": "MOMENTUM",
+      "affectedHistoricalProfitableProfiles": 664,
+      "affectedCurrentCandidates": 664,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.2914837576821773,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 3,
+      "bottleneck": "TECHNICAL",
+      "affectedHistoricalProfitableProfiles": 397,
+      "affectedCurrentCandidates": 397,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.1742756804214223,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    },
+    {
+      "rank": 4,
+      "bottleneck": "RISK",
+      "affectedHistoricalProfitableProfiles": 74,
+      "affectedCurrentCandidates": 74,
+      "firstStage": "tdi",
+      "evidence": {
+        "suppressionShare": 0.0324846356453029,
+        "medianScoreGap": null,
+        "avgScoreGap": null
+      },
+      "confidence": "HIGH"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment": "TDI_INTERACTION_ANALYSIS",
+      "hypothesis": "Historical profitable profiles are primarily lost at momentum/confidence interactions before AI gate.",
+      "affectedCohort": "historical profitable trades blocked by simulated current TDI",
+      "expectedMeasurement": "Pass/Wait/Reject shift by blocker class without changing production thresholds.",
+      "risk": "LOW (offline replay only)",
+      "successCriterion": "Primary blocker share remains stable in OOS split (<=10pp drift)."
+    },
+    {
+      "experiment": "MOMENTUM_POLICY_SHADOW",
+      "hypothesis": "Momentum-driven WAIT/REJECT cluster is the largest suppressor bucket for profitable profiles.",
+      "affectedCohort": "momentum-blocked profitable historical trades",
+      "expectedMeasurement": "Momentum blocker share and near-threshold density under shadow diagnostics.",
+      "risk": "LOW (research-only)",
+      "successCriterion": "Momentum remains top blocker with reproducible share in chronological OOS."
+    },
+    {
+      "experiment": "REGIME_AWARE_TDI_SHADOW",
+      "hypothesis": "Suppression profile changes by regime and can be measured without touching production policy.",
+      "affectedCohort": "RANGE/TREND/HIGH_VOL/LOW_VOL regime buckets",
+      "expectedMeasurement": "Per-regime pass/wait/reject + first-blocker distribution.",
+      "risk": "LOW (offline + shadow analytics)",
+      "successCriterion": "At least one regime shows materially different blocker composition."
+    }
+  ]
+}

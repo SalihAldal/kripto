@@ -1,0 +1,206 @@
+import { describe, expect, it } from "vitest";
+import { resolveMicroState, buildFinalCandidate } from "@/src/server/microstructure/final-ranker";
+import { DEFAULT_MICRO_CONFIG } from "@/src/server/microstructure/config";
+import { computePriceDriftPct } from "@/src/server/execution-safety/price-validation.service";
+import type { OpportunityCandidate } from "@/src/server/opportunity/types";
+import type { MicroFeatures } from "@/src/server/microstructure/types";
+
+function mockOpportunity(): OpportunityCandidate {
+  return {
+    candidateId: "cand-x",
+    symbol: "TESTUSDT",
+    primaryLane: "STEADY",
+    secondaryEvidence: [],
+    score: 61,
+    laneScores: { EARLY: 52, STEADY: 61, MOMENTUM: 49, CONTINUATION: 45 },
+    breakdown: {
+      priceVelocity: 8,
+      priceAcceleration: 7,
+      volumeAcceleration: 8,
+      relativeVolume: 8,
+      relativeStrength: 8,
+      breakout: 6,
+      compressionExpansion: 5,
+      consistency: 9,
+      retracementQuality: 9,
+      exhaustion: -2,
+      chaseControl: -1,
+      liquidity: 8,
+    },
+    features: {
+      return1s: 0.1,
+      return5s: 0.2,
+      return15s: 0.3,
+      return30s: 0.4,
+      return1m: 0.5,
+      return3m: 0.7,
+      return5m: 1.2,
+      return15m: 2.5,
+      change24h: 3.1,
+      velocity5s: 0.1,
+      velocity15s: 0.1,
+      velocity30s: 0.1,
+      velocity1m: 0.1,
+      priceAccelerationShort: 0.1,
+      priceAccelerationMedium: 0.1,
+      accelerationConsistency: 0.5,
+      volume1m: 1200,
+      volume3m: 3200,
+      volume5m: 5100,
+      rvol1m: 1.5,
+      rvol3m: 1.2,
+      rvol5m: 1.1,
+      volumeAcceleration: 200,
+      relativeStrengthBTC1m: 0.2,
+      relativeStrengthBTC5m: 0.2,
+      relativeStrengthMarket: 0.1,
+      distanceTo3mHigh: 0.3,
+      distanceTo5mHigh: 0.4,
+      breakout3m: 0.3,
+      breakout5m: 0.2,
+      compressionScore: 0.4,
+      expansionScore: 0.5,
+      maxRetracement: 0.8,
+      retracementRatio: 0.2,
+      recoverySpeed: 0.3,
+      momentumConsistency: 0.6,
+      exhaustionScore: 10,
+      chaseRisk: 1.2,
+      quoteVolume24h: 1_000_000,
+    },
+    reasonCodes: ["STEADY_TREND"],
+    state: "HOT",
+    firstDetectedAt: Date.now() - 3000,
+    firstDetectionPrice: 1.0,
+    lastScoreAt: Date.now() - 1000,
+    lastEvidenceAt: Date.now() - 1000,
+    currentPrice: 1.01,
+    scansWithoutEvidence: 0,
+    deepSubscribed: true,
+  };
+}
+
+function mockMicroFeatures(now: number): MicroFeatures {
+  return {
+    takerBuyVolume1s: 100,
+    takerSellVolume1s: 80,
+    takerBuyVolume5s: 300,
+    takerSellVolume5s: 260,
+    takerBuyVolume15s: 900,
+    takerSellVolume15s: 820,
+    takerBuyVolume60s: 3600,
+    takerSellVolume60s: 3300,
+    netTakerFlow5s: 40,
+    netTakerFlow15s: 120,
+    takerBuyRatio5s: 0.56,
+    takerBuyRatio15s: 0.54,
+    flowImbalance3s: 0.1,
+    flowImbalance5s: 0.12,
+    flowImbalance15s: 0.09,
+    flowImbalance60s: 0.06,
+    buyFlowAcceleration: 10,
+    sellFlowAcceleration: 8,
+    netFlowAcceleration: 12,
+    tradeRate1s: 2,
+    tradeRate5s: 4,
+    tradeRate15s: 3,
+    tradeRateAcceleration: 1.5,
+    avgTradeNotional5s: 30,
+    avgTradeNotional15s: 28,
+    avgTradeNotional60s: 25,
+    largeBuyTradeRate: 0.1,
+    largeSellTradeRate: 0.05,
+    largeBuyNotional: 700,
+    largeSellNotional: 400,
+    spreadBps: 25,
+    spreadAbsolute: 0.0001,
+    topBookImbalance: 0.12,
+    depthImbalance5bps: 0.1,
+    depthImbalance10bps: 0.1,
+    depthImbalance25bps: 0.08,
+    bidLiquidity: 2400,
+    askLiquidity: 2200,
+    askDepthChange: -8,
+    askDepletionRate: 0.08,
+    askReloadRate: 0.04,
+    bidPersistence: 0.72,
+    bidReload: 0.08,
+    bidWithdrawal: 0.11,
+    liquidityVolatility: 0.1,
+    largeAskAppearedThenRemoved: 0,
+    largeBidAppearedThenRemoved: 0,
+    priceChangePerBuyNotional: 0.2,
+    sellAbsorption: 0,
+    buyAbsorption: 0.1,
+    crossLayerConfirmation: 0.2,
+    priceFlowDivergence: 0,
+    priceVolumeDivergence: 0,
+    priceBookDivergence: 0,
+    microExhaustion: 0.1,
+    breakoutHoldTime: 4,
+    postBreakoutFlow: 0.1,
+    breakoutRetestQuality: 0.2,
+    failedBreakout: 0,
+    expectedSlippageBps: 10,
+    depthToIntendedSize: 4,
+    lastAggTradeAt: now - 1000,
+    lastBookTickerAt: now - 900,
+    lastDepthAt: now - 900,
+    tradeCount: 14,
+  };
+}
+
+describe("hot/execution/price integrity fixes", () => {
+  it("micro confirmed candidate yeni execution floor ile ready olabilir", () => {
+    const state = resolveMicroState({
+      previous: "MICRO_CONFIRMED",
+      hotAt: Date.now() - 20_000,
+      now: Date.now(),
+      config: DEFAULT_MICRO_CONFIG,
+      warmed: true,
+      stale: false,
+      hardReject: null,
+      microScore: 66,
+      executionQuality: 60,
+      finalScore: 60,
+      spreadBps: 20,
+    });
+    expect(state).toBe("EXECUTION_READY");
+  });
+
+  it("not-ready reasonlari execution gate icin explicit olur", () => {
+    const now = Date.now();
+    const built = buildFinalCandidate({
+      opportunity: mockOpportunity(),
+      features: mockMicroFeatures(now),
+      microScore: 66,
+      breakdown: {
+        takerBuyRatio: 4,
+        buyFlowAcceleration: 8,
+        tradeAcceleration: 7,
+        askDepletion: 3,
+        bidSupport: 6,
+        depthImbalance: 2,
+        breakoutAcceptance: 3,
+        spreadQuality: 2,
+        exhaustion: -2,
+        divergence: -1,
+      },
+      liquidityScore: 58,
+      executionQuality: 50,
+      ai: { status: "NO_OPINION", decision: "NEUTRAL", modifier: 0, reason: "test" },
+      hotAt: now - 5000,
+      now,
+      config: DEFAULT_MICRO_CONFIG,
+      hardReject: null,
+      deepSubscribed: true,
+    });
+    expect(built.state).toBe("MICRO_CONFIRMED");
+    expect(built.reasonCodes.includes("EXECUTION_QUALITY_BELOW_THRESHOLD")).toBe(true);
+  });
+
+  it("price drift formulu kucuk fiyatlarda da 1% kalir", () => {
+    expect(Number(computePriceDriftPct(100, 101).toFixed(6))).toBe(1);
+    expect(Number(computePriceDriftPct(0.001, 0.00101).toFixed(6))).toBe(1);
+  });
+});

@@ -17,6 +17,12 @@ function normalize(value: number, min: number, max: number) {
   return ((value - min) / (max - min)) * 100;
 }
 
+/** Signed magnitude in [-100, +100]. Positive = long evidence, negative = short/sell evidence. */
+export function signedNormalize(value: number, min: number, max: number): number {
+  const magnitude = normalize(Math.abs(value), min, max);
+  return value >= 0 ? magnitude : -magnitude;
+}
+
 export function scoreContext(context: MarketContext): ScannerScore {
   const shortMomentumPercent = Number(context.metadata.shortMomentumPercent ?? 0);
   const tradeVelocity = Number(context.metadata.tradeVelocity ?? 0);
@@ -29,11 +35,11 @@ export function scoreContext(context: MarketContext): ScannerScore {
   const volume = normalize(context.volume24h, env.SCANNER_MIN_VOLUME_24H, env.SCANNER_MIN_VOLUME_24H * 8);
   const spread = 100 - normalize(context.spreadPercent, 0.01, env.SCANNER_MAX_SPREAD_PERCENT * 1.5);
   const volatility = 100 - normalize(context.volatilityPercent, 0.3, 4.5);
-  const orderBook = normalize(Math.abs(context.orderBookImbalance), 0.01, 0.45);
-  const pressure = normalize(Math.abs(context.buyPressure - 0.5), 0.02, 0.35);
-  const microFlow = normalize(Math.abs(shortFlowImbalance), 0.02, 0.6);
+  const orderBook = signedNormalize(context.orderBookImbalance, 0.01, 0.45);
+  const pressure = signedNormalize(context.buyPressure - 0.5, 0.02, 0.35);
+  const microFlow = signedNormalize(shortFlowImbalance, 0.02, 0.6);
   const velocity = normalize(tradeVelocity, 0.2, 3.5);
-  const candle = normalize(Math.abs(context.shortCandleSignal), 0.5, 4);
+  const candle = signedNormalize(context.shortCandleSignal, 0.5, 4);
   const pumpBoost = normalize(context.pumpIntensity ?? 0, 35, 100);
   const pumpRiskPenalty = normalize(context.pumpRisk ?? 0, 25, 95);
   const fakeSpikePenalty = normalize(context.fakeSpikeScore ?? 0, 0, 4);
@@ -43,6 +49,22 @@ export function scoreContext(context: MarketContext): ScannerScore {
   const regimeFlipPenalty = normalize(Number(context.metadata.regimeFlipRisk ?? 0), 35, 90);
   const regimeStabilityBoost = normalize(Number(context.metadata.regimeStabilityScore ?? 50), 62, 88);
   const liquidityPenalty = context.volume24h < env.SCANNER_MIN_VOLUME_24H ? 40 : 0;
+  const positiveEvidence = Number(
+    (
+      Math.max(0, orderBook) +
+      Math.max(0, pressure) +
+      Math.max(0, microFlow) +
+      Math.max(0, candle)
+    ).toFixed(2),
+  );
+  const negativeEvidence = Number(
+    (
+      Math.max(0, -orderBook) +
+      Math.max(0, -pressure) +
+      Math.max(0, -microFlow) +
+      Math.max(0, -candle)
+    ).toFixed(2),
+  );
 
   const rawScore =
     momentum * 0.12 +
@@ -55,7 +77,7 @@ export function scoreContext(context: MarketContext): ScannerScore {
     microFlow * 0.08 +
     velocity * 0.08 +
     candle * 0.1 -
-    pumpRiskPenalty * 0.1 +
+    pumpRiskPenalty * 0.1 -
     fakeSpikePenalty * 0.12 -
     futuresRiskPenalty * 0.08 -
     leverageStressPenalty * 0.06 -
@@ -140,6 +162,8 @@ export function scoreContext(context: MarketContext): ScannerScore {
       pumpBoost: Number(pumpBoost.toFixed(2)),
       pumpRiskPenalty: Number(pumpRiskPenalty.toFixed(2)),
       fakeSpikePenalty: Number(fakeSpikePenalty.toFixed(2)),
+      positiveEvidence,
+      negativeEvidence,
       futuresRiskPenalty: Number(futuresRiskPenalty.toFixed(2)),
       leverageStressPenalty: Number(leverageStressPenalty.toFixed(2)),
       regimeTransitionPenalty: Number(regimeTransitionPenalty.toFixed(2)),

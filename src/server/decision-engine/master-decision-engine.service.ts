@@ -1,5 +1,9 @@
 import type { AIConsensusResult } from "@/src/types/ai";
-import type { AdjudicateInput, MasterDecisionOutput } from "@/src/server/decision-engine/decision-engine.types";
+import type {
+  AdjudicateInput,
+  ExpertOpinionResult,
+  MasterDecisionOutput,
+} from "@/src/server/decision-engine/decision-engine.types";
 import { runAllExperts } from "@/src/server/decision-engine/experts/expert-runner.service";
 import {
   buildAttribution,
@@ -7,6 +11,7 @@ import {
   buildHumanReadableDecision,
   computeConsensusMetrics,
   detectConflicts,
+  mapMasterConsensusDecision,
   mapMasterToLegacy,
   resolveEffectiveTradingDecision,
   resolveMasterDecision,
@@ -17,6 +22,7 @@ import { enqueueWatchlistIfNeeded } from "@/src/server/decision-engine/watchlist
 import { emitDecisionEngineEvent } from "@/src/server/decision-engine/decision-engine.events";
 import { bridgeTdiDecision } from "@/src/server/forensics/forensic-bridge.service";
 import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
+import type { TdiFirstBlockingCondition } from "@/src/server/forensics/forensic.types";
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
@@ -24,6 +30,15 @@ function clamp(value: number, min: number, max: number) {
 
 function round(value: number, decimals = 2) {
   return Number(value.toFixed(decimals));
+}
+
+function mapExpertToBlockingCondition(expertType: ExpertOpinionResult["expertType"]): TdiFirstBlockingCondition {
+  if (expertType === "MOMENTUM") return "MOMENTUM";
+  if (expertType === "LEARNING") return "LEARNING";
+  if (expertType === "RISK" || expertType === "LIQUIDITY") return "RISK";
+  if (expertType === "MARKET") return "TECHNICAL";
+  if (expertType === "EXECUTION") return "CONFIDENCE";
+  return "OTHER";
 }
 
 export async function adjudicateWithMasterDecisionEngine(input: AdjudicateInput): Promise<AIConsensusResult> {
@@ -81,6 +96,20 @@ export async function adjudicateWithMasterDecisionEngine(input: AdjudicateInput)
 
   const tdiVerdict =
     legacyDecision === "BUY" ? "APPROVED" : decision === "WAIT" || decision === "WATCHLIST" ? "WAIT" : "REJECTED";
+  const roleScores = Array.isArray(legacy.roleScores) ? legacy.roleScores : [];
+  const technicalRoleScore = roleScores.find((row) => row.role === "AI-1_TECHNICAL")?.score;
+  const sentimentRoleScore = roleScores.find((row) => row.role === "AI-2_SENTIMENT")?.score;
+  const shortMomentum = Number(input.input.marketSignals?.shortMomentumPercent ?? 0);
+  const shortFlow = Number(input.input.marketSignals?.shortFlowImbalance ?? 0);
+  const blockers = attribution.blockers.map((row) => mapExpertToBlockingCondition(row.expert)).filter((row, idx, arr) => arr.indexOf(row) === idx);
+  const bullishCount = expertOpinions.filter((row) => row.opinion === "BUY" || row.opinion === "WEAK_BUY").length;
+  const strategyRuntime = legacy.decisionPayload?.strategyRuntime;
+  const strategyExecutionMode = String(
+    (input.input.strategyParams as Record<string, unknown> | undefined)?.executionMode ??
+      (input.input.strategyParams as Record<string, unknown> | undefined)?.mode ??
+      "",
+  ).toLowerCase();
+  const paperRelaxed = strategyExecutionMode === "paper";
   bridgeTdiDecision({
     candidateId: createCandidateId(input.input.symbol, "tdi"),
     symbol: input.input.symbol,
@@ -90,19 +119,39 @@ export async function adjudicateWithMasterDecisionEngine(input: AdjudicateInput)
     hybridDecision: legacy.finalDecision,
     hybridRejected: Boolean(legacy.rejected),
     consensusScore: metrics.consensusScore,
+    technicalScore: technicalRoleScore != null ? round(technicalRoleScore, 2) : undefined,
+    momentumScore: round(matrix.momentum, 2),
+    sentimentScore: sentimentRoleScore != null ? round(sentimentRoleScore, 2) : undefined,
+    shortMomentum: round(shortMomentum, 4),
+    shortFlow: round(shortFlow, 4),
+    executionScore: round(matrix.execution, 2),
     confidence: blendedConfidence,
+    bullishCount,
+    learningScore: round(matrix.learning, 2),
+    liquidity: Number(input.input.volume24h ?? NaN),
+    volatility: Number(input.input.volatility ?? NaN),
+    expectedValue: round(metrics.consensusScore, 4),
+    openInterest: Number(input.input.marketSignals?.openInterest ?? NaN),
+    marketContext: String(input.input.marketRegime?.reason ?? ""),
+    simulation: paperRelaxed ? "PAPER" : "LIVE",
+    trendData: String(input.input.multiTimeframe?.dominantTrend ?? input.input.marketRegime?.mode ?? "UNKNOWN"),
+    thresholds: {
+      technicalMinScore: Number(strategyRuntime?.technicalMinScore ?? 0) || undefined,
+      sentimentMinScore: Number(strategyRuntime?.sentimentMinScore ?? 0) || undefined,
+      compositeMinScore: Number(strategyRuntime?.consensusMinScore ?? 0) || undefined,
+      confidenceMinScore: TRADING_DECISION_POLICY.minMasterConfidenceToPreserve,
+    },
+    regime: String(input.input.marketRegime?.mode ?? "UNKNOWN"),
+    regimeDelta: undefined,
+    paperRelaxed,
+    reasonCode: `MASTER_${decision}`,
+    firstBlockingCondition: blockers[0],
+    blockingConditions: blockers,
     strategy: String(input.input.marketRegime?.selectedStrategy ?? "UNKNOWN"),
     reasonDetail: humanReadable,
   });
 
-  const mappedConsensusDecision =
-    decision === "STRONG_BUY" || decision === "BUY"
-      ? "BUY"
-      : decision === "WATCHLIST"
-        ? "WATCHLIST"
-        : decision === "SELL" || decision === "REDUCE"
-          ? "REJECT"
-          : "NO-TRADE";
+  const mappedConsensusDecision = mapMasterConsensusDecision(decision, effective.preservedHybridBuy);
 
   return {
     ...legacy,

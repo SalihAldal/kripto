@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-08-22T11:41:27.459Z",
+  "baseline": [
+    {
+      "split": "TRAIN",
+      "tradeCount": 103,
+      "netPnL": -14.943674490000003,
+      "expectancy": -0.1450842183495146,
+      "profitFactor": 0.0668539365842077,
+      "winRate": 0.18446601941747573,
+      "drawdown": -14.943674490000003
+    },
+    {
+      "split": "VALIDATION",
+      "tradeCount": 34,
+      "netPnL": -1.7706417499999998,
+      "expectancy": -0.052077698529411756,
+      "profitFactor": 0.2055233045377096,
+      "winRate": 0.17647058823529413,
+      "drawdown": -1.7706417499999998
+    },
+    {
+      "split": "OOS",
+      "tradeCount": 36,
+      "netPnL": -1.8808849900000002,
+      "expectancy": -0.05224680527777778,
+      "profitFactor": 0.21927780408177794,
+      "winRate": 0.2222222222222222,
+      "drawdown": -1.94770499
+    }
+  ],
+  "variantD": [
+    {
+      "split": "TRAIN",
+      "tradeCount": 97,
+      "netPnL": -0.5676389999999998,
+      "expectancy": -0.005851948453608245,
+      "profitFactor": 0.7260983420823683,
+      "winRate": 0.26804123711340205,
+      "drawdown": -0.7941989999999999
+    },
+    {
+      "split": "VALIDATION",
+      "tradeCount": 32,
+      "netPnL": -0.16796000000000005,
+      "expectancy": -0.005248750000000002,
+      "profitFactor": 0.8031226556639159,
+      "winRate": 0.28125,
+      "drawdown": -0.37692000000000003
+    },
+    {
+      "split": "OOS",
+      "tradeCount": 34,
+      "netPnL": -0.29659040000000003,
+      "expectancy": -0.008723247058823531,
+      "profitFactor": 0.7171262607650009,
+      "winRate": 0.38235294117647056,
+      "drawdown": -0.46999040000000003
+    }
+  ],
+  "oosExpectancyDelta": 0.04352355821895425
+}

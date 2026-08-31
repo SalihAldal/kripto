@@ -247,23 +247,34 @@ export async function evaluateJobHealth(jobId: string): Promise<JobHealthEvaluat
 
   const integrity = await auditAutoRoundIntegrity(jobId);
   if (integrity) {
-    if (Object.keys(integrity.duplicateActiveRoundNos).length > 0) {
-      issues.push({
-        component: "registry",
-        failure: "REGISTRY_INTEGRITY",
-        severity: "critical",
-        message: "Duplicate active logical rounds detected",
-        evidence: integrity.duplicateActiveRoundNos,
-      });
-    }
-    if (integrity.orphanActiveRunId) {
-      issues.push({
-        component: "round_ownership",
-        failure: "REGISTRY_INTEGRITY",
-        severity: "warn",
-        message: "Job activeRunId points to non-active run",
-        evidence: { activeRunId: integrity.activeRunId },
-      });
+    const hasRegistryDrift =
+      Object.keys(integrity.duplicateActiveRoundNos).length > 0 || integrity.orphanActiveRunId;
+    if (hasRegistryDrift) {
+      const deps = configuredDeps;
+      if (deps?.reconcileRegistryIntegrity) {
+        await deps.reconcileRegistryIntegrity(jobId, buildRoundOwnerId(getProcessOwnerId())).catch(() => null);
+      }
+      const reaudit = await auditAutoRoundIntegrity(jobId);
+      if (reaudit) {
+        if (Object.keys(reaudit.duplicateActiveRoundNos).length > 0) {
+          issues.push({
+            component: "registry",
+            failure: "REGISTRY_INTEGRITY",
+            severity: "critical",
+            message: "Duplicate active logical rounds detected",
+            evidence: reaudit.duplicateActiveRoundNos,
+          });
+        }
+        if (reaudit.orphanActiveRunId) {
+          issues.push({
+            component: "round_ownership",
+            failure: "REGISTRY_INTEGRITY",
+            severity: "warn",
+            message: "Job activeRunId points to non-active run",
+            evidence: { activeRunId: reaudit.activeRunId },
+          });
+        }
+      }
     }
   }
 
@@ -508,19 +519,25 @@ async function applyRecoveryAction(input: {
     case "NO_ACTION":
       return { result: "skipped", message: input.decision.reason };
     case "RECONCILE": {
+      const ownerId = buildRoundOwnerId(getProcessOwnerId());
+      if (deps.reconcileRegistryIntegrity) {
+        await deps.reconcileRegistryIntegrity(input.jobId, ownerId);
+      } else {
+        await deps.reconcileStaleWaitingRuns(input.jobId);
+        deps.recoverRoundRegistry({
+          jobId: input.jobId,
+          ownerId,
+          runs: (job.rounds ?? []).map((run) => ({
+            id: run.id,
+            roundNo: run.roundNo,
+            state: run.state,
+            startedAt: run.startedAt,
+            endedAt: run.endedAt,
+            metadata: run.metadata,
+          })),
+        });
+      }
       await deps.reconcileStaleWaitingRuns(input.jobId);
-      deps.recoverRoundRegistry({
-        jobId: input.jobId,
-        ownerId: buildRoundOwnerId(getProcessOwnerId()),
-        runs: (job.rounds ?? []).map((run) => ({
-          id: run.id,
-          roundNo: run.roundNo,
-          state: run.state,
-          startedAt: run.startedAt,
-          endedAt: run.endedAt,
-          metadata: run.metadata,
-        })),
-      });
       return { result: "success", message: "Registry reconciled" };
     }
     case "RESTART_CURRENT_STAGE": {

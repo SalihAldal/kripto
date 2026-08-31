@@ -1,0 +1,13 @@
+{
+  "runId": "p1-tdi-data-quality-2026-08-18T08-26-29-586Z",
+  "smokeSessionId": "cmsyd5spj000bund4xns2j4yh",
+  "verdict": "PARTIAL",
+  "beforeMissing": 57,
+  "afterMissing": 0,
+  "dataQualityBlockCount": 0,
+  "policyBlockCount": 76,
+  "runtimeTimeouts": {
+    "sampleCount": 98,
+    "timeoutCount": 1
+  }
+}

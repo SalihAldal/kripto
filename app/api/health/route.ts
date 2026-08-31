@@ -4,6 +4,7 @@ import { listHeartbeats, markHeartbeat } from "@/src/server/observability/heartb
 import { getCircuitSnapshot } from "@/src/server/resilience/circuit-breaker";
 import { validateStartupConfig } from "@/src/server/startup/validate-startup";
 import { runRestartRecovery, getSafeModeState } from "@/src/server/recovery/failsafe-recovery.service";
+import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
 
 export async function GET() {
   validateStartupConfig();
@@ -49,5 +50,6 @@ export async function GET() {
     exchangeRuntime,
     recovery,
     safeMode,
+    marketDataSpine: getMarketDataDaemon().telemetry(),
   });
 }

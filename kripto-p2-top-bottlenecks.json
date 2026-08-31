@@ -1,0 +1,54 @@
+[
+  {
+    "rank": 1,
+    "bottleneck": "CONFIDENCE",
+    "affectedHistoricalProfitableProfiles": 1143,
+    "affectedCurrentCandidates": 1143,
+    "firstStage": "tdi",
+    "evidence": {
+      "suppressionShare": 0.5017559262510974,
+      "medianScoreGap": null,
+      "avgScoreGap": null
+    },
+    "confidence": "HIGH"
+  },
+  {
+    "rank": 2,
+    "bottleneck": "MOMENTUM",
+    "affectedHistoricalProfitableProfiles": 664,
+    "affectedCurrentCandidates": 664,
+    "firstStage": "tdi",
+    "evidence": {
+      "suppressionShare": 0.2914837576821773,
+      "medianScoreGap": null,
+      "avgScoreGap": null
+    },
+    "confidence": "HIGH"
+  },
+  {
+    "rank": 3,
+    "bottleneck": "TECHNICAL",
+    "affectedHistoricalProfitableProfiles": 397,
+    "affectedCurrentCandidates": 397,
+    "firstStage": "tdi",
+    "evidence": {
+      "suppressionShare": 0.1742756804214223,
+      "medianScoreGap": null,
+      "avgScoreGap": null
+    },
+    "confidence": "HIGH"
+  },
+  {
+    "rank": 4,
+    "bottleneck": "RISK",
+    "affectedHistoricalProfitableProfiles": 74,
+    "affectedCurrentCandidates": 74,
+    "firstStage": "tdi",
+    "evidence": {
+      "suppressionShare": 0.0324846356453029,
+      "medianScoreGap": null,
+      "avgScoreGap": null
+    },
+    "confidence": "HIGH"
+  }
+]

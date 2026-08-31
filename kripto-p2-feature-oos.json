@@ -1,0 +1,13 @@
+{
+  "splitSizes": {
+    "TRAIN": 149,
+    "VALIDATION": 49,
+    "OOS": 50
+  },
+  "topFeature": "momentumScore",
+  "topFeatureOosExpectancy": 0.02061415,
+  "topInteraction": "EV×liquidity",
+  "topInteractionOosExpectancy": 0.094689,
+  "positiveFeatureCountOOS": 2,
+  "supported": "PARTIAL"
+}

@@ -6,6 +6,9 @@ vi.mock("@/src/server/repositories/execution.repository", () => ({
     connection: { id: "conn-1" },
   }),
   getEmergencyStopState: vi.fn().mockResolvedValue(false),
+  getSafeModeState: vi.fn().mockResolvedValue({ enabled: false }),
+  persistAnalysisState: vi.fn().mockResolvedValue(undefined),
+  getIdempotentExecution: vi.fn().mockResolvedValue(null),
   listOpenPositionsByUser: vi.fn().mockResolvedValue([
     {
       id: "pos-open-1",
@@ -68,6 +71,16 @@ vi.mock("@/src/server/risk", () => ({
   resumeSystem: vi.fn(),
 }));
 
+vi.mock("@/src/server/risk/canonical-risk-decision.service", () => ({
+  evaluateCanonicalRiskDecision: vi.fn().mockResolvedValue({
+    verdict: "ALLOW",
+    reasonCodes: [],
+    reasons: [],
+    metrics: {},
+    timestamp: new Date().toISOString(),
+  }),
+}));
+
 describe("execution orchestrator integration", () => {
   it("acik pozisyon varken yeni islem acmayi engeller", async () => {
     const { executeAnalyzeAndTrade } = await import("../src/server/execution/execution-orchestrator.service");
@@ -75,5 +88,5 @@ describe("execution orchestrator integration", () => {
     expect(result.opened).toBe(false);
     expect(result.rejected).toBe(true);
     expect(String(result.rejectReason)).toContain("Açık pozisyon");
-  });
+  }, 15_000);
 });

@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-08-23T19:11:56.669Z",
+  "anomaliesBefore": 856,
+  "classCounts": {
+    "REAL_EV_REJECTION": 0,
+    "HYBRID_DECISION_MIRROR": 856,
+    "OTHER": 0
+  },
+  "evFalseRejects": 0,
+  "pass": true
+}

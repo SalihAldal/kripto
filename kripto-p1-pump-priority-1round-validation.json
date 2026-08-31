@@ -1,0 +1,28 @@
+{
+  "status": "DONE",
+  "jobId": "cmsxnjwi90007unqwzfr3oxdi",
+  "preflight": {
+    "canStart": true,
+    "overallVerdict": "READY"
+  },
+  "job": {
+    "status": "COMPLETED",
+    "completedRounds": 0,
+    "failedRounds": 1,
+    "lastError": "SIM_TIGHT_FILTER_15m: pump zayif AI profili (tech=0.0, composite=65.0, 24h=3.79%) | pump CALM rejim riskli (tape=0.000%, stage=NONE, composite=65.0) | Kalite skoru cok dusuk (6/100 < 42) | Saatlik momentum negatif (-0.63%)"
+  },
+  "evidence": {
+    "pumpScanTimeoutCount": 0,
+    "fallbackCount": 15,
+    "priorityCandidates": 0,
+    "priorityRescuedCount": 0,
+    "noZombie": true,
+    "zombieCount": 0,
+    "noAiBypass": true,
+    "noFeeMismatch": true,
+    "recoveryRecords": 0,
+    "roundState": "tur_basarisiz",
+    "roundFailReason": "SIM_TIGHT_FILTER_15m: pump zayif AI profili (tech=0.0, composite=65.0, 24h=3.79%) | pump CALM rejim riskli (tape=0.000%, stage=NONE, composite=65.0) | Kalite skoru cok dusuk (6/100 < 42) | Saatlik momentum negatif (-0.63%)",
+    "candidateCount": 35
+  }
+}

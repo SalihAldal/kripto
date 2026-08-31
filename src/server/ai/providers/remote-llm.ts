@@ -457,7 +457,13 @@ async function getJson(url: string, init: RequestInit, timeoutMs: number, parent
   }
 }
 
-async function callOpenAI(apiKey: string, prompt: string, timeoutMs: number, parentSignal?: AbortSignal) {
+async function callOpenAI(
+  apiKey: string,
+  prompt: string,
+  timeoutMs: number,
+  parentSignal?: AbortSignal,
+  model?: string | null,
+) {
   const json = await postJson(
     "https://api.openai.com/v1/chat/completions",
     {
@@ -467,7 +473,7 @@ async function callOpenAI(apiKey: string, prompt: string, timeoutMs: number, par
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: env.AI_PROVIDER_1_MODEL ?? "gpt-4o-mini",
+        model: model ?? env.AI_PROVIDER_1_MODEL ?? "gpt-4o-mini",
         temperature: 0,
         messages: [
           {
@@ -520,8 +526,14 @@ async function callAnthropic(apiKey: string, prompt: string, timeoutMs: number, 
   throw lastError instanceof Error ? lastError : new Error("Anthropic model resolution failed");
 }
 
-async function callGemini(apiKey: string, prompt: string, timeoutMs: number, parentSignal?: AbortSignal) {
-  const models = await resolveGeminiModels(apiKey, timeoutMs);
+async function callGemini(
+  apiKey: string,
+  prompt: string,
+  timeoutMs: number,
+  parentSignal?: AbortSignal,
+  preferredModel?: string | null,
+) {
+  const models = await resolveGeminiModels(apiKey, timeoutMs, preferredModel);
   let lastError: unknown = null;
   for (const model of models) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -642,13 +654,14 @@ async function resolveAnthropicModels(apiKey: string, timeoutMs: number) {
   }
 }
 
-async function resolveGeminiModels(apiKey: string, timeoutMs: number) {
+async function resolveGeminiModels(apiKey: string, timeoutMs: number, configuredModel?: string | null) {
   const cached = geminiModelCache.get(apiKey);
   if (cached && cached.expiresAt > Date.now() && cached.models.length > 0) {
     return cached.models;
   }
 
   const preferred = [
+    configuredModel,
     env.AI_PROVIDER_3_MODEL,
     "gemini-2.0-flash",
     "gemini-1.5-flash-latest",
@@ -786,7 +799,7 @@ export async function analyzeWithRemoteModel(
   const apiKey = config.apiKey?.trim();
   if (!provider || !apiKey) return null;
 
-  const providerKey = `${provider}:${config.id}`;
+  const providerKey = `${provider}:${config.id}:${lane}`;
   const blockedUntil = providerBackoffUntil.get(providerKey) ?? 0;
   if (Date.now() < blockedUntil) {
     return null;
@@ -813,10 +826,10 @@ export async function analyzeWithRemoteModel(
             : Math.max(9000, config.timeoutMs);
       const raw =
         provider === "openai"
-          ? await callOpenAI(apiKey, prompt, timeoutMs, parentSignal)
+          ? await callOpenAI(apiKey, prompt, timeoutMs, parentSignal, config.model)
           : provider === "anthropic"
             ? await callAnthropic(apiKey, prompt, timeoutMs, parentSignal)
-            : await callGemini(apiKey, prompt, timeoutMs, parentSignal);
+            : await callGemini(apiKey, prompt, timeoutMs, parentSignal, config.model);
 
       const output = toOutput(parseLenientModelOutput(raw), input, lane, config.name);
       if (!output) {
@@ -835,7 +848,9 @@ export async function analyzeWithRemoteModel(
     } catch (error) {
       const message = (error as Error).message;
       if (isTransientRemoteFailure(message)) {
-        providerBackoffUntil.set(providerKey, Date.now() + 1_500);
+        const failureCategory = classifyRemoteAiFailure(message);
+        const backoffMs = failureCategory === "rate_limit" ? 3_000 : 800;
+        providerBackoffUntil.set(providerKey, Date.now() + backoffMs);
       }
       if (shouldWarn(`${providerKey}:${lane}`, 12_000)) {
         const failureCategory = classifyRemoteAiFailure(message);
@@ -860,4 +875,13 @@ export async function analyzeWithRemoteModel(
 
   inflight.set(cacheKey, task);
   return task;
+}
+
+export function clearRemoteProviderStateForTests() {
+  resultCache.clear();
+  inflight.clear();
+  providerBackoffUntil.clear();
+  warnThrottle.clear();
+  anthropicModelCache.clear();
+  geminiModelCache.clear();
 }

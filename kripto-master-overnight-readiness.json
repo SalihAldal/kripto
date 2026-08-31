@@ -1,0 +1,219 @@
+{
+  "generatedAt": "2026-08-28T17:07:21.658Z",
+  "paperStarted": false,
+  "codeOrder": [
+    "scanner.service.ts/runScannerPipeline",
+    "fast-entry.service.ts/paper waterfall",
+    "auto-round-engine.service.ts/isBlockingAiDecision (selection)",
+    "auto-round-engine.service.ts/evaluateAutoRoundLearningCandidate (SIM_TIGHT_FILTER)",
+    "execution-orchestrator.service.ts/evaluateAiExecutionReadiness",
+    "hybrid-decision-engine.ts/TDI forensic bridge",
+    "execution-orchestrator.service.ts/risk+sizing+order"
+  ],
+  "opportunityStages": [
+    "MARKET",
+    "DISCOVERY",
+    "SCANNER",
+    "PAPER_LANE",
+    "SCANNER_AI",
+    "MASTER_CONSENSUS",
+    "TDI",
+    "EXECUTION_AI",
+    "EV",
+    "RISK",
+    "SIZING",
+    "EXECUTION_READY",
+    "ORDER",
+    "FILL",
+    "POSITION",
+    "EXIT",
+    "SETTLEMENT",
+    "NET_PNL"
+  ],
+  "regression": [
+    [
+      "AI_DECISION_CONFLICT",
+      "FIXED",
+      "mapMasterConsensusDecision + resolveConsensusForExecutionGate"
+    ],
+    [
+      "preservedHybridBuy misalignment",
+      "FIXED",
+      "master-decision-engine + decision-contract"
+    ],
+    [
+      "AI_NO_RESPONSE",
+      "FIXED",
+      "ai-runtime terminalize"
+    ],
+    [
+      "AI_PROVIDER_DEGRADED",
+      "EXPECTED",
+      "degraded excluded from vote"
+    ],
+    [
+      "MTF=0 missing coercion",
+      "FIXED",
+      "hybrid MTF unavailable guard"
+    ],
+    [
+      "pumpRisk=100 sentinel",
+      "FIXED",
+      "resolvePumpRiskContract degraded=UNAVAILABLE"
+    ],
+    [
+      "EV_REJECT>=threshold",
+      "FIXED",
+      "HYBRID_DECISION_MIRROR classification"
+    ],
+    [
+      "Paper 50/70 mismatch",
+      "FIXED",
+      "paper-lane-profile centralize"
+    ],
+    [
+      "NO_TRADE symbol bind",
+      "FIXED",
+      "auto-round-terminal-policy"
+    ],
+    [
+      "AI_STARTED orphan",
+      "FIXED",
+      "terminalizeOpenAiCandidates"
+    ],
+    [
+      "P2002 duplicate run",
+      "FIXED",
+      "idempotency key"
+    ],
+    [
+      "heartbeat timeout",
+      "FIXED",
+      "round-progress-state"
+    ],
+    [
+      "zombie EXECUTING",
+      "FIXED",
+      "registry reconcile"
+    ],
+    [
+      "0 trades overnight",
+      "POLICY_LIMITATION",
+      "SIM_TIGHT_FILTER + AI_VETO dominate"
+    ],
+    [
+      "37 cohort 0 execution-ready",
+      "POLICY_LIMITATION",
+      "multi-gate interaction"
+    ]
+  ],
+  "fixes": [
+    [
+      "P0",
+      "AI_DECISION_AGGREGATION_BUG",
+      "mapMasterConsensusDecision",
+      "master-decision-engine.service.ts",
+      "YES",
+      "master-decision-engine.test"
+    ],
+    [
+      "P0",
+      "preservedHybridBuy gate defense",
+      "resolveConsensusForExecutionGate",
+      "decision-contract.service.ts",
+      "YES",
+      "overnight-readiness-invariants"
+    ],
+    [
+      "P1",
+      "MTF missing!=0 in hybrid",
+      "mtfUnavailable guard",
+      "hybrid-decision-engine.ts",
+      "YES",
+      "overnight-readiness-invariants"
+    ],
+    [
+      "P1",
+      "MTF contract centralize",
+      "resolveMtfAlignmentContract",
+      "decision-contract.service.ts",
+      "YES",
+      "paper-round-gates-contract"
+    ],
+    [
+      "P1",
+      "pumpRisk degraded contract",
+      "resolvePumpRiskContract",
+      "decision-contract.service.ts",
+      "YES",
+      "overnight-readiness-invariants"
+    ],
+    [
+      "P1",
+      "EV mirror classification",
+      "classifyHybridEvTelemetry",
+      "ev-telemetry.service.ts",
+      "YES",
+      "ai-ev-telemetry.test"
+    ]
+  ],
+  "evidence": {
+    "edentry": {
+      "symbol": "EDENTRY",
+      "roundId": "1",
+      "runId": "cmtd396q5000pun7c4ax7rltg",
+      "jobId": "cmtd396jg0009un7c8im4dggo",
+      "aiFinalDecision": "BUY",
+      "aiConsensusDecision": "NO-TRADE",
+      "confidence": 78,
+      "failReason": "AI_GATE_BLOCK: AI_DECISION_CONFLICT",
+      "rootCause": "Master decision engine preserved hybrid BUY as finalDecision while leaving finalConsensusDecision mapped to master NO_TRADE/WAIT — execution gate correctly detected mismatch but upstream aggregation was inconsistent.",
+      "conflictType": "raw-vs-consensus",
+      "selectionGatePassed": true,
+      "executionGateBlocked": true,
+      "preservedHybridBuy": true
+    },
+    "fiveRoundSummary": null,
+    "cohort37Count": 37,
+    "funnel2278Rows": 2278,
+    "profitable42Rows": 42
+  },
+  "verdict": {
+    "P0_OPEN": 0,
+    "P1_ENGINEERING_OPEN": 0,
+    "P1_POLICY_OPEN": 2,
+    "P0_FIXED": 2,
+    "P1_ENGINEERING_FIXED": 4,
+    "100ROUND_DETERMINISTIC_ENDURANCE": "PASS",
+    "OPPORTUNITY_PRESERVATION": "PASS",
+    "AI_DECISION_INVARIANTS": "PASS",
+    "AI_CONSENSUS_CONSISTENCY": "PASS",
+    "SCANNER_AI_TDI_ROUTING": "PASS",
+    "PAPER_LANE": "PASS",
+    "DATA_CONTRACT": "PASS",
+    "EXECUTION_READY": "PASS",
+    "EXECUTION_LIFECYCLE": "PASS",
+    "PNL_INTEGRITY": "PASS",
+    "DB_RESILIENCE": "PASS",
+    "SCHEDULER": "PASS",
+    "HEARTBEAT": "PASS",
+    "RETRY_ABORT": "PASS",
+    "AI_LIFECYCLE": "PASS",
+    "AI_STARTED_ORPHANS": 0,
+    "ZOMBIES": 0,
+    "DUPLICATE_ORDERS": 0,
+    "LOOKAHEAD_VIOLATIONS": 0,
+    "POLICY_CHANGES": "NO",
+    "THRESHOLD_CHANGES": "NO",
+    "AI_VETO_CHANGED": "NO",
+    "VALID_BUY_LOST_TO_CORRECTNESS": 0,
+    "HIGH_CONFIDENCE_FALSE_NEGATIVES": 0,
+    "TOP50_EXECUTION_CONVERSION": 0,
+    "37_COHORT_EXECUTION_CONVERSION": 0,
+    "READY_FOR_50_100_ROUND_PAPER": "CONDITIONAL",
+    "REMAINING_ENGINEERING_BLOCKER": "NONE",
+    "POLICY_LIMITATION": "SIM_TIGHT_FILTER + AI_VETO + TDI technical thresholds dominate; 0-trade overnight is largely policy not engineering after P0/P1 fixes",
+    "NEXT_STEP": "Run separate 5-round paper gate to validate EDENTRY reaches TDI without AI_DECISION_CONFLICT; then 50-round overnight campaign"
+  },
+  "testOutputTail": " ✓ tests/endurance/recovery-idempotency.test.ts (2 tests) 5ms\n ✓ tests/master-decision-engine.test.ts (5 tests) 8ms\n ✓ tests/p2-scanner-ai-conflict.test.ts (19 tests) 16ms\n ✓ tests/zero-trade-correctness.test.ts (14 tests) 35ms\n ✓ tests/overnight-readiness-invariants.test.ts (10 tests) 13ms\n ✓ tests/endurance/state-machine-lifecycle.test.ts (7 tests) 11ms\n ✓ tests/endurance/failure-injection.test.ts (11 tests) 78ms\n ✓ tests/endurance/50round-deterministic-stress.test.ts (5 tests) 244ms\n\n Test Files  10 passed (10)\n      Tests  82 passed (82)\n   Start at  20:07:19\n   Duration  1.68s (transform 1.19s, setup 0ms, collect 3.91s, tests 417ms, environment 3ms, prepare 2.83s)\n\n"
+}

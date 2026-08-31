@@ -1,0 +1,14 @@
+{
+  "roundsCompleted": 0,
+  "roundsAttempted": 77,
+  "roundsFailed": 79,
+  "currentRoundAtStop": 79,
+  "round20Reached": true,
+  "trades": 0,
+  "tdiEntered": 0,
+  "aiDegradedFunnel": 11155,
+  "runtimeIncidents": 1,
+  "primaryBlocker": "RUNTIME_REFERENCE_ERROR_resolveMinimumProtectedProfitPercent",
+  "reachedAt": "2026-08-29T02:34:59Z",
+  "reportGeneratedAt": "2026-08-29T10:33:28Z"
+}

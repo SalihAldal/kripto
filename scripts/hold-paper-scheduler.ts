@@ -38,6 +38,13 @@ async function withDbRetry<T>(label: string, fn: () => Promise<T>, attempts = 5)
 }
 
 async function main() {
+  const { runEngineSanityChecks } = await import("@/src/server/forensics/engine-sanity.service");
+  const sanity = runEngineSanityChecks();
+  if (!sanity.ok) {
+    console.log(JSON.stringify({ ok: false, reason: "ENGINE_SANITY_FAIL", checks: sanity.checks }, null, 2));
+    process.exit(2);
+  }
+
   const { triggerSchedulerRecovery, ensureAutoRoundRecovery } = await import(
     "@/src/server/execution/auto-round-engine.service"
   );
@@ -59,6 +66,34 @@ async function main() {
     console.log(JSON.stringify({ ok: false, reason: "No RUNNING job" }));
     await prisma.$disconnect();
     process.exit(1);
+  }
+
+  const jobRow = await withDbRetry("loadJob", () => prisma.autoRoundJob.findUnique({ where: { id: job } }));
+  if (
+    jobRow &&
+    jobRow.status === "RUNNING" &&
+    (jobRow.activeState === "tur_basarisiz" || jobRow.activeState === "tur basarisiz")
+  ) {
+    const nextRound = Math.max(jobRow.currentRound, jobRow.failedRounds + 1);
+    await withDbRetry("resumeFailedRound", () =>
+      prisma.autoRoundJob.update({
+        where: { id: job },
+        data: {
+          status: "RUNNING",
+          activeState: "tariyor",
+          lastError: null,
+          finishedAt: null,
+          currentRound: nextRound,
+          activeRunId: null,
+          metadata: {
+            ...((jobRow.metadata as Record<string, unknown>) ?? {}),
+            activeRound: null,
+            consecutiveFilterRejections: 0,
+          } as never,
+        },
+      }),
+    );
+    console.log(JSON.stringify({ ok: true, resumedFromRound: nextRound, reason: "tur_basarisiz_resume" }));
   }
 
   const recovery = await withDbRetry("triggerSchedulerRecovery", () =>

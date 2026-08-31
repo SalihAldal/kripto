@@ -1,0 +1,28 @@
+{
+  "mode": "POLICY_LEVEL_OOS",
+  "train": {
+    "size": 148,
+    "released": 0,
+    "releasedNetPnl": 0,
+    "releasedExpectancy": 0,
+    "baselineApproved": 0,
+    "correctionApproved": 0
+  },
+  "validation": {
+    "size": 50,
+    "released": 0,
+    "releasedNetPnl": 0,
+    "releasedExpectancy": 0,
+    "baselineApproved": 0,
+    "correctionApproved": 0
+  },
+  "oos": {
+    "size": 50,
+    "released": 0,
+    "releasedNetPnl": 0,
+    "releasedExpectancy": 0,
+    "baselineApproved": 0,
+    "correctionApproved": 0
+  },
+  "support": "YES"
+}

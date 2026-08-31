@@ -1,0 +1,28 @@
+{
+  "selectedFix": "FIX_AI_RELIABILITY",
+  "file": "src/server/ai/ai-orchestration.service.ts",
+  "function": "orchestrateProviderCalls",
+  "condition": "All provider calls degraded (DEGRADED_FALLBACK) with success=false before consensus",
+  "currentBehavior": "Paper session: rounds 1–5 terminal AI_NO_RESPONSE / AI_DECISION_CONFLICT; ai-trace shows 100% degraded provider calls; 0 execution-ready despite scanner shadow diffs",
+  "expectedBehavior": "Restore AI provider health + explicit reliability telemetry; round must not proceed to consensus on all-degraded path without operator signal",
+  "minimalSafeFix": "Add AI provider health gate and degraded-path telemetry; do NOT weaken VETO, consensus, or EV thresholds",
+  "shadowDownstreamAfterRelease": {
+    "SCANNER": 130,
+    "AI": 557,
+    "UNKNOWN": 24,
+    "MASTER": 138,
+    "CONSENSUS": 44
+  },
+  "mustNotChange": [
+    "TDI thresholds",
+    "momentum thresholds",
+    "confidence thresholds",
+    "AI VETO policy",
+    "consensus thresholds",
+    "EV thresholds",
+    "scanner production policy",
+    "Variant_D",
+    "risk/sizing/exits"
+  ],
+  "implementInThisTask": false
+}

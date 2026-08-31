@@ -60,9 +60,16 @@ export function buildTdiSensitivityReport(input: {
   const replaySummary = summarizeProductionReplayStatus(replays);
 
   const waitDistribution: TdiSensitivityReport["waitDistribution"] = {};
-  for (const row of decisions.filter((d) => d.verdict === "WAIT")) {
+  const firstBlockingDistribution: NonNullable<TdiSensitivityReport["firstBlockingDistribution"]> = {};
+  const blockClassificationDistribution: NonNullable<TdiSensitivityReport["blockClassificationDistribution"]> = {};
+  for (const [index, row] of decisions.entries()) {
+    if (replays[index]?.verdict !== "WAIT") continue;
     const code = row.waitReasonCode ?? "OTHER";
     waitDistribution[code] = (waitDistribution[code] ?? 0) + 1;
+    const blocker = row.firstBlockingCondition ?? "OTHER";
+    firstBlockingDistribution[blocker] = (firstBlockingDistribution[blocker] ?? 0) + 1;
+    const blockClass = row.blockClassification ?? ((row.dataQualityIssues?.length ?? 0) > 0 ? "DATA_QUALITY_BLOCK" : "POLICY_BLOCK");
+    blockClassificationDistribution[blockClass] = (blockClassificationDistribution[blockClass] ?? 0) + 1;
   }
 
   const runtimeApproved = decisions.filter((row) => row.verdict === "APPROVED").length;
@@ -125,6 +132,10 @@ export function buildTdiSensitivityReport(input: {
     productionReplayReason: replaySummary.reason,
     scoreThresholdExplanation: SCORE_THRESHOLD_EXPLANATION,
     waitDistribution,
+    firstBlockingDistribution,
+    blockClassificationDistribution,
+    dataQualityBlockCount: blockClassificationDistribution.DATA_QUALITY_BLOCK ?? 0,
+    policyBlockCount: blockClassificationDistribution.POLICY_BLOCK ?? 0,
     sensitivityPoints,
     recommendation: scores.length < 20 ? "INSUFFICIENT_DATA" : "NO_CHANGE",
     deterministicHash: "",

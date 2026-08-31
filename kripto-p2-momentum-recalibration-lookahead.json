@@ -1,0 +1,18 @@
+{
+  "checkedFeatures": [
+    "momentumScore",
+    "shortMomentum",
+    "shortFlow",
+    "sentimentScore",
+    "technicalScore",
+    "confidence",
+    "learningScore",
+    "executionScore",
+    "EV",
+    "liquidity",
+    "volatility"
+  ],
+  "rule": "timestamp(feature) <= decisionTimestamp",
+  "notes": "Features are sourced from decision metadata or deterministic policy-level inference without outcome/pnl fields as inputs.",
+  "violations": 0
+}

@@ -11,7 +11,9 @@ const closePositionRecordMock = vi.fn();
 const createPnlRecordMock = vi.fn();
 const estimateFeesMock = vi.fn();
 const getAccountBalancesMock = vi.fn();
-const executePaperCloseOrderMock = vi.fn();
+const executePaperCloseOrderViaSimulatorMock = vi.fn();
+const bridgeClosedTradePnlMock = vi.fn();
+const ensureSingleActiveExitOrderMock = vi.fn();
 
 vi.mock("@/services/binance.service", () => ({
   getTicker: getTickerMock,
@@ -28,6 +30,7 @@ vi.mock("@/services/binance-global.service", () => ({
   getGlobalTicker: vi.fn(),
   placeGlobalMarketBuy: vi.fn(),
   placeGlobalMarketSell: vi.fn(),
+  toGlobalLeverageSymbol: vi.fn((symbol: string) => symbol),
 }));
 
 vi.mock("@/src/server/repositories/execution.repository", () => ({
@@ -45,8 +48,16 @@ vi.mock("@/src/server/repositories/log.repository", () => ({
   addSystemLog: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("@/src/server/simulation/paper-trading.service", () => ({
-  executePaperCloseOrder: executePaperCloseOrderMock,
+vi.mock("@/src/server/exchange-simulator/paper-exchange-adapter.service", () => ({
+  executePaperCloseOrderViaSimulator: executePaperCloseOrderViaSimulatorMock,
+}));
+
+vi.mock("@/src/server/forensics/forensic-bridge.service", () => ({
+  bridgeClosedTradePnl: bridgeClosedTradePnlMock,
+}));
+
+vi.mock("@/src/server/execution/order-manager.service", () => ({
+  ensureSingleActiveExitOrder: ensureSingleActiveExitOrderMock,
 }));
 
 vi.mock("@/src/server/repositories/risk.repository", () => ({
@@ -90,7 +101,8 @@ describe("settlement integration", () => {
     closePositionRecordMock.mockResolvedValue({});
     createPnlRecordMock.mockResolvedValue({});
     findLatestPendingCloseOrderMock.mockResolvedValue(null);
-    executePaperCloseOrderMock.mockResolvedValue({
+    ensureSingleActiveExitOrderMock.mockResolvedValue({ allowed: true, pending: null });
+    executePaperCloseOrderViaSimulatorMock.mockResolvedValue({
       orderId: "paper-close-1",
       clientOrderId: "paper-client-1",
       symbol: "BTCTRY",
@@ -105,10 +117,9 @@ describe("settlement integration", () => {
   });
 
   it("duplicate close order varsa yeni satis gondermez", async () => {
-    findLatestPendingCloseOrderMock.mockResolvedValueOnce({
-      id: "pending-1",
-      exchangeOrderId: "ex-1",
-      status: "NEW",
+    ensureSingleActiveExitOrderMock.mockResolvedValueOnce({
+      allowed: false,
+      pending: { id: "pending-1" },
     });
     const { settleOpenPosition } = await import("../src/server/execution/post-trade-settlement.service");
     const result = await settleOpenPosition({
@@ -172,6 +183,14 @@ describe("settlement integration", () => {
     expect(result.closed).toBe(true);
     expect(closePositionRecordMock).toHaveBeenCalled();
     expect(createPnlRecordMock).toHaveBeenCalled();
+    expect(bridgeClosedTradePnlMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tradeId: "pos-1",
+        positionId: "pos-1",
+        exitReason: "TAKE_PROFIT",
+        exitModel: "POSITION_MONITOR",
+      }),
+    );
   });
 
   it("kismi dolum qty ile kapanis kaydini olusturur", async () => {
@@ -222,6 +241,14 @@ describe("settlement integration", () => {
     });
     expect(result.closed).toBe(true);
     expect(result.pnl.netPnl).toBe(0);
+    expect(bridgeClosedTradePnlMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tradeId: "pos-1",
+        positionId: "pos-1",
+        exitReason: "TIME_EXIT",
+        exitModel: "MANUAL_TIMEOUT",
+      }),
+    );
   });
 
   it("paper modda gercek borsa base bakiyesi 0 olsa bile sanal pozisyonu kapatir", async () => {
@@ -235,7 +262,7 @@ describe("settlement integration", () => {
     });
     expect(result.closed).toBe(true);
     expect(result.pnl.netPnl).not.toBe(0);
-    expect(executePaperCloseOrderMock).toHaveBeenCalledWith(
+    expect(executePaperCloseOrderViaSimulatorMock).toHaveBeenCalledWith(
       expect.objectContaining({
         quantity: 1.2,
         side: "SELL",

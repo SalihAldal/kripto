@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ExpertOpinionResult } from "../src/server/decision-engine/decision-engine.types";
 import {
   computeConsensusMetrics,
+  mapMasterConsensusDecision,
   mapMasterToLegacy,
   resolveEffectiveTradingDecision,
   resolveMasterDecision,
@@ -112,5 +113,11 @@ describe("master-decision-engine / trading decision calibration", () => {
   it("exports stable trading decision policy constants", () => {
     expect(TRADING_DECISION_POLICY.preserveHybridBuyOnMasterDefer).toBe(true);
     expect(TRADING_DECISION_POLICY.minHybridConfidenceToPreserve).toBe(65);
+  });
+
+  it("aligns consensus to BUY when hybrid BUY is preserved", () => {
+    expect(mapMasterConsensusDecision("WAIT", true)).toBe("BUY");
+    expect(mapMasterConsensusDecision("NO_TRADE", true)).toBe("BUY");
+    expect(mapMasterConsensusDecision("WAIT", false)).toBe("NO-TRADE");
   });
 });

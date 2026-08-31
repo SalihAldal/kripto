@@ -1,0 +1,107 @@
+{
+  "sourceFiles": [
+    "src/server/scanner/market-context-builder.ts",
+    "src/server/decision-engine/experts/momentum-expert.utils.ts",
+    "src/server/decision-engine/experts/domain-experts.ts",
+    "src/server/ai/hybrid-momentum-gates.ts",
+    "src/server/decision-engine/conflict-detection.service.ts"
+  ],
+  "formula": {
+    "scannerSignals": {
+      "shortMomentumPercent": "((shortLast-shortFirst)/shortFirst)*100",
+      "shortFlowImbalance": "(shortBuyVolume-shortSellVolume)/(shortBuyVolume+shortSellVolume)",
+      "tradeVelocity": "shortTradeCount/windowSec",
+      "change5m": "marketSignals.change5m",
+      "change15m": "marketSignals.change15m",
+      "change24h": "marketSignals.change24h"
+    },
+    "momentumSubscores": {
+      "impulse": "clamp(shortMomentumAbs*28 + abs(change5m)*10 + abs(change15m)*4, 0, 100)",
+      "continuation": "clamp(change15m>0 && change5m>0 ? 75 : 45, 0, 100)",
+      "velocity": "clamp(tradeVelocity*10 + volumeSpikeRatio*20, 0, 100)",
+      "relativeStrength": "clamp(50 + change24h*3, 0, 100)"
+    },
+    "momentumExpertScore": "clamp(impulse*0.35 + continuation*0.25 + velocity*0.2 + relativeStrength*0.2, 0, 100)",
+    "lowMomentumInputGate": "abs(shortMomentumPercent)<0.08 && abs(shortFlowImbalance)<0.03",
+    "momentumWeakGate": "sentimentScore < (minSentimentScore + regimeSentimentDelta) || lowMomentumInput",
+    "masterBuyMomentumGate": "matrix.momentum >= 60 required for BUY",
+    "NOT_PART_OF_MOMENTUM_FORMULA": [
+      "technicalScore thresholding",
+      "risk sizing",
+      "AI VETO policy",
+      "SL/TP/TIME_EXIT logic"
+    ]
+  },
+  "componentTable": [
+    {
+      "component": "shortMomentumPercent",
+      "source": "scanner market context",
+      "weight": "impulse term *28",
+      "normalization": "percentage-points direct",
+      "inputRange": "signed real, practical small",
+      "outputRange": "0..100 after impulse clamp",
+      "clamp": "yes",
+      "sign": "absolute in impulse gate",
+      "threshold": "0.08 abs for lowMomentumInput",
+      "regimeAdjustment": "none directly",
+      "fallback": "effectiveLastPrice path",
+      "missingBehavior": "treated as 0 if absent in many flows"
+    },
+    {
+      "component": "shortFlowImbalance",
+      "source": "scanner market context",
+      "weight": "volume expert + lowMomentumInput gate",
+      "normalization": "ratio [-1,1]",
+      "inputRange": "-1..1",
+      "outputRange": "gate boolean or weighted score",
+      "clamp": "implicit ratio bound",
+      "sign": "signed",
+      "threshold": "0.03 abs for lowMomentumInput",
+      "regimeAdjustment": "none directly",
+      "fallback": "0 on missing",
+      "missingBehavior": "missing -> gate may not trigger if telemetry missing; in some paths 0 default"
+    },
+    {
+      "component": "sentimentScore",
+      "source": "hybrid sentiment scorer",
+      "weight": "momentumWeak condition",
+      "normalization": "score [0,100]",
+      "inputRange": "0..100",
+      "outputRange": "boolean gate effect",
+      "clamp": "already bounded",
+      "sign": "higher better",
+      "threshold": "minSentimentScore + regimeDelta",
+      "regimeAdjustment": "yes via resolveRegimePolicy.minSentimentDelta",
+      "fallback": "provider defaults around 50",
+      "missingBehavior": "neutral-ish fallback"
+    },
+    {
+      "component": "regimeDelta",
+      "source": "resolveRegimePolicy",
+      "weight": "adds to sentiment floor",
+      "normalization": "integer deltas",
+      "inputRange": "-2..99",
+      "outputRange": "effective sentiment threshold",
+      "clamp": "no",
+      "sign": "positive tighter / negative relaxed",
+      "threshold": "base 52 + delta",
+      "regimeAdjustment": "direct",
+      "fallback": "0 for unknown/range",
+      "missingBehavior": "unknown -> default branch"
+    },
+    {
+      "component": "learningScore",
+      "source": "master expert matrix.learning",
+      "weight": "master attribution and decision confidence",
+      "normalization": "score [0,100]",
+      "inputRange": "0..100",
+      "outputRange": "decision/support blocker",
+      "clamp": "yes",
+      "sign": "higher better",
+      "threshold": "implicit through master decision gates",
+      "regimeAdjustment": "indirect",
+      "fallback": "NO_OPINION 50 when no history",
+      "missingBehavior": "NO_OPINION path"
+    }
+  ]
+}

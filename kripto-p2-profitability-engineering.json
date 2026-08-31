@@ -1,0 +1,436 @@
+{
+  "generatedAt": "2026-08-21T23:46:33.284Z",
+  "scope": "DIRECT_NATIVE_KRIPTO_REPOSITORY_ONLY",
+  "objective": "REPEATABLE_POSITIVE_NET_EXPECTANCY_AFTER_FEES",
+  "part1_currentBaseline": {
+    "roundCount": 5,
+    "validRounds": 5,
+    "tradeCount": 0,
+    "winRate": 0,
+    "grossPnL": 0,
+    "fees": 0,
+    "netPnL": 0,
+    "expectancy": 0,
+    "profitFactor": "N/A",
+    "averageWin": 0,
+    "averageLoss": 0,
+    "maxDrawdown": 0,
+    "maxDrawdownPct": 0,
+    "averageHold": 0,
+    "medianHold": 0,
+    "aiAlignment": {
+      "aiExecutionParity": "PASS",
+      "aiRemoteHealth": "PASS"
+    },
+    "entryQuality": "NOT_PROVEN",
+    "exitModel": "NOT_PROVEN",
+    "feeClassification": "CURRENT_UNOBSERVABLE_HISTORICAL_FEE_DOMINANT",
+    "regimeDistribution": "NOT_ENOUGH_DATA",
+    "strategyDistribution": "NOT_ENOUGH_DATA"
+  },
+  "part2_lossAttributionEngine": {
+    "rows": [
+      {
+        "cause": "FEE_EROSION",
+        "role": "PRIMARY",
+        "tradeCount": 11,
+        "grossPnL": null,
+        "fees": null,
+        "netPnL": null,
+        "shareOfLosses": "11/51",
+        "evidence": "grossPositiveNetNegative=11 historical",
+        "confidence": "FACT"
+      },
+      {
+        "cause": "REPLAY_WINDOW",
+        "role": "PRIMARY",
+        "tradeCount": 51,
+        "grossPnL": -0.33651532,
+        "fees": 5.09837823,
+        "netPnL": -5.43489355,
+        "shareOfLosses": "51/51 exits",
+        "evidence": "historical exits are END_OF_REPLAY",
+        "confidence": "FACT"
+      },
+      {
+        "cause": "EXIT_PROBLEM",
+        "role": "SECONDARY",
+        "tradeCount": 51,
+        "grossPnL": -0.33651532,
+        "fees": 5.09837823,
+        "netPnL": -5.43489355,
+        "shareOfLosses": "51/51 exits",
+        "evidence": "position-monitor edge not proven",
+        "confidence": "REPEATED_PATTERN"
+      },
+      {
+        "cause": "STRATEGY_WEAKNESS",
+        "role": "PRIMARY",
+        "tradeCount": 51,
+        "grossPnL": -0.33651532,
+        "fees": 5.09837823,
+        "netPnL": -5.43489355,
+        "shareOfLosses": "all historical strategies net negative",
+        "evidence": "MR/VB/TF net < 0 in historical sample",
+        "confidence": "REPEATED_PATTERN"
+      },
+      {
+        "cause": "ENTRY_DECISION_QUALITY",
+        "role": "SECONDARY",
+        "tradeCount": 0,
+        "grossPnL": null,
+        "fees": null,
+        "netPnL": null,
+        "shareOfLosses": "N/A",
+        "evidence": "insufficient post-fix executed entries",
+        "confidence": "UNKNOWN"
+      },
+      {
+        "cause": "REGIME_MISMATCH",
+        "role": "SECONDARY",
+        "tradeCount": 0,
+        "grossPnL": null,
+        "fees": null,
+        "netPnL": null,
+        "shareOfLosses": "N/A",
+        "evidence": "insufficient trade-level regime outcomes",
+        "confidence": "UNKNOWN"
+      },
+      {
+        "cause": "AI_MISJUDGMENT",
+        "role": "SECONDARY",
+        "tradeCount": 0,
+        "grossPnL": null,
+        "fees": null,
+        "netPnL": null,
+        "shareOfLosses": "N/A",
+        "evidence": "AI execution parity PASS; predictive quality insufficient",
+        "confidence": "UNKNOWN"
+      }
+    ],
+    "summary": {
+      "knownPrimaryDrivers": [
+        "FEE_EROSION",
+        "REPLAY_WINDOW",
+        "STRATEGY_WEAKNESS"
+      ],
+      "insufficientEvidenceDrivers": [
+        "BAD_ENTRY",
+        "CHASING",
+        "EDGE_DECAY",
+        "REGIME_MISMATCH",
+        "AI_MISJUDGMENT",
+        "RISK",
+        "DATA_QUALITY"
+      ]
+    }
+  },
+  "part3_feeDrag": {
+    "historical": {
+      "tradeCount": 51,
+      "grossPnL": -0.33651532,
+      "fees": 5.09837823,
+      "netPnL": -5.43489355,
+      "grossPositiveNetNegative": 11,
+      "feeDominantLossCount": 11
+    },
+    "current": {
+      "tradeCount": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0
+    },
+    "classification": "DOMINANT",
+    "note": "Fees dominate historical net loss profile; current run has no trades."
+  },
+  "part4_entryQuality": {
+    "status": "NOT_PROVEN",
+    "reason": "No executed entries in current baseline",
+    "winnersVsLosers": "UNAVAILABLE"
+  },
+  "part5_exitQuality": {
+    "current": {
+      "positionMonitorTrades": 0,
+      "replayWindowTrades": 0
+    },
+    "historical": {
+      "replayWindowEndOfReplayDominance": "51/51"
+    },
+    "verdict": "EXIT_EDGE_NOT_PROVEN"
+  },
+  "part6_strategyRegimeMatrix": {
+    "totalCells": 28,
+    "notEnoughDataCells": 28,
+    "source": "kripto-p2-profitability-master.json:strategyRegimeProfitability.rows"
+  },
+  "part7_candidateQualityModel": {
+    "ranking": [
+      {
+        "feature": "momentum / shortMomentum",
+        "class": "FACT",
+        "evidence": "First-blocking distribution shows momentum-dominant policy blocks in latest run."
+      },
+      {
+        "feature": "technical",
+        "class": "FACT",
+        "evidence": "Technical is second-largest first-blocking component in latest run."
+      },
+      {
+        "feature": "confidence",
+        "class": "REPEATED_PATTERN",
+        "evidence": "Confidence appears as low-frequency blocker; repeated but sparse."
+      },
+      {
+        "feature": "regime",
+        "class": "HYPOTHESIS",
+        "evidence": "No direct first-blocking regime events in latest run."
+      },
+      {
+        "feature": "flow/sentiment/liquidity/volatility/EV/OI",
+        "class": "HYPOTHESIS",
+        "evidence": "No outcome-linked winner/loser sample in current run."
+      }
+    ]
+  },
+  "part8_tdiEffectiveness": {
+    "runtimeApprovalEquivalentRate": 0,
+    "tdiApproved": 0,
+    "tdiWait": 193,
+    "tdiRejected": 2085,
+    "verdict": "OVERLY_CONSERVATIVE",
+    "note": "Current 5-round had zero runtime TDI approvals."
+  },
+  "part9_aiPredictiveQuality": {
+    "aiPredictionQuality": "UNKNOWN",
+    "aiExecutionParity": "PASS",
+    "aiCalls": 1500,
+    "remoteCalls": 1430,
+    "failed": 70,
+    "timeouts": 82
+  },
+  "part10_missedOpportunity": {
+    "counts": {
+      "NOT_DISCOVERED": 10,
+      "DISCOVERED_BUT_NOT_TRADED": 622,
+      "AI_REJECTED": 198
+    },
+    "positiveEstimatedRows": 0,
+    "analysisScope": "POST_ENTRY_ANALYSIS_ONLY"
+  },
+  "part11to18_experiments": [
+    {
+      "variant": "BASELINE",
+      "hypothesis": "Reference only",
+      "baseline": "CURRENT_POST_P0P1_5ROUND",
+      "sample": "0 trades",
+      "metrics": "expectancy/netPnL/profitFactor/drawdown",
+      "decision": "REFERENCE",
+      "status": "NOT_PROVEN",
+      "risk": "none"
+    },
+    {
+      "variant": "FEE_AWARE",
+      "hypothesis": "Reduce gross-positive net-negative trades",
+      "baseline": "BASELINE",
+      "sample": "historical=51 / current=0",
+      "metrics": "grossPositiveNetNegative, feeDragPct, netExpectancy",
+      "decision": "RESEARCH_ONLY",
+      "status": "RESEARCH_ONLY",
+      "risk": "may reduce opportunities"
+    },
+    {
+      "variant": "ENTRY_QUALITY_PROTECTED",
+      "hypothesis": "Block CHASING and EDGE_DECAY dominated entries",
+      "baseline": "BASELINE",
+      "sample": "post-fix no executed entries",
+      "metrics": "entryDelay, expectedNetEdge, netPnL by entry class",
+      "decision": "RESEARCH_ONLY",
+      "status": "RESEARCH_ONLY",
+      "risk": "under-trading risk"
+    },
+    {
+      "variant": "REGIME_AWARE",
+      "hypothesis": "Avoid mismatch regime-strategy combinations",
+      "baseline": "BASELINE",
+      "sample": "matrix sparse / zero closed trades current",
+      "metrics": "expectancy by strategy-regime cell",
+      "decision": "RESEARCH_ONLY",
+      "status": "RESEARCH_ONLY",
+      "risk": "overfit on sparse sample"
+    },
+    {
+      "variant": "TDI_INTERACTION_CORRECTION",
+      "hypothesis": "Counterfactual momentum/technical gate sensitivity",
+      "baseline": "BASELINE",
+      "sample": "counterfactual only",
+      "metrics": "runtimeApprovalEquivalentRate, expectancy",
+      "decision": "RESEARCH_ONLY",
+      "status": "RESEARCH_ONLY",
+      "risk": "quality dilution"
+    },
+    {
+      "variant": "STRATEGY_SPECIFIC_REGIME_GATING",
+      "hypothesis": "Use only evidence-backed cells",
+      "baseline": "BASELINE",
+      "sample": "NOT_ENOUGH_DATA cells dominate",
+      "metrics": "netExpectancy, OOS support",
+      "decision": "RESEARCH_ONLY",
+      "status": "RESEARCH_ONLY",
+      "risk": "false confidence from sparse cells"
+    }
+  ],
+  "part19_beforeAfterLossAttribution": {
+    "preFixHistorical": {
+      "tradeCount": 51,
+      "grossPnL": -0.33651532,
+      "fees": 5.09837823,
+      "netPnL": -5.43489355
+    },
+    "postP0P1Current": {
+      "tradeCount": 0,
+      "grossPnL": 0,
+      "fees": 0,
+      "netPnL": 0
+    },
+    "conclusion": "LOSS_DRIVERS_NOW_UNPROVEN_DUE_TO_ZERO_TRADES"
+  },
+  "part20_scorecard": {
+    "generatedAt": "2026-08-21T23:46:33.283Z",
+    "edgeQuality": {
+      "status": "NOT_PROVEN",
+      "netExpectancy": 0,
+      "note": "Current 5-round has 0 trades; positive net edge not proven."
+    },
+    "feeEfficiency": {
+      "status": "NEGATIVE_HISTORICAL",
+      "historical": {
+        "grossPnL": -0.33651532,
+        "fees": 5.09837823,
+        "netPnL": -5.43489355,
+        "grossPositiveNetNegative": 11
+      },
+      "current": {
+        "grossPnL": 0,
+        "fees": 0,
+        "netPnL": 0
+      }
+    },
+    "entryQuality": {
+      "status": "NOT_PROVEN",
+      "reason": "No executed entries in latest 5-round sample"
+    },
+    "exitQuality": {
+      "status": "EXIT_EDGE_NOT_PROVEN",
+      "historicalExitMode": "END_OF_REPLAY_DOMINANT",
+      "currentClosedTrades": 0
+    },
+    "strategyQuality": {
+      "status": "NEGATIVE_HISTORICAL",
+      "historicalByStrategy": [
+        {
+          "strategy": "Mean Reversion",
+          "trades": 39,
+          "netPnL": -3.93
+        },
+        {
+          "strategy": "Volatility Breakout",
+          "trades": 9,
+          "netPnL": -1.46
+        },
+        {
+          "strategy": "Trend Following",
+          "trades": 3,
+          "netPnL": -0.04
+        }
+      ],
+      "current": "NOT_ENOUGH_DATA"
+    },
+    "regimeQuality": {
+      "status": "NOT_ENOUGH_DATA",
+      "reason": "strategy-regime matrix sparse / zero closed trades current"
+    },
+    "AIQuality": {
+      "executionParity": "PASS",
+      "remoteHealth": "PASS",
+      "predictiveQuality": "UNKNOWN",
+      "note": "AI predictive quality cannot be validated without realized outcomes"
+    },
+    "executionQuality": {
+      "status": "NOT_EXERCISED",
+      "runtimeStable": "YES",
+      "zombieCount": 0,
+      "aiOrphanCount": 0
+    },
+    "sampleQuality": {
+      "currentRoundCount": 5,
+      "validRounds": 5,
+      "currentTradeCount": 0,
+      "oosSupport": "NO",
+      "classification": "INSUFFICIENT_SAMPLE"
+    }
+  },
+  "part21_paperValidationPlan": {
+    "stage1_5round": {
+      "objective": "runtime + trade lifecycle + fee + exit evidence",
+      "minimumTrades": 3,
+      "minimumValidRounds": 5,
+      "requiredRemoteAiPct": ">=80%",
+      "requiredNonReplayExits": ">=1 if any trade closes",
+      "feeReconciliation": "MANDATORY",
+      "aiParity": "MANDATORY_PASS",
+      "oosRequirement": "NOT_REQUIRED"
+    },
+    "stage2_30round": {
+      "objective": "first meaningful profitability sample",
+      "minimumTrades": 20,
+      "minimumValidRounds": 27,
+      "requiredRemoteAiPct": ">=85%",
+      "requiredNonReplayExits": ">=5",
+      "feeReconciliation": "MANDATORY",
+      "aiParity": "MANDATORY_PASS",
+      "oosRequirement": "PARTIAL"
+    },
+    "stage3_50plus": {
+      "objective": "robust profitability validation",
+      "minimumTrades": 40,
+      "minimumValidRounds": 45,
+      "requiredRemoteAiPct": ">=85%",
+      "requiredNonReplayExits": ">=10",
+      "feeReconciliation": "MANDATORY",
+      "aiParity": "MANDATORY_PASS",
+      "oosRequirement": "REQUIRED"
+    }
+  },
+  "finalAnswers": {
+    "q1_whyLose": "Historical sample loses mainly from fee erosion + replay-window exit distortion + strategy weakness.",
+    "q2_feeImpact": "Historical fees 5.09837823 exceed absolute gross 0.33651532.",
+    "q3_entryImpact": "Not measurable on post-P0/P1 current sample (0 executed entries).",
+    "q4_exitImpact": "Historical 51/51 END_OF_REPLAY indicates exit realism gap.",
+    "q5_regimeImpact": "Insufficient direct trade evidence.",
+    "q6_strategyEdge": "None proven net-positive yet.",
+    "q7_regimeEdge": "None proven net-positive yet.",
+    "q8_tdiConservatism": "Likely overly conservative in current sample (approved=0).",
+    "q9_aiPredictiveUsefulness": "Unknown; outcome-linked sample insufficient.",
+    "q10_bestImprovement": "Fee-aware entry protection (research-only) with expectedNetEdge safeguard.",
+    "q11_researchOnly": [
+      "FEE_AWARE",
+      "ENTRY_QUALITY_PROTECTED",
+      "REGIME_AWARE",
+      "TDI_INTERACTION_CORRECTION",
+      "STRATEGY_SPECIFIC_REGIME_GATING"
+    ],
+    "q12_promotable": [],
+    "q13_positiveNetEdgeYet": "NOT_PROVEN",
+    "q14_nextMeasurement": "Need closed trades with non-replay exits, then OOS expectancy validation."
+  },
+  "finalVerdict": {
+    "LOSS_ROOT_CAUSE": "MIXED",
+    "PROFITABILITY_STATUS": "NOT_PROVEN",
+    "POSITIVE_NET_EDGE": "NOT_PROVEN",
+    "BEST_EVIDENCE_BACKED_VARIANT": "FEE_AWARE",
+    "PROMOTABLE_VARIANTS": [],
+    "OOS_SUPPORTED": "NO",
+    "READY_FOR_30_ROUNDS": "CONDITIONAL",
+    "READY_FOR_50_ROUNDS": "CONDITIONAL"
+  }
+}

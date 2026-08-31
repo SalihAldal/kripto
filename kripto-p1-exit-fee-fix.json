@@ -1,0 +1,197 @@
+{
+  "task": "KRIPTO P1 — EXIT LIFECYCLE + FEE-AWARE PROFITABILITY FIX",
+  "status": "PROVISIONAL_PASS",
+  "timestamp": "2026-08-17T17:47:30.000Z",
+  "phase": "KRIPTO-EXIT-001 + KRIPTO-FEE-001",
+  "exitLifecycleMap": {
+    "entryToPnlPath": [
+      "executeAnalyzeAndTradeInternal",
+      "createPosition",
+      "attachPositionMonitor/startPositionMonitor",
+      "TP/SL/strategy/time checks",
+      "settleOpenPosition",
+      "bridgeClosedTradePnl/createPnlLedgerEntry",
+      "exportRoundForensicArtifacts"
+    ],
+    "files": {
+      "takeProfitStopLoss": "src/server/execution/tp-sl-evaluator.ts",
+      "positionMonitor": "src/server/execution/position-monitor.service.ts",
+      "settlement": "src/server/execution/post-trade-settlement.service.ts",
+      "replayModel": "src/server/forensics/exit-replay.engine.ts",
+      "exitMapper": "src/server/forensics/exit-forensics.service.ts",
+      "pnlLedger": "src/server/forensics/pnl-ledger.service.ts"
+    },
+    "precedence": {
+      "positionMonitor": "EXIT_AI -> paper protections -> smart-exit -> TP/SL -> dynamic-exit -> trailing/early-protect -> timeout",
+      "replayWindow": "same-candle precedence (default STOP_LOSS, configurable TAKE_PROFIT) -> STOP_LOSS -> TAKE_PROFIT -> TIME_EXIT/END_OF_REPLAY"
+    }
+  },
+  "exitModelSeparation": {
+    "implemented": true,
+    "models": [
+      "POSITION_MONITOR",
+      "REPLAY_WINDOW",
+      "MANUAL_TIMEOUT"
+    ],
+    "explicitFields": [
+      "tradeId",
+      "positionId",
+      "symbol",
+      "entryPrice",
+      "entryTimestamp",
+      "exitPrice",
+      "exitTimestamp",
+      "holdDurationMs",
+      "exitReason",
+      "exitModel",
+      "tpLevel",
+      "slLevel",
+      "strategyExitReason",
+      "timeExitReason",
+      "grossPnL",
+      "entryFee",
+      "exitFee",
+      "totalFee",
+      "netPnL"
+    ],
+    "note": "Strategic exit is no longer inferred for replay-boundary exits; END_OF_REPLAY remains explicit."
+  },
+  "exitForensics": {
+    "newArtifacts": [
+      "exit-forensics.json",
+      "replay-exit-diagnostics.json",
+      "replayExitDiagnostics.json"
+    ],
+    "runtimeSnapshotFields": [
+      "priceAtMonitorTick",
+      "decisionTimestamp",
+      "monitorPrecedenceRule",
+      "replayPrecedenceRule"
+    ]
+  },
+  "feeAware": {
+    "preTrade": {
+      "metrics": [
+        "estimatedEntryFee",
+        "estimatedExitFee",
+        "estimatedRoundTripFees",
+        "expectedGrossAtTp",
+        "expectedNetAfterFeesAtTp",
+        "feeToExpectedGrossRatio",
+        "minimumGrossToCoverFees"
+      ],
+      "classification": [
+        "FEE_SAFE",
+        "FEE_BORDERLINE",
+        "FEE_EROSION",
+        "UNKNOWN"
+      ],
+      "policyMode": "OBSERVE by default (no production auto-block)",
+      "sourceOfMinRatio": "fee-aware-entry-policy.minGrossToFeeRatio(default=1)"
+    },
+    "postTrade": {
+      "reconciliationRules": [
+        "totalFee = entryFee + exitFee + slippageCost",
+        "netPnL = grossPnL - totalFee"
+      ],
+      "perTradeFields": [
+        "feeReconciliationStatus",
+        "feeEdgeClass",
+        "grossPositiveNetNegative"
+      ]
+    }
+  },
+  "grossPositiveNetNegativeForensics": {
+    "implemented": true,
+    "artifact": "gross-positive-net-negative.json",
+    "fields": [
+      "tradeId",
+      "symbol",
+      "strategy",
+      "grossPnL",
+      "entryFee",
+      "exitFee",
+      "totalFee",
+      "netPnL",
+      "feeToGrossRatio",
+      "minimumGrossMovementToCoverFees"
+    ]
+  },
+  "feeDragAnalysis": {
+    "artifacts": [
+      "fee-by-strategy.json",
+      "fee-by-hold-time.json",
+      "exit-fee-interaction.json"
+    ],
+    "exitFeeInteractionClasses": [
+      "EXIT_CREATED_LOSS",
+      "FEE_CREATED_LOSS",
+      "BOTH",
+      "UNKNOWN"
+    ]
+  },
+  "tests": {
+    "status": "PASS",
+    "runs": [
+      {
+        "command": "npx vitest run tests/forensics/p0-execution-correctness.test.ts tests/forensics/p1-profitability-engineering.test.ts tests/forensics/p2-profitability-optimization.test.ts tests/forensics/trading-engine-forensics.test.ts",
+        "files": 4,
+        "tests": 68,
+        "passed": true
+      },
+      {
+        "command": "npx vitest run tests/forensics/round-export.test.ts tests/forensics/p0-execution-correctness.test.ts tests/forensics/p1-profitability-engineering.test.ts tests/forensics/p2-profitability-optimization.test.ts",
+        "files": 4,
+        "tests": 51,
+        "passed": true
+      }
+    ]
+  },
+  "controlledValidation": {
+    "script": "scripts/_p1-exit-fee-5round-validation.ts",
+    "output": "reports/p1-exit-fee-5round-validation.json",
+    "job": {
+      "sessionId": "cmsxircm50007unj4l3g0zinv",
+      "status": "FAILED",
+      "completedRounds": 0,
+      "failedRounds": 1
+    },
+    "result": "EXIT_VALIDATION_BLOCKED",
+    "reason": "Round failed before trade lifecycle due to PUMP_SCAN_FAILED timeout; no closed trades observed.",
+    "aiVetoBypassCount": 0
+  },
+  "acceptance": {
+    "exitModelExplicitlyRecorded": "PASS",
+    "exitReasonExplicitlyRecorded": "PASS",
+    "tpSlStrategyTimeTestable": "PASS",
+    "replayBoundarySeparated": "PASS",
+    "pnlReconciliationExact": "PASS",
+    "feesVisiblePreAndPostTrade": "PASS",
+    "noHiddenFeeAssumptions": "PASS_WITH_DOCUMENTED_SOURCE",
+    "noLookAhead": "PASS",
+    "noSafetyBypass": "PASS",
+    "realPositionMonitorExitProofIn5to10Rounds": "BLOCKED"
+  },
+  "changedFiles": [
+    "src/server/forensics/fee-edge-metrics.service.ts",
+    "src/server/forensics/forensic.types.ts",
+    "src/server/forensics/exit-forensics.service.ts",
+    "src/server/forensics/exit-replay.engine.ts",
+    "src/server/forensics/pnl-ledger.service.ts",
+    "src/server/forensics/fee-aware-edge-research.service.ts",
+    "src/server/forensics/fee-aware-entry-policy.service.ts",
+    "src/server/forensics/exit-fee-forensics.service.ts",
+    "src/server/forensics/p1-forensic-report.service.ts",
+    "src/server/forensics/p2-forensic-report.service.ts",
+    "src/server/forensics/round-forensic-export.service.ts",
+    "src/server/execution/post-trade-settlement.service.ts",
+    "tests/forensics/p0-execution-correctness.test.ts",
+    "tests/forensics/p1-profitability-engineering.test.ts",
+    "scripts/_p1-exit-fee-5round-validation.ts",
+    "scripts/_stop-auto-round-job.ts"
+  ],
+  "remainingBlockers": [
+    "Runtime validation is currently blocked by scanner pump-lane timeout before exit lifecycle can produce closed trades.",
+    "Historical END_OF_REPLAY reconstruction remains UNKNOWN unless deterministic candle-path evidence is available for each trade."
+  ]
+}

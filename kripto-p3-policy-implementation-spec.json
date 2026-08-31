@@ -1,0 +1,12 @@
+{
+  "implemented": false,
+  "winner": "NO_SAFE_POLICY_CHANGE",
+  "reason": "No single-variable variant improved OOS net expectancy without releasing disproportionate losers. Historical profitable profiles fail primary TDI momentum/confidence bars by large margins (median momentum ~2 vs threshold 60).",
+  "policyFirewall": {
+    "aiVeto": false,
+    "risk": false,
+    "sizing": false,
+    "thresholds": false
+  },
+  "note": "NO_SAFE_POLICY_CHANGE — no production policy code modified"
+}

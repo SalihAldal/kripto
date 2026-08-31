@@ -2,7 +2,7 @@ export type TerminalVerdict = "APPROVED" | "WAIT" | "REJECTED" | "FAILED" | "UNK
 
 export type DecisionVerdict = "APPROVE" | "WAIT" | "REJECT" | "FAILED";
 
-export type AiExecutionMode = "REMOTE" | "DEGRADED_LOCAL" | "AI_DEGRADED";
+export type AiExecutionMode = "REMOTE" | "DEGRADED_LOCAL" | "AI_DEGRADED" | "AI_PROVIDER_DEGRADED";
 
 export type ExitReasonCode =
   | "TAKE_PROFIT"
@@ -50,8 +50,15 @@ export type FeeEdgeMetricsSnapshot = {
   expectedNetAfterFeesAtTp: number;
   expectedNetAfterFeesAtSl: number;
   expectedNetPnL: number;
+  expectedGrossEdge?: number;
+  expectedNetEdge?: number;
+  feeToGrossEdgeRatio?: number;
+  minimumGrossMoveToCoverFees?: number;
+  edgeAfterFees?: number;
+  feeClassification?: "FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN";
   takeProfitPercent: number;
   stopLossPercent: number;
+  feeEdgeClass?: "FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN";
 };
 
 export type ExitForensicRecord = {
@@ -62,9 +69,18 @@ export type ExitForensicRecord = {
   entryTimestamp: string;
   exitTimestamp: string;
   durationMs: number;
+  holdDurationMs?: number;
   tpLevel?: number | null;
   slLevel?: number | null;
   strategyExit?: boolean;
+  strategyExitReason?: string | null;
+  timeExitReason?: string | null;
+  normalizedCloseReason?: string | null;
+  closeReasonAlias?: string | null;
+  priceAtMonitorTick?: number | null;
+  decisionTimestamp?: string | null;
+  monitorPrecedenceRule?: string | null;
+  replayPrecedenceRule?: string | null;
   realizedGrossPnL?: number;
   closeReason?: string | null;
   replayWindowEnded?: boolean;
@@ -92,7 +108,20 @@ export type ForensicRegimeClass =
   | "LOW_LIQUIDITY"
   | "UNKNOWN";
 
-export type EntryTimingClass = "GOOD_ENTRY" | "NORMAL" | "POSSIBLY_LATE" | "UNKNOWN";
+export type EntryTimingClass = "GOOD_ENTRY" | "NORMAL" | "CHASING" | "EDGE_DECAY" | "POSSIBLY_LATE" | "UNKNOWN";
+
+export type EntryTimingAggregateReport = {
+  generatedAt: string;
+  sampleSize: number;
+  classificationCounts: Partial<Record<EntryTimingClass, number>>;
+  entryDelayMs: { p50: number; p90: number; p95: number };
+  movementToEntryPercent: { p50: number; p90: number; p95: number };
+  stageLatencyMs: {
+    scannerToCandidate?: { p50: number; p90: number; p95: number };
+    candidateToDecision?: { p50: number; p90: number; p95: number };
+    decisionToEntry?: { p50: number; p90: number; p95: number };
+  };
+};
 
 export type MeanReversionEntryRecord = {
   candidateId: string;
@@ -121,6 +150,15 @@ export type ScannerQualificationRejection = {
   stage: "universe" | "qualification" | "filter" | "candidate_generation" | "ranking";
   filter: string;
   reasonCode: string;
+  exclusionCategory?:
+    | "SCANNER_ROTATION"
+    | "PUMP_LANE_MISS"
+    | "QUALIFICATION"
+    | "LIQUIDITY"
+    | "SPREAD"
+    | "VOLATILITY"
+    | "STALE_DATA"
+    | "OTHER";
   reasonDetail: string;
   threshold?: number | string | null;
   actualValue?: number | string | null;
@@ -182,6 +220,29 @@ export type EntryTimingRecord = {
   reasonDetail: string;
 };
 
+export type ScannerCoverageSnapshot = {
+  timestamp: string;
+  scannerUniverse: number;
+  priorityMaxPerCycle?: number;
+  rotationCandidates: number;
+  priorityCandidates: number;
+  rotationCount?: number;
+  priorityCount?: number;
+  duplicatesRemoved: number;
+  duplicateCount?: number;
+  totalEvaluated: number;
+  totalEvaluationCount?: number;
+  notDiscoveredCount: number;
+  priorityRescuedCount: number;
+  discoverySources: Array<{
+    symbol: string;
+    discoverySource: "ROTATION" | "PRIORITY" | "PUMP" | "OTHER";
+    prioritySource?: string;
+    priorityReason?: string;
+    priorityScore?: number;
+  }>;
+};
+
 export type StrategyPerformanceRow = {
   strategy: string;
   sampleSize: number;
@@ -222,6 +283,8 @@ export type P1ForensicSessionBundle = {
   scannerQualificationRejections: ScannerQualificationRejection[];
   notDiscoveredRecords: NotDiscoveredAnalysisRecord[];
   entryTimingRecords: EntryTimingRecord[];
+  entryTimingAggregates?: EntryTimingAggregateReport;
+  scannerCoverage?: ScannerCoverageSnapshot[];
   meanReversionAnalysis?: MeanReversionOfflineAnalysis;
   evCalibration?: EvCalibrationReport;
   evComponentAttribution?: EvComponentAttributionReport;
@@ -233,6 +296,89 @@ export type P1ForensicSessionBundle = {
   winningPatterns?: TradePatternReport;
   feeAwareEdgeResearch?: FeeAwareEdgeResearchReport;
   promotionGate?: PromotionGateEvaluation;
+  exitForensicsReport?: {
+    generatedAt: string;
+    precedence: {
+      positionMonitor: string;
+      replayWindow: string;
+    };
+    rows: Array<{
+      tradeId: string;
+      positionId: string;
+      symbol: string;
+      entryPrice: number;
+      entryTimestamp?: string;
+      exitPrice: number;
+      exitTimestamp?: string;
+      holdDurationMs?: number;
+      exitReason?: ExitReasonCode;
+      exitModel?: ExitForensicRecord["exitModel"];
+      tpLevel?: number | null;
+      slLevel?: number | null;
+      strategyExitReason?: string | null;
+      timeExitReason?: string | null;
+      grossPnL: number;
+      entryFee: number;
+      exitFee: number;
+      totalFee: number;
+      netPnL: number;
+    }>;
+    exitReasonCounts: Record<string, number>;
+    exitModelCounts: Record<string, number>;
+  };
+  replayExitDiagnostics?: {
+    generatedAt: string;
+    rows: Array<{
+      tradeId: string;
+      symbol: string;
+      exitReason?: ExitReasonCode;
+      exitModel?: ExitForensicRecord["exitModel"];
+      replayWindowEnded?: boolean;
+      tpWouldHitBeforeBoundary: "YES" | "NO" | "UNKNOWN";
+      slWouldHitBeforeBoundary: "YES" | "NO" | "UNKNOWN";
+      strategyExitWouldHitBeforeBoundary: "YES" | "NO" | "UNKNOWN";
+      timeExitWouldHitBeforeBoundary: "YES" | "NO" | "UNKNOWN";
+      diagnostic: string;
+    }>;
+  };
+  grossPositiveNetNegative?: Array<{
+    tradeId: string;
+    symbol: string;
+    strategy: string;
+    grossPnL: number;
+    entryFee: number;
+    exitFee: number;
+    totalFee: number;
+    netPnL: number;
+    feeToGrossRatio?: number;
+    minimumGrossMovementToCoverFees: number;
+  }>;
+  feeByStrategy?: Array<{
+    strategy: string;
+    grossPnL: number;
+    fees: number;
+    netPnL: number;
+    feePerTrade: number;
+    grossPositiveNetNegativeCount: number;
+    tradeCount: number;
+  }>;
+  feeByHoldTime?: Array<{
+    holdBucket: string;
+    tradeCount: number;
+    grossPnL: number;
+    fees: number;
+    netPnL: number;
+    avgFeePerTrade: number;
+  }>;
+  exitFeeInteraction?: Array<{
+    tradeId: string;
+    symbol: string;
+    classification: "EXIT_CREATED_LOSS" | "FEE_CREATED_LOSS" | "BOTH" | "UNKNOWN";
+    grossPnL: number;
+    totalFee: number;
+    netPnL: number;
+    exitReason?: ExitReasonCode;
+  }>;
 };
 
 export type MissedOpportunityStage =
@@ -333,15 +479,29 @@ export type CandidateTraceRecord = {
 
 export type AiCallAudit = {
   callId: string;
+  candidateId?: string;
   symbol: string;
   executionMode: AiExecutionMode;
   provider: string;
   model?: string | null;
   timestamp: string;
   latencyMs: number;
+  remote?: boolean;
   success: boolean;
   degraded: boolean;
+  healthState?: string;
   reason?: string;
+  reasonCode?: string;
+  reasonDetail?: string;
+  healthBefore?: string;
+  healthAfter?: string;
+  requestStartedAt?: string;
+  requestEndedAt?: string;
+  responseReceived?: boolean;
+  errorCode?: string;
+  errorType?: string;
+  retryCount?: number;
+  finalHealth?: string;
 };
 
 export type ConsensusAudit = {
@@ -424,6 +584,7 @@ export type PaperOrderAudit = {
 
 export type PnlLedgerEntry = {
   tradeId: string;
+  positionId?: string;
   symbol: string;
   roundId?: string;
   sessionId?: string;
@@ -433,6 +594,8 @@ export type PnlLedgerEntry = {
   totalFee: number;
   netPnL: number;
   feeToGrossRatio?: number;
+  feeEdgeClass?: "FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN";
+  grossPositiveNetNegative?: boolean;
   feeReconciliationStatus: "PASS" | "FAIL" | "UNKNOWN";
   exitReason?: ExitReasonCode;
   exitModel?: ExitForensicRecord["exitModel"];
@@ -452,6 +615,9 @@ export type PnlLedgerSummary = {
   averageLoss: number;
   consecutiveLosses: number;
   tradeCount: number;
+  grossPositiveNetNegativeCount?: number;
+  feeClassBreakdown?: Partial<Record<"FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN", number>>;
+  exitModelBreakdown?: Partial<Record<"POSITION_MONITOR" | "REPLAY_WINDOW" | "MANUAL_TIMEOUT", number>>;
 };
 
 export type PaperSessionSnapshot = {
@@ -500,6 +666,17 @@ export type NativePaperDiagnostics = {
 export type ResolvedConfigSnapshot = {
   generatedAt: string;
   exchange: string;
+  mode?: string;
+  exchangeRouting?: {
+    platform?: string;
+    marketDataProvider?: string;
+    metadataProvider?: string;
+    paperExecutionProvider?: string;
+    liveExecutionProvider?: string;
+  };
+  aiPolicy?: string;
+  tdiPolicy?: string;
+  riskMode?: string;
   universe: Record<string, unknown>;
   aiMode: Record<string, unknown>;
   strategyConfig: Record<string, unknown>;
@@ -577,10 +754,52 @@ export const FORENSIC_ARTIFACT_CAPS = {
 export type TdiWaitReasonCode = "NO_SLOT" | "BELOW_THRESHOLD" | "NEUTRAL" | "RISK" | "COOLDOWN" | "OTHER";
 
 export type TdiDecisionVerdict = "APPROVED" | "WAIT" | "REJECTED";
+export type TdiFirstBlockingCondition =
+  | "MOMENTUM"
+  | "TECHNICAL"
+  | "MTF_ALIGNMENT"
+  | "RISK"
+  | "COOLDOWN"
+  | "NO_SLOT"
+  | "LEARNING"
+  | "CONFIDENCE"
+  | "NEUTRAL"
+  | "OTHER";
 
 export type TdiScoreType = "HYBRID_COMPOSITE" | "MASTER_EXPERT_AVERAGE" | "UNKNOWN";
 
 export type TdiProductionReplayStatus = "COMPLETE" | "PARTIAL" | "INCOMPLETE";
+export type TdiInputValueStatus = "AVAILABLE" | "MISSING" | "STALE" | "INVALID" | "NOT_APPLICABLE" | "UNKNOWN";
+export type TdiBlockClassification = "DATA_QUALITY_BLOCK" | "POLICY_BLOCK";
+
+export type TdiInputField<T = unknown> = {
+  value: T | null;
+  status: TdiInputValueStatus;
+  source?: string;
+  note?: string;
+};
+
+export type TdiInputContract = {
+  technicalScore: TdiInputField<number>;
+  momentumScore: TdiInputField<number>;
+  sentimentScore: TdiInputField<number>;
+  shortMomentum: TdiInputField<number>;
+  shortFlowImbalance: TdiInputField<number>;
+  executionScore: TdiInputField<number>;
+  confidence: TdiInputField<number>;
+  bullishCount: TdiInputField<number>;
+  learningScore: TdiInputField<number>;
+  regime: TdiInputField<string>;
+  regimeDelta: TdiInputField<TdiDecisionRecord["regimeDelta"]>;
+  thresholds: TdiInputField<TdiDecisionRecord["thresholds"]>;
+  liquidity: TdiInputField<number>;
+  volatility: TdiInputField<number>;
+  expectedValue: TdiInputField<number>;
+  openInterest: TdiInputField<number>;
+  marketContext: TdiInputField<string>;
+  simulation: TdiInputField<string>;
+  trendData: TdiInputField<string>;
+};
 
 export const TDI_DECISION_SCHEMA_VERSION = "tdi-decision-v2" as const;
 
@@ -588,9 +807,13 @@ export type TdiDecisionRecord = {
   candidateId: string;
   symbol: string;
   verdict: TdiDecisionVerdict;
+  reasonCode?: string;
   waitReasonCode?: TdiWaitReasonCode;
+  firstBlockingCondition?: TdiFirstBlockingCondition;
+  blockingConditions?: TdiFirstBlockingCondition[];
   masterDecision?: string;
   hybridDecision?: string;
+  finalDecision?: string;
   legacyDecision?: string;
   hybridRejected?: boolean;
   /** @deprecated Use hybridCompositeScore or masterExpertConsensusScore with scoreType. */
@@ -598,7 +821,42 @@ export type TdiDecisionRecord = {
   hybridCompositeScore?: number | null;
   masterExpertConsensusScore?: number | null;
   scoreType?: TdiScoreType;
+  technicalScore?: number;
+  momentumScore?: number;
+  sentimentScore?: number;
+  shortMomentum?: number;
+  shortFlow?: number;
+  executionScore?: number;
   confidence?: number;
+  bullishCount?: number;
+  learningScore?: number;
+  liquidity?: number;
+  volatility?: number;
+  expectedValue?: number;
+  openInterest?: number;
+  marketContext?: string;
+  simulation?: string;
+  trendData?: string;
+  thresholds?: {
+    technicalMinScore?: number;
+    sentimentMinScore?: number;
+    compositeMinScore?: number;
+    confidenceMinScore?: number;
+  };
+  regime?: string;
+  regimeDelta?: {
+    technical?: number;
+    sentiment?: number;
+    composite?: number;
+  };
+  paperRelaxed?: boolean;
+  learningLane?: boolean;
+  tdiInputContract?: TdiInputContract;
+  missingFields?: string[];
+  dataQualityIssues?: string[];
+  blockClassification?: TdiBlockClassification;
+  dataQualityBlock?: boolean;
+  policyBlock?: boolean;
   rank?: number;
   capitalSlot?: number;
   maxSlots?: number;
@@ -679,10 +937,13 @@ export type FeeAwareEntryPolicyVerdict = "OBSERVE" | "PASS" | "BLOCK";
 export type FeeAwareEntryPolicyEvaluation = {
   policyVersion: string;
   verdict: FeeAwareEntryPolicyVerdict;
+  feeEdgeClass?: "FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN";
   expectedGrossToFeeRatio: number;
   minimumGrossToCoverFees: number;
   estimatedRoundTripFees: number;
   expectedNetAfterFeesAtTp: number;
+  minGrossToFeeRatio?: number;
+  minGrossToFeeRatioSource?: string;
   blockingEnabled: boolean;
   reasonCode: string;
   reasonDetail: string;
@@ -844,7 +1105,7 @@ export type StrategyRegimeMatrixReport = {
   deterministicHash: string;
 };
 
-export type FeeEdgeClassification = "FEE_ERASING_EDGE" | "FEE_SAFE_EDGE" | "UNKNOWN";
+export type FeeEdgeClassification = "FEE_SAFE" | "FEE_BORDERLINE" | "FEE_EROSION" | "UNKNOWN";
 
 export type FeeAwareEdgeResearchRow = {
   candidateId?: string;
@@ -957,6 +1218,10 @@ export type TdiSensitivityReport = {
   productionReplayReason?: string;
   scoreThresholdExplanation: string;
   waitDistribution: Partial<Record<TdiWaitReasonCode, number>>;
+  firstBlockingDistribution?: Partial<Record<TdiFirstBlockingCondition, number>>;
+  blockClassificationDistribution?: Partial<Record<TdiBlockClassification, number>>;
+  dataQualityBlockCount?: number;
+  policyBlockCount?: number;
   sensitivityPoints: TdiSensitivityPoint[];
   recommendation: "NO_CHANGE" | "RESEARCH_ONLY" | "INSUFFICIENT_DATA";
   deterministicHash: string;
@@ -1089,4 +1354,71 @@ export type P2ForensicSessionBundle = {
   experimentRegistry: ProfitabilityExperimentRegistry;
   promotionGate: PromotionGateEvaluation;
   promotionDecisions: Array<{ changeId: string; status: PromotionGateStatus; reason: string }>;
+  baselineMetrics?: {
+    generatedAt: string;
+    tradeCount: number;
+    winRate: number;
+    grossPnL: number;
+    fees: number;
+    netPnL: number;
+    profitFactor: number;
+    expectancy: number;
+    maxDrawdown: number;
+    averageWin: number;
+    averageLoss: number;
+    averageHold: number;
+    medianHold: number;
+    aiAlignment: string;
+    entryQuality: string;
+    exitModelQuality: string;
+    feeStatus: string;
+    scannerDiscoveryQuality: string;
+  };
+  outOfSampleEvaluation?: {
+    available: boolean;
+    reason?: string;
+    split?: { inSampleCount: number; outOfSampleCount: number };
+    support?: { expectancyImproved: boolean; drawdownSafe: boolean; supported: boolean };
+    inSample?: {
+      baseline: StrategyComparisonMetrics;
+      candidate: StrategyComparisonMetrics;
+      delta: Partial<StrategyComparisonMetrics>;
+    };
+    outOfSample?: {
+      baseline: StrategyComparisonMetrics;
+      candidate: StrategyComparisonMetrics;
+      delta: Partial<StrategyComparisonMetrics>;
+    };
+  };
+  profitConcentration?: {
+    available: boolean;
+    reason?: string;
+    totalPositiveTrades?: number;
+    totalPositiveNetPnL?: number;
+    top1TradeContributionPct: number;
+    top3TradeContributionPct: number;
+    topSymbol?: string | null;
+    topSymbolContributionPct: number;
+    topStrategy?: string | null;
+    topStrategyContributionPct: number;
+    topRegime?: string | null;
+    topRegimeContributionPct: number;
+    concentrationClass: "REAL_EDGE" | "SINGLE_TRADE_LUCK" | "UNKNOWN";
+  };
+  candidateQualityFactors?: {
+    generatedAt: string;
+    winners: Record<string, number>;
+    losers: Record<string, number>;
+    deltas: Record<string, number>;
+    evidenceClass: "FACT" | "REPEATED_PATTERN" | "HYPOTHESIS";
+  };
+  trendFollowingValidation?: {
+    generatedAt: string;
+    strategyCount: number;
+    tradeCount: number;
+    netPnL: number;
+    expectancy: number;
+    verdict: "NOT_PROVEN" | "PROMISING" | "MIXED";
+    reason: string;
+  };
 };

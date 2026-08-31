@@ -1,0 +1,16 @@
+{
+  "ready": "YES",
+  "conditions": [
+    "P0=0",
+    "P1 data-contract blockers closed",
+    "MTF status fixed or explicit safe unavailable across all consumers",
+    "pump risk semantic contract verified"
+  ],
+  "current": {
+    "p0Open": 0,
+    "p1Open": 0
+  },
+  "remainingBlocker": "NONE",
+  "nextStep": "Paper öncesi standart kısa smoke test matrisi çalıştırılıp job başlatılabilir.",
+  "paperStarted": "NO"
+}

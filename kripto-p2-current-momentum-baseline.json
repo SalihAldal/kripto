@@ -1,0 +1,21 @@
+{
+  "sourceFiles": [
+    "src/server/decision-engine/experts/momentum-expert.utils.ts",
+    "src/server/decision-engine/experts/domain-experts.ts",
+    "src/server/ai/hybrid-momentum-gates.ts",
+    "src/server/decision-engine/conflict-detection.service.ts"
+  ],
+  "currentMomentumFormula": {
+    "impulse": "clamp(shortMomentumPercent*28 + |change5m|*10 + |change15m|*4, 0, 100)",
+    "continuation": "change15m>0 && change5m>0 ? 75 : 45",
+    "velocity": "clamp(tradeVelocity*10 + volumeSpikeRatio*20, 0, 100)",
+    "relativeStrength": "clamp(50 + change24h*3, 0, 100)",
+    "combinedMomentumExpertScore": "clamp(impulse*0.35 + continuation*0.25 + velocity*0.2 + relativeStrength*0.2, 0, 100)",
+    "masterMatrixMomentum": "matrix.momentum = momentum expert score",
+    "masterBuyCondition": "consensus>=68 && confidence>=62 && bullish>=4 && momentum>=60 && execution>=55",
+    "telemetryWeakGate": "|shortMomentum|<0.08 && |shortFlow|<0.03 => lowMomentumInput=true",
+    "sentimentWeakGate": "sentimentScore < minSentiment + regimeDelta => momentumWeak",
+    "threshold": 60,
+    "notes": "Momentum score is carried to TDI forensic via bridgeTdiDecision; learning/confidence interactions are downstream gates, not raw momentum formula."
+  }
+}

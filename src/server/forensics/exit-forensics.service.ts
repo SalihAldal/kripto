@@ -31,6 +31,19 @@ const POSITION_MONITOR_REASON_MAP: Partial<Record<PositionCloseReason, ExitReaso
   SMART_EXIT: "STRATEGY_EXIT",
 };
 
+function normalizeTimeoutReason(reason: PositionCloseReason) {
+  if (reason === "TIMEOUT" || reason === "MANUAL_CLOSE") {
+    return {
+      normalizedCloseReason: "SYSTEM_TIMEOUT",
+      closeReasonAlias: reason === "MANUAL_CLOSE" ? "MANUAL_TIMEOUT_COMPAT_ALIAS" : null,
+    };
+  }
+  return {
+    normalizedCloseReason: reason,
+    closeReasonAlias: null,
+  };
+}
+
 export function mapPositionMonitorExit(input: {
   closeReason: PositionCloseReason;
   entryPrice: number;
@@ -43,6 +56,8 @@ export function mapPositionMonitorExit(input: {
   quantity: number;
   openFee?: number;
   closeFee?: number;
+  decisionTimestamp?: string | Date;
+  priceAtMonitorTick?: number;
 }): ExitForensicSnapshot {
   const entryMs = new Date(input.entryTimestamp).getTime();
   const exitMs = new Date(input.exitTimestamp ?? Date.now()).getTime();
@@ -51,7 +66,7 @@ export function mapPositionMonitorExit(input: {
     input.side === "LONG"
       ? (input.exitPrice - input.entryPrice) * input.quantity
       : (input.entryPrice - input.exitPrice) * input.quantity;
-  const fees = Number(input.openFee ?? 0) + Number(input.closeFee ?? 0);
+  const timeoutNorm = normalizeTimeoutReason(input.closeReason);
 
   return {
     exitModel: input.closeReason === "MANUAL_CLOSE" ? "MANUAL_TIMEOUT" : "POSITION_MONITOR",
@@ -61,10 +76,18 @@ export function mapPositionMonitorExit(input: {
     entryTimestamp: new Date(entryMs).toISOString(),
     exitTimestamp: new Date(exitMs).toISOString(),
     durationMs: Math.max(0, exitMs - entryMs),
+    holdDurationMs: Math.max(0, exitMs - entryMs),
     tpLevel: input.takeProfitPrice ?? null,
     slLevel: input.stopLossPrice ?? null,
     strategyExit: exitReason === "STRATEGY_EXIT",
-    realizedGrossPnL: Number((gross - fees).toFixed(8)),
+    strategyExitReason: exitReason === "STRATEGY_EXIT" ? input.closeReason : null,
+    timeExitReason: exitReason === "TIME_EXIT" ? "SYSTEM_TIMEOUT" : null,
+    normalizedCloseReason: timeoutNorm.normalizedCloseReason,
+    closeReasonAlias: timeoutNorm.closeReasonAlias,
+    priceAtMonitorTick: Number.isFinite(Number(input.priceAtMonitorTick)) ? Number(input.priceAtMonitorTick) : null,
+    decisionTimestamp: input.decisionTimestamp ? new Date(input.decisionTimestamp).toISOString() : null,
+    monitorPrecedenceRule: "POSITION_MONITOR_EVAL_ORDER_V1",
+    realizedGrossPnL: Number(gross.toFixed(8)),
     closeReason: input.closeReason,
     replayWindowEnded: false,
   };
@@ -79,6 +102,7 @@ export function mapReplayWindowExit(input: {
   takeProfitPrice: number;
   stopLossPrice: number;
   replayWindowEnded: boolean;
+  replayPrecedenceRule?: "STOP_LOSS" | "TAKE_PROFIT";
 }): ExitForensicSnapshot {
   return {
     exitModel: "REPLAY_WINDOW",
@@ -88,9 +112,13 @@ export function mapReplayWindowExit(input: {
     entryTimestamp: new Date(input.entryTimestamp).toISOString(),
     exitTimestamp: new Date(input.exitTimestamp).toISOString(),
     durationMs: Math.max(0, input.exitTimestamp - input.entryTimestamp),
+    holdDurationMs: Math.max(0, input.exitTimestamp - input.entryTimestamp),
     tpLevel: input.takeProfitPrice,
     slLevel: input.stopLossPrice,
     strategyExit: input.exitReason === "STRATEGY_EXIT",
+    strategyExitReason: input.exitReason === "STRATEGY_EXIT" ? "REPLAY_CLASSIFIED_STRATEGY_EXIT" : null,
+    timeExitReason: input.exitReason === "TIME_EXIT" ? "REPLAY_MAX_HOLD_EXCEEDED" : null,
+    replayPrecedenceRule: input.replayPrecedenceRule ?? "STOP_LOSS",
     replayWindowEnded: input.replayWindowEnded,
     closeReason: input.exitReason,
   };

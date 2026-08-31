@@ -1,0 +1,32 @@
+[
+  {
+    "experiment": "MOMENTUM_CONFIDENCE_INTERACTION",
+    "expectedNetImpact": 1,
+    "evidenceStrength": "MEDIUM",
+    "causality": "clean bounded gate-level",
+    "oos": "YES",
+    "safetyRisk": "LOW",
+    "implementationComplexity": "LOW",
+    "hypothesis": "Momentum weakness and confidence floor combination over-suppresses candidates."
+  },
+  {
+    "experiment": "SHORT_MOMENTUM_CORRECTION",
+    "expectedNetImpact": 2,
+    "evidenceStrength": "MEDIUM",
+    "causality": "moderate",
+    "oos": "YES",
+    "safetyRisk": "LOW",
+    "implementationComplexity": "LOW",
+    "hypothesis": "shortMomentum low-input gating is stricter than needed in current regime mix."
+  },
+  {
+    "experiment": "TDI_ORDERING_CORRECTION",
+    "expectedNetImpact": 3,
+    "evidenceStrength": "LOW",
+    "causality": "ordering sensitivity only",
+    "oos": "YES",
+    "safetyRisk": "LOW",
+    "implementationComplexity": "MEDIUM",
+    "hypothesis": "Gate order drives first-blocker attribution and may alter wait/reject composition."
+  }
+]

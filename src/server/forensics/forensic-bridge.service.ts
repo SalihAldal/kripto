@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { consensusVoteLabel } from "@/src/server/ai/ai-provider-health.service";
 import type { AIConsensusResult, AIProviderResult } from "@/src/types/ai";
 import type { ScannerCandidate } from "@/src/types/scanner";
 import {
@@ -18,11 +19,13 @@ import {
   recordNotDiscoveredAnalysis,
   recordEntryTiming,
   recordScannerUniverseSnapshot,
+  recordScannerCoverageSnapshot,
   recordTdiDecision,
   recordFeePolicyEvaluation,
   startScannerCycle,
 } from "@/src/server/forensics/forensic-collector.service";
 import { buildTdiDecisionRecord } from "@/src/server/forensics/tdi-decision-forensics.service";
+import { recordCandidateFunnelStage } from "@/src/server/forensics/candidate-funnel-trace.service";
 import { evaluateFeeAwareEntryPolicy } from "@/src/server/forensics/fee-aware-entry-policy.service";
 import { runWithForensicSession, setForensicSession } from "@/src/server/forensics/forensic-context";
 import type {
@@ -76,6 +79,7 @@ export function beginForensicPaperSession(input: {
     scannerQualificationRejections: [],
     notDiscoveredRecords: [],
     entryTimingRecords: [],
+    scannerCoverageSnapshots: [],
     tdiDecisions: [],
     feePolicyEvaluations: [],
     rejectionCountsByStage: {},
@@ -107,18 +111,21 @@ export async function withForensicPaperSession<T>(
 }
 
 export function bridgeScannerObservability(input: ScannerDecisionObservabilityInput) {
-  const candidateId = createCandidateId(input.symbol, "scanner");
+  const candidateId = input.rejectTelemetry?.candidateId ?? createCandidateId(input.symbol, "scanner");
+  const reasonCode =
+    input.rejectTelemetry?.rejectReasonCode ??
+    (input.status === "QUALIFIED" || input.status === "PASS" ? "QUALIFIED" : input.reasons[0] ?? input.status);
   recordScannerSymbol({
     symbol: input.symbol,
     market: "binance-tr",
     quote: "TRY",
     qualification: input.status === "PASS" || input.status === "QUALIFIED" ? "APPROVED" : "REJECTED",
-    reasonCode: input.reasons[0] ?? input.status,
+    reasonCode,
     volume: Number(input.metrics?.volume24h ?? 0),
     liquidity: Number(input.metrics?.liquidityScore ?? 0),
     price: Number(input.metrics?.lastPrice ?? 0),
     change24h: Number(input.metrics?.change24h ?? 0),
-    marketRegime: String(input.contextMetadata?.regime ?? ""),
+    marketRegime: String(input.contextMetadata?.regime ?? input.contextMetadata?.marketRegime ?? ""),
   });
   recordCandidateTrace({
     candidateId,
@@ -132,6 +139,7 @@ export function bridgeScannerObservability(input: ScannerDecisionObservabilityIn
 }
 
 export function bridgeAiProviderResult(input: {
+  candidateId?: string;
   symbol: string;
   provider: string;
   model?: string | null;
@@ -139,20 +147,56 @@ export function bridgeAiProviderResult(input: {
   ok: boolean;
   remote: boolean;
   degraded?: boolean;
+  healthState?: string;
   reason?: string;
+  healthBefore?: string;
+  healthAfter?: string;
+  requestStartedAt?: string;
+  requestEndedAt?: string;
+  responseReceived?: boolean;
+  errorCode?: string;
+  errorType?: string;
+  retryCount?: number;
+  finalHealth?: string;
 }) {
-  const executionMode: AiExecutionMode = input.ok && input.remote ? "REMOTE" : input.degraded ? "AI_DEGRADED" : "DEGRADED_LOCAL";
+  const healthState = input.healthState ?? (input.ok && input.remote ? "HEALTHY" : input.degraded ? "DEGRADED" : "UNAVAILABLE");
+  const executionMode: AiExecutionMode =
+    healthState === "HEALTHY" && input.remote
+      ? "REMOTE"
+      : healthState === "DEGRADED"
+        ? "AI_DEGRADED"
+        : "DEGRADED_LOCAL";
+  const policyFailure = ["TIMEOUT", "UNAVAILABLE", "INVALID_RESPONSE", "RATE_LIMITED", "ABORTED"].includes(healthState);
   const audit: AiCallAudit = {
     callId: randomUUID(),
+    candidateId: input.candidateId,
     symbol: input.symbol,
     executionMode,
     provider: input.provider,
     model: input.model,
-    timestamp: new Date().toISOString(),
+    timestamp: input.requestEndedAt ?? new Date().toISOString(),
     latencyMs: input.latencyMs,
-    success: input.ok && executionMode === "REMOTE",
+    remote: executionMode === "REMOTE",
+    success: executionMode === "REMOTE",
     degraded: executionMode !== "REMOTE",
+    healthState,
     reason: input.reason,
+    healthBefore: input.healthBefore,
+    healthAfter: input.healthAfter ?? healthState,
+    requestStartedAt: input.requestStartedAt,
+    requestEndedAt: input.requestEndedAt,
+    responseReceived: input.responseReceived ?? executionMode === "REMOTE",
+    errorCode: input.errorCode,
+    errorType: input.errorType,
+    retryCount: input.retryCount,
+    finalHealth: input.finalHealth ?? healthState,
+    reasonCode:
+      executionMode === "REMOTE"
+        ? "REMOTE_OK"
+        : policyFailure
+          ? `AI_PROVIDER_${healthState}`
+          : "DEGRADED_FALLBACK",
+    reasonDetail: input.reason,
   };
   recordAiCall(audit);
   return audit;
@@ -163,13 +207,15 @@ export function bridgeConsensusResult(input: {
   consensus: AIConsensusResult;
   providers: AIProviderResult[];
   masterRuleId?: string;
+  providerHealthGate?: string;
 }) {
   const providerVotes: Record<string, string> = {};
   const weights: Record<string, number> = {};
   for (const row of input.providers) {
-    providerVotes[row.providerId] = row.output?.decision ?? "UNKNOWN";
+    providerVotes[row.providerId] = consensusVoteLabel(row);
     weights[row.providerId] = row.weight ?? 1;
   }
+  const reasonSuffix = input.providerHealthGate ? ` | providerHealthGate=${input.providerHealthGate}` : "";
   return recordConsensusAudit({
     consensusId: randomUUID(),
     symbol: input.symbol,
@@ -178,7 +224,7 @@ export function bridgeConsensusResult(input: {
     confidence: input.consensus.confidence,
     masterRuleId: input.masterRuleId,
     finalDecision: input.consensus.finalDecision,
-    reason: input.consensus.explanation ?? "",
+    reason: `${input.consensus.explanation ?? ""}${reasonSuffix}`,
     timestamp: new Date().toISOString(),
   });
 }
@@ -288,6 +334,7 @@ export function bridgePaperFill(input: {
 
 export function bridgeClosedTradePnl(input: {
   tradeId: string;
+  positionId?: string;
   symbol: string;
   side: "LONG" | "SHORT";
   entryPrice: number;
@@ -405,6 +452,12 @@ export function bridgeScannerUniverseSnapshot(input: { watchlist: string[]; cycl
   return recordScannerUniverseSnapshot(input);
 }
 
+export function bridgeScannerCoverageSnapshot(
+  input: import("@/src/server/forensics/forensic.types").ScannerCoverageSnapshot,
+) {
+  return recordScannerCoverageSnapshot(input);
+}
+
 export function bridgeScannerQualificationForensics(input: {
   context: MarketContext;
   score: ScannerScore;
@@ -516,7 +569,21 @@ export function bridgeStrategyDecision(input: {
 }
 
 export function bridgeTdiDecision(input: Parameters<typeof buildTdiDecisionRecord>[0]) {
-  return recordTdiDecision(buildTdiDecisionRecord(input));
+  const record = buildTdiDecisionRecord(input);
+  recordCandidateFunnelStage({
+    candidateId: input.candidateId,
+    symbol: input.symbol,
+    stage: "tdi",
+    verdict: record.verdict,
+    reasonCode: record.reasonCode ?? "TDI_EVALUATED",
+    reasonDetail: record.reasonDetail ?? `TDI ${record.verdict}`,
+    metadata: {
+      tdiEntered: true,
+      hybridDecision: record.hybridDecision,
+      firstBlockingCondition: record.firstBlockingCondition,
+    },
+  });
+  return recordTdiDecision(record);
 }
 
 export function bridgeFeeAwareEntryPolicy(input: {

@@ -24,6 +24,7 @@ function round(value: number, digits = 4) {
 export type StrategyComparisonInputRow = {
   tradeId: string;
   symbol: string;
+  timestamp?: string;
   strategy: string;
   regime: string;
   netPnL: number;
@@ -45,6 +46,7 @@ export function buildStrategyComparisonInputRows(input: {
   return input.pnlEntries.map((row) => ({
     tradeId: row.tradeId,
     symbol: row.symbol,
+    timestamp: row.timestamp,
     strategy: input.strategyByTradeId?.[row.tradeId] ?? "UNKNOWN",
     regime: String(input.regimeByTradeId?.[row.tradeId] ?? "UNKNOWN"),
     netPnL: row.netPnL,
@@ -68,7 +70,13 @@ function passesPolicy(row: StrategyComparisonInputRow, flags: StrategyComparison
     if (row.feeMetrics.expectedGrossToFeeRatio < 1) return false;
   }
   if (flags.entryTimingProtection && row.entryTiming) {
-    if (row.entryTiming.classification === "POSSIBLY_LATE") return false;
+    if (
+      row.entryTiming.classification === "POSSIBLY_LATE" ||
+      row.entryTiming.classification === "CHASING" ||
+      row.entryTiming.classification === "EDGE_DECAY"
+    ) {
+      return false;
+    }
   }
   return true;
 }

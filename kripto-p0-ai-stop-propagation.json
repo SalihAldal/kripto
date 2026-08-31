@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-08-22T21:18:34.385Z",
+  "before": {
+    "hasGlobalSweepOnStopPath": false,
+    "hasPreAiSpreadTerminalization": false,
+    "notes": [
+      "stopAutoRoundJob/halt/finalize paths had no guaranteed AI sweep",
+      "pre-AI spread gate could return without terminal write"
+    ]
+  },
+  "after": {
+    "hasGlobalSweepOnStopPath": true,
+    "hasPreAiSpreadTerminalization": true,
+    "hasSelectionFinallySweep": true,
+    "noLateCounterMutationWithoutOpenRow": true
+  }
+}

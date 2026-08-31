@@ -1,0 +1,26 @@
+{
+  "runId": "p1-tdi-tech-momentum-2026-08-18T01-37-35-217Z",
+  "smokeSessionId": "cmsxzth2q0009un70ik4b0upy",
+  "rounds": [
+    {
+      "roundNo": 1,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "SIM_TIGHT_FILTER_30m: AI karar zayif (NO_TRADE, conf=31.0) | non-pump kalite dusuk (composite=45.7, sentiment=43.4, mtf=39.0) | AI role consensus zayif (tech=39.5, sentiment=43.4, risk=54.3) | confidence 31.00 < 36 | Kalite skoru dusuk (21/100 < 52)"
+    },
+    {
+      "roundNo": 2,
+      "state": "tur_basarisiz",
+      "result": "failed",
+      "failReason": "scanner-ai pool aborted: Tur secim suresi doldu (1200s)"
+    }
+  ],
+  "runtimeTimeouts": {
+    "sampleCount": 98,
+    "timeoutCount": 0
+  },
+  "tdiApproved": 0,
+  "tdiWait": 66,
+  "finalVerdict": "PASS",
+  "approvalHealth": "PARTIAL"
+}

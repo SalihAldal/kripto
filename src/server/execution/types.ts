@@ -23,6 +23,9 @@ export type ExecuteTradeInput = {
   preselectedCandidate?: ScannerCandidate;
   learningLane?: boolean;
   executionMode?: TradingMode;
+  roundId?: string;
+  runId?: string;
+  sessionId?: string;
 };
 
 export type SelectedTradeOpportunity = {

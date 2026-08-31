@@ -5,6 +5,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { classifyRoundTerminalReason } from "@/src/server/forensics/round-terminal-classification.service";
 
 for (const line of fs.readFileSync(".env", "utf8").split(/\r?\n/)) {
   if (!line || line.startsWith("#")) continue;
@@ -29,6 +30,8 @@ const JOB_DEADLINE_MS = TOTAL_ROUNDS * ROUND_CEILING_MS + 30 * 60_000;
 
 const MINIMUM_ARTIFACTS = [
   "round-summary.json",
+  "round-liveness.json",
+  "selectionTimeBudgetBreakdown.json",
   "recovery-decisions.json",
   "recovery-telemetry.json",
 ];
@@ -173,7 +176,10 @@ function validateAiGate(input: {
   const gateBlocks = input.decisions.filter(
     (row) =>
       row.stage === "execution" &&
-      (row.verdict === "REJECT" || row.reasonCode === "NO_TRADE" || String(row.executionVerdict) === "AI_GATE_BLOCK"),
+      (row.verdict === "REJECT" ||
+        row.verdict === "REJECTED" ||
+        row.reasonCode === "NO_TRADE" ||
+        String(row.executionVerdict) === "AI_GATE_BLOCK"),
   );
 
   for (const order of input.orders) {
@@ -261,6 +267,7 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
   const root = roundDir(sessionId, rid);
   const exists = fs.existsSync(root);
   const missingArtifacts = EXPECTED_ARTIFACTS.filter((f) => !fs.existsSync(path.join(root, f)));
+  const hangSnapshotExists = fs.existsSync(path.join(root, "round-hang-snapshot.json"));
 
   const summary = readJson<Record<string, unknown>>(path.join(root, "round-summary.json"));
   const decisions = readJson<{ decisions?: Array<Record<string, unknown>> }>(path.join(root, "decision-trace.json"));
@@ -327,15 +334,25 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
   const degradedCount = (aiTrace?.aiCalls ?? []).filter((r) => r.degraded === true).length;
 
   const riskPassed = riskRows.filter((r) => r.verdict === "PASS" || r.verdict === "APPROVED").length;
-  const riskRejected = riskRows.filter((r) => r.verdict === "REJECT" || r.verdict === "FAILED").length;
+  const riskRejected = riskRows.filter((r) => r.verdict === "REJECT" || r.verdict === "REJECTED" || r.verdict === "FAILED").length;
   const sizingPassed = riskRows.filter((r) => r.stage === "sizing" && (r.verdict === "PASS" || r.verdict === "APPROVED")).length;
-  const sizingRejected = riskRows.filter((r) => r.stage === "sizing" && (r.verdict === "REJECT" || r.verdict === "FAILED")).length;
+  const sizingRejected = riskRows.filter(
+    (r) => r.stage === "sizing" && (r.verdict === "REJECT" || r.verdict === "REJECTED" || r.verdict === "FAILED"),
+  ).length;
 
   const tdiApprovals = tdiRecords.filter((r) => r.verdict === "APPROVED").length;
   const tdiWaitCount = tdiRecords.filter((r) => r.verdict === "WAIT").length;
-  const tdiRejects = tdiRecords.filter((r) => r.verdict === "REJECT").length;
+  const tdiRejects = tdiRecords.filter((r) => r.verdict === "REJECT" || r.verdict === "REJECTED").length;
 
   const terminal = TERMINAL_ROUND_STATES.includes(String(roundMeta.state));
+  const terminalClassification = classifyRoundTerminalReason({
+    reason: String(roundMeta.failReason ?? summary?.failReason ?? ""),
+    reasonCode: String((watchdog?.reasonCode as string | undefined) ?? ""),
+    currentStage: String(roundMeta.state ?? summary?.currentStage ?? ""),
+  });
+  const hangSnapshotRequired = terminalClassification.terminalClass === "ABNORMAL_RUNTIME_TERMINAL";
+  const exportErrorArtifact = String(exportError?.artifact ?? "");
+  const hangSnapshotExportFailed = exportErrorArtifact === "round-hang-snapshot.json";
   const durationMs =
     roundMeta.startedAt && roundMeta.endedAt
       ? new Date(String(roundMeta.endedAt)).getTime() - new Date(String(roundMeta.startedAt)).getTime()
@@ -367,6 +384,11 @@ function analyzeRound(sessionId: string, roundNo: number, roundMeta: Record<stri
     artifactsExist: exists,
     missingArtifacts,
     missingMinimumArtifacts,
+    hangSnapshotExists,
+    hangSnapshotRequired,
+    hangSnapshotExportFailed,
+    terminalClass: terminalClassification.terminalClass,
+    terminalClassRule: terminalClassification.matchedRule,
     exportStatus: String(summary?.exportStatus ?? (exportError ? "FAILED" : "UNKNOWN")),
     exportErrorExists: Boolean(exportError),
     exportKind: summary?.exportKind ?? null,
@@ -889,6 +911,15 @@ export async function finalizeStressSession(
           ra.missingMinimumArtifacts.length > 0
             ? `Round ${ra.roundNo} missing minimum artifacts: ${ra.missingMinimumArtifacts.join(", ")}`
             : `Round ${ra.roundNo} forensic export missing`,
+        roundId: ra.roundId,
+      });
+    }
+    if (ra.hangSnapshotRequired && !ra.hangSnapshotExists) {
+      criticalFailures.push({
+        code: ra.hangSnapshotExportFailed ? "HANG_SNAPSHOT_EXPORT_FAILED" : "HANG_SNAPSHOT_MISSING",
+        message: ra.hangSnapshotExportFailed
+          ? `Round ${ra.roundNo} abnormal terminal but hang snapshot export failed`
+          : `Round ${ra.roundNo} abnormal terminal but hang snapshot is missing`,
         roundId: ra.roundId,
       });
     }

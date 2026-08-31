@@ -1,0 +1,148 @@
+{
+  "task": "KRIPTO_P1_PUMP_SCAN_RELIABILITY_PRIORITY_LANE_FIX",
+  "generatedAt": "2026-08-17T20:00:00.000Z",
+  "rootCause": {
+    "primaryClassification": [
+      "TOO_MANY_SYMBOLS",
+      "CACHE_MISS",
+      "PROVIDER_LATENCY",
+      "CANCELLATION"
+    ],
+    "details": [
+      "90s timer wrapped full live pump scan as one monolithic await.",
+      "Live scan candidate batch could grow very large from merged hot leaders + leader map + rotation batch.",
+      "Pump scan cache TTL and cache usage caused frequent live rescans.",
+      "Parent abort/deadline was not propagated to per-symbol pump scan workers.",
+      "Pump failure path in cooperative round selection could terminate selection instead of safe scanner fallback."
+    ]
+  },
+  "timeoutBehavior": {
+    "before": "resolveLiveTopGainerPumpCandidates could run until outer 90s timer and raise PUMP_SCAN_FAILED; failure could end candidate selection path early.",
+    "after": "effective live scan timeout is deadline-aware and respects remaining selection budget; abort propagation is wired; timeout/network failures emit explicit lifecycle telemetry and route to scanner fallback."
+  },
+  "budgetBehavior": {
+    "effectiveDeadlineFormula": "min(AUTO_ROUND_PUMP_SCAN_TIMEOUT_MS, remainingSelectionBudget)",
+    "implementation": [
+      "resolvePumpLiveScanTimeoutMs now clamps by selectionDeadlineMs with lower bound for deterministic termination.",
+      "runBoundedLivePumpScan accepts parent abortSignal and enforces bounded await with cooperative cancellation.",
+      "resolveLiveTopGainerPumpCandidates and scanTopPumpCandidates accept selectionDeadline/abort and bounded maxSymbolsToEvaluate."
+    ]
+  },
+  "fallbackHierarchy": {
+    "implemented": [
+      "cache scan (with cache telemetry)",
+      "stale-priority warning telemetry",
+      "bounded live pump scan",
+      "on pump timeout/network failure -> explicit fallback event -> continue full scanner rotation path",
+      "safe empty result with explicit PUMP_SCAN_EMPTY telemetry"
+    ],
+    "eventCodes": [
+      "PUMP_SCAN_TIMEOUT",
+      "PUMP_SCAN_NETWORK_ERROR",
+      "PUMP_SCAN_CACHE_FALLBACK",
+      "PUMP_SCAN_EMPTY",
+      "PUMP_SCAN_COMPLETE",
+      "PUMP_SCAN_ABORTED"
+    ]
+  },
+  "priorityLaneDesign": {
+    "bounded": true,
+    "deduplicated": true,
+    "rateLimited": true,
+    "noAutoTradeBypass": true,
+    "artifacts": [
+      "priorityMaxPerCycle",
+      "priorityCandidates",
+      "priorityRescuedCount",
+      "prioritySource",
+      "priorityReason",
+      "priorityScore",
+      "rotationCount",
+      "priorityCount",
+      "duplicateCount",
+      "totalEvaluationCount"
+    ]
+  },
+  "cowReproduction": {
+    "fixture": {
+      "watchlistIndex": 0,
+      "cursor": 224,
+      "batchSize": 79
+    },
+    "result": "PASS",
+    "evidence": "COWTRY is rescued through priority lane and included in cycle evaluation symbols with discoverySource=PRIORITY; no direct trade bypass added."
+  },
+  "scannerMetrics": {
+    "coverageExtensions": [
+      "priorityMaxPerCycle",
+      "rotationCount",
+      "priorityCount",
+      "duplicateCount",
+      "totalEvaluationCount",
+      "prioritySource in discoverySources rows"
+    ],
+    "pumpLifecycleExtensions": [
+      "phase",
+      "reasonCode",
+      "fallbackUsed",
+      "source",
+      "timeoutMs",
+      "cacheHit/cacheMiss/cacheAgeMs/liveScanTriggered via meta"
+    ]
+  },
+  "performanceImpact": {
+    "summary": "Live pump scan symbol evaluation is bounded and cancellable; repeated unnecessary live scans are reduced via cache-aware behavior.",
+    "changes": [
+      "maxSymbolsToEvaluate cap introduced for live pump scan.",
+      "Per-symbol market context now runs in cooperative pool with timeout/abort support.",
+      "Watcher-aware cache TTL floor reduces redundant live rescans.",
+      "Progress callbacks/telemetry improve recovery safety and observability."
+    ]
+  },
+  "recoveryInteraction": {
+    "status": "PASS",
+    "details": [
+      "Pump timeout/failure now records explicit fallback telemetry.",
+      "Round selection continues to full scanner when pump scan fails safely.",
+      "No zombie behavior observed in controlled 1-round evidence."
+    ]
+  },
+  "tests": {
+    "newOrUpdated": [
+      "tests/forensics/p1-pump-scan-priority-fix.test.ts",
+      "tests/forensics/p1-strategy-scanner-ev.test.ts",
+      "tests/forensics/p0-gap-closure.test.ts",
+      "tests/round-progress-recovery.test.ts",
+      "tests/scheduler-recovery.test.ts",
+      "tests/scanner.test.ts"
+    ],
+    "result": {
+      "status": "PASS",
+      "filesPassed": 6,
+      "testsPassed": 35
+    }
+  },
+  "controlledValidation": {
+    "mode": "single_round",
+    "artifact": "kripto-p1-pump-priority-1round-validation.json",
+    "result": {
+      "jobId": "cmsxnjwi90007unqwzfr3oxdi",
+      "jobStatus": "COMPLETED",
+      "completedRounds": 0,
+      "failedRounds": 1,
+      "pumpScanTimeoutCount": 0,
+      "fallbackCount": 15,
+      "priorityCandidates": 0,
+      "priorityRescuedCount": 0,
+      "noZombie": true,
+      "noAiBypass": true,
+      "noFeeMismatch": true
+    },
+    "note": "Single-round run completed without PUMP_SCAN timeout; round failed at SIM_TIGHT_FILTER stage."
+  },
+  "remainingBlockers": [
+    "Priority candidates may be zero in specific market snapshots; requires additional runtime sampling beyond one round.",
+    "Round-level outcomes can still fail due downstream filters (e.g., SIM_TIGHT_FILTER), independent of pump scan timeout.",
+    "Further multi-round runtime evidence is still needed before 30-50 round readiness."
+  ]
+}

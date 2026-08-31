@@ -3,12 +3,14 @@ import { buildMarketContext } from "@/src/server/scanner/market-context-builder"
 import { resolveRegimePipelinePolicy } from "@/src/server/scanner/regime-intelligence.service";
 import {
   getApiFailureState,
+  getApiFailureStateByDomain,
   getConsecutiveLossCount,
   getDailyPnlSummary,
   getWeeklyPnlSummary,
   getPausedState,
   getRiskConfigByUser,
   listOpenPositionsCount,
+  type ApiFailureDomain,
   setApiFailureState,
   setPausedState,
 } from "@/src/server/repositories/risk.repository";
@@ -297,22 +299,96 @@ export async function evaluateRuntimeRisk(input: { userId: string; symbol: strin
 
 export async function registerApiFailure(userId: string) {
   const risk = await getEffectiveRiskConfig(userId);
-  const current = await getApiFailureState(userId);
+  const current = await getApiFailureStateByDomain(userId, "EXECUTION");
   const nextCount = current.count + 1;
   const blocked =
     nextCount >= risk.apiFailureBreaker
       ? new Date(Date.now() + 10 * 60 * 1000).toISOString()
       : current.blockedUntil;
-  await setApiFailureState(userId, {
-    count: nextCount,
-    lastFailureAt: new Date().toISOString(),
-    blockedUntil: blocked,
-  });
+  await setApiFailureState(
+    userId,
+    {
+      count: nextCount,
+      consecutiveFailures: current.consecutiveFailures + 1,
+      lastFailureAt: new Date().toISOString(),
+      blockedUntil: blocked,
+      openUntil: blocked,
+      state: blocked ? "OPEN" : "CLOSED",
+      lastFailureCode: "UNSPECIFIED",
+      lastFailureMessage: "Execution/API failure",
+      resetCount: current.resetCount,
+    },
+    "EXECUTION",
+  );
+  return { count: nextCount, blockedUntil: blocked };
+}
+
+export async function registerDomainApiFailure(input: {
+  userId: string;
+  domain: ApiFailureDomain;
+  reasonCode: string;
+  reasonMessage: string;
+  cooldownMs?: number;
+}) {
+  const risk = await getEffectiveRiskConfig(input.userId);
+  const current = await getApiFailureStateByDomain(input.userId, input.domain);
+  const nextCount = current.count + 1;
+  const now = Date.now();
+  const timeoutMs = Math.max(5_000, Math.min(input.cooldownMs ?? 10 * 60 * 1000, 30 * 60 * 1000));
+  const blocked =
+    nextCount >= risk.apiFailureBreaker
+      ? new Date(now + timeoutMs).toISOString()
+      : current.blockedUntil;
+  await setApiFailureState(
+    input.userId,
+    {
+      count: nextCount,
+      consecutiveFailures: current.consecutiveFailures + 1,
+      lastFailureAt: new Date(now).toISOString(),
+      blockedUntil: blocked,
+      openUntil: blocked,
+      state: blocked ? "OPEN" : "CLOSED",
+      lastFailureCode: input.reasonCode,
+      lastFailureMessage: input.reasonMessage.slice(0, 300),
+      resetCount: current.resetCount,
+    },
+    input.domain,
+  );
   return { count: nextCount, blockedUntil: blocked };
 }
 
 export async function resetApiFailure(userId: string) {
-  await setApiFailureState(userId, { count: 0 });
+  const current = await getApiFailureStateByDomain(userId, "EXECUTION");
+  await setApiFailureState(
+    userId,
+    {
+      count: 0,
+      consecutiveFailures: 0,
+      state: "CLOSED",
+      lastSuccessAt: new Date().toISOString(),
+      resetCount: current.resetCount + 1,
+      blockedUntil: undefined,
+      openUntil: undefined,
+    },
+    "EXECUTION",
+  );
+}
+
+export async function resetDomainApiFailure(userId: string, domain: ApiFailureDomain) {
+  const current = await getApiFailureStateByDomain(userId, domain);
+  await setApiFailureState(
+    userId,
+    {
+      count: 0,
+      consecutiveFailures: 0,
+      state: "CLOSED",
+      lastSuccessAt: new Date().toISOString(),
+      resetCount: current.resetCount + 1,
+      blockedUntil: undefined,
+      openUntil: undefined,
+    },
+    domain,
+  );
 }
 
 export async function pauseSystemByRisk(userId: string, reason: string, minutes = 10) {

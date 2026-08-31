@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-08-22T23:08:25.234Z",
+  "scannerFalseBlockFix": true,
+  "aiNoResponseRecovery": "PASS",
+  "telemetryConsistency": "PASS",
+  "current2278": {
+    "beforePass": 50,
+    "afterPass": 50,
+    "afterDeferred": 1329
+  },
+  "historical": {
+    "profitableSample": 42,
+    "losingSample": 206,
+    "profitableUnblocked": 42,
+    "losingUnblocked": 206
+  },
+  "aiLifecycle": {
+    "aiStartedOrphan": 0
+  },
+  "thresholdsChanged": false,
+  "aiVetoPreserved": true,
+  "riskPreserved": true,
+  "sizingPreserved": true,
+  "tests": "PASS",
+  "readyFor5Round": "YES"
+}

@@ -1,4 +1,5 @@
 import { env } from "@/lib/config";
+import { deriveExactScannerRejectReason } from "@/src/server/scanner/scanner-reject-telemetry.service";
 import type { MarketContext, ScannerScore } from "@/src/types/scanner";
 import type { MissedOpportunityStage, ScannerQualificationRejection } from "@/src/server/forensics/forensic.types";
 
@@ -29,6 +30,7 @@ export function buildScannerQualificationRejections(input: {
       stage: "universe",
       filter: "watchlist_membership",
       reasonCode: "NOT_IN_UNIVERSE",
+      exclusionCategory: "SCANNER_ROTATION",
       reasonDetail: "Symbol not present in scanner watchlist universe",
       threshold: "watchlist",
       actualValue: symbol,
@@ -43,6 +45,7 @@ export function buildScannerQualificationRejections(input: {
       stage: "universe",
       filter: "cycle_slice",
       reasonCode: "NOT_IN_CYCLE_SLICE",
+      exclusionCategory: "SCANNER_ROTATION",
       reasonDetail: "Symbol in universe but not included in current scanner cycle batch",
       threshold: env.SCANNER_CYCLE_SYMBOL_LIMIT,
       actualValue: "outside_cursor_window",
@@ -57,6 +60,7 @@ export function buildScannerQualificationRejections(input: {
         stage: "filter",
         filter: "min_volume_24h",
         reasonCode: "LOW_LIQUIDITY",
+        exclusionCategory: "LIQUIDITY",
         reasonDetail: reason,
         threshold: env.SCANNER_MIN_VOLUME_24H,
         actualValue: input.context.volume24h,
@@ -68,6 +72,7 @@ export function buildScannerQualificationRejections(input: {
         stage: "filter",
         filter: "max_spread_percent",
         reasonCode: "SPREAD_TOO_WIDE",
+        exclusionCategory: "SPREAD",
         reasonDetail: reason,
         threshold: env.SCANNER_MAX_SPREAD_PERCENT,
         actualValue: input.context.spreadPercent,
@@ -79,6 +84,7 @@ export function buildScannerQualificationRejections(input: {
         stage: "filter",
         filter: "market_context",
         reasonCode: reason.replace(/\s+/g, "_").toUpperCase().slice(0, 48),
+        exclusionCategory: reason.toUpperCase().includes("STALE") ? "STALE_DATA" : "OTHER",
         reasonDetail: reason,
         missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",
       });
@@ -93,6 +99,7 @@ export function buildScannerQualificationRejections(input: {
           stage: "qualification",
           filter: "scanner_min_score",
           reasonCode: "SCORE_BELOW_THRESHOLD",
+          exclusionCategory: "QUALIFICATION",
           reasonDetail: reason,
           threshold: env.SCANNER_MIN_SCORE,
           actualValue: input.score.score,
@@ -104,6 +111,7 @@ export function buildScannerQualificationRejections(input: {
           stage: "qualification",
           filter: "directional_edge",
           reasonCode: "NO_DIRECTIONAL_EDGE",
+          exclusionCategory: "QUALIFICATION",
           reasonDetail: reason,
           missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",
         });
@@ -113,6 +121,7 @@ export function buildScannerQualificationRejections(input: {
           stage: "qualification",
           filter: "regime_gate",
           reasonCode: "REGIME_GATE",
+          exclusionCategory: "VOLATILITY",
           reasonDetail: reason,
           actualValue: String(input.context.metadata.marketRegime ?? "UNKNOWN"),
           missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",
@@ -123,7 +132,23 @@ export function buildScannerQualificationRejections(input: {
           stage: "qualification",
           filter: "signal_scoring",
           reasonCode: reason.replace(/\s+/g, "_").toUpperCase().slice(0, 48),
+          exclusionCategory: "QUALIFICATION",
           reasonDetail: reason,
+          missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",
+        });
+      }
+    }
+
+    if (!rows.some((row) => row.stage === "qualification" || row.stage === "filter")) {
+      const exact = deriveExactScannerRejectReason(input.context, input.score);
+      if (exact) {
+        pushRejection(rows, {
+          symbol,
+          stage: exact.rejectStage,
+          filter: exact.rejectReasonCode.toLowerCase(),
+          reasonCode: exact.rejectReasonCode,
+          exclusionCategory: exact.rejectReasonCode === "SPREAD_TOO_WIDE" ? "SPREAD" : "QUALIFICATION",
+          reasonDetail: exact.rejectReasonDetail,
           missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",
         });
       }
@@ -136,6 +161,7 @@ export function buildScannerQualificationRejections(input: {
       stage: "candidate_generation",
       filter: "discovery_ranking",
       reasonCode: "NOT_RANKED",
+      exclusionCategory: "QUALIFICATION",
       reasonDetail: "Qualified locally but excluded from discovery ranking batch",
       missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",
     });
@@ -147,6 +173,7 @@ export function buildScannerQualificationRejections(input: {
       stage: "candidate_generation",
       filter: "ai_scope_limit",
       reasonCode: "OUTSIDE_AI_SCOPE",
+      exclusionCategory: "QUALIFICATION",
       reasonDetail: "Ranked candidate excluded from AI evaluation scope due to top-N limit",
       threshold: env.SCANNER_TOP_CANDIDATES,
       missedOpportunityStage: "DISCOVERED_NOT_QUALIFIED",

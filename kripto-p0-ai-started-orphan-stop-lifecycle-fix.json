@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-08-22T21:18:34.385Z",
+  "rootCause": "AI_STARTED_orphan was created by pre-AI spread early return without terminal state and by stop/finalization paths missing deterministic terminal sweep for in-flight STARTED AI records.",
+  "fixImplemented": true,
+  "aiStartedOrphanBefore": 53,
+  "aiStartedOrphanAfter": 0,
+  "stopPropagation": "PASS",
+  "abortPropagation": "PASS",
+  "retryAfterStop": "NO",
+  "persistenceRace": "YES",
+  "terminalizationOrderFixed": "YES",
+  "orphanReconciliation": "PASS",
+  "lifecycleTests": "17/17",
+  "tdiUnchanged": true,
+  "aiPolicyUnchanged": true,
+  "riskSizingUnchanged": true,
+  "readyFor5Round": true
+}

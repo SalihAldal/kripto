@@ -32,6 +32,8 @@ const loopRegistry = new Map<string, LoopHandle>();
 const ownerRegistry = new Map<string, SchedulerLease>();
 const spawnQueues = new Map<string, Promise<AtomicSpawnResult>>();
 const transitionLocks = new Map<string, Promise<void>>();
+const leasePersistedAtRegistry = new Map<string, number>();
+const LEASE_PERSIST_MIN_INTERVAL_MS = 10_000;
 
 function nowIso() {
   return new Date().toISOString();
@@ -141,11 +143,19 @@ export async function touchSchedulerLease(
   };
   setLocalLease(jobId, next);
   if (persistence) {
-    await persistence.persistLease({
-      jobId,
-      lease: next,
-      expectedVersion: current.version,
-    });
+    const now = Date.now();
+    const lastPersistedAt = leasePersistedAtRegistry.get(jobId) ?? 0;
+    const shouldPersist =
+      current.state !== "RUNNING" ||
+      now - lastPersistedAt >= LEASE_PERSIST_MIN_INTERVAL_MS;
+    if (shouldPersist) {
+      await persistence.persistLease({
+        jobId,
+        lease: next,
+        expectedVersion: current.version,
+      });
+      leasePersistedAtRegistry.set(jobId, now);
+    }
   }
 }
 
@@ -174,6 +184,7 @@ async function transitionLeaseState(
       });
       if (result.ok && result.lease) {
         setLocalLease(jobId, result.lease);
+        leasePersistedAtRegistry.set(jobId, Date.now());
         return;
       }
     }
@@ -219,6 +230,7 @@ export async function releaseSchedulerOwnership(
         lease: next,
         expectedVersion: current.version,
       });
+      leasePersistedAtRegistry.set(jobId, Date.now());
     }
     setLocalLease(jobId, next);
   });
@@ -289,6 +301,7 @@ async function internalAtomicSpawn(
         };
       }
       setLocalLease(jobId, acquired.lease);
+      leasePersistedAtRegistry.set(jobId, Date.now());
     } else {
       setLocalLease(jobId, { ...startingLease, version: startingLease.version + 1 });
     }
@@ -371,6 +384,7 @@ export function resetSchedulerOwnershipForTests() {
   ownerRegistry.clear();
   spawnQueues.clear();
   transitionLocks.clear();
+  leasePersistedAtRegistry.clear();
 }
 
 export { loopRegistry, ownerRegistry, spawnQueues };

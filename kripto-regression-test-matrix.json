@@ -1,0 +1,17 @@
+{
+  "executed": [
+    "auto-round-integrity retry/idempotency",
+    "round-runtime persistence and timeout semantics",
+    "round forensic scope filter",
+    "auto-round-engine integration (no paper run)",
+    "round forensic export artifact contract",
+    "runtime reliability regression",
+    "transaction telemetry scope filter"
+  ],
+  "pendingCriticalP1": [
+    "MTF UNKNOWN/UNAVAILABLE propagation matrix",
+    "pumpRisk semantic distribution contract tests"
+  ],
+  "command": "vitest --run tests/auto-round-engine.integration.test.ts tests/forensics/round-export.test.ts tests/forensics/p1-runtime-reliability.test.ts tests/forensics/round-scope-consistency.test.ts tests/auto-round-integrity.test.ts tests/round-runtime.test.ts tests/forensics/transaction-telemetry-scope.test.ts",
+  "result": "PASS"
+}

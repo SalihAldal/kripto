@@ -1,4 +1,6 @@
 import { prisma } from "@/src/server/db/prisma";
+import { logger } from "@/lib/logger";
+import { isTransientPrismaConnectivityError } from "@/src/server/db/transient-prisma-error";
 import {
   addAiPerformanceMemory,
   listPendingAiPerformance,
@@ -9,6 +11,26 @@ import type { AIProviderResult } from "@/src/types/ai";
 
 const evaluatorTimers = new Map<string, ReturnType<typeof setInterval>>();
 const weightCache = new Map<string, { weights: Record<string, number>; updatedAt: number }>();
+const DB_READ_RETRY_LIMIT = 2;
+
+async function withTransientReadFallback<T>(label: string, fallback: T, work: () => Promise<T>): Promise<T> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < DB_READ_RETRY_LIMIT; attempt += 1) {
+    try {
+      return await work();
+    } catch (error) {
+      lastError = error;
+      if (!isTransientPrismaConnectivityError(error) || attempt + 1 >= DB_READ_RETRY_LIMIT) break;
+      await new Promise((resolve) => setTimeout(resolve, 120 * (attempt + 1)));
+    }
+  }
+  if (lastError && isTransientPrismaConnectivityError(lastError)) {
+    logger.warn({ label, error: (lastError as Error).message }, "AI performance DB read degraded to fallback");
+    return fallback;
+  }
+  if (lastError) throw lastError;
+  return fallback;
+}
 
 function clamp(min: number, value: number, max: number) {
   return Math.max(min, Math.min(max, value));
@@ -51,20 +73,20 @@ function evaluatePrediction(input: {
 }
 
 async function getSnapshotPrice(symbol: string, targetAt: Date) {
-  const tradingPair = await prisma.tradingPair.findFirst({
+  const tradingPair = await withTransientReadFallback("tradingPair.findFirst", null, () => prisma.tradingPair.findFirst({
     where: { symbol: symbol.toUpperCase() },
     select: { id: true },
-  });
+  }));
   if (!tradingPair) return null;
   const windowStart = new Date(targetAt.getTime() - 10 * 60 * 1000);
   const windowEnd = new Date(targetAt.getTime() + 10 * 60 * 1000);
-  const snapshot = await prisma.marketSnapshot.findFirst({
+  const snapshot = await withTransientReadFallback("marketSnapshot.findFirst", null, () => prisma.marketSnapshot.findFirst({
     where: {
       tradingPairId: tradingPair.id,
       snapshotAt: { gte: windowStart, lte: windowEnd },
     },
     orderBy: { snapshotAt: "asc" },
-  });
+  }));
   if (!snapshot) return null;
   return Number(snapshot.lastPrice ?? snapshot.bidPrice ?? snapshot.askPrice ?? 0);
 }
@@ -125,7 +147,9 @@ export async function recordAiPerformancePrediction(input: {
 }
 
 export async function evaluateAiPerformanceMemory(userId: string) {
-  const pending = await listPendingAiPerformance(userId);
+  const pending = await withTransientReadFallback("listPendingAiPerformance", [] as Awaited<ReturnType<typeof listPendingAiPerformance>>, () =>
+    listPendingAiPerformance(userId),
+  );
   if (pending.length === 0) return;
   const now = Date.now();
   for (const record of pending) {
@@ -160,7 +184,9 @@ export async function getAiProviderWeights(userId: string) {
   if (cached && Date.now() - cached.updatedAt < 5 * 60 * 1000) {
     return cached.weights;
   }
-  const rows = await listRecentAiPerformance(userId, 180);
+  const rows = await withTransientReadFallback("listRecentAiPerformance", [] as Awaited<ReturnType<typeof listRecentAiPerformance>>, () =>
+    listRecentAiPerformance(userId, 180),
+  );
   const now = Date.now();
   const halfLifeHours = 72;
   const shortWindowHours = 48;

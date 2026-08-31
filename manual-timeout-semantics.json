@@ -1,0 +1,421 @@
+{
+  "generatedAt": "2026-08-22T11:41:27.443Z",
+  "semanticsClass": "MISNAMED_SYSTEM_TIMEOUT",
+  "semanticsFinalLabel": "SYSTEM_TIMEOUT",
+  "totalManualTimeoutTrades": 17,
+  "rows": [
+    {
+      "tradeId": "cmpx525l1017funp0smaimwq3",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "BTCTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-02T21:17:30.000Z",
+      "exitTimestamp": "2026-06-02T21:52:58.000Z",
+      "holdDuration": 2128,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-02T21:52:58.061Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 75
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmpxa03cl0e37unp03x4ot9yo",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "BTCTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-02T23:35:52.000Z",
+      "exitTimestamp": "2026-06-02T23:59:23.000Z",
+      "holdDuration": 1411,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-02T23:59:22.966Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 52
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmpxsh5ae1ozgunp0ja1m5bk2",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "1000SATSTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "LOW_VOLATILITY_CALM",
+      "entryTimestamp": "2026-06-03T08:13:01.000Z",
+      "exitTimestamp": "2026-06-03T08:23:42.000Z",
+      "holdDuration": 641,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-03T08:23:42.490Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "LOW_VOLATILITY_CALM",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 27
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq89xvz71tiqkrqzdsqurp1o",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "STRAXTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-10T16:19:37.000Z",
+      "exitTimestamp": "2026-06-10T16:20:35.000Z",
+      "holdDuration": 58,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-10T16:20:35.067Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 8
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq7o3zz3460ukr9545wg734f",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "BABYTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-10T06:08:31.000Z",
+      "exitTimestamp": "2026-06-10T06:10:28.000Z",
+      "holdDuration": 117,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-10T06:10:28.034Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 12
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq5stuxf4eb3kr66dud6sv97",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "ONTTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-08T22:45:04.000Z",
+      "exitTimestamp": "2026-06-08T23:15:05.000Z",
+      "holdDuration": 1801,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-08T23:15:05.355Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 77
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq7xg3g05xbnkr95qfqhvr5i",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "SANDTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-10T10:29:52.000Z",
+      "exitTimestamp": "2026-06-10T10:55:56.000Z",
+      "holdDuration": 1564,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-10T10:55:56.586Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 58
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq6lpxyka748kr662rzb3ubk",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "BABYTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-09T12:13:50.000Z",
+      "exitTimestamp": "2026-06-09T12:32:04.000Z",
+      "holdDuration": 1094,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-09T12:32:04.137Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 44
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq6n7dilaf0tkr66o98hqc31",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "ASTERTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-09T12:55:23.000Z",
+      "exitTimestamp": "2026-06-09T13:19:06.000Z",
+      "holdDuration": 1423,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-09T13:19:06.552Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 55
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq6vfvve0cc6kro9nmmg424a",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "BTCTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-09T16:45:57.000Z",
+      "exitTimestamp": "2026-06-09T17:15:59.000Z",
+      "holdDuration": 1802,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-09T17:15:59.081Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 66
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq81v5ev0emikrqz4d35za77",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "SUITRY",
+      "strategy": "BREAKOUT_CONTINUATION:SHORT_30M",
+      "regime": "ROCKET_PUMP",
+      "entryTimestamp": "2026-06-10T12:33:33.000Z",
+      "exitTimestamp": "2026-06-10T13:03:34.000Z",
+      "holdDuration": 1801,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-10T13:03:33.993Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "ROCKET_PUMP",
+        "setupStrategy": "BREAKOUT_CONTINUATION",
+        "eventCount": 67
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq6ycgf20tpukro9xla9kb2l",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "FDUSDTRY",
+      "strategy": "RANGE_MEAN_REVERSION:SHORT_30M",
+      "regime": "LOW_VOLATILITY_CALM",
+      "entryTimestamp": "2026-06-09T18:07:15.000Z",
+      "exitTimestamp": "2026-06-09T18:34:50.000Z",
+      "holdDuration": 1655,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-09T18:34:50.127Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "LOW_VOLATILITY_CALM",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 60
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq9dgt4969w6krotpc2urbge",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "TRXTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "LOW_VOLATILITY_CALM",
+      "entryTimestamp": "2026-06-11T10:46:05.000Z",
+      "exitTimestamp": "2026-06-11T10:52:49.000Z",
+      "holdDuration": 404,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-11T10:52:48.960Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "LOW_VOLATILITY_CALM",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 19
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq9hbqc104rmkrosk2hj5yxv",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "FLOKITRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "LOW_VOLATILITY_CALM",
+      "entryTimestamp": "2026-06-11T12:34:07.000Z",
+      "exitTimestamp": "2026-06-11T13:23:36.000Z",
+      "holdDuration": 2969,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-11T13:23:36.368Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "LOW_VOLATILITY_CALM",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 108
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmq9jjsls0ey0krossy51mjs5",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "ALLOTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-11T13:36:22.000Z",
+      "exitTimestamp": "2026-06-11T13:37:43.000Z",
+      "holdDuration": 81,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-11T13:37:43.910Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 8
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmqaerosi46e2krwyj9y9bzfk",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "CHZTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "RANGE_SIDEWAYS",
+      "entryTimestamp": "2026-06-12T04:10:19.000Z",
+      "exitTimestamp": "2026-06-12T05:10:21.000Z",
+      "holdDuration": 3602,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-12T05:10:21.127Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "RANGE_SIDEWAYS",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 744
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    },
+    {
+      "tradeId": "cmqcggc7ndjrxkrwyv19arbqn",
+      "roundId": null,
+      "candidateId": null,
+      "symbol": "SPKTRY",
+      "strategy": "RANGE_MEAN_REVERSION:INTRADAY_1H",
+      "regime": "LOW_VOLATILITY_CALM",
+      "entryTimestamp": "2026-06-13T14:33:01.000Z",
+      "exitTimestamp": "2026-06-13T14:33:26.000Z",
+      "holdDuration": 25,
+      "exitModel": "MANUAL_TIMEOUT",
+      "exitReason": "MANUAL_TIMEOUT",
+      "actualTriggerFunction": "settleOpenPosition(reason=MANUAL_CLOSE)",
+      "triggerReason": "MANUAL_CLOSE",
+      "triggerTimestamp": "2026-06-13T14:33:25.992Z",
+      "triggerState": {
+        "eventType": "NEW_SELL_ORDER_CREATED",
+        "setupMarketRegime": "LOW_VOLATILITY_CALM",
+        "setupStrategy": "RANGE_MEAN_REVERSION",
+        "eventCount": 6
+      },
+      "semanticSubtype": "SYSTEM_TIMEOUT_OR_FORCED_CLOSE"
+    }
+  ],
+  "codePaths": [
+    {
+      "file": "src/server/forensics/exit-forensics.service.ts",
+      "function": "mapPositionMonitorExit",
+      "condition": "closeReason === MANUAL_CLOSE",
+      "emittedExitModel": "MANUAL_TIMEOUT"
+    },
+    {
+      "file": "src/server/execution/execution-orchestrator.service.ts",
+      "function": "closePositionManually",
+      "callerExamples": [
+        "pre-close oldest position before new execution",
+        "auto-round watchdog overdue close",
+        "stale paper position cleanup"
+      ]
+    },
+    {
+      "file": "src/server/execution/position-monitor.service.ts",
+      "function": "onClose(reason=TIMEOUT)",
+      "note": "TIMEOUT maps to TIME_EXIT, not MANUAL_TIMEOUT"
+    }
+  ]
+}

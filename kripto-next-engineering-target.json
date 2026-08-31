@@ -1,0 +1,13 @@
+{
+  "target": "SCANNER_STAGE_AI_CONSENSUS_CONFLICT_RESOLUTION",
+  "description": "Audit and fix scanner-stage AI consensus aggregation so high-confidence BUY paths with provider disagreement (e.g. EDENTRY conf=78 BUY vs NO-TRADE) route to TDI for technical validation instead of hard-blocking before downstream gates. Add per-provider conflict telemetry.",
+  "rationale": [
+    "EDEN: discovered YES, paper admitted YES, confidence 78 BUY — blocked only by AI conflict",
+    "37 cohort: 0 execution-ready; scanner/AI dominate first blocker",
+    "42 profitable historical: all TDI-blocked — scanner fix alone releases 0 without TDI path",
+    "Counterfactual: only 2/37 reach exec-ready if scanner removed — multi-gate interaction"
+  ],
+  "implementNow": false,
+  "paperRequired": true,
+  "productionChangeRecommended": false
+}

@@ -61,7 +61,6 @@ export function buildWorkerSnapshot(
 }
 
 export function validateCriticalWorkerBudget(activeCriticalCount: number) {
-  if (!env.HOT_PATH_V2_FREEZE_ENABLED || env.HOT_PATH_LEGACY_WORKERS_ENABLED) return { ok: true as const };
   if (activeCriticalCount > env.HOT_PATH_MAX_CRITICAL_WORKERS) {
     return {
       ok: false as const,

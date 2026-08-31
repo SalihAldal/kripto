@@ -1,0 +1,2708 @@
+{
+  "sessionId": "cmszwci4l0009unywvfufbuj9",
+  "generatedAt": "2026-08-19T11:09:47.889Z",
+  "rounds": [
+    {
+      "roundNo": 1,
+      "runId": "cmszwci74000nunyw9ryz4k3b",
+      "terminalState": "tur_basarisiz",
+      "failReason": "Tur secim suresi doldu (1200s)",
+      "currentStage": "FAILED",
+      "stageTimeline": {
+        "runtimeTimeline": [],
+        "scannerTimelineSample": [
+          {
+            "at": "2026-08-19T09:37:56.194Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MUBARAKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:37:56.261Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:05.251Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:10.879Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZROTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:12.162Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XRPTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:21.693Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RENDERTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:38:23.426Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WLDTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:29.139Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RVNTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:31.326Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ROBOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:43.082Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "PUMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:43.925Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ALPINETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:53.015Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:53.155Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:39:04.166Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "0GTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:39:36.566Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TSTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:39:55.615Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WIFTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:40:04.941Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "UNITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:40:33.321Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SXTTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:40:33.989Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AAVETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:41:04.740Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "REDTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:41:05.379Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "STRAXTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:41:27.018Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "VIRTUALTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:41:27.634Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TAOTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:41:55.400Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XLMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:42:11.008Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TRUMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:42:23.865Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SUITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:42:46.104Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "STOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:42:54.414Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOPHTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:43:23.588Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SENTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:43:30.325Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "THETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:43:58.690Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TIATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:44:06.945Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TLMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:44:27.073Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOLVTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:44:35.295Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOMITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:45:03.666Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TRXTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:45:05.468Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SHIBTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:45:25.924Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WLFITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:45:54.318Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RARETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:46:02.794Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RADTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:46:15.711Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "REZTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:46:24.212Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XAUTTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:46:37.117Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SAGATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:46:52.759Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "USDCTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:46:53.347Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XPLTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:47:15.151Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZBTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:47:15.691Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "USDTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:47:37.962Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "1000SATSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:47:42.443Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RESOLVTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:48:03.806Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SHELLTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:48:06.327Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WALTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:48:28.583Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TNSRTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:48:40.307Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "2ZTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:48:49.946Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TOWNSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:07.609Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RSRTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:12.857Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "PYTHTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:21.332Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SKYTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:49:31.199Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SKLTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:39.159Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XAITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:03.370Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SPELLTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:50:06.434Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ESPTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:50:24.753Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SANTOSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:34.804Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SNXTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:40.057Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SAHARATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:56.224Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ROSETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:51:01.412Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "STRKTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:51:16.683Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RONINTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:51:32.660Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "USTCTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:51:38.050Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "1MBABYDOGETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:51:54.032Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:52:21.469Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "THETATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:52:25.412Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SPKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:52:37.831Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOLTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:52:40.739Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TREETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:53:55.517Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AIGENSYNTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:53:55.583Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BONKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:00.603Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "INJTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:04.802Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ERATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:05.040Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZROTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:09.039Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ASRTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:09.109Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BARDTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:12.011Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "COMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:12.286Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FETTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:15.308Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CRVTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:16.562Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ENSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:20.328Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACMUSDT",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:20.907Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FILTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:54:21.240Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ATOMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:54:24.174Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DODOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:24.630Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CHIPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:27.546Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MUBARAKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:27.610Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CYBERTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:32.423Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ADATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:33.558Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ETHFITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:36.666Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CAKETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:37.058Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:39.883Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "COTITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:54:40.010Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AVAXTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:43.620Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HEITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:52.633Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "PUMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:56.913Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ARBTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:03.311Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FIDATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:55:04.669Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BERATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:27.232Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CHZTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:29.903Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DOGETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:37.646Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FLOKITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:55:41.482Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BABYTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:42.583Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:50.599Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ATTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:51.039Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ARKMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:56.247Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BELTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:59.521Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BOMETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          }
+        ]
+      },
+      "selectionStartedAt": "2026-08-19T09:36:02.848Z",
+      "selectionDeadline": "2026-08-19T09:56:02.848Z",
+      "lastMeaningfulProgressAt": null,
+      "lastHeartbeatAt": null,
+      "lastScannerProgressAt": null,
+      "lastMarketDataProgressAt": null,
+      "lastPumpProgressAt": null,
+      "lastAIProgressAt": null,
+      "lastTDIProgressAt": null,
+      "lastPersistAt": null,
+      "scannerCandidates": 111,
+      "AIStarted": 38,
+      "AIProcessed": 36,
+      "AIFailed": 0,
+      "AITimeout": 2,
+      "TDIProcessed": 172,
+      "executionReady": 0,
+      "retryCount": 0,
+      "queueDepth": 0,
+      "finalBudgetConsumingStage": "SCANNER_FULL_WITH_LATE_AI (runtime metadata lost, inferred from scanner-summary + ai-progress)",
+      "notes": [
+        "Run metadata.runtime missing at terminalization; watchdog/selection breakdown rely on fallback values.",
+        "selectionTimeBudgetBreakdown forensics row is known to over-attribute to forensics when timeline lacks durations."
+      ]
+    },
+    {
+      "roundNo": 3,
+      "runId": "cmszxtg8n0gymunyw8uf150dr",
+      "terminalState": "tur_basarisiz",
+      "failReason": "Tur secim suresi doldu (1200s)",
+      "currentStage": "TIMEOUT",
+      "stageTimeline": {
+        "runtimeTimeline": [
+          {
+            "at": "2026-08-19T10:37:04.389Z",
+            "kind": "step",
+            "step": "SCANNER_STARTING",
+            "message": "Tur 3 secim dongusu basladi",
+            "pipeline": "round-selection"
+          },
+          {
+            "at": "2026-08-19T10:37:04.404Z",
+            "kind": "step",
+            "step": "PUMP_SCAN",
+            "message": "Pump oncelikli aday taramasi",
+            "pipeline": "pump-cache"
+          },
+          {
+            "at": "2026-08-19T10:37:04.422Z",
+            "kind": "step",
+            "step": "PUMP_SCAN",
+            "message": "Pump taramasi (cache) aday=3, kalan=3",
+            "pipeline": "pump-cache"
+          },
+          {
+            "at": "2026-08-19T10:37:04.439Z",
+            "kind": "step",
+            "step": "PUMP_CONFIRMATION",
+            "message": "EULTRY pump teyidi (1/3)",
+            "pipeline": "pump-confirmation",
+            "symbol": "EULTRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.458Z",
+            "kind": "step",
+            "step": "CANDIDATE_REJECTED",
+            "message": "EULTRY: Pump confirmation NO_TRADE (early)",
+            "pipeline": "pump-confirmation",
+            "symbol": "EULTRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.474Z",
+            "kind": "step",
+            "step": "NEXT_CANDIDATE",
+            "message": "Sonraki aday deneniyor",
+            "pipeline": "pump-confirmation",
+            "symbol": "EULTRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.493Z",
+            "kind": "step",
+            "step": "PUMP_CONFIRMATION",
+            "message": "NIGHTTRY pump teyidi (2/3)",
+            "pipeline": "pump-confirmation",
+            "symbol": "NIGHTTRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.512Z",
+            "kind": "step",
+            "step": "CANDIDATE_REJECTED",
+            "message": "NIGHTTRY: Pump confirmation NO_TRADE (early)",
+            "pipeline": "pump-confirmation",
+            "symbol": "NIGHTTRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.528Z",
+            "kind": "step",
+            "step": "NEXT_CANDIDATE",
+            "message": "Sonraki aday deneniyor",
+            "pipeline": "pump-confirmation",
+            "symbol": "NIGHTTRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.549Z",
+            "kind": "step",
+            "step": "PUMP_CONFIRMATION",
+            "message": "ALICETRY pump teyidi (3/3)",
+            "pipeline": "pump-confirmation",
+            "symbol": "ALICETRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.570Z",
+            "kind": "step",
+            "step": "CANDIDATE_REJECTED",
+            "message": "ALICETRY: Pump confirmation NO_TRADE (early)",
+            "pipeline": "pump-confirmation",
+            "symbol": "ALICETRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.585Z",
+            "kind": "step",
+            "step": "NEXT_CANDIDATE",
+            "message": "Sonraki aday deneniyor",
+            "pipeline": "pump-confirmation",
+            "symbol": "ALICETRY"
+          },
+          {
+            "at": "2026-08-19T10:37:04.610Z",
+            "kind": "step",
+            "step": "FULL_SCAN",
+            "message": "Pump adaylari tukendi, tam scanner devreye aliniyor",
+            "pipeline": "scanner-full",
+            "symbol": "ALICETRY"
+          },
+          {
+            "at": "2026-08-19T10:37:05.561Z",
+            "kind": "step",
+            "step": "FULL_SCAN",
+            "message": "Tam tarayici (1/1)",
+            "pipeline": "scanner-full",
+            "symbol": "ALICETRY"
+          },
+          {
+            "at": "2026-08-19T10:37:09.551Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 4/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:10.479Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 2/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:10.499Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 5/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:10.794Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 3/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:10.796Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 6/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:11.008Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 7/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:11.211Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 1/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:11.277Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 9/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:11.751Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 11/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:11.790Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 12/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:11.859Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 8/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.013Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 13/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.029Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 18/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.045Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 19/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.047Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 10/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.061Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 20/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.077Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 21/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.093Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 22/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.109Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 23/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.125Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 24/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.141Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 25/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.157Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 26/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.173Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 27/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.188Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 28/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.205Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 29/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.220Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 30/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.235Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 31/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.251Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 32/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.283Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 34/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.344Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 14/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.362Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 36/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.717Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 37/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.731Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 15/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.746Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 38/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.771Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 39/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:12.898Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 33/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.002Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 16/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.024Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 43/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.044Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 44/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.065Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 45/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.066Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 17/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.082Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 46/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.108Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 35/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.109Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 42/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.109Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 47/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.110Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 40/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.112Z",
+            "kind": "step",
+            "step": "SCANNING",
+            "message": "Scanner context 41/100",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.223Z",
+            "kind": "step",
+            "step": "TIMEOUT",
+            "message": "Tur secim suresi doldu (1200s)",
+            "pipeline": "scanner-full"
+          },
+          {
+            "at": "2026-08-19T10:37:13.240Z",
+            "kind": "timeout",
+            "step": "TIMEOUT",
+            "message": "Tur secim suresi doldu (1200s)",
+            "pipeline": "scanner-full"
+          }
+        ],
+        "scannerTimelineSample": [
+          {
+            "at": "2026-08-19T09:37:56.194Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MUBARAKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:37:56.261Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:05.251Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:10.879Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZROTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:12.162Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XRPTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:21.693Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RENDERTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:38:23.426Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WLDTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:29.139Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RVNTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:31.326Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ROBOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:43.082Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "PUMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:43.925Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ALPINETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:38:53.015Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:38:53.155Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:39:04.166Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "0GTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:39:36.566Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TSTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:39:55.615Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WIFTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:40:04.941Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "UNITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:40:33.321Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SXTTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:40:33.989Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AAVETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:41:04.740Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "REDTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:41:05.379Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "STRAXTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:41:27.018Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "VIRTUALTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:41:27.634Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TAOTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:41:55.400Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XLMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:42:11.008Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TRUMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:42:23.865Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SUITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:42:46.104Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "STOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:42:54.414Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOPHTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:43:23.588Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SENTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:43:30.325Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "THETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:43:58.690Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TIATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:44:06.945Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TLMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:44:27.073Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOLVTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:44:35.295Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOMITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:45:03.666Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TRXTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:45:05.468Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SHIBTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:45:25.924Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WLFITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:45:54.318Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RARETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:46:02.794Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RADTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:46:15.711Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "REZTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:46:24.212Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XAUTTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:46:37.117Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SAGATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:46:52.759Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "USDCTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:46:53.347Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XPLTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:47:15.151Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZBTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:47:15.691Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "USDTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:47:37.962Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "1000SATSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:47:42.443Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RESOLVTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:48:03.806Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SHELLTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:48:06.327Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WALTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:48:28.583Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TNSRTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:48:40.307Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "2ZTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:48:49.946Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TOWNSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:07.609Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RSRTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:12.857Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "PYTHTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:21.332Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SKYTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:49:31.199Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SKLTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:49:39.159Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "XAITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:03.370Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SPELLTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:50:06.434Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ESPTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:50:24.753Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SANTOSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:34.804Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SNXTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:40.057Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SAHARATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:50:56.224Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ROSETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:51:01.412Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "STRKTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:51:16.683Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "RONINTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:51:32.660Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "USTCTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:51:38.050Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "1MBABYDOGETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:51:54.032Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "WTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:52:21.469Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "THETATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:52:25.412Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SPKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:52:37.831Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "SOLTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:52:40.739Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TREETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:53:55.517Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AIGENSYNTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:53:55.583Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BONKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:00.603Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "INJTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:04.802Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ERATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:05.040Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZROTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:09.039Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ASRTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:09.109Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BARDTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:12.011Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "COMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:12.286Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FETTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:15.308Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CRVTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:16.562Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ENSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:20.328Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACMUSDT",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:20.907Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FILTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:54:21.240Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ATOMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:54:24.174Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DODOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:24.630Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CHIPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:27.546Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MUBARAKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:27.610Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CYBERTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:32.423Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ADATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:33.558Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ETHFITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:36.666Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CAKETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:37.058Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:39.883Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "COTITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:54:40.010Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AVAXTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:43.620Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HEITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:52.633Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "PUMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:54:56.913Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ARBTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:03.311Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FIDATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:55:04.669Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BERATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:27.232Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "CHZTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:29.903Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DOGETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:37.646Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FLOKITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:55:41.482Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BABYTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:42.583Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "AMPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:50.599Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ATTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:51.039Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ARKMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:56.247Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BELTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:55:59.521Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "BOMETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:56:57.913Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "TOMOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (PRICE_STALE)"
+          },
+          {
+            "at": "2026-08-19T09:56:57.974Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MANTRATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:01.343Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HUMATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:05.402Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "JTOTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:57:15.300Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ENSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:19.104Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GUNTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:22.954Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NIGHTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:23.374Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NEIROTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:57:28.978Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FILTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:38.957Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GRAMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:57:42.562Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ONETRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:57:46.053Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DODOTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:57:49.277Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "IOTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:57:51.074Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ENSOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:52.561Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ONTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:57:57.645Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LUNATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:01.164Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ZROTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:58:14.479Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FLOKITRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:58:16.312Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HMSTRTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:58:20.670Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MEMETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:27.062Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:31.731Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "JASMYTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:33.098Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LDOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:36.496Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GALATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:38.734Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FIDATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:58:41.238Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ENATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:58:48.283Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "EIGENTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:58:55.943Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GRTTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:58:57.361Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GMTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T09:59:01.286Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:13.802Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "INITTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:15.469Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DOGETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:18.318Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HOLOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:19.989Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FDUSDTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:25.288Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FETTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:27.981Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DOTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:30.053Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "OGTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:59:33.420Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LINKTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T09:59:39.524Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MITOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:43.343Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ICPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:49.735Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ETHFITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T09:59:59.699Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "OPGTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:00.801Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "OPENTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T10:00:06.114Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MINATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:07.111Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MORPHOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:07.862Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HEMITRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:10.007Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NOMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (CHANGE24H_FALLBACK)"
+          },
+          {
+            "at": "2026-08-19T10:00:25.164Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LUMIATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:27.526Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ENJTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:31.617Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DASHTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:42.429Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NXPCTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:43.400Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "KATTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:45.220Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FORMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:51.289Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GIGGLETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:00:53.508Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HBARTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:00.621Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HOTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:08.465Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "JOETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (PRICE_STALE)"
+          },
+          {
+            "at": "2026-08-19T10:01:11.701Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LUNCTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:16.451Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "EGLDTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:17.656Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "IMXTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Data quality issue (PRICE_STALE)"
+          },
+          {
+            "at": "2026-08-19T10:01:21.298Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DYMTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:26.841Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "DYDXTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T10:01:27.176Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MUBARAKTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:30.998Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LTCTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T10:01:39.510Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LINEATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:40.239Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ACMTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T10:01:44.604Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ONDOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:48.412Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NOTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:01:48.969Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NEARTRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T10:01:53.603Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "KITETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:00.272Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FFTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:05.925Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "FOGOTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:23.818Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "ETHTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:30.111Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MIRATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:38.213Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GPSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:40.963Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GENIUSTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:47.036Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LAYERTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:02:59.684Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MEGATRY",
+            "verdict": "APPROVED",
+            "reasonCode": "QUALIFIED"
+          },
+          {
+            "at": "2026-08-19T10:03:04.132Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "LPTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:12.282Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "METRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:14.016Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "HOMETRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:24.868Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "GASTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:25.379Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "NILTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:33.974Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "EDENTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:39.299Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "IDTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:46.997Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MMTTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:47.251Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MANTATRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          },
+          {
+            "at": "2026-08-19T10:03:59.846Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "MOVRTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "Spread too wide"
+          },
+          {
+            "at": "2026-08-19T10:04:07.568Z",
+            "stage": "SCANNER_SYMBOL",
+            "symbol": "JUPTRY",
+            "verdict": "REJECTED",
+            "reasonCode": "REJECTED"
+          }
+        ]
+      },
+      "selectionStartedAt": "2026-08-19T10:17:13.080Z",
+      "selectionDeadline": "2026-08-19T10:37:13.080Z",
+      "lastMeaningfulProgressAt": "2026-08-19T10:37:13.223Z",
+      "lastHeartbeatAt": "2026-08-19T10:37:13.223Z",
+      "lastScannerProgressAt": "2026-08-19T10:37:13.112Z",
+      "lastMarketDataProgressAt": null,
+      "lastPumpProgressAt": "2026-08-19T10:37:04.549Z",
+      "lastAIProgressAt": null,
+      "lastTDIProgressAt": null,
+      "lastPersistAt": null,
+      "scannerCandidates": 164,
+      "AIStarted": 74,
+      "AIProcessed": 74,
+      "AIFailed": 0,
+      "AITimeout": 9,
+      "TDIProcessed": 500,
+      "executionReady": 0,
+      "retryCount": 3,
+      "queueDepth": 0,
+      "finalBudgetConsumingStage": "TIMEOUT",
+      "notes": [
+        "Runtime snapshot available.",
+        "selectionTimeBudgetBreakdown forensics row is known to over-attribute to forensics when timeline lacks durations."
+      ]
+    }
+  ]
+}

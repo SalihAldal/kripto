@@ -3,8 +3,19 @@ import path from "node:path";
 import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
 import { traceCandidateFailed } from "@/src/server/forensics/candidate-lifecycle.service";
 import { STALL_ERROR_CODES, type StallErrorRecord } from "@/src/server/forensics/stall-error-taxonomy";
+import {
+  ensureRoundHangSnapshotForAbnormalTerminal,
+  writeRoundLivenessArtifact,
+} from "@/src/server/forensics/round-progress-watchdog.service";
 
-export type AiCandidateStatus = "STARTED" | "COMPLETED" | "AI_FAILED" | "AI_TIMEOUT" | "CONSENSUS_FAILED" | "CONSENSUS_TIMEOUT";
+export type AiCandidateStatus =
+  | "STARTED"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "AI_FAILED"
+  | "AI_TIMEOUT"
+  | "CONSENSUS_FAILED"
+  | "CONSENSUS_TIMEOUT";
 
 export type AiCandidateRecord = {
   candidateId: string;
@@ -198,22 +209,57 @@ export function completeAiCandidate(input: {
   const batch = batchByRound.get(key);
   if (!batch) return null;
   const row = findOpenCandidate(batch, input.symbol);
+  if (!row) return null;
   const status = input.status ?? "COMPLETED";
-  if (row) {
-    terminalizeRow(row, {
-      status,
-      reasonDetail: input.reasonDetail,
-      retryCount: input.retryCount,
-      consensusStage: input.consensusStage,
-      provider: input.provider,
-      model: input.model,
-    });
-  }
+  terminalizeRow(row, {
+    status,
+    reasonDetail: input.reasonDetail,
+    retryCount: input.retryCount,
+    consensusStage: input.consensusStage,
+    provider: input.provider,
+    model: input.model,
+  });
   batch.processed += 1;
-  batch.lastProgressAt = row?.completedAt ?? new Date().toISOString();
+  batch.lastProgressAt = row.completedAt ?? new Date().toISOString();
   if (status === "COMPLETED") batch.successCount += 1;
   else if (status === "AI_TIMEOUT" || status === "CONSENSUS_TIMEOUT") batch.timeoutCount += 1;
   else batch.failedCount += 1;
+  return row;
+}
+
+export function cancelAiCandidate(input: {
+  roundId: string;
+  runId?: string;
+  symbol: string;
+  reasonCode?: string;
+  reasonDetail: string;
+  cancelledAt?: string;
+  signalPropagated?: boolean;
+  abortReason?: string;
+  provider?: string;
+  model?: string;
+}) {
+  const row = completeAiCandidate({
+    roundId: input.roundId,
+    runId: input.runId,
+    symbol: input.symbol,
+    status: "CANCELLED",
+    reasonDetail: input.reasonDetail,
+    provider: input.provider,
+    model: input.model,
+  });
+  if (!row) return null;
+  terminalizeRow(row, {
+    status: "CANCELLED",
+    reasonCode: input.reasonCode ?? STALL_ERROR_CODES.AI_TIMEOUT,
+    errorType: "RoundSelectionAbortError",
+    reasonDetail: input.reasonDetail,
+    cancelledAt: input.cancelledAt ?? new Date().toISOString(),
+    cancelReason: input.reasonDetail,
+    signalPropagated: input.signalPropagated ?? true,
+    aborted: true,
+    abortReason: input.abortReason ?? input.reasonDetail,
+  });
   return row;
 }
 
@@ -286,7 +332,7 @@ export function terminalizeOpenAiCandidates(input: {
     if (row.status !== "STARTED") continue;
     const isTimeout = input.reasonCode.includes("TIMEOUT") || input.reasonCode.includes("BUDGET");
     terminalizeRow(row, {
-      status: isTimeout ? "AI_TIMEOUT" : "AI_FAILED",
+      status: isTimeout ? "AI_TIMEOUT" : "CANCELLED",
       reasonCode: input.reasonCode,
       errorType: "RoundSelectionAbortError",
       reasonDetail: input.cancelReason,
@@ -360,6 +406,24 @@ export function writeMinimumAiStallArtifacts(input: {
   const root = path.join(process.cwd(), "artifacts", "forensics", input.sessionId, "rounds", input.roundId);
   mkdirSync(root, { recursive: true });
   const written: string[] = [];
+  const nowIso = new Date().toISOString();
+  const batch = getAiBatchProgress(input.roundId, input.runId);
+  const activeCandidates = Math.max(0, Number(batch?.total ?? 0) - Number(batch?.processed ?? 0));
+  const runtimeSnapshot = {
+    step: "TIMEOUT",
+    message: input.reason,
+    heartbeatAt: nowIso,
+    lastProgressAt: batch?.lastProgressAt ?? nowIso,
+    lastMeaningfulProgressAt: batch?.lastProgressAt ?? nowIso,
+    aiProcessed: Number(batch?.processed ?? 0),
+    aiTotal: Number(batch?.total ?? 0),
+    candidatesRemaining: activeCandidates,
+    retryCount: 0,
+    selectionBudgetMs: 0,
+    elapsedMs: 0,
+    cancelled: true,
+    cancelReason: input.reason,
+  };
   const progressPath = writeAiProgressArtifact(input);
   if (progressPath) written.push("ai-progress.json");
   const tracePath = path.join(root, "ai-trace.json");
@@ -380,10 +444,73 @@ export function writeMinimumAiStallArtifacts(input: {
     const filePath = path.join(root, name);
     writeFileSync(
       filePath,
-      `${JSON.stringify({ partial: true, reason: input.reason, exportedAt: new Date().toISOString() }, null, 2)}\n`,
+      `${JSON.stringify({ partial: true, reason: input.reason, exportedAt: nowIso }, null, 2)}\n`,
       "utf8",
     );
     written.push(name);
+  }
+  const selectionBudgetPath = path.join(root, "selectionTimeBudgetBreakdown.json");
+  writeFileSync(
+    selectionBudgetPath,
+    `${JSON.stringify(
+      {
+        generatedAt: nowIso,
+        partial: true,
+        reason: input.reason,
+        selectionBudgetMs: 0,
+        totalElapsedMs: 0,
+        measuredTotalMs: 0,
+        PRIMARY_TIME_CONSUMER: "unknown",
+        TOP_5_TIME_CONSUMERS: [],
+        rows: [],
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  written.push("selectionTimeBudgetBreakdown.json");
+  writeRoundLivenessArtifact({
+    sessionId: input.sessionId,
+    roundId: input.roundId,
+    nowIso,
+    currentStage: "TIMEOUT",
+    runtime: runtimeSnapshot,
+    watchdog: {
+      progressState: "STALLED",
+      reasonCode: "NO_PROGRESS_TIMEOUT",
+      reasonDetail: input.reason,
+      selectionBudgetRemainingMs: 0,
+    },
+  });
+  written.push("round-liveness.json");
+  const hangSnapshot = ensureRoundHangSnapshotForAbnormalTerminal({
+    sessionId: input.sessionId,
+    roundId: input.roundId,
+    runId: input.runId,
+    jobId: input.sessionId,
+    nowIso,
+    startedAt: nowIso,
+    endedAt: nowIso,
+    terminalReason: input.reason,
+    terminalReasonCode: STALL_ERROR_CODES.AI_TIMEOUT,
+    currentStage: "TIMEOUT",
+    currentCandidate: batch?.currentCandidate,
+    runtime: runtimeSnapshot,
+    watchdog: {
+      progressState: "STALLED",
+      reasonCode: "NO_PROGRESS_TIMEOUT",
+      reasonDetail: input.reason,
+      selectionBudgetRemainingMs: 0,
+    },
+    activeAI: Number(batch?.processed ?? 0),
+    activeRetries: 0,
+    activeScannerWork: 0,
+    activePumpWork: 0,
+    activeDBWork: 0,
+  });
+  if (hangSnapshot.attempted && hangSnapshot.written) {
+    written.push("round-hang-snapshot.json");
   }
   return { root, written };
 }
