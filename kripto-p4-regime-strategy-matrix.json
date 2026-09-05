@@ -1,0 +1,23 @@
+{
+  "status": "PARTIAL",
+  "regimes": [
+    "BULL_TREND",
+    "BEAR_TREND",
+    "RANGE_SIDEWAYS",
+    "HIGH_VOLATILITY",
+    "LOW_VOLATILITY",
+    "ROCKET_PUMP",
+    "CHOP",
+    "TRANSITION",
+    "UNKNOWN"
+  ],
+  "strategies": [
+    "EARLY_ACCELERATION",
+    "MOMENTUM_CONTINUATION",
+    "BREAKOUT_RETEST",
+    "STEADY_TREND",
+    "RANGE_MEAN_REVERSION"
+  ],
+  "cells": [],
+  "reason": "Contract and evaluator are implemented, but complete sample matrix is insufficient."
+}

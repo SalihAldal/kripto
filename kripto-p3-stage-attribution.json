@@ -1,0 +1,14 @@
+{
+  "status": "PARTIAL",
+  "sameCohortPairedComparison": true,
+  "stages": [
+    "FIRST_DETECTED",
+    "HOT",
+    "MICRO_CONFIRMED",
+    "EXECUTION_READY",
+    "CANONICAL_ENTER"
+  ],
+  "metrics": [],
+  "funnelValue": [],
+  "reason": "Stage attribution engine is ready, but complete-valid sample is insufficient."
+}

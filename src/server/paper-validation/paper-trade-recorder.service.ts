@@ -7,9 +7,11 @@ import {
 } from "@/src/server/paper-validation/paper-validation.repository";
 
 export async function recordPaperFillEvent(input: {
+  campaignId?: string;
   userId: string;
   simulationId: string;
   executionId?: string;
+  positionId?: string;
   symbol: string;
   side: "BUY" | "SELL";
   executedQty: number;
@@ -27,11 +29,11 @@ export async function recordPaperFillEvent(input: {
     },
   });
 
-  const position = input.executionId
+  const position = !input.positionId && input.executionId && input.side === "SELL"
     ? await prisma.position.findFirst({
         where: {
           userId: input.userId,
-          status: input.side === "BUY" ? "OPEN" : "CLOSED",
+          status: "CLOSED",
         },
         orderBy: { updatedAt: "desc" },
         include: { tradingPair: true },
@@ -64,6 +66,7 @@ export async function recordPaperFillEvent(input: {
 
   if (input.side === "BUY") {
     const trade = await upsertPaperTrade({
+      campaignId: input.campaignId,
       tradeKey,
       userId: input.userId,
       symbol: input.symbol,
@@ -76,7 +79,7 @@ export async function recordPaperFillEvent(input: {
       slippagePct: simulation?.totalSlippagePct ?? 0,
       decisionId: decisionLog?.decisionId,
       executionId: input.executionId,
-      positionId: position?.id,
+      positionId: input.positionId ?? position?.id,
       simulationId: input.simulationId,
       strategy: decisionLog?.strategyUsed ?? undefined,
       marketRegime: decisionLog?.marketState ? String((decisionLog.marketState as Record<string, unknown>).regime ?? "") : undefined,
@@ -85,6 +88,7 @@ export async function recordPaperFillEvent(input: {
     });
 
     await createPaperExecution({
+      campaignId: input.campaignId,
       executionKey: `${tradeKey}_exec_${input.simulationId}`,
       paperTradeId: trade.id,
       simulationId: input.simulationId,
@@ -122,6 +126,7 @@ export async function recordPaperFillEvent(input: {
   const holdSec = Math.floor((Date.now() - openTrade.openedAt.getTime()) / 1000);
 
   const closedTrade = await upsertPaperTrade({
+    campaignId: input.campaignId ?? openTrade.campaignId ?? undefined,
     tradeKey: openTrade.tradeKey,
     userId: input.userId,
     symbol: input.symbol,
@@ -146,6 +151,7 @@ export async function recordPaperFillEvent(input: {
   });
 
   await createPaperExecution({
+    campaignId: input.campaignId ?? openTrade.campaignId ?? undefined,
     executionKey: `${openTrade.tradeKey}_close_${input.simulationId}`,
     paperTradeId: closedTrade.id,
     simulationId: input.simulationId,

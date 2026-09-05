@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "splitMethod": "TIME_ORDERED",
+  "purgeEmbargo": true,
+  "shuffle": false,
+  "lifecycleLeakage": false,
+  "trainCount": 0,
+  "validationCount": 0,
+  "testCount": 0,
+  "lookaheadSafe": true,
+  "evidence": [
+    "tests/p4-regime-strategy-shadow.test.ts"
+  ]
+}

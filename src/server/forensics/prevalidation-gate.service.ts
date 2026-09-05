@@ -45,6 +45,14 @@ export type PreValidationGateInput = {
   canProducePaperOpen?: boolean;
   positionExitReady?: boolean;
   legacyExecutionInvocationCount?: number;
+  campaignIdentityReady?: boolean;
+  campaignQueryReady?: boolean;
+  shadowCampaignBindingReady?: boolean;
+  moverCampaignBindingReady?: boolean;
+  checkpointSchemaReady?: boolean;
+  breakerDetailReady?: boolean;
+  settlementValidityReady?: boolean;
+  pipelineLivenessReady?: boolean;
 };
 
 function pushManualCheck(list: PreValidationGateCheck[], input: ManualCheck) {
@@ -254,6 +262,46 @@ export async function runPreValidationGate(input: PreValidationGateInput = {}) {
     pass: input.positionExitReady === true,
     detail: input.positionExitReady ? "Known-good paper position can close end-to-end" : "Position close path not confirmed",
   });
+  pushManualCheck(checks, {
+    code: "CAMPAIGN_IDENTITY_READY",
+    pass: input.campaignIdentityReady === true,
+    detail: input.campaignIdentityReady ? "Canonical immutable campaign identity is enforced" : "Campaign identity enforcement missing",
+  });
+  pushManualCheck(checks, {
+    code: "CAMPAIGN_QUERY_READY",
+    pass: input.campaignQueryReady === true,
+    detail: input.campaignQueryReady ? "Report/finalizer queries resolve campaign dataset correctly" : "Campaign-level query path is incomplete",
+  });
+  pushManualCheck(checks, {
+    code: "SHADOW_CAMPAIGN_BINDING_READY",
+    pass: input.shadowCampaignBindingReady === true,
+    detail: input.shadowCampaignBindingReady ? "Shadow outcomes require campaign identity" : "Shadow outcome campaign binding missing",
+  });
+  pushManualCheck(checks, {
+    code: "MOVER_CAMPAIGN_BINDING_READY",
+    pass: input.moverCampaignBindingReady === true,
+    detail: input.moverCampaignBindingReady ? "Ground-truth mover records require campaign identity" : "Mover campaign binding missing",
+  });
+  pushManualCheck(checks, {
+    code: "CHECKPOINT_SCHEMA_READY",
+    pass: input.checkpointSchemaReady === true,
+    detail: input.checkpointSchemaReady ? "Checkpoint schema includes mandatory campaign/runtime fields" : "Checkpoint schema contract incomplete",
+  });
+  pushManualCheck(checks, {
+    code: "BREAKER_DETAIL_READY",
+    pass: input.breakerDetailReady === true,
+    detail: input.breakerDetailReady ? "Breaker telemetry contains domain+code level details" : "Breaker telemetry is still generic",
+  });
+  pushManualCheck(checks, {
+    code: "SETTLEMENT_VALIDITY_READY",
+    pass: input.settlementValidityReady === true,
+    detail: input.settlementValidityReady ? "Settlement status semantics handle no-data and invalid datasets" : "Settlement validity semantics incomplete",
+  });
+  pushManualCheck(checks, {
+    code: "PIPELINE_LIVENESS_READY",
+    pass: input.pipelineLivenessReady === true,
+    detail: input.pipelineLivenessReady ? "Per-stage heartbeat liveness snapshot is available" : "Pipeline liveness telemetry missing",
+  });
 
   const blockers = checks
     .filter((row) => row.status === "FAIL")
@@ -285,6 +333,14 @@ export async function runPreValidationGate(input: PreValidationGateInput = {}) {
     "WS_HARDENING_READY",
     "BREAKER_READY",
     "LIVE_ORDER_LOCKED",
+    "CAMPAIGN_IDENTITY_READY",
+    "CAMPAIGN_QUERY_READY",
+    "SHADOW_CAMPAIGN_BINDING_READY",
+    "MOVER_CAMPAIGN_BINDING_READY",
+    "CHECKPOINT_SCHEMA_READY",
+    "BREAKER_DETAIL_READY",
+    "SETTLEMENT_VALIDITY_READY",
+    "PIPELINE_LIVENESS_READY",
   ]);
   const longPaperRunReady =
     checks.filter((row) => longRunMustPass.has(row.code)).every((row) => row.status === "PASS") &&

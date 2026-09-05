@@ -9,6 +9,7 @@ export type CandidateTerminalStatus = "TRADED" | "WAIT" | "REJECTED" | "FAILED" 
 
 export type CandidateLifecycleRecord = {
   candidateId: string;
+  campaignId?: string;
   symbol: string;
   stage: ForensicStage;
   verdict: CandidateTerminalStatus;
@@ -39,6 +40,7 @@ export function recordCandidateLifecycle(input: {
   const session = getForensicSession();
   const record: CandidateLifecycleRecord = {
     candidateId: input.candidateId ?? createCandidateId(input.symbol, input.stage),
+    campaignId: session?.campaignId,
     symbol: input.symbol.toUpperCase(),
     stage: input.stage,
     verdict: input.verdict,
@@ -58,7 +60,7 @@ export function recordCandidateLifecycle(input: {
     reasonCode: record.reasonCode,
     reasonDetail: record.reasonDetail,
     timestamp: record.timestamp,
-    metadata: { lifecycleVerdict: record.verdict, runId: record.runId },
+    metadata: { lifecycleVerdict: record.verdict, runId: record.runId, campaignId: record.campaignId },
   });
   return record;
 }

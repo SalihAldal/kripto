@@ -1,0 +1,116 @@
+{
+  "artifact": "kripto-p5-master-qa-and-paper-preflight",
+  "generatedAt": "2026-09-02T04:20:32.4054916+03:00",
+  "git": {
+    "commitSha": "caa75fd8fa2cb0f53028bebb47e0e750d3776c90"
+  },
+  "commands": [
+    "npm run test:run -- tests/p0-execution-breaker.test.ts tests/p0-orchestrator-success-and-timeout-atomicity.test.ts tests/p0-paper-atomicity.test.ts tests/p0-paper-close-persistence.test.ts tests/p0-paper-event-bridge-dedup.test.ts tests/p0-paper-live-isolation.test.ts tests/p0-paper-persistence.test.ts tests/p1-round-selection-event-driven.test.ts tests/entry-decision-engine.test.ts tests/execution-orchestrator.integration.test.ts tests/phase05-shadow-outcome.test.ts tests/phase06-paper-production.test.ts tests/execution-settlement.integration.test.ts tests/forensics/p1-profitability-engineering.test.ts tests/forensics/prevalidation-gate.test.ts tests/forensics/known-good-funnel-viability.test.ts tests/phase08-campaign-binding.test.ts tests/endurance/recovery-idempotency.test.ts tests/p2-zero-trade-bias-detector.test.ts tests/p3-canonical-dataset-contract.test.ts tests/p4-regime-strategy-shadow.test.ts",
+    "npm run test:run -- tests/p0-execution-breaker.test.ts tests/p0-orchestrator-success-and-timeout-atomicity.test.ts tests/p0-paper-atomicity.test.ts tests/p0-paper-close-persistence.test.ts tests/p0-paper-event-bridge-dedup.test.ts tests/p0-paper-live-isolation.test.ts tests/p0-paper-persistence.test.ts tests/p1-round-selection-event-driven.test.ts tests/entry-decision-engine.test.ts tests/execution-orchestrator.integration.test.ts tests/phase05-shadow-outcome.test.ts tests/phase06-paper-production.test.ts tests/execution-settlement.integration.test.ts tests/forensics/p1-profitability-engineering.test.ts tests/forensics/prevalidation-gate.test.ts tests/forensics/known-good-funnel-viability.test.ts tests/phase08-campaign-binding.test.ts tests/endurance/recovery-idempotency.test.ts tests/p2-zero-trade-bias-detector.test.ts tests/p3-canonical-dataset-contract.test.ts tests/p4-regime-strategy-shadow.test.ts (repeat #2)",
+    "npm run test:run -- tests/p0-execution-breaker.test.ts tests/p0-orchestrator-success-and-timeout-atomicity.test.ts tests/p0-paper-atomicity.test.ts tests/p0-paper-close-persistence.test.ts tests/p0-paper-event-bridge-dedup.test.ts tests/p0-paper-live-isolation.test.ts tests/p0-paper-persistence.test.ts tests/p1-round-selection-event-driven.test.ts tests/entry-decision-engine.test.ts tests/execution-orchestrator.integration.test.ts tests/phase05-shadow-outcome.test.ts tests/phase06-paper-production.test.ts tests/execution-settlement.integration.test.ts tests/forensics/p1-profitability-engineering.test.ts tests/forensics/prevalidation-gate.test.ts tests/forensics/known-good-funnel-viability.test.ts tests/phase08-campaign-binding.test.ts tests/endurance/recovery-idempotency.test.ts tests/p2-zero-trade-bias-detector.test.ts tests/p3-canonical-dataset-contract.test.ts tests/p4-regime-strategy-shadow.test.ts (repeat #3)",
+    "npm run test:run -- tests/p0-execution-breaker.test.ts tests/p0-orchestrator-success-and-timeout-atomicity.test.ts tests/p0-paper-atomicity.test.ts tests/p0-paper-close-persistence.test.ts tests/p0-paper-event-bridge-dedup.test.ts tests/p0-paper-live-isolation.test.ts tests/p0-paper-persistence.test.ts tests/entry-decision-engine.test.ts tests/p1-round-selection-event-driven.test.ts tests/auto-round-integrity.test.ts tests/auto-round-engine.integration.test.ts tests/zero-trade-correctness.test.ts tests/phase05-shadow-outcome.test.ts tests/phase06-paper-production.test.ts tests/execution-settlement.integration.test.ts tests/p2-zero-trade-bias-detector.test.ts tests/p3-canonical-dataset-contract.test.ts tests/p4-regime-strategy-shadow.test.ts tests/forensics/p1-profitability-engineering.test.ts tests/forensics/prevalidation-gate.test.ts tests/forensics/known-good-funnel-viability.test.ts tests/forensics/paper-preflight.test.ts tests/phase08-campaign-binding.test.ts tests/endurance/recovery-idempotency.test.ts",
+    "npm run typecheck",
+    "npm run build",
+    "npm run prisma:migrate:status"
+  ],
+  "testResults": {
+    "masterFocusedSuite": {
+      "status": "PASS",
+      "files": 24,
+      "tests": 206
+    },
+    "deterministicRepeats": [
+      {
+        "run": 1,
+        "status": "PASS",
+        "files": 21,
+        "tests": 173
+      },
+      {
+        "run": 2,
+        "status": "PASS",
+        "files": 21,
+        "tests": 173
+      },
+      {
+        "run": 3,
+        "status": "PASS",
+        "files": 21,
+        "tests": 173
+      }
+    ],
+    "typecheck": "PASS",
+    "build": "PASS",
+    "prismaMigrateStatus": "PASS"
+  },
+  "phaseVerdicts": {
+    "P0": "PASS",
+    "P1": "PASS",
+    "P2": "PASS",
+    "P3_ENGINEERING": "PASS",
+    "P4_ENGINEERING": "PASS"
+  },
+  "blockers": {
+    "closed": [
+      "P0-B01",
+      "P0-B07",
+      "P1-B01",
+      "P1-B02",
+      "P1-B03",
+      "P1-B04",
+      "P1-B05",
+      "P2-B01",
+      "P2-B02",
+      "P3-B01",
+      "P4-B01",
+      "P4-B02"
+    ],
+    "openEngineering": [],
+    "openSafety": [],
+    "openEvidenceOrSample": [
+      {
+        "id": "EVIDENCE-S01",
+        "status": "INSUFFICIENT_SAMPLE",
+        "note": "Offline positive-edge promotion icin bagimsiz complete-valid sample yetersiz."
+      }
+    ]
+  },
+  "strategyEvidenceStatus": {
+    "EARLY": "INSUFFICIENT_SAMPLE",
+    "MOMENTUM": "INSUFFICIENT_SAMPLE",
+    "BREAKOUT_RETEST": "INSUFFICIENT_SAMPLE",
+    "STEADY": "INSUFFICIENT_SAMPLE",
+    "RANGE": "INSUFFICIENT_SAMPLE",
+    "offlineCandidate": []
+  },
+  "configDriftSummary": {
+    "unauthorizedDriftDetected": false,
+    "notes": "Strategy/threshold/risk/sizing/exit policy alanlarinda bu P5 calismasinda gerekcesiz drift tespit edilmedi."
+  },
+  "liveLock": {
+    "status": "PASS",
+    "liveSubmitCount": 0,
+    "liveTradingStarted": false
+  },
+  "paperPreflight": {
+    "status": "GO",
+    "campaignDurationHours": 6,
+    "campaignIdTemplate": "cmp:p5:<unix_timestamp>",
+    "exactCommand": "node -r ./scripts/load-dotenv.cjs ./node_modules/tsx/dist/cli.mjs scripts/p5-paper-launch.ts \"cmp:p5:$([int][double]::Parse((Get-Date -UFormat %s)))\" 6",
+    "requiredEnvNames": [
+      "DATABASE_URL",
+      "EXECUTION_MODE",
+      "EXCHANGE_MODE",
+      "LIVE_TRADING_ENABLED",
+      "BINANCE_PLATFORM",
+      "BINANCE_TR_API_KEY",
+      "BINANCE_TR_SECRET_KEY"
+    ]
+  },
+  "gates": {
+    "ENGINEERING_GATE": "PASS",
+    "SAFETY_GATE": "PASS",
+    "EVIDENCE_GATE": "INSUFFICIENT_SAMPLE",
+    "PAPER_PREFLIGHT": "GO"
+  }
+}

@@ -62,6 +62,15 @@ export type CanonicalCandidateRecord = {
   };
 };
 
+export type CandidateTransitionEvent = {
+  at: number;
+  candidateId: string;
+  symbol: string;
+  lane: string;
+  state: CandidateLifecycleState;
+  reasons: string[];
+};
+
 type CandidateStoreTelemetry = {
   instanceId: string;
   active: number;
@@ -165,6 +174,7 @@ class CandidateStore {
   private expired = 0;
   private invariantViolations = 0;
   private readonly events: CandidateStoreTelemetry["recentTransitions"] = [];
+  private readonly transitionListeners = new Set<(event: CandidateTransitionEvent) => void>();
   private readonly handoffErrors: CandidateStoreTelemetry["handoffErrors"] = [];
   private readonly transitionByState = new Map<CandidateLifecycleState, number>();
   private readonly executionIntents = new Map<string, string>();
@@ -323,6 +333,21 @@ class CandidateStore {
       state,
       reasons: normalizedReasons,
     });
+    const transitionEvent: CandidateTransitionEvent = {
+      at: row.lastUpdatedAt,
+      candidateId: row.candidateId,
+      symbol: row.symbol,
+      lane: row.lane,
+      state,
+      reasons: normalizedReasons,
+    };
+    for (const listener of this.transitionListeners) {
+      try {
+        listener(transitionEvent);
+      } catch {
+        // Listener failures must never break canonical lifecycle transitions.
+      }
+    }
     if (this.events.length > 10_000) this.events.splice(0, this.events.length - 10_000);
     recordCanonicalEvent({
       candidateId: row.candidateId,
@@ -601,6 +626,14 @@ class CandidateStore {
     this.handoffErrors.length = 0;
     this.transitionByState.clear();
     this.executionIntents.clear();
+    this.transitionListeners.clear();
+  }
+
+  subscribeTransitions(listener: (event: CandidateTransitionEvent) => void) {
+    this.transitionListeners.add(listener);
+    return () => {
+      this.transitionListeners.delete(listener);
+    };
   }
 
   private normalizeCandidateId(candidateId: string): string;
@@ -766,4 +799,8 @@ export function resetCanonicalCandidateStoreForTests() {
   const store = getCanonicalCandidateStore();
   store.resetForTests();
   return store;
+}
+
+export function subscribeCanonicalCandidateTransitions(listener: (event: CandidateTransitionEvent) => void) {
+  return getCanonicalCandidateStore().subscribeTransitions(listener);
 }

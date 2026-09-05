@@ -23,6 +23,7 @@ export type ExecuteTradeInput = {
   preselectedCandidate?: ScannerCandidate;
   learningLane?: boolean;
   executionMode?: TradingMode;
+  campaignId?: string;
   roundId?: string;
   runId?: string;
   sessionId?: string;

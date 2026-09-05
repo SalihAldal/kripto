@@ -90,7 +90,14 @@ export function generateValidationReport(runId: string, outputPath?: string) {
   );
   const settlementTerminal = settlement.complete + settlement.invalid + settlement.historyUnavailable;
   const settlementProgress = trackedRows.length > 0 ? Number(((settlementTerminal / trackedRows.length) * 100).toFixed(2)) : 0;
-  const reportStatus = settlement.pending > 0 ? "PROVISIONAL" : "FINAL";
+  const reportStatus =
+    settlement.pending > 0
+      ? "PROVISIONAL"
+      : trackedRows.length === 0
+        ? "NO_MEASUREMENT_DATA"
+        : settlement.invalid + settlement.historyUnavailable >= trackedRows.length
+          ? "INVALID_CAMPAIGN_DATASET"
+          : "FINAL_VALID";
   const report = [
     "# Validation Report",
     "",

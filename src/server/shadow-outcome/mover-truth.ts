@@ -12,6 +12,7 @@ export function detectMoverEvents(input: {
   symbol: string;
   points: PricePoint[];
   now: number;
+  campaignId?: string | null;
   runId?: string | null;
 }): MoverEvent[] {
   const points = input.points.filter((row) => row.t <= input.now).sort((a, b) => a.t - b.t);
@@ -37,6 +38,7 @@ export function detectMoverEvents(input: {
       const peak = findPeak(points, start.t, end.t + horizonMs);
       events.push({
         moverId: `mvr_${randomUUID()}`,
+        campaignId: input.campaignId ?? null,
         runId: input.runId ?? null,
         symbol: input.symbol.toUpperCase(),
         moveClass: spec.moveClass as MoveClass,

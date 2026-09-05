@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "positiveFixtures": [
+    { "name": "EARLY_ACCELERATION", "status": "PASS" },
+    { "name": "MOMENTUM_CONTINUATION", "status": "PASS" },
+    { "name": "BREAKOUT_RETEST", "status": "PASS" },
+    { "name": "SLOW_STEADY_TREND", "status": "PASS" }
+  ],
+  "negativeFixtures": [
+    { "name": "FAKE_PUMP_DUMP", "status": "PASS" },
+    { "name": "LATE_EXHAUSTED_PUMP", "status": "PASS" },
+    { "name": "WIDE_SPREAD_MOVER", "status": "PASS" },
+    { "name": "LOW_LIQUIDITY_SPIKE", "status": "PASS" }
+  ],
+  "naturalTradeContract": {
+    "forceTrade": false,
+    "forcedSelection": false,
+    "thresholdOverride": false,
+    "riskBypass": false,
+    "safetyBypass": false,
+    "manualFinalCandidateInjection": false,
+    "randomFallback": false,
+    "liveSubmission": false
+  },
+  "remainingBlockers": [],
+  "evidence": [
+    "tests/phase05-shadow-outcome.test.ts",
+    "tests/forensics/prevalidation-gate.test.ts",
+    "tests/forensics/known-good-funnel-viability.test.ts"
+  ]
+}

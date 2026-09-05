@@ -828,6 +828,7 @@ model AuditLog {
 
 model TradeLifecycleEvent {
   id          String   @id @default(cuid())
+  campaignId  String?
   executionId String?
   symbol      String?
   stage       String
@@ -841,6 +842,7 @@ model TradeLifecycleEvent {
 
   @@index([createdAt])
   @@index([executionId, createdAt])
+  @@index([campaignId, createdAt])
   @@index([symbol, createdAt])
   @@index([orderId, createdAt])
 }
@@ -885,6 +887,7 @@ model PositionTracking {
 
 model AutoRoundJob {
   id                String         @id @default(cuid())
+  campaignId        String?
   userId            String
   user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   status            String
@@ -914,11 +917,13 @@ model AutoRoundJob {
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
+  @@index([campaignId, createdAt])
   @@index([activeRunId])
 }
 
 model AutoRoundRun {
   id             String       @id @default(cuid())
+  campaignId     String?
   jobId          String
   job            AutoRoundJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   roundNo        Int
@@ -944,6 +949,7 @@ model AutoRoundRun {
 
   @@index([jobId, roundNo])
   @@index([state, createdAt])
+  @@index([campaignId, startedAt])
   @@index([jobId, roundNo, endedAt])
 }
 
@@ -8875,6 +8881,7 @@ model PaperPortfolio {
 
 model PaperTrade {
   id                String           @id @default(cuid())
+  campaignId        String?
   tradeKey          String           @unique
   userId            String
   portfolioId       String?
@@ -8914,6 +8921,7 @@ model PaperTrade {
   metrics    PaperMetrics?
 
   @@index([userId, status, openedAt])
+  @@index([campaignId, openedAt])
   @@index([symbol, openedAt])
   @@index([decisionId])
   @@index([positionId])
@@ -8921,6 +8929,7 @@ model PaperTrade {
 
 model PaperExecution {
   id                  String     @id @default(cuid())
+  campaignId          String?
   executionKey        String     @unique
   paperTradeId        String
   paperTrade          PaperTrade @relation(fields: [paperTradeId], references: [id], onDelete: Cascade)
@@ -8947,6 +8956,7 @@ model PaperExecution {
   executedAt          DateTime   @default(now())
 
   @@index([paperTradeId, executedAt])
+  @@index([campaignId, executedAt])
   @@index([simulationId])
   @@index([executionId])
 }
@@ -9359,6 +9369,7 @@ model LiveTradingJobState {
 
 model ShadowCandidateOutcome {
   id                   String   @id @default(cuid())
+  campaignId           String?
   runId                String?
   candidateId          String   @unique
   symbol               String
@@ -9380,6 +9391,7 @@ model ShadowCandidateOutcome {
   updatedAt            DateTime @updatedAt
 
   @@index([symbol, detectedAt])
+  @@index([campaignId, detectedAt])
   @@index([runId, detectedAt])
   @@index([lane, detectedAt])
   @@index([finalScore])
@@ -9391,6 +9403,7 @@ model ShadowCandidateOutcome {
 model ShadowMoverEvent {
   id                 String   @id @default(cuid())
   moverId            String   @unique
+  campaignId         String?
   runId              String?
   symbol             String
   venue              String
@@ -9420,6 +9433,7 @@ model ShadowMoverEvent {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  @@index([campaignId, threshold])
   @@index([runId, threshold])
   @@index([symbol, thresholdReachedAt])
   @@index([candidateId])

@@ -1,0 +1,17 @@
+{
+  "status": "PARTIAL",
+  "baselines": [
+    "CURRENT_CANONICAL_POLICY",
+    "OPPORTUNITY_ONLY",
+    "MICRO_ONLY",
+    "SIMPLE_5M_MOMENTUM",
+    "SIMPLE_1M_ACCELERATION",
+    "LIQUIDITY_RANKED",
+    "SEEDED_RANDOM_LIQUIDITY_MATCHED"
+  ],
+  "sameTopKCountConstraint": true,
+  "sameCoverageConstraint": true,
+  "results": [],
+  "costWaterfall": [],
+  "reason": "Baseline framework is validated but campaign-level complete sample is insufficient."
+}

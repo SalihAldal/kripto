@@ -74,6 +74,7 @@ export type ExecutionFlowResult = {
   orderType: ExecutionOrderType;
   rejected?: boolean;
   rejectReason?: string;
+  metadata?: Record<string, unknown>;
 };
 
 export function mapEntryVerdictToDecision(verdict: EntryVerdict, waitDuration?: WaitDuration | null): EntryDecision {

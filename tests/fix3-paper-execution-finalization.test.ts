@@ -6,6 +6,7 @@ import { resolveExecutionAdapter } from "@/src/server/paper-runtime/execution-po
 const marketMocks = vi.hoisted(() => ({
   getTicker: vi.fn(),
   getOrderBook: vi.fn(),
+  persistExecutionSimulation: vi.fn(),
 }));
 
 vi.mock("@/services/binance.service", () => ({
@@ -14,7 +15,7 @@ vi.mock("@/services/binance.service", () => ({
 }));
 
 vi.mock("@/src/server/exchange-simulator/exchange-simulator.repository", () => ({
-  persistExecutionSimulation: vi.fn(async () => null),
+  persistExecutionSimulation: marketMocks.persistExecutionSimulation,
 }));
 
 vi.mock("@/src/server/exchange-simulator/exchange-filter-engine", () => ({
@@ -47,6 +48,8 @@ describe("fix3 paper execution finalization", () => {
   beforeEach(() => {
     marketMocks.getTicker.mockReset();
     marketMocks.getOrderBook.mockReset();
+    marketMocks.persistExecutionSimulation.mockReset();
+    marketMocks.persistExecutionSimulation.mockResolvedValue(null);
   });
 
   it("depth walk does not fabricate missing liquidity", () => {
@@ -137,5 +140,27 @@ describe("fix3 paper execution finalization", () => {
     expect(sell.ok).toBe(true);
     expect(sell.executedQty).toBe(15);
     expect(sell.avgFillPrice).toBeLessThanOrEqual(99);
+  });
+
+  it("simulation persistence failure cannot be reported as a successful fill", async () => {
+    marketMocks.getTicker.mockResolvedValue({ symbol: "BTCUSDT", price: 100, change24h: 0, volume24h: 1_000_000 });
+    marketMocks.getOrderBook.mockResolvedValue({
+      bids: [{ price: 99, quantity: 10 }],
+      asks: [{ price: 101, quantity: 10 }],
+    });
+    marketMocks.persistExecutionSimulation.mockRejectedValueOnce(new Error("Prisma P1001 database unavailable"));
+    const { simulateMarketExecution } = await import("@/src/server/exchange-simulator/exchange-simulator.service");
+
+    await expect(
+      simulateMarketExecution({
+        executionId: "exec-persistence-failure",
+        symbol: "BTCUSDT",
+        side: "BUY",
+        quantity: 1,
+        priceHint: 100,
+        quoteAsset: "USDT",
+        baseAsset: "BTC",
+      }),
+    ).rejects.toThrow("database unavailable");
   });
 });

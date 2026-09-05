@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "p0Verdict": "PASS",
+  "p1Verdict": "PASS",
+  "canonicalEntryAuthorityCount": 1,
+  "rejectionCounterIndependent": true,
+  "forcedAcceptanceCount": 0,
+  "eventDrivenPrimarySelection": true,
+  "duplicateQualityTerminalGateCount": 0,
+  "learningHardVetoCount": 0,
+  "safetyRegression": "PASS",
+  "remainingBlockers": []
+}

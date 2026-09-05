@@ -48,6 +48,14 @@ describe("prevalidation gate", () => {
       canProducePaperOpen: true,
       positionExitReady: true,
       legacyExecutionInvocationCount: 0,
+      campaignIdentityReady: true,
+      campaignQueryReady: true,
+      shadowCampaignBindingReady: true,
+      moverCampaignBindingReady: true,
+      checkpointSchemaReady: true,
+      breakerDetailReady: true,
+      settlementValidityReady: true,
+      pipelineLivenessReady: true,
     });
     expect(result.status).toBe("READY");
     expect(result.blockers.length).toBe(0);

@@ -1,7 +1,23 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/src/server/db/prisma";
 
-export type ApiFailureDomain = "EXECUTION" | "ACCOUNT" | "MARKET_DATA" | "METADATA";
+export type ApiFailureDomain =
+  | "MARKET_DATA"
+  | "EXCHANGE_INFO"
+  | "SYMBOL_FILTER"
+  | "PRICE"
+  | "ORDER_BOOK"
+  | "BALANCE"
+  | "DATABASE"
+  | "REDIS"
+  | "CLOCK_SYNC"
+  | "AI_PROVIDER"
+  | "PAPER_EXECUTION"
+  | "LIVE_EXECUTION"
+  | "UNKNOWN"
+  | "EXECUTION"
+  | "ACCOUNT"
+  | "METADATA";
 
 export type ApiFailureState = {
   domain: ApiFailureDomain;

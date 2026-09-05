@@ -52,16 +52,16 @@ export function classifyFilterReason(reason: string): FilterPriority {
 }
 
 export function computeAdaptiveRelaxation(consecutiveRejections: number): AdaptiveRelaxation {
-  const tier = Math.min(5, Math.floor(Math.max(0, consecutiveRejections) / 3));
+  const tier = Math.max(0, Math.floor(Math.max(0, consecutiveRejections)));
   return {
     tier,
-    minConfidenceDelta: tier * -2,
-    minQualityScoreDelta: tier * -4,
-    minScannerScoreDelta: tier * -2,
-    minScannerConfidenceDelta: tier * -2,
-    compositeFloorRelax: tier * 3,
-    advisoryStackLimit: Math.max(1, 4 - tier),
-    explorationMode: consecutiveRejections >= 9,
+    minConfidenceDelta: 0,
+    minQualityScoreDelta: 0,
+    minScannerScoreDelta: 0,
+    minScannerConfidenceDelta: 0,
+    compositeFloorRelax: 0,
+    advisoryStackLimit: 4,
+    explorationMode: false,
   };
 }
 
@@ -150,45 +150,11 @@ export function resolveAdaptiveEntryDecision(input: {
     };
   }
 
-  const compositeFloor = Math.max(42, 50 - relaxation.compositeFloorRelax);
-  const remainingImportant = importantBlockers.filter((reason) => {
-    if (relaxation.explorationMode && input.compositeAvg >= compositeFloor) {
-      waivedBlockers.push(reason);
-      return false;
-    }
-    if (relaxation.tier >= 2 && input.compositeAvg >= compositeFloor + 2) {
-      if (/confidence .*?</i.test(reason) && input.confidence >= input.effectiveConfidenceFloor - 2) {
-        waivedBlockers.push(reason);
-        return false;
-      }
-      if (/kalite skoru dusuk/i.test(reason) && input.compositeAvg >= compositeFloor) {
-        waivedBlockers.push(reason);
-        return false;
-      }
-      if (/non-pump kalite/i.test(reason) && input.compositeAvg >= compositeFloor) {
-        waivedBlockers.push(reason);
-        return false;
-      }
-    }
-    return true;
-  });
-
-  const remainingAdvisory = advisoryBlockers.filter((reason) => {
-    if (relaxation.explorationMode) {
-      waivedBlockers.push(reason);
-      return false;
-    }
-    if (relaxation.tier >= 1 && input.compositeAvg >= compositeFloor) {
-      waivedBlockers.push(reason);
-      return false;
-    }
-    return true;
-  });
+  const remainingImportant = [...importantBlockers];
+  const remainingAdvisory = [...advisoryBlockers];
 
   const advisoryStackCount = remainingAdvisory.length;
-  const ok =
-    remainingImportant.length === 0 &&
-    (advisoryStackCount <= relaxation.advisoryStackLimit || relaxation.explorationMode);
+  const ok = remainingImportant.length === 0 && advisoryStackCount <= relaxation.advisoryStackLimit;
 
   const blockers = [...remainingImportant, ...remainingAdvisory];
   return {

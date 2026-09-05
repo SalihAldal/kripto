@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "p3EngineeringVerdict": "PASS",
+  "selectedStrategy": "NONE",
+  "offlinePromotionCandidateCount": 0,
+  "validation": {
+    "regimeAuthority": "PASS",
+    "strategyContracts": "PASS",
+    "routerConflictDeterminism": "PASS",
+    "costAwareEligibility": "PASS",
+    "walkForwardSplit": "PASS",
+    "negativeControls": "PASS",
+    "multipleTestingCorrection": "PASS",
+    "shadowFirewall": "PASS"
+  },
+  "remainingBlockers": []
+}

@@ -4,6 +4,11 @@ import { resolveExecutionAdapter } from "@/src/server/paper-runtime/execution-po
 
 export async function simulatePaperExecution(input: {
   userId: string;
+  campaignId?: string;
+  jobId?: string;
+  sessionId?: string;
+  runId?: string;
+  roundId?: string;
   executionId: string;
   candidateId?: string;
   executionIntentId?: string;
@@ -51,6 +56,11 @@ export async function simulatePaperExecution(input: {
   const adapter = resolveExecutionAdapter("paper");
   const placed = await adapter.submitEntry({
     userId: input.userId,
+    campaignId: input.campaignId,
+    jobId: input.jobId,
+    sessionId: input.sessionId,
+    runId: input.runId,
+    roundId: input.roundId,
     executionId: input.executionId,
     candidateId,
     executionIntentId,

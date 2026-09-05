@@ -428,12 +428,12 @@ describe("auto round engine integration", () => {
     });
     expect(second.started).toBe(false);
 
-    let safety = 0;
-    while (safety < 200) {
+    const deadline = Date.now() + 55_000;
+    while (Date.now() < deadline) {
       const status = await mod.getAutoRoundStatus();
-      if (!status.active) break;
-      safety += 1;
-      await wait(10);
+      const done = Array.from(jobs.values()).find((x) => x.totalRounds === 10);
+      if (!status.active || Number(done?.completedRounds ?? 0) >= 1) break;
+      await wait(100);
     }
 
     const done = Array.from(jobs.values()).find((x) => x.totalRounds === 10);

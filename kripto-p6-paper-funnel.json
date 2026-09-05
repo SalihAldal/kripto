@@ -1,0 +1,21 @@
+{
+  "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+  "roundsTotal": 69,
+  "enterCount": 0,
+  "waitCount": 40,
+  "rejectCount": 29,
+  "topBlockers": [
+    [
+      "NONE",
+      40
+    ],
+    [
+      "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING",
+      28
+    ],
+    [
+      "PERSIST_TIMEOUT: round-runtime.patchJobActiveRound timed out after 15000ms",
+      1
+    ]
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "p0Verdict": "PASS",
+  "liveSubmitCount": 0,
+  "deterministicSuccessPath": "PASS",
+  "timeoutLateResultAtomicity": "PASS",
+  "focusedTests": "PASS",
+  "typecheck": "PASS",
+  "build": "PASS",
+  "remainingBlockers": []
+}

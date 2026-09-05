@@ -124,6 +124,7 @@ import type { ExecuteTradeInput, ExecutionResult, PositionCloseReason, SelectedT
 import type { ScannerCandidate } from "@/src/types/scanner";
 import type { AIConsensusResult } from "@/src/types/ai";
 import {
+  claimIdempotentExecutionIntent,
   getIdempotentExecution,
   getSafeModeState,
   persistAnalysisState,
@@ -169,6 +170,39 @@ import {
   type DecisionFeatureSnapshot,
 } from "@/src/server/forensics/decision-time-tdi-telemetry.service";
 import { getForensicSession } from "@/src/server/forensics/forensic-context";
+import {
+  CanonicalExecutionError,
+  classifyExecutionFailure,
+  formatCanonicalExecutionReason,
+  preserveExecutionFailure,
+  redactExecutionError,
+  resolveExecutionFailure,
+} from "@/src/server/execution/execution-failure-contract";
+import { recordPaperFillEvent } from "@/src/server/paper-validation/paper-trade-recorder.service";
+import { markPaperPersistenceReconciliation } from "@/src/server/execution/paper-persistence-reconciliation.service";
+import { evaluateCanonicalRegime, routeStrategies } from "@/src/server/forensics/p4-regime-strategy-shadow";
+import { resolveStrategyActivationMode, type StrategyStatus } from "@/src/server/execution/p7-paper-strategy-contract";
+
+type CanonicalEntryDecision = {
+  candidateId: string;
+  symbol: string;
+  verdict: "ENTER" | "WAIT" | "REJECT";
+  firstBlocker: string | null;
+  reasonCodes: string[];
+  qualityComponents: Record<string, number | null>;
+  dataQuality: {
+    status: "COMPLETE" | "DEGRADED" | "INSUFFICIENT";
+    missing: string[];
+    stale: string[];
+  };
+  advisory: {
+    aiDecision: string | null;
+    tdiDecision: string | null;
+    learningDecision: string | null;
+  };
+  evaluatedAt: string;
+  policyVersion: string;
+};
 
 function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED" {
   const upper = raw.toUpperCase();
@@ -302,101 +336,6 @@ function resolveTpSl(entryPrice: number, side: "BUY" | "SELL", takeProfitPercent
   return {
     takeProfitPrice: Number((entryPrice * (1 - takeProfitPercent / 100)).toFixed(8)),
     stopLossPrice: Number((entryPrice * (1 + stopLossPercent / 100)).toFixed(8)),
-  };
-}
-
-type FailureDomain = "EXECUTION" | "ACCOUNT" | "MARKET_DATA" | "METADATA" | "INTERNAL";
-
-type ExecutionFailureClassification = {
-  domain: FailureDomain;
-  reasonCode: string;
-  statusCode: number | null;
-  countsTowardExecutionBreaker: boolean;
-  safeModeReason?: string;
-};
-
-function parseHttpStatusCode(message: string): number | null {
-  const match = message.match(/\bhttp\s+(\d{3})\b/i);
-  if (!match?.[1]) return null;
-  const code = Number(match[1]);
-  return Number.isFinite(code) ? code : null;
-}
-
-function classifyExecutionFailure(message: string, appErrorCode?: string): ExecutionFailureClassification {
-  const lower = message.toLowerCase();
-  const statusCode = parseHttpStatusCode(message);
-  const hasAny = (...tokens: string[]) => tokens.some((token) => lower.includes(token));
-  const rateLimit = hasAny("http 429", "too many requests", "rate limit");
-  const ipBan = hasAny("http 418", "ip banned");
-  const timeout = hasAny("timeout", "etimedout", "aborted", "abort");
-  const network = hasAny("enotfound", "econnreset", "econnrefused", "socket hang up", "network");
-  const server5xx = statusCode != null && statusCode >= 500;
-  const metadataDomain = hasAny("exchangeinfo", "open symbols", "/open/v1/common/symbols", "symbol metadata");
-  const marketDataDomain = hasAny("ticker", "klines", "depth", "orderbook", "recent trades", "market data");
-  const accountDomain = hasAny("getaccountbalances", "account balance", "accountinfo", "balance unavailable");
-  const executionDomain = hasAny(
-    "placeorder",
-    "order submit",
-    "order validation",
-    "trplaceorder",
-    "execution engine",
-    "executeapprovedspotorder",
-  );
-  const internalDb = hasAny("p1001", "prisma", "database");
-
-  if (metadataDomain) {
-    return {
-      domain: "METADATA",
-      reasonCode: rateLimit ? "METADATA_RATE_LIMIT" : timeout ? "METADATA_TIMEOUT" : "METADATA_UNAVAILABLE",
-      statusCode,
-      countsTowardExecutionBreaker: false,
-    };
-  }
-  if (marketDataDomain && !executionDomain) {
-    return {
-      domain: "MARKET_DATA",
-      reasonCode: rateLimit ? "DATA_RATE_LIMIT" : timeout ? "DATA_TIMEOUT" : network ? "DATA_NETWORK_ERROR" : "DATA_UNAVAILABLE",
-      statusCode,
-      countsTowardExecutionBreaker: false,
-    };
-  }
-  if (accountDomain) {
-    return {
-      domain: "ACCOUNT",
-      reasonCode: rateLimit ? "ACCOUNT_RATE_LIMIT" : timeout ? "ACCOUNT_TIMEOUT" : "ACCOUNT_UNAVAILABLE",
-      statusCode,
-      countsTowardExecutionBreaker: false,
-    };
-  }
-  if (executionDomain || appErrorCode === "EXTERNAL_SERVICE_FAILURE" || appErrorCode === "CIRCUIT_OPEN") {
-    let reasonCode = "EXECUTION_PROVIDER_UNAVAILABLE";
-    if (rateLimit) reasonCode = "RATE_LIMIT";
-    else if (ipBan) reasonCode = "IP_BAN";
-    else if (timeout) reasonCode = "NETWORK_TIMEOUT";
-    else if (network) reasonCode = "NETWORK_FAILURE";
-    else if (server5xx) reasonCode = "UPSTREAM_5XX";
-    return {
-      domain: "EXECUTION",
-      reasonCode,
-      statusCode,
-      countsTowardExecutionBreaker: !rateLimit,
-      safeModeReason: `EXECUTION_BREAKER_${reasonCode}`,
-    };
-  }
-  if (internalDb) {
-    return {
-      domain: "INTERNAL",
-      reasonCode: "SHARED_STATE_UNAVAILABLE",
-      statusCode,
-      countsTowardExecutionBreaker: false,
-      safeModeReason: "Database connection lost",
-    };
-  }
-  return {
-    domain: "INTERNAL",
-    reasonCode: "INTERNAL_ERROR",
-    statusCode,
-    countsTowardExecutionBreaker: false,
   };
 }
 
@@ -595,6 +534,15 @@ function readMarketRegimeMeta(candidate: ScannerCandidate) {
   const slMultiplier = Number(candidate.context.metadata.marketRegimeSlMultiplier ?? 1);
   const riskMultiplier = Number(candidate.context.metadata.marketRegimeRiskMultiplier ?? 1);
   return { mode, reason, strategy, openAllowed, tpMultiplier, slMultiplier, riskMultiplier };
+}
+
+function resolveStrategyStatus(raw: unknown): StrategyStatus {
+  const normalized = String(raw ?? "PAPER_EXPERIMENT").trim().toUpperCase();
+  if (normalized === "SHADOW_ONLY") return "SHADOW_ONLY";
+  if (normalized === "OFFLINE_CANDIDATE") return "OFFLINE_CANDIDATE";
+  if (normalized === "LIVE_NOT_APPROVED") return "LIVE_NOT_APPROVED";
+  if (normalized === "NOT_SUPPORTED") return "NOT_SUPPORTED";
+  return "PAPER_EXPERIMENT";
 }
 
 function inferTdiBlockingConditions(reasonDetail: string) {
@@ -1325,6 +1273,17 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
   const mode = getMode(input);
   const paperRelaxed = mode === "paper";
   const learningLane = mode === "paper" && input.learningLane === true;
+  const forensicSession = getForensicSession();
+  const executionIdentity = {
+    campaignId: input.campaignId ?? forensicSession?.campaignId ?? null,
+    jobId: forensicSession?.jobId ?? input.sessionId ?? null,
+    sessionId: input.sessionId ?? forensicSession?.sessionId ?? null,
+    runId: input.runId ?? forensicSession?.runId ?? null,
+    roundId: input.roundId ?? forensicSession?.roundId ?? null,
+    candidateId: null as string | null,
+    venue: "BINANCE_TR",
+    executionMode: mode,
+  };
   const decisionTrace = beginDecisionTrace({
     decisionId: executionId,
     analysisId: executionId,
@@ -1337,6 +1296,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
   let obsQualityGate: SignalQualityResult | undefined;
   let obsResult: ExecutionResult | undefined;
   let canonicalCandidateId = "";
+  const idempotencyKey = String(
+    input.requestedSymbol ?? "auto",
+  ) + `:${String(input.requestedQuoteAmountTry ?? input.requestedQuantity ?? "default")}:${mode}`;
   const finishExecution = (result: ExecutionResult): ExecutionResult => {
     obsResult = result;
     return result;
@@ -1358,6 +1320,15 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     message: "Analyze and trade akisi basladi",
     level: "INFO",
     context: { mode, requestedSymbol: input.requestedSymbol, learningLane },
+  });
+  publishExecutionEvent({
+    executionId,
+    symbol: input.requestedSymbol,
+    stage: "EXECUTION_PRECHECK_STARTED",
+    status: "RUNNING",
+    message: "Execution selected-candidate flow started",
+    level: "INFO",
+    context: executionIdentity,
   });
 
   try {
@@ -1393,22 +1364,40 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       stage: "start",
       status: "RUNNING",
     });
-    const idempotencyKey = String(
-      input.requestedSymbol ?? "auto",
-    ) + `:${String(input.requestedQuoteAmountTry ?? input.requestedQuantity ?? "default")}:${mode}`;
     if (!input.bypassIdempotency) {
-      const existing = await getIdempotentExecution(user.id, idempotencyKey);
-      if (existing && typeof existing.executionId === "string") {
-        return finishExecution({
-          executionId: String(existing.executionId),
-          mode,
-          opened: Boolean(existing.opened),
-          rejected: Boolean(existing.rejected),
-          rejectReason: typeof existing.rejectReason === "string" ? existing.rejectReason : undefined,
-          symbol: typeof existing.symbol === "string" ? existing.symbol : undefined,
-          orderId: typeof existing.orderId === "string" ? existing.orderId : undefined,
-          positionId: typeof existing.positionId === "string" ? existing.positionId : undefined,
-        });
+      const claim = await claimIdempotentExecutionIntent(user.id, idempotencyKey, executionId);
+      if (!claim.claimed) {
+        const existing = claim.existing ?? (await getIdempotentExecution(user.id, idempotencyKey));
+        const existingExecutionId = typeof existing?.executionId === "string" ? String(existing.executionId) : executionId;
+        const existingState = String(existing?.executionState ?? "").toUpperCase();
+        if (existingState === "IN_PROGRESS") {
+          const inProgressFailure = classifyExecutionFailure(new Error("Duplicate order blocked by idempotency in progress"), {
+            operation: "execution_idempotency_claim",
+            dependency: "idempotency_store",
+            executionMode: mode,
+          });
+          return finishExecution({
+            executionId: existingExecutionId,
+            mode,
+            opened: false,
+            rejected: true,
+            rejectReason: formatCanonicalExecutionReason(inProgressFailure),
+            symbol: typeof existing?.symbol === "string" ? String(existing.symbol) : input.requestedSymbol,
+            details: { ...inProgressFailure },
+          });
+        }
+        if (existing && typeof existing.executionId === "string") {
+          return finishExecution({
+            executionId: String(existing.executionId),
+            mode,
+            opened: Boolean(existing.opened),
+            rejected: Boolean(existing.rejected),
+            rejectReason: typeof existing.rejectReason === "string" ? existing.rejectReason : undefined,
+            symbol: typeof existing.symbol === "string" ? existing.symbol : undefined,
+            orderId: typeof existing.orderId === "string" ? existing.orderId : undefined,
+            positionId: typeof existing.positionId === "string" ? existing.positionId : undefined,
+          });
+        }
       }
     }
     await ensureOpenPositionMonitors(user.id).catch(() => null);
@@ -1563,6 +1552,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
 
     const ai = selected.ai;
     canonicalCandidateId = String(selected.context.metadata.opportunityCandidateId ?? "").trim();
+    executionIdentity.candidateId = canonicalCandidateId || null;
     if (!canonicalCandidateId) {
       return finishExecution({
         executionId,
@@ -1843,6 +1833,59 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
     const marketRegime = readMarketRegimeMeta(selected);
+    const strategyStatus = resolveStrategyStatus(selected.context.metadata.strategyStatus);
+    const strategyActivation = resolveStrategyActivationMode({
+      executionMode: mode,
+      strategyStatus,
+      liveTradingEnabled: env.LIVE_TRADING_ENABLED,
+    });
+    const p4Regime = evaluateCanonicalRegime({
+      marketEventAt: String(selected.context.metadata.marketDataTimestamp ?? new Date().toISOString()),
+      detectedAt: new Date().toISOString(),
+      trend: Number(selected.context.metadata.trendStrength ?? 0),
+      volatility: Number(selected.context.volatilityPercent ?? 0) / 100,
+      momentum: Number(selected.context.metadata.shortMomentumPercent ?? 0),
+      transitionProbability: Number(selected.context.metadata.regimeTransitionProbability ?? 0) / 100,
+      chaosProbability: Number(selected.context.metadata.regimeChaosProbability ?? 0) / 100,
+      pumpScore: Number(selected.context.metadata.pumpScore ?? selected.context.pumpRisk ?? 0),
+    });
+    const strategyRouter = routeStrategies(
+      {
+        candidateId: String(selected.context.metadata.opportunityCandidateId ?? createCandidateId(selected.context.symbol, "strategy")),
+        sourceType: "LIVE_MARKET",
+        marketEventAt: p4Regime.marketEventAt,
+        evaluatedAt: new Date().toISOString(),
+        velocity: Number(selected.context.metadata.tradeVelocity ?? 0),
+        acceleration: Number(selected.context.metadata.priceAcceleration ?? 0),
+        volumeAcceleration: Number(selected.context.metadata.volumeAcceleration ?? 0),
+        relativeStrength: Number(selected.context.metadata.relativeStrength ?? 0),
+        spreadBps: Number(selected.context.spreadPercent ?? 0) * 100,
+        liquidityScore: Math.max(0, Math.min(1, Number(selected.context.metadata.liquidityScore ?? 0.6))),
+        exhaustion: Math.max(0, Math.min(1, Number(selected.context.metadata.exhaustion ?? 0.2))),
+        momentum: Number(selected.context.metadata.shortMomentumPercent ?? 0),
+        retracement: Number(selected.context.metadata.retracement ?? 0.4),
+        breakoutHeld: Boolean(selected.context.metadata.breakoutHeld ?? false),
+        rangeScore: Number(selected.context.metadata.rangeScore ?? 0.4),
+        distanceFromMean: Number(selected.context.metadata.distanceFromMean ?? 0.4),
+        flowRecovery: Number(selected.context.metadata.flowRecovery ?? 0.5),
+        staleFeatures: Array.isArray(selected.context.metadata.staleFeatures)
+          ? (selected.context.metadata.staleFeatures as string[])
+          : [],
+        missingFeatures: Array.isArray(selected.context.metadata.missingFeatures)
+          ? (selected.context.metadata.missingFeatures as string[])
+          : [],
+        entrySpread: Number(selected.context.metadata.entrySpread ?? selected.context.spreadPercent ?? 0),
+        entrySlippage: Number(selected.context.metadata.entrySlippage ?? 0),
+        entryFee: Number(selected.context.metadata.entryFee ?? 0.1),
+        exitSpread: Number(selected.context.metadata.exitSpread ?? selected.context.spreadPercent ?? 0),
+        exitSlippage: Number(selected.context.metadata.exitSlippage ?? 0),
+        exitFee: Number(selected.context.metadata.exitFee ?? 0.1),
+        strategyProfitBuffer: Number(selected.context.metadata.strategyProfitBuffer ?? 0.12),
+        expectedMovePercent: Number(selected.context.metadata.expectedMovePercent ?? Math.max(0, Number(ai.score ?? 0))),
+      },
+      p4Regime,
+    );
+    const selectedStrategyId = strategyRouter.preferredStrategy ?? marketRegime.strategy;
     if (!marketRegime.openAllowed && !paperRelaxed) {
       return finishExecution({
         executionId,
@@ -1884,6 +1927,28 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     }
     const qualityGate = evaluateSignalQualityGate({ candidate: selected, ai });
     obsQualityGate = qualityGate;
+    const canonicalEntryBlockers: Array<{ code: string; reason: string; details?: Record<string, unknown> }> = [];
+    if (strategyRouter.conflictStatus === "CONTRADICTORY") {
+      canonicalEntryBlockers.push({
+        code: "STRATEGY_CONFLICT",
+        reason: "Multiple contradictory strategy signals",
+        details: { conflictStatus: strategyRouter.conflictStatus, eligibleStrategies: strategyRouter.eligibleStrategies },
+      });
+    }
+    if (!strategyRouter.preferredStrategy) {
+      canonicalEntryBlockers.push({
+        code: "NO_ELIGIBLE_STRATEGY",
+        reason: "No eligible strategy signal for this candidate",
+        details: { conflictStatus: strategyRouter.conflictStatus, evaluations: strategyRouter.evaluations },
+      });
+    }
+    if (mode === "paper" && strategyActivation !== "PAPER_ELIGIBLE") {
+      canonicalEntryBlockers.push({
+        code: "ROUTER_SHADOW_ONLY",
+        reason: `Strategy mode ${strategyActivation} cannot create paper intent`,
+        details: { strategyStatus, strategyActivation },
+      });
+    }
     const orchestration = await evaluateOrchestration({
       userId: user.id,
       candidate: selected,
@@ -1909,14 +1974,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           orchestration,
         },
       });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: `Kalitesiz sinyal (score=${qualityGate.qualityScore}/${qualityGate.minimumRequiredScore}): ${qualityGate.reasons.join(", ")}`,
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
+      canonicalEntryBlockers.push({
+        code: "QUALITY_GATE_REJECT",
+        reason: `Kalitesiz sinyal (score=${qualityGate.qualityScore}/${qualityGate.minimumRequiredScore}): ${qualityGate.reasons.join(", ")}`,
         details: {
           tradeQuality: {
             totalScore: qualityGate.qualityScore,
@@ -1932,7 +1992,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
             openTrade: false,
             reason: qualityGate.reasons.join(", "),
           },
-          orchestration,
         },
       });
     }
@@ -1954,17 +2013,10 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           persistence: orchestration.persisted,
         },
       });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: `ORCHESTRATION_${orchestration.action}: ${orchestration.vetoReasons.join(" | ") || "adaptive suppression"}`,
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
-        details: {
-          orchestration,
-        },
+      canonicalEntryBlockers.push({
+        code: `ORCHESTRATION_${orchestration.action}`,
+        reason: `ORCHESTRATION_${orchestration.action}: ${orchestration.vetoReasons.join(" | ") || "adaptive suppression"}`,
+        details: { orchestration },
       });
     }
     const adaptiveEval = await evaluateAdaptiveCandidate({
@@ -1986,17 +2038,10 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           components: adaptiveEval.components,
         },
       });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: adaptiveEval.reason,
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
-        details: {
-          adaptiveOptimization: adaptiveEval,
-        },
+      canonicalEntryBlockers.push({
+        code: "ADAPTIVE_GATE_REJECT",
+        reason: adaptiveEval.reason,
+        details: { adaptiveOptimization: adaptiveEval },
       });
     }
     const learningFeatureSnapshot = buildSetupFeatureSnapshot({
@@ -2044,24 +2089,16 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         executionId,
         symbol: selected.context.symbol,
         stage: "learning-immediate-risk-gate",
-        status: "SKIPPED",
-        message: "Learning immediate risk policy islemi blokladi",
+        status: "RUNNING",
+        message: "Learning immediate risk policy advisory warning",
         level: "WARN",
         context: {
           mode,
           patternKey: learningFeatureSnapshot.patternKey,
           reason: immediateLearningAdjustment.reason,
           policy: immediateLearningPolicy,
+          advisoryOnly: true,
         },
-      });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: `LEARNING_IMMEDIATE_BLOCK: ${immediateLearningAdjustment.reason}`,
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
       });
     }
     if (
@@ -2072,8 +2109,8 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         executionId,
         symbol: selected.context.symbol,
         stage: "learning-immediate-risk-gate",
-        status: "SKIPPED",
-        message: "Learning immediate risk policy ekstra skor istedi",
+        status: "RUNNING",
+        message: "Learning immediate min-score advisory warning",
         level: "WARN",
         context: {
           mode,
@@ -2082,16 +2119,8 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           patternKey: learningFeatureSnapshot.patternKey,
           reason: immediateLearningAdjustment.reason,
           policy: immediateLearningPolicy,
+          advisoryOnly: true,
         },
-      });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: `LEARNING_IMMEDIATE_MIN_SCORE: ${scorecardConfidence.toFixed(2)} < ${(minConfidenceForLane + immediateLearningAdjustment.minScoreDelta).toFixed(2)} (${immediateLearningAdjustment.reason})`,
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
       });
     }
     if (mode === "live" && !liveLearningAdjustment.allowed) {
@@ -2099,34 +2128,30 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         executionId,
         symbol: selected.context.symbol,
         stage: "learning-policy-gate",
-        status: "SKIPPED",
-        message: "Learning policy live islemi blokladi",
+        status: "RUNNING",
+        message: "Learning policy advisory warning",
         level: "WARN",
         context: {
           patternKey: learningFeatureSnapshot.patternKey,
           reason: liveLearningAdjustment.reason,
           policy: liveLearningPolicy,
+          advisoryOnly: true,
         },
-      });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: `LEARNING_POLICY_BLOCK: ${liveLearningAdjustment.reason}`,
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
       });
     }
     if (mode === "live" && liveLearningAdjustment.minScoreDelta > 0 && scorecardConfidence < minConfidenceForLane + liveLearningAdjustment.minScoreDelta) {
-      return finishExecution({
+      publishExecutionEvent({
         executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: `LEARNING_POLICY_MIN_SCORE: ${scorecardConfidence.toFixed(2)} < ${(minConfidenceForLane + liveLearningAdjustment.minScoreDelta).toFixed(2)}`,
         symbol: selected.context.symbol,
-        decision: ai.finalDecision,
+        stage: "learning-policy-gate",
+        status: "RUNNING",
+        message: "Learning policy min-score advisory warning",
+        level: "WARN",
+        context: {
+          scorecardConfidence,
+          requiredConfidence: minConfidenceForLane + liveLearningAdjustment.minScoreDelta,
+          advisoryOnly: true,
+        },
       });
     }
     let symbol = await resolveExchangeSymbol(selected.context.symbol);
@@ -2150,18 +2175,17 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       ? canOpenLearningLaneMicroTrade({ candidate: selected, confidence: scorecardConfidence })
       : false;
     if (learningLane && !microTradeEligible) {
-      return finishExecution({
+      publishExecutionEvent({
         executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: "LEARNING_LANE_NO_EXPLORATION_EDGE",
         symbol,
-        decision: ai.finalDecision,
-        details: {
-          learningLane: true,
+        stage: "learning-lane-gate",
+        status: "SKIPPED",
+        message: "Learning lane no-exploration edge advisory",
+        level: "WARN",
+        context: {
           confidence: scorecardConfidence,
           scannerScore: selected.score.score,
+          advisoryOnly: true,
         },
       });
     }
@@ -2295,7 +2319,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         hybridDecision: ai.finalDecision,
         consensusScore: scorecardConfidence,
         evBelowThreshold: aiGate.reasonCode === "AI_VETO" || aiGate.reasonCode === "AI_NOT_EXECUTABLE",
-        strategy: marketRegime.strategy,
+        strategy: selectedStrategyId,
         reasonCode: aiGate.reasonCode,
         reasonDetail: aiGate.reasonDetail,
       });
@@ -2910,22 +2934,31 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     }
 
     if (!preValidation.ok) {
+      const failure = classifyExecutionFailure(new Error(preValidation.reasons.join(", ")), {
+        operation: "validate_symbol_and_order",
+        dependency: "binance_symbol_filters",
+        venue: executionIdentity.venue,
+        executionMode: mode,
+        domainHint: "SYMBOL_FILTER",
+      });
       publishExecutionEvent({
         executionId,
         symbol: executionSymbol,
         stage: "validation",
         status: "FAILED",
-        message: `Validation fail: ${preValidation.reasons.join(", ")}`,
+        message: formatCanonicalExecutionReason(failure),
         level: "WARN",
+        context: { ...executionIdentity, ...failure },
       });
       return finishExecution({
         executionId,
         mode,
         opened: false,
         rejected: true,
-        rejectReason: preValidation.reasons.join(", "),
+        rejectReason: formatCanonicalExecutionReason(failure),
         symbol: executionSymbol,
         decision: ai.finalDecision,
+        details: { ...failure },
       });
     }
     publishExecutionEvent({
@@ -3165,16 +3198,71 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           smartEntry: smartEntry.details,
         },
       });
+      canonicalEntryBlockers.push({
+        code: "SMART_ENTRY_REJECT",
+        reason: smartEntry.reason,
+        details: {
+          smartEntry: smartEntry.details,
+        },
+      });
+    }
+    const paperBlockingCodes = new Set(["ROUTER_SHADOW_ONLY", "NO_ELIGIBLE_STRATEGY", "STRATEGY_CONFLICT"]);
+    const hasPaperBlockingCode = canonicalEntryBlockers.some((row) => paperBlockingCodes.has(row.code));
+    const canonicalVerdict: CanonicalEntryDecision["verdict"] =
+      canonicalEntryBlockers.length === 0
+        ? "ENTER"
+        : paperRelaxed
+          ? hasPaperBlockingCode
+            ? "WAIT"
+            : "ENTER"
+          : "REJECT";
+    const canonicalEntryDecision: CanonicalEntryDecision = {
+      candidateId: canonicalCandidateId,
+      symbol: executionSymbol,
+      verdict: canonicalVerdict,
+      firstBlocker: canonicalEntryBlockers[0]?.code ?? null,
+      reasonCodes: canonicalEntryBlockers.map((row) => row.code),
+      qualityComponents: {
+        confidence: Number(ai.finalConfidence ?? 0),
+        quality: Number(qualityGate.qualityScore ?? 0),
+        adaptive: Number(adaptiveEval.score ?? 0),
+        orchestration: Number(orchestration.orchestrationScore ?? 0),
+      },
+      dataQuality: {
+        status: dataQualityIssues.length > 0 ? "DEGRADED" : "COMPLETE",
+        missing: [],
+        stale: [],
+      },
+      advisory: {
+        aiDecision: ai.finalDecision ?? null,
+        tdiDecision: "SHADOW",
+        learningDecision: learningLane ? "ADVISORY_ONLY" : null,
+      },
+      evaluatedAt: new Date().toISOString(),
+      policyVersion: "p1-canonical-entry-v1",
+    };
+    if (canonicalEntryDecision.verdict !== "ENTER") {
+      publishExecutionEvent({
+        executionId,
+        symbol: executionSymbol,
+        stage: "canonical-entry",
+        status: "SKIPPED",
+        message: canonicalEntryBlockers[0]?.reason ?? "Canonical entry not entered",
+        level: "WARN",
+        context: canonicalEntryDecision as unknown as Record<string, unknown>,
+      });
       return finishExecution({
         executionId,
         mode,
         opened: false,
         rejected: true,
-        rejectReason: smartEntry.reason,
+        rejectReason:
+          `${canonicalEntryDecision.verdict}:${canonicalEntryBlockers[0]?.code ?? "ENTRY_CONTRACT_NOT_MET"} ${canonicalEntryBlockers[0]?.reason ?? "Canonical entry not entered"}`,
         symbol: executionSymbol,
         decision: ai.finalDecision,
         details: {
-          smartEntry: smartEntry.details,
+          canonicalEntryDecision,
+          blockers: canonicalEntryBlockers,
         },
       });
     }
@@ -3291,7 +3379,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         riskBlocked: true,
         hybridDecision: ai.finalDecision,
         consensusScore: scorecardConfidence,
-        strategy: marketRegime.strategy,
+        strategy: selectedStrategyId,
         reasonCode: riskGate.reasonCodes[0] ?? "RISK_GATE_REJECT",
         reasonDetail: riskGate.reasonCodes.join(",") || riskGate.reasons.join(", "),
       });
@@ -3340,16 +3428,16 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     bridgeStrategyDecision({
       candidateId: forensicCandidateId,
       symbol: executionSymbol,
-      strategyId: marketRegime.strategy,
+      strategyId: selectedStrategyId,
       approved: true,
-      reasonCode: "STRATEGY_SELECTED",
-      reasonDetail: marketRegime.reason,
+      reasonCode: strategyRouter.preferredStrategy ? "STRATEGY_SELECTED" : "STRATEGY_FALLBACK_SELECTED",
+      reasonDetail: `${marketRegime.reason}; activation=${strategyActivation}; status=${strategyStatus}`,
     });
     bridgeMeanReversionEntry({
       candidateId: forensicCandidateId,
       symbol: executionSymbol,
       side: side === "SELL" ? "SHORT" : "LONG",
-      strategyId: marketRegime.strategy,
+      strategyId: selectedStrategyId,
       strategySelectionReason: marketRegime.reason,
       marketRegime: marketRegime.mode,
       volatilityPercent: selected.context.volatilityPercent,
@@ -3388,7 +3476,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       capitalSlot: openPositions.length + 1,
       maxSlots: runtimeMaxOpenPositions,
       openPositionCount: openPositions.length,
-      strategy: marketRegime.strategy,
+      strategy: selectedStrategyId,
       reasonCode: "EXECUTION_APPROVED",
       reasonDetail: "Execution path approved through TDI and risk gates",
     });
@@ -3484,6 +3572,13 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
 
     const safetyResult = await runPreTradeSafetyValidation({
       executionId,
+      campaignId: executionIdentity.campaignId ?? undefined,
+      jobId: executionIdentity.jobId ?? undefined,
+      sessionId: executionIdentity.sessionId ?? undefined,
+      runId: executionIdentity.runId ?? undefined,
+      roundId: executionIdentity.roundId ?? undefined,
+      candidateId: canonicalCandidateId,
+      venue: executionIdentity.venue,
       userId: user.id,
       symbol: executionSymbol,
       side,
@@ -3501,14 +3596,37 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       atr: Number(selected.context.metadata.atr ?? 0),
       bidDepth: Number(selected.context.metadata.bidDepth ?? 0),
       askDepth: Number(selected.context.metadata.askDepth ?? 0),
+      suppressStartedEvent: true,
     });
     if (!safetyResult.passed) {
+      const blockedDomain =
+        safetyResult.blockedBy === "BALANCE"
+          ? "BALANCE"
+          : safetyResult.blockedBy === "PRICE"
+            ? "PRICE"
+            : safetyResult.blockedBy === "EXCHANGE" || safetyResult.blockedBy === "QUANTITY"
+              ? "SYMBOL_FILTER"
+              : safetyResult.blockedBy === "API" || safetyResult.blockedBy === "MARKET"
+                ? "MARKET_DATA"
+                : mode === "paper"
+                  ? "PAPER_EXECUTION"
+                  : "LIVE_EXECUTION";
+      const failure = classifyExecutionFailure(
+        new Error(safetyResult.rejectReason ?? "Execution safety validation failed"),
+        {
+          operation: "execution_precheck",
+          dependency: String(safetyResult.blockedBy ?? "safety_validator").toLowerCase(),
+          venue: executionIdentity.venue,
+          executionMode: mode,
+          domainHint: blockedDomain,
+        },
+      );
       await recordExecutionFailure({
         executionId,
         userId: user.id,
         symbol: executionSymbol,
         side,
-        reason: safetyResult.rejectReason ?? "Execution safety validation failed",
+        reason: formatCanonicalExecutionReason(failure),
         stage: safetyResult.blockedBy,
       }).catch(() => null);
       publishExecutionEvent({
@@ -3516,18 +3634,19 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         symbol: executionSymbol,
         stage: "validation",
         status: "FAILED",
-        message: `Safety blocked: ${safetyResult.rejectReason ?? "unknown"}`,
+        message: formatCanonicalExecutionReason(failure),
         level: "WARN",
-        context: { safetyId: safetyResult.safetyId, blockedBy: safetyResult.blockedBy },
+        context: { ...executionIdentity, ...failure, safetyId: safetyResult.safetyId, blockedBy: safetyResult.blockedBy },
       });
       return finishExecution({
         executionId,
         mode,
         opened: false,
         rejected: true,
-        rejectReason: safetyResult.rejectReason ?? "Execution safety validation failed",
+        rejectReason: formatCanonicalExecutionReason(failure),
         symbol: executionSymbol,
         decision: ai.finalDecision,
+        details: { ...failure },
       });
     }
 
@@ -3583,6 +3702,11 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         const v2Result = await executeApprovedSpotOrder({
           executionId,
           userId: user.id,
+          campaignId: executionIdentity.campaignId ?? undefined,
+          jobId: executionIdentity.jobId ?? undefined,
+          sessionId: executionIdentity.sessionId ?? undefined,
+          runId: executionIdentity.runId ?? undefined,
+          roundId: executionIdentity.roundId ?? undefined,
           candidateId: canonicalCandidateId,
           executionIntentId: executionId,
           symbol: executionSymbol,
@@ -3636,32 +3760,88 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           executedQty: v2Result.filledQuantity,
           price: v2Result.averageFillPrice,
           dryRun: mode === "dry-run",
-          metadata: { fee: v2Result.fee, source: "execution-engine-v2" },
+          metadata: { fee: v2Result.fee, source: "execution-engine-v2", ...(v2Result.metadata ?? {}) },
         };
       }
       if (mode === "paper") {
-        return executePaperOrderViaExchangeSimulator({
-          userId: user.id,
+        publishExecutionEvent({
           executionId,
-          candidateId: canonicalCandidateId,
-          executionIntentId: executionId,
-          marketDataVenue: String(selected.context.metadata.marketDataVenue ?? ""),
           symbol: executionSymbol,
-          side,
-          quantity: qty,
-          quoteOrderQty: unifiedQuoteSpend,
-          priceHint: entryPrice,
-          quoteAsset: pair.quoteAsset,
-          baseAsset: pair.baseAsset,
-          bidDepth: Number(selected.context.metadata.bidDepth ?? 0),
-          askDepth: Number(selected.context.metadata.askDepth ?? 0),
-          spreadPercent: Number(selected.context.spreadPercent ?? 0),
-          atr: Number(selected.context.metadata.atr ?? 0),
-          volatilityPercent: Number(selected.context.volatilityPercent ?? 0),
-          volumeQuote: Number(selected.context.metadata.volumeQuote ?? selected.context.volume24h ?? 0),
-          aggressiveBuyPct: Number(selected.context.metadata.aggressiveBuyPct ?? 50),
-          aggressiveSellPct: Number(selected.context.metadata.aggressiveSellPct ?? 50),
+          stage: "PAPER_ORDER_SIMULATION_STARTED",
+          status: "RUNNING",
+          message: "Paper order simulation started",
+          level: "INFO",
+          context: { ...executionIdentity, operation: "simulate_order", dependency: "paper_exchange_simulator" },
         });
+        try {
+          const paperOrder = await executePaperOrderViaExchangeSimulator({
+            userId: user.id,
+            campaignId: executionIdentity.campaignId ?? undefined,
+            jobId: executionIdentity.jobId ?? undefined,
+            sessionId: executionIdentity.sessionId ?? undefined,
+            runId: executionIdentity.runId ?? undefined,
+            roundId: executionIdentity.roundId ?? undefined,
+            executionId,
+            candidateId: canonicalCandidateId,
+            executionIntentId: executionId,
+            marketDataVenue: String(selected.context.metadata.marketDataVenue ?? ""),
+            symbol: executionSymbol,
+            side,
+            quantity: qty,
+            quoteOrderQty: unifiedQuoteSpend,
+            priceHint: entryPrice,
+            quoteAsset: pair.quoteAsset,
+            baseAsset: pair.baseAsset,
+            bidDepth: Number(selected.context.metadata.bidDepth ?? 0),
+            askDepth: Number(selected.context.metadata.askDepth ?? 0),
+            spreadPercent: Number(selected.context.spreadPercent ?? 0),
+            atr: Number(selected.context.metadata.atr ?? 0),
+            volatilityPercent: Number(selected.context.volatilityPercent ?? 0),
+            volumeQuote: Number(selected.context.metadata.volumeQuote ?? selected.context.volume24h ?? 0),
+            aggressiveBuyPct: Number(selected.context.metadata.aggressiveBuyPct ?? 50),
+            aggressiveSellPct: Number(selected.context.metadata.aggressiveSellPct ?? 50),
+          });
+          publishExecutionEvent({
+            executionId,
+            symbol: executionSymbol,
+            stage: "PAPER_ORDER_SIMULATION_SUCCEEDED",
+            status: "SUCCESS",
+            message: "Paper order simulation succeeded",
+            level: "TRADE",
+            context: {
+              ...executionIdentity,
+              operation: "simulate_order",
+              dependency: "paper_exchange_simulator",
+              orderId: paperOrder.orderId,
+              simulationId: paperOrder.simulationId,
+            },
+          });
+          return paperOrder;
+        } catch (error) {
+          const failure = classifyExecutionFailure(error, {
+            operation: "simulate_order",
+            dependency: "paper_exchange_simulator",
+            venue: executionIdentity.venue,
+            executionMode: "paper",
+            domainHint: "PAPER_EXECUTION",
+          });
+          publishExecutionEvent({
+            executionId,
+            symbol: executionSymbol,
+            stage: "PAPER_ORDER_SIMULATION_FAILED",
+            status: "FAILED",
+            message: formatCanonicalExecutionReason(failure),
+            level: "ERROR",
+            context: { ...executionIdentity, ...failure },
+          });
+          throw preserveExecutionFailure(error, {
+            operation: "simulate_order",
+            dependency: "paper_exchange_simulator",
+            venue: executionIdentity.venue,
+            executionMode: "paper",
+            domainHint: "PAPER_EXECUTION",
+          });
+        }
       }
       if (useGlobalLeverageVenue) {
         if (side === "BUY") {
@@ -3768,8 +3948,13 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
       throw ((lastPlaceError as Error) ?? new Error("Order placement failed"));
     }
-    await resetApiFailure(user.id).catch(() => null);
-    await resetDomainApiFailure(user.id, "ACCOUNT").catch(() => null);
+    if (mode === "live") {
+      await resetApiFailure(user.id).catch(() => null);
+      await resetDomainApiFailure(user.id, "LIVE_EXECUTION").catch(() => null);
+      await resetDomainApiFailure(user.id, "BALANCE").catch(() => null);
+    } else if (mode === "paper") {
+      await resetDomainApiFailure(user.id, "PAPER_EXECUTION").catch(() => null);
+    }
 
     if (mode === "live" && !String(placedOrder.orderId ?? "").trim()) {
       publishExecutionEvent({
@@ -3995,7 +4180,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       : runtimeTrailingGap > 0
         ? runtimeTrailingGap
         : ai.analysisScorecard?.trailingGapPercent;
-    const forensicSession = getForensicSession();
     const decisionFeatureSnapshot = buildDecisionFeatureSnapshot({
       candidate: selected,
       ai,
@@ -4033,6 +4217,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       feeTotal: fee.estimatedTakerFee,
       metadata: {
         executionId,
+        campaignId: executionIdentity.campaignId,
         mode,
         executionVenue: useGlobalLeverageVenue ? "BINANCE_GLOBAL" : "BINANCE_TR",
         executionSymbol,
@@ -4122,6 +4307,57 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     });
     await bindDecisionFeatureSnapshotPositionId(position.id);
     await attachOrderToPosition(orderRecord.id, position.id);
+    if (mode === "paper") {
+      const simulationId = String(placedMetadata.simulationId ?? "");
+      try {
+        if (!simulationId) {
+          throw preserveExecutionFailure(new Error("PAPER_EXECUTION_SIMULATION_ID_MISSING"), {
+            operation: "persist_paper_fill",
+            dependency: "execution_simulation",
+            executionMode: "paper",
+            domainHint: "PAPER_EXECUTION",
+          });
+        }
+        await recordPaperFillEvent({
+          campaignId: executionIdentity.campaignId ?? undefined,
+          userId: user.id,
+          simulationId,
+          executionId,
+          positionId: position.id,
+          symbol: executionSymbol,
+          side,
+          executedQty: submittedQty,
+          avgFillPrice: actualFillPrice,
+          fee: fee.estimatedTakerFee,
+          fillCount: Number(placedMetadata.fillCount ?? 1),
+        });
+      } catch (error) {
+        const persistenceFailure = resolveExecutionFailure(error, {
+          operation: "persist_paper_fill",
+          dependency: "paper_trade_repository",
+          executionMode: "paper",
+          domainHint: "DATABASE",
+        });
+        await markPaperPersistenceReconciliation({
+          executionId,
+          symbol: executionSymbol,
+          side,
+          quantity: submittedQty,
+          positionId: position.id,
+          orderId: orderRecord.id,
+          simulationId: simulationId || null,
+          candidateId: canonicalCandidateId,
+          campaignId: executionIdentity.campaignId,
+          jobId: executionIdentity.jobId,
+          sessionId: executionIdentity.sessionId,
+          runId: executionIdentity.runId,
+          roundId: executionIdentity.roundId,
+          venue: executionIdentity.venue,
+          failure: persistenceFailure,
+        });
+        throw new CanonicalExecutionError(persistenceFailure, { cause: error });
+      }
+    }
     void replayExecutionRecord({
       executionId,
       orderId: orderRecord.id,
@@ -4252,6 +4488,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     });
     await setIdempotentExecution(user.id, idempotencyKey, {
       executionId,
+      executionState: "COMPLETED",
       opened: true,
       rejected: false,
       symbol: executionSymbol,
@@ -4315,87 +4552,103 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
   } catch (error) {
     resumeScannerWorker();
     const appError = toAppError(error);
-    const internalMessage = appError.message;
-    const failure = classifyExecutionFailure(internalMessage, appError.code);
-    const safeMessage = appError.expose
-      ? appError.message
-      : `EXECUTION_FLOW_FAILED:${failure.reasonCode}`;
-    logger.error({ err: internalMessage, code: appError.code }, "Execution orchestrator failed");
+    const internalMessage = redactExecutionError(appError.message);
+    const paperFailure = mode === "paper" && /paper|simulation/i.test(internalMessage);
+    const failure = resolveExecutionFailure(error, {
+      operation: paperFailure ? "simulate_order" : "execute_analyze_and_trade",
+      dependency: paperFailure ? "paper_exchange_simulator" : "execution_orchestrator",
+      venue: executionIdentity.venue,
+      executionMode: mode,
+      appErrorCode: appError.code,
+    });
+    const safeMessage = formatCanonicalExecutionReason(failure);
+    logger.error(
+      {
+        err: failure.safeMessage,
+        code: appError.code,
+        failureDomain: failure.failureDomain,
+        failureCode: failure.failureCode,
+      },
+      "Execution orchestrator failed",
+    );
     try {
       const { user } = await getRuntimeExecutionContext(input.userId);
-      if (failure.countsTowardExecutionBreaker) {
+      if (failure.breakerEligible) {
         const failureState = await registerDomainApiFailure({
           userId: user.id,
-          domain: "EXECUTION",
-          reasonCode: failure.reasonCode,
-          reasonMessage: internalMessage,
+          domain: failure.failureDomain,
+          reasonCode: failure.failureCode,
+          reasonMessage: failure.safeMessage,
           cooldownMs: 10 * 60 * 1000,
         });
         const risk = await getEffectiveRiskConfig(user.id);
         if (failureState.count >= risk.apiFailureBreaker) {
-          await setSafeModeState({
-            userId: user.id,
-            enabled: true,
-            reason: failure.safeModeReason ?? "EXECUTION_BREAKER_OPEN",
-            requireManualAck: true,
-          }).catch(() => null);
+          failure.breakerState = "OPEN";
+          failure.openUntil = failureState.blockedUntil ?? null;
+          if (mode === "live" && failure.failureDomain === "LIVE_EXECUTION") {
+            await setSafeModeState({
+              userId: user.id,
+              enabled: true,
+              reason: safeMessage,
+              requireManualAck: true,
+            }).catch(() => null);
+          }
           await notifySystemEvent({
             userId: user.id,
-            eventType: "BINANCE_API_ERROR",
-            title: "Binance API hatasi",
-            message: `Execution breaker acildi (${failure.reasonCode}), sistem safe mode'a alindi.`,
+            eventType: "EXECUTION_DEPENDENCY_ERROR",
+            title: "Execution dependency breaker",
+            message: `${safeMessage} dependency=${failure.dependency} operation=${failure.operation}`,
             level: "ERROR",
+          });
+          publishExecutionEvent({
+            executionId,
+            symbol: input.requestedSymbol,
+            stage: "BREAKER_OPENED",
+            status: "FAILED",
+            message: safeMessage,
+            level: "ERROR",
+            context: { ...executionIdentity, ...failure },
           });
           logger.warn(
             { userId: user.id, failureCount: failureState.count, breaker: risk.apiFailureBreaker, failure },
-            "API failure breaker reached; auto-pause skipped to keep manual trading available",
+            "Isolated execution dependency breaker reached",
           );
         }
       }
-      if (
-        (appError.code === "EXTERNAL_SERVICE_FAILURE" || appError.code === "CIRCUIT_OPEN") &&
-        (failure.domain === "EXECUTION" || failure.domain === "ACCOUNT")
-      ) {
+      if (failure.failureDomain === "DATABASE") {
         await setSafeModeState({
           userId: user.id,
           enabled: true,
-          reason: failure.safeModeReason ?? "External service failure",
-          requireManualAck: true,
-        }).catch(() => null);
-        await notifySystemEvent({
-          userId: user.id,
-          eventType: "BINANCE_API_ERROR",
-          title: "Dis servis hatasi",
-          message: `${failure.domain} domain servisleri cevap vermiyor, safe mode aktif.`,
-          level: "ERROR",
-        });
-      }
-      if (/P1001|database|prisma/i.test(internalMessage)) {
-        await setSafeModeState({
-          userId: user.id,
-          enabled: true,
-          reason: "Database connection lost",
+          reason: safeMessage,
           requireManualAck: true,
         }).catch(() => null);
       }
-    } catch {
-      // noop
+    } catch (telemetryError) {
+      logger.warn(
+        { error: redactExecutionError(telemetryError), executionId },
+        "Execution failure telemetry persistence failed",
+      );
     }
     publishExecutionEvent({
       executionId,
+      symbol: input.requestedSymbol,
       stage: "failed",
       status: "FAILED",
       message: safeMessage,
       level: "ERROR",
-      context: {
-        failureDomain: failure.domain,
-        failureCode: failure.reasonCode,
-        statusCode: failure.statusCode,
-        safeModeReason: failure.safeModeReason ?? null,
-      },
+      context: { ...executionIdentity, ...failure },
     });
     const { user } = await getRuntimeExecutionContext(input.userId).catch(() => ({ user: null as { id: string } | null }));
     if (user?.id) {
+      const keepInProgressForLateResultGuard =
+        mode === "paper" &&
+        (failure.operation === "simulate_order" ||
+          /paper|simulation/i.test(internalMessage) ||
+          /paper|simulation/i.test(safeMessage)) &&
+        (/TIMEOUT/i.test(failure.failureCode) ||
+          /CANCEL/i.test(failure.failureCode) ||
+          /TIMEOUT/i.test(internalMessage) ||
+          /CANCEL/i.test(internalMessage));
       await persistAnalysisState({
         userId: user.id,
         executionId,
@@ -4403,6 +4656,28 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         stage: "failed",
         status: "FAILED",
       }).catch(() => null);
+      if (!input.bypassIdempotency) {
+        if (keepInProgressForLateResultGuard) {
+          publishExecutionEvent({
+            executionId,
+            symbol: input.requestedSymbol,
+            stage: "LATE_RESULT_GUARD_ARMED",
+            status: "RUNNING",
+            message: "Paper timeout/cancel guarded: execution intent kept IN_PROGRESS for late result dedupe",
+            level: "WARN",
+            context: { ...executionIdentity, failureCode: failure.failureCode, failureDomain: failure.failureDomain },
+          });
+        }
+        await setIdempotentExecution(user.id, idempotencyKey, {
+          executionId,
+          executionState: keepInProgressForLateResultGuard ? "IN_PROGRESS" : "FAILED",
+          opened: false,
+          rejected: true,
+          rejectReason: safeMessage,
+          symbol: input.requestedSymbol ?? undefined,
+          updatedAt: new Date().toISOString(),
+        }).catch(() => null);
+      }
     }
     await addSystemLog({
       level: "ERROR",
@@ -4410,19 +4685,23 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       message: `Execution failed: ${internalMessage}`,
       context: {
         executionId,
-        failureDomain: failure.domain,
-        failureCode: failure.reasonCode,
+        failureDomain: failure.failureDomain,
+        failureCode: failure.failureCode,
+        operation: failure.operation,
+        dependency: failure.dependency,
+        retryable: failure.retryable,
         statusCode: failure.statusCode,
       },
     }).catch(() => null);
     if (canonicalCandidateId) {
-      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_REJECTED", [failure.reasonCode]);
+      getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_REJECTED", [failure.failureCode]);
     }
     await logTradeLifecycle({
       executionId,
       stage: "failed",
       status: "FAILED",
-      message: internalMessage,
+      message: safeMessage,
+      context: { ...executionIdentity, ...failure },
     });
     return finishExecution({
       executionId,
@@ -4430,11 +4709,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       opened: false,
       rejected: true,
       rejectReason: safeMessage,
-      details: {
-        failureDomain: failure.domain,
-        failureCode: failure.reasonCode,
-        statusCode: failure.statusCode,
-      },
+      details: { ...failure },
     });
   } finally {
     markHeartbeat({ service: "execution", status: "UP", message: "Execution flow finished", details: { executionId } });

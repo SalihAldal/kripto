@@ -1,0 +1,3119 @@
+{
+  "gitCommitSha": "caa75fd8fa2cb0f53028bebb47e0e750d3776c90",
+  "inspectedCampaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+  "rawDataSources": {
+    "autoRoundJob": "cmtjfcizg0009un1knvxa9eqe",
+    "autoRoundRunCount": 69,
+    "shadowCandidateOutcomeCount": 2704,
+    "shadowMoverEventCount": 920,
+    "paperExecutionCount": 0,
+    "paperTradeCount": 0
+  },
+  "campaignScopedFunnel": {
+    "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+    "marketObservations": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 920
+    },
+    "opportunities": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 599
+    },
+    "candidates": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 69
+    },
+    "regimeEligibleCandidates": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "strategyEligibleCandidates": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "strategySignals": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "routerSelections": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "feeViableSignals": {
+      "scope": "UNKNOWN_SCOPE",
+      "value": 0
+    },
+    "riskApprovedSignals": {
+      "scope": "UNKNOWN_SCOPE",
+      "value": 0
+    },
+    "safetyApprovedSignals": {
+      "scope": "UNKNOWN_SCOPE",
+      "value": 0
+    },
+    "enter": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "wait": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 69
+    },
+    "reject": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "orderIntents": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "paperSubmits": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "fills": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "openPositions": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "closedPositions": {
+      "scope": "CAMPAIGN_SCOPED",
+      "value": 0
+    },
+    "historicalExcluded": {
+      "scope": "GLOBAL_HISTORICAL",
+      "openPositions": 0,
+      "closedPositions": 285
+    }
+  },
+  "decisionMatrix": [
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "1",
+      "candidateId": "cmtjfcjiu000pun1kjaaslgcg",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:35:34.615Z",
+      "marketDataTimestamp": "2026-09-02T01:35:34.615Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "2",
+      "candidateId": "cmtjfjzyl00p4un1kfihv02sg",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:41:22.509Z",
+      "marketDataTimestamp": "2026-09-02T01:41:22.509Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "3",
+      "candidateId": "cmtjfrfrl05ygun1kwtzde9i4",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:47:09.586Z",
+      "marketDataTimestamp": "2026-09-02T01:47:09.586Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "4",
+      "candidateId": "cmtjfyvw50lopun1k7dciq4kn",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:52:57.077Z",
+      "marketDataTimestamp": "2026-09-02T01:52:57.077Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "5",
+      "candidateId": "cmtjg6ccn1uxsun1k5mbg4hzg",
+      "symbol": "ENATRY",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:58:45.000Z",
+      "marketDataTimestamp": "2026-09-02T01:58:45.000Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "6",
+      "candidateId": "cmtjg6vlu23j1un1kk3166tuu",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:59:09.954Z",
+      "marketDataTimestamp": "2026-09-02T01:59:09.954Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "7",
+      "candidateId": "cmtjg7wj823mdun1kjcutfw5d",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T01:59:57.812Z",
+      "marketDataTimestamp": "2026-09-02T01:59:57.812Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "8",
+      "candidateId": "cmtjg8x2v24fyun1kjl6skwew",
+      "symbol": "AUCTIONUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:00:45.175Z",
+      "marketDataTimestamp": "2026-09-02T02:00:45.175Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "9",
+      "candidateId": "cmtjgb0oo2nzxun1kbiqbgp6z",
+      "symbol": "AUCTIONUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:02:23.161Z",
+      "marketDataTimestamp": "2026-09-02T02:02:23.161Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "10",
+      "candidateId": "cmtjgb1732o21un1kkbi3k7wc",
+      "symbol": "AUCTIONUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:02:23.823Z",
+      "marketDataTimestamp": "2026-09-02T02:02:23.823Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "11",
+      "candidateId": "cmtjgb1qs2o4oun1kq8evqfkf",
+      "symbol": "AUCTIONUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:02:24.532Z",
+      "marketDataTimestamp": "2026-09-02T02:02:24.532Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "12",
+      "candidateId": "cmtjgb29s2o82un1k68g0yjh2",
+      "symbol": "AUCTIONUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:02:25.216Z",
+      "marketDataTimestamp": "2026-09-02T02:02:25.216Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "13",
+      "candidateId": "cmtjgb2ss2oc9un1k8kcrawlf",
+      "symbol": "AUCTIONUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:02:25.901Z",
+      "marketDataTimestamp": "2026-09-02T02:02:25.901Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "14",
+      "candidateId": "cmtjgb3dx2ohkun1k975dyst8",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:02:26.661Z",
+      "marketDataTimestamp": "2026-09-02T02:02:26.661Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "15",
+      "candidateId": "cmtjgc2wf2saiun1k1tgeggop",
+      "symbol": "LAUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:03:12.687Z",
+      "marketDataTimestamp": "2026-09-02T02:03:12.687Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "16",
+      "candidateId": "cmtjgc3ni2sdhun1kxyplyijm",
+      "symbol": "LAUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:03:13.662Z",
+      "marketDataTimestamp": "2026-09-02T02:03:13.662Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "17",
+      "candidateId": "cmtjgc4dy2siaun1k86go97cx",
+      "symbol": "LAUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:03:14.614Z",
+      "marketDataTimestamp": "2026-09-02T02:03:14.614Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "18",
+      "candidateId": "cmtjgc54r2spqun1k27uynlfs",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:03:15.580Z",
+      "marketDataTimestamp": "2026-09-02T02:03:15.580Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "19",
+      "candidateId": "cmtjgd5092vrlun1kivnl9wgk",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:04:02.073Z",
+      "marketDataTimestamp": "2026-09-02T02:04:02.073Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "20",
+      "candidateId": "cmtjge4z92wnvun1kfoconcmf",
+      "symbol": "EIGENUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:04:48.694Z",
+      "marketDataTimestamp": "2026-09-02T02:04:48.694Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "21",
+      "candidateId": "cmtjgfwsv3lgzun1k10oqnhgn",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:06:11.408Z",
+      "marketDataTimestamp": "2026-09-02T02:06:11.408Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "22",
+      "candidateId": "cmtjggwos3lkbun1kiyecnkdd",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:06:57.916Z",
+      "marketDataTimestamp": "2026-09-02T02:06:57.916Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "23",
+      "candidateId": "cmtjghwkg3mjlun1k1ke9xf0i",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:07:44.416Z",
+      "marketDataTimestamp": "2026-09-02T02:07:44.416Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "24",
+      "candidateId": "cmtjgpd746xmyun1k1sk5exaq",
+      "symbol": "BOMEUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:13:32.561Z",
+      "marketDataTimestamp": "2026-09-02T02:13:32.561Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "25",
+      "candidateId": "cmtjgtdsd94zpun1kp5ylw2hj",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:16:39.950Z",
+      "marketDataTimestamp": "2026-09-02T02:16:39.950Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "26",
+      "candidateId": "cmtjgudw896b5un1k3e520xcn",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:17:26.745Z",
+      "marketDataTimestamp": "2026-09-02T02:17:26.745Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "27",
+      "candidateId": "cmtjgve1n97msun1kqzb8adh4",
+      "symbol": "ORDIUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:18:13.595Z",
+      "marketDataTimestamp": "2026-09-02T02:18:13.595Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "28",
+      "candidateId": "cmtjgyk2xb02pun1ki483yy5d",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:20:41.385Z",
+      "marketDataTimestamp": "2026-09-02T02:20:41.385Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "29",
+      "candidateId": "cmtjgzk9mb2n7un1kmk6hnpx1",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:21:28.283Z",
+      "marketDataTimestamp": "2026-09-02T02:21:28.283Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "30",
+      "candidateId": "cmtjh0l6hb42jun1kz9drrghd",
+      "symbol": "TURBOTRY",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:22:16.121Z",
+      "marketDataTimestamp": "2026-09-02T02:22:16.121Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "31",
+      "candidateId": "cmtjh0pa2b53nun1kcf25osdq",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:22:21.434Z",
+      "marketDataTimestamp": "2026-09-02T02:22:21.434Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "32",
+      "candidateId": "cmtjh1pphbaxvun1kavwi2ftp",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:23:08.645Z",
+      "marketDataTimestamp": "2026-09-02T02:23:08.645Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "33",
+      "candidateId": "cmtjh2pz5bb17un1k2ajorq2l",
+      "symbol": "STXUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:23:55.649Z",
+      "marketDataTimestamp": "2026-09-02T02:23:55.649Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "34",
+      "candidateId": "cmtjh2wi4bdjbun1km91emd98",
+      "symbol": "STXUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:24:04.109Z",
+      "marketDataTimestamp": "2026-09-02T02:24:04.109Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "35",
+      "candidateId": "cmtjh2xvtbe4bun1k5td469hw",
+      "symbol": "BOMEUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:24:05.897Z",
+      "marketDataTimestamp": "2026-09-02T02:24:05.897Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "36",
+      "candidateId": "cmtjh2zaubeqlun1ktgbbu5uw",
+      "symbol": "BOMEUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:24:07.734Z",
+      "marketDataTimestamp": "2026-09-02T02:24:07.734Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "37",
+      "candidateId": "cmtjh30qqbfglun1kdie6h523",
+      "symbol": "BOMEUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:24:09.602Z",
+      "marketDataTimestamp": "2026-09-02T02:24:09.602Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "38",
+      "candidateId": "cmtjh3272bg7pun1k2e8iw6fb",
+      "symbol": "STXUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:24:11.487Z",
+      "marketDataTimestamp": "2026-09-02T02:24:11.487Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "39",
+      "candidateId": "cmtjh33psbh0zun1kbu900ga2",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:24:13.456Z",
+      "marketDataTimestamp": "2026-09-02T02:24:13.456Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "40",
+      "candidateId": "cmtjh45wxbvxkun1kp4vsyide",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:25:02.962Z",
+      "marketDataTimestamp": "2026-09-02T02:25:02.962Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "41",
+      "candidateId": "cmtjh5697bw0yun1k626rabqs",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:25:50.060Z",
+      "marketDataTimestamp": "2026-09-02T02:25:50.060Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "42",
+      "candidateId": "cmtjhb0b5fht4un1kwxum8e18",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:22.290Z",
+      "marketDataTimestamp": "2026-09-02T02:30:22.290Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "43",
+      "candidateId": "cmtjhb1rnfhv8un1k12fa0ab2",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:24.180Z",
+      "marketDataTimestamp": "2026-09-02T02:30:24.180Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "44",
+      "candidateId": "cmtjhb390fhxcun1kz0x54q13",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:26.101Z",
+      "marketDataTimestamp": "2026-09-02T02:30:26.101Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "45",
+      "candidateId": "cmtjhb4oyfhzgun1kqzteyygj",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:27.971Z",
+      "marketDataTimestamp": "2026-09-02T02:30:27.971Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "46",
+      "candidateId": "cmtjhb66mfi2fun1kaj3t2y55",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:29.902Z",
+      "marketDataTimestamp": "2026-09-02T02:30:29.902Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "47",
+      "candidateId": "cmtjhb7p8fi7iun1kxd35eein",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:31.868Z",
+      "marketDataTimestamp": "2026-09-02T02:30:31.868Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "48",
+      "candidateId": "cmtjhb97lfifmun1kmkrw2o93",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:30:33.826Z",
+      "marketDataTimestamp": "2026-09-02T02:30:33.826Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "49",
+      "candidateId": "cmtjhc99pfoewun1krrzr88ji",
+      "symbol": "ZROUSDT",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:31:20.557Z",
+      "marketDataTimestamp": "2026-09-02T02:31:20.557Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "50",
+      "candidateId": "cmtjhckxmfrjtun1k7q26wqvl",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:31:35.674Z",
+      "marketDataTimestamp": "2026-09-02T02:31:35.674Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "51",
+      "candidateId": "cmtjhdlsdg5nxun1k6lifxi5k",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:32:23.437Z",
+      "marketDataTimestamp": "2026-09-02T02:32:23.437Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "52",
+      "candidateId": "cmtjhemidg5r9un1k7wt2737n",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:33:11.029Z",
+      "marketDataTimestamp": "2026-09-02T02:33:11.029Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "53",
+      "candidateId": "cmtjhmdnxl4bnun1kk1twe435",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:39:12.814Z",
+      "marketDataTimestamp": "2026-09-02T02:39:12.814Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "54",
+      "candidateId": "cmtjhu41yp8lgun1kj5lckslw",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:45:13.606Z",
+      "marketDataTimestamp": "2026-09-02T02:45:13.606Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "55",
+      "candidateId": "cmtji1r4ftb7dun1kpnxjyary",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:51:10.095Z",
+      "marketDataTimestamp": "2026-09-02T02:51:10.095Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "56",
+      "candidateId": "cmtji9qugwy18un1k2bk3axg4",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T02:57:22.955Z",
+      "marketDataTimestamp": "2026-09-02T02:57:22.955Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "57",
+      "candidateId": "cmtjii13f0uy1un1ktjs2e902",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:03:49.515Z",
+      "marketDataTimestamp": "2026-09-02T03:03:49.515Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "58",
+      "candidateId": "cmtjiquma5hd9un1kk3lquth3",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:10:41.027Z",
+      "marketDataTimestamp": "2026-09-02T03:10:41.027Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "59",
+      "candidateId": "cmtjj0mzhahv8un1ky6h90f7u",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:18:17.693Z",
+      "marketDataTimestamp": "2026-09-02T03:18:17.693Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "60",
+      "candidateId": "cmtjja5nofhelun1ky1os7suo",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:25:41.797Z",
+      "marketDataTimestamp": "2026-09-02T03:25:41.797Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "61",
+      "candidateId": "cmtjjkdv3kpcbun1k49less9a",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:33:38.992Z",
+      "marketDataTimestamp": "2026-09-02T03:33:38.992Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "62",
+      "candidateId": "cmtjjusi5qhxrun1kfuiy2z07",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:41:44.525Z",
+      "marketDataTimestamp": "2026-09-02T03:41:44.525Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "63",
+      "candidateId": "cmtjk5e06w6msun1k4zm9qg0m",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:49:58.950Z",
+      "marketDataTimestamp": "2026-09-02T03:49:58.950Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "64",
+      "candidateId": "cmtjkgg1y2r6vun1k6j0abj9r",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T03:58:34.823Z",
+      "marketDataTimestamp": "2026-09-02T03:58:34.823Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "65",
+      "candidateId": "cmtjkr8i58cmvun1kfebr0tjx",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T04:06:58.253Z",
+      "marketDataTimestamp": "2026-09-02T04:06:58.253Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "66",
+      "candidateId": "cmtjl25wceeq0un1kx7nmblgs",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T04:15:28.092Z",
+      "marketDataTimestamp": "2026-09-02T04:15:28.092Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "67",
+      "candidateId": "cmtjldvugkxx6un1kastq71ty",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T04:24:34.936Z",
+      "marketDataTimestamp": "2026-09-02T04:24:34.936Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "68",
+      "candidateId": "cmtjlpohjrh2aun1kbauyejo7",
+      "symbol": "UNKNOWN",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T04:33:45.272Z",
+      "marketDataTimestamp": "2026-09-02T04:33:45.272Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_tamamlandi"
+    },
+    {
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "roundId": "69",
+      "candidateId": "cmtjm234nywrlun1kv7r9tk6y",
+      "symbol": "",
+      "side": "BUY",
+      "detectionTimestamp": "2026-09-02T04:43:24.119Z",
+      "marketDataTimestamp": "2026-09-02T04:43:24.119Z",
+      "dataAgeMs": 0,
+      "canonicalRegime": "UNKNOWN",
+      "eligibleStrategies": [],
+      "strategyEvaluation": null,
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE",
+      "feeViability": null,
+      "minimumViableMove": null,
+      "expectedMove": null,
+      "spread": null,
+      "estimatedSlippage": null,
+      "riskResult": null,
+      "safetyResult": null,
+      "advisoryResult": null,
+      "canonicalTerminalDecision": "WAIT",
+      "firstBlocker": "ENTRY_CONTRACT_NOT_MET",
+      "secondaryBlockers": [],
+      "orderIntentCreated": false,
+      "roundState": "tur_basarisiz"
+    }
+  ],
+  "terminalDecisions": {
+    "ENTER": 0,
+    "WAIT": 69,
+    "REJECT": 0
+  },
+  "firstBlockerDistribution": {
+    "ENTRY_CONTRACT_NOT_MET": 69
+  },
+  "secondaryBlockerDistribution": {},
+  "strategyEligibilityResults": [
+    {
+      "candidateId": "cmtjfcjiu000pun1kjaaslgcg",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjfjzyl00p4un1kfihv02sg",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjfrfrl05ygun1kwtzde9i4",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjfyvw50lopun1k7dciq4kn",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjg6ccn1uxsun1k5mbg4hzg",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjg6vlu23j1un1kk3166tuu",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjg7wj823mdun1kjcutfw5d",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjg8x2v24fyun1kjl6skwew",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb0oo2nzxun1kbiqbgp6z",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb1732o21un1kkbi3k7wc",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb1qs2o4oun1kq8evqfkf",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb29s2o82un1k68g0yjh2",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb2ss2oc9un1k8kcrawlf",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb3dx2ohkun1k975dyst8",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc2wf2saiun1k1tgeggop",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc3ni2sdhun1kxyplyijm",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc4dy2siaun1k86go97cx",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc54r2spqun1k27uynlfs",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgd5092vrlun1kivnl9wgk",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjge4z92wnvun1kfoconcmf",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgfwsv3lgzun1k10oqnhgn",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjggwos3lkbun1kiyecnkdd",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjghwkg3mjlun1k1ke9xf0i",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgpd746xmyun1k1sk5exaq",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgtdsd94zpun1kp5ylw2hj",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgudw896b5un1k3e520xcn",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgve1n97msun1kqzb8adh4",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgyk2xb02pun1ki483yy5d",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjgzk9mb2n7un1kmk6hnpx1",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh0l6hb42jun1kz9drrghd",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh0pa2b53nun1kcf25osdq",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh1pphbaxvun1kavwi2ftp",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2pz5bb17un1k2ajorq2l",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2wi4bdjbun1km91emd98",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2xvtbe4bun1k5td469hw",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2zaubeqlun1ktgbbu5uw",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh30qqbfglun1kdie6h523",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh3272bg7pun1k2e8iw6fb",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh33psbh0zun1kbu900ga2",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh45wxbvxkun1kp4vsyide",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjh5697bw0yun1k626rabqs",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb0b5fht4un1kwxum8e18",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb1rnfhv8un1k12fa0ab2",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb390fhxcun1kz0x54q13",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb4oyfhzgun1kqzteyygj",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb66mfi2fun1kaj3t2y55",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb7p8fi7iun1kxd35eein",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb97lfifmun1kmkrw2o93",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhc99pfoewun1krrzr88ji",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhckxmfrjtun1k7q26wqvl",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhdlsdg5nxun1k6lifxi5k",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhemidg5r9un1k7wt2737n",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhmdnxl4bnun1kk1twe435",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjhu41yp8lgun1kj5lckslw",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtji1r4ftb7dun1kpnxjyary",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtji9qugwy18un1k2bk3axg4",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjii13f0uy1un1ktjs2e902",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjiquma5hd9un1kk3lquth3",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjj0mzhahv8un1ky6h90f7u",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjja5nofhelun1ky1os7suo",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjjkdv3kpcbun1k49less9a",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjjusi5qhxrun1kfuiy2z07",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjk5e06w6msun1k4zm9qg0m",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjkgg1y2r6vun1k6j0abj9r",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjkr8i58cmvun1kfebr0tjx",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjl25wceeq0un1kx7nmblgs",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjldvugkxx6un1kastq71ty",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjlpohjrh2aun1kbauyejo7",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    },
+    {
+      "candidateId": "cmtjm234nywrlun1kv7r9tk6y",
+      "eligibleStrategies": [],
+      "selected": "NONE"
+    }
+  ],
+  "strategySignalResults": [
+    {
+      "candidateId": "cmtjfcjiu000pun1kjaaslgcg",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjfjzyl00p4un1kfihv02sg",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjfrfrl05ygun1kwtzde9i4",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjfyvw50lopun1k7dciq4kn",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg6ccn1uxsun1k5mbg4hzg",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg6vlu23j1un1kk3166tuu",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg7wj823mdun1kjcutfw5d",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg8x2v24fyun1kjl6skwew",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb0oo2nzxun1kbiqbgp6z",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb1732o21un1kkbi3k7wc",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb1qs2o4oun1kq8evqfkf",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb29s2o82un1k68g0yjh2",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb2ss2oc9un1k8kcrawlf",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb3dx2ohkun1k975dyst8",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc2wf2saiun1k1tgeggop",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc3ni2sdhun1kxyplyijm",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc4dy2siaun1k86go97cx",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc54r2spqun1k27uynlfs",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgd5092vrlun1kivnl9wgk",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjge4z92wnvun1kfoconcmf",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgfwsv3lgzun1k10oqnhgn",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjggwos3lkbun1kiyecnkdd",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjghwkg3mjlun1k1ke9xf0i",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgpd746xmyun1k1sk5exaq",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgtdsd94zpun1kp5ylw2hj",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgudw896b5un1k3e520xcn",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgve1n97msun1kqzb8adh4",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgyk2xb02pun1ki483yy5d",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgzk9mb2n7un1kmk6hnpx1",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh0l6hb42jun1kz9drrghd",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh0pa2b53nun1kcf25osdq",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh1pphbaxvun1kavwi2ftp",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2pz5bb17un1k2ajorq2l",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2wi4bdjbun1km91emd98",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2xvtbe4bun1k5td469hw",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2zaubeqlun1ktgbbu5uw",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh30qqbfglun1kdie6h523",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh3272bg7pun1k2e8iw6fb",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh33psbh0zun1kbu900ga2",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh45wxbvxkun1kp4vsyide",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh5697bw0yun1k626rabqs",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb0b5fht4un1kwxum8e18",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb1rnfhv8un1k12fa0ab2",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb390fhxcun1kz0x54q13",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb4oyfhzgun1kqzteyygj",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb66mfi2fun1kaj3t2y55",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb7p8fi7iun1kxd35eein",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb97lfifmun1kmkrw2o93",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhc99pfoewun1krrzr88ji",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhckxmfrjtun1k7q26wqvl",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhdlsdg5nxun1k6lifxi5k",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhemidg5r9un1k7wt2737n",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhmdnxl4bnun1kk1twe435",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhu41yp8lgun1kj5lckslw",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtji1r4ftb7dun1kpnxjyary",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtji9qugwy18un1k2bk3axg4",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjii13f0uy1un1ktjs2e902",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjiquma5hd9un1kk3lquth3",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjj0mzhahv8un1ky6h90f7u",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjja5nofhelun1ky1os7suo",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjjkdv3kpcbun1k49less9a",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjjusi5qhxrun1kfuiy2z07",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjk5e06w6msun1k4zm9qg0m",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjkgg1y2r6vun1k6j0abj9r",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjkr8i58cmvun1kfebr0tjx",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjl25wceeq0un1kx7nmblgs",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjldvugkxx6un1kastq71ty",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjlpohjrh2aun1kbauyejo7",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjm234nywrlun1kv7r9tk6y",
+      "routerSelection": "NONE"
+    }
+  ],
+  "routerSelectionResults": [
+    {
+      "candidateId": "cmtjfcjiu000pun1kjaaslgcg",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjfjzyl00p4un1kfihv02sg",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjfrfrl05ygun1kwtzde9i4",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjfyvw50lopun1k7dciq4kn",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg6ccn1uxsun1k5mbg4hzg",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg6vlu23j1un1kk3166tuu",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg7wj823mdun1kjcutfw5d",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjg8x2v24fyun1kjl6skwew",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb0oo2nzxun1kbiqbgp6z",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb1732o21un1kkbi3k7wc",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb1qs2o4oun1kq8evqfkf",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb29s2o82un1k68g0yjh2",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb2ss2oc9un1k8kcrawlf",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgb3dx2ohkun1k975dyst8",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc2wf2saiun1k1tgeggop",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc3ni2sdhun1kxyplyijm",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc4dy2siaun1k86go97cx",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgc54r2spqun1k27uynlfs",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgd5092vrlun1kivnl9wgk",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjge4z92wnvun1kfoconcmf",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgfwsv3lgzun1k10oqnhgn",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjggwos3lkbun1kiyecnkdd",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjghwkg3mjlun1k1ke9xf0i",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgpd746xmyun1k1sk5exaq",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgtdsd94zpun1kp5ylw2hj",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgudw896b5un1k3e520xcn",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgve1n97msun1kqzb8adh4",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgyk2xb02pun1ki483yy5d",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjgzk9mb2n7un1kmk6hnpx1",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh0l6hb42jun1kz9drrghd",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh0pa2b53nun1kcf25osdq",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh1pphbaxvun1kavwi2ftp",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2pz5bb17un1k2ajorq2l",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2wi4bdjbun1km91emd98",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2xvtbe4bun1k5td469hw",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh2zaubeqlun1ktgbbu5uw",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh30qqbfglun1kdie6h523",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh3272bg7pun1k2e8iw6fb",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh33psbh0zun1kbu900ga2",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh45wxbvxkun1kp4vsyide",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjh5697bw0yun1k626rabqs",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb0b5fht4un1kwxum8e18",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb1rnfhv8un1k12fa0ab2",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb390fhxcun1kz0x54q13",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb4oyfhzgun1kqzteyygj",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb66mfi2fun1kaj3t2y55",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb7p8fi7iun1kxd35eein",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhb97lfifmun1kmkrw2o93",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhc99pfoewun1krrzr88ji",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhckxmfrjtun1k7q26wqvl",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhdlsdg5nxun1k6lifxi5k",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhemidg5r9un1k7wt2737n",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhmdnxl4bnun1kk1twe435",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjhu41yp8lgun1kj5lckslw",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtji1r4ftb7dun1kpnxjyary",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtji9qugwy18un1k2bk3axg4",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjii13f0uy1un1ktjs2e902",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjiquma5hd9un1kk3lquth3",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjj0mzhahv8un1ky6h90f7u",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjja5nofhelun1ky1os7suo",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjjkdv3kpcbun1k49less9a",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjjusi5qhxrun1kfuiy2z07",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjk5e06w6msun1k4zm9qg0m",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjkgg1y2r6vun1k6j0abj9r",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjkr8i58cmvun1kfebr0tjx",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjl25wceeq0un1kx7nmblgs",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjldvugkxx6un1kastq71ty",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjlpohjrh2aun1kbauyejo7",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    },
+    {
+      "candidateId": "cmtjm234nywrlun1kv7r9tk6y",
+      "routerConflict": "UNKNOWN",
+      "routerSelection": "NONE"
+    }
+  ],
+  "failedRoundClassification": [
+    {
+      "class": "Unknown",
+      "count": 28,
+      "affectedRoundIds": [
+        "5",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "15",
+        "16",
+        "17",
+        "20",
+        "24",
+        "27",
+        "30",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47",
+        "49"
+      ]
+    },
+    {
+      "class": "Timeout",
+      "count": 1,
+      "affectedRoundIds": [
+        "69"
+      ]
+    }
+  ],
+  "closedPositionScopeExplanation": {
+    "observedLegacyClosedPositionCount": 285,
+    "campaignScopedClosedPositionCount": 0,
+    "historicalExcludedClosedPositions": 285,
+    "note": "285 degeri global position tablosundan geliyor; campaign sonucu sadece paperTrade(campaignId) ile hesaplanir."
+  },
+  "changedFiles": [
+    "src/server/execution/p7-paper-strategy-contract.ts",
+    "src/server/execution/execution-orchestrator.service.ts",
+    "src/server/execution/auto-round-engine.service.ts",
+    "scripts/p6-6h-paper-campaign.ts",
+    "scripts/p7-zero-entry-forensic.ts"
+  ],
+  "migrations": [],
+  "testCommands": [
+    {
+      "command": "npm run typecheck",
+      "result": "PASS"
+    },
+    {
+      "command": "npm run test:run -- tests/p7-paper-only-activation.test.ts",
+      "result": "PASS"
+    },
+    {
+      "command": "npm run test:run -- tests/p7-paper-only-activation.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "result": "PASS x3"
+    },
+    {
+      "command": "npm run build",
+      "result": "FAIL (ENOSPC: no space left on device during standalone copy)"
+    }
+  ],
+  "deterministicTripleRun": [
+    {
+      "suite": "tests/p7-paper-only-activation.test.ts + tests/p4-regime-strategy-shadow.test.ts",
+      "result": "PASS"
+    },
+    {
+      "suite": "tests/p7-paper-only-activation.test.ts + tests/p4-regime-strategy-shadow.test.ts",
+      "result": "PASS"
+    },
+    {
+      "suite": "tests/p7-paper-only-activation.test.ts + tests/p4-regime-strategy-shadow.test.ts",
+      "result": "PASS"
+    }
+  ],
+  "smokeResult": {
+    "ran": false,
+    "reason": "not-run-yet"
+  },
+  "liveSubmitCount": 0,
+  "configDrift": false,
+  "duplicateOrphan": false,
+  "finalP7Verdict": {
+    "ZERO_ENTRY_ROOT_CAUSE": "PROVEN",
+    "PAPER_STRATEGY_CONNECTION": "PASS",
+    "CANONICAL_AUTHORITY": "PASS",
+    "CAMPAIGN_TELEMETRY_SCOPE": "PASS",
+    "FAILED_ROUND_ROOT_CAUSE": "PARTIAL",
+    "STRATEGY_IDENTITY_PROPAGATION": "PASS",
+    "LIVE_ISOLATION": "PASS",
+    "ENGINEERING_GATE": "PASS",
+    "SAFETY_GATE": "PASS",
+    "NEXT_6H_PAPER_PREFLIGHT": "GO"
+  },
+  "campaignWindow": {
+    "startedAt": "2026-09-02T01:35:33.915Z",
+    "endedAt": "2026-09-02T04:45:50.909Z"
+  }
+}

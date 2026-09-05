@@ -3,6 +3,7 @@ import { getForensicSession } from "@/src/server/forensics/forensic-context";
 
 export type CanonicalEventEnvelope = {
   eventId: string;
+  campaignId?: string;
   runId: string;
   candidateId?: string;
   positionId?: string;
@@ -27,6 +28,7 @@ export function recordCanonicalEvent(input: Omit<CanonicalEventEnvelope, "eventI
   if (!runId) return null;
   const row: CanonicalEventEnvelope = {
     eventId: `evt_${randomUUID()}`,
+    campaignId: session?.campaignId,
     runId,
     candidateId: input.candidateId,
     positionId: input.positionId,

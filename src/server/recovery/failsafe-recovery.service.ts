@@ -187,6 +187,38 @@ export async function getIdempotentExecution(userId: string, idempotencyKey: str
   return row.value as Record<string, unknown>;
 }
 
+export async function claimIdempotentExecutionIntent(
+  userId: string,
+  idempotencyKey: string,
+  executionId: string,
+): Promise<{ claimed: boolean; existing: Record<string, unknown> | null }> {
+  const key = `${IDEMPOTENCY_PREFIX}.${userId}.${idempotencyKey}`;
+  const intent = {
+    executionId,
+    executionState: "IN_PROGRESS",
+    opened: false,
+    rejected: false,
+    updatedAt: new Date().toISOString(),
+  } as Prisma.InputJsonValue;
+  try {
+    await prisma.appSetting.create({
+      data: {
+        key,
+        scope: "USER",
+        userId,
+        value: intent,
+        valueType: "json",
+        status: "ACTIVE",
+        description: "Execution idempotency intent guard",
+      },
+    });
+    return { claimed: true, existing: null };
+  } catch {
+    const existing = await getIdempotentExecution(userId, idempotencyKey);
+    return { claimed: false, existing };
+  }
+}
+
 export async function setIdempotentExecution(userId: string, idempotencyKey: string, value: Record<string, unknown>) {
   const key = `${IDEMPOTENCY_PREFIX}.${userId}.${idempotencyKey}`;
   await upsertUserSetting(userId, key, value as Prisma.InputJsonValue, "Execution idempotency key");

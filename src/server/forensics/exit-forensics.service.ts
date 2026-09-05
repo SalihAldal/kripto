@@ -89,7 +89,7 @@ export function mapPositionMonitorExit(input: {
     slLevel: input.stopLossPrice ?? null,
     strategyExit: exitReason === "STRATEGY_EXIT",
     strategyExitReason: exitReason === "STRATEGY_EXIT" ? input.closeReason : null,
-    timeExitReason: exitReason === "TIME_EXIT" ? "SYSTEM_TIMEOUT" : null,
+    timeExitReason: exitReason === "TIME_EXIT" ? "TIMEOUT" : null,
     normalizedCloseReason: timeoutNorm.normalizedCloseReason,
     closeReasonAlias: timeoutNorm.closeReasonAlias,
     priceAtMonitorTick: Number.isFinite(Number(input.priceAtMonitorTick)) ? Number(input.priceAtMonitorTick) : null,

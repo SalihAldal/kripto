@@ -38,6 +38,7 @@ export async function updatePaperPortfolio(input: {
 }
 
 export async function upsertPaperTrade(input: {
+  campaignId?: string;
   tradeKey: string;
   userId: string;
   portfolioId?: string;
@@ -68,6 +69,7 @@ export async function upsertPaperTrade(input: {
   return prisma.paperTrade.upsert({
     where: { tradeKey: input.tradeKey },
     create: {
+      campaignId: input.campaignId,
       tradeKey: input.tradeKey,
       userId: input.userId,
       portfolioId: input.portfolioId ?? portfolio.id,
@@ -101,6 +103,7 @@ export async function upsertPaperTrade(input: {
       metadata: input.metadata as Prisma.InputJsonValue,
     },
     update: {
+      campaignId: input.campaignId,
       status: input.status,
       exitPrice: input.exitPrice,
       realizedPnl: input.realizedPnl,
@@ -109,6 +112,7 @@ export async function upsertPaperTrade(input: {
       slippagePct: input.slippagePct,
       holdSec: input.holdSec,
       closedAt: input.closedAt,
+      positionId: input.positionId,
       tradeQualityScore: input.scores?.tradeQualityScore,
       entryScore: input.scores?.entryScore,
       exitScore: input.scores?.exitScore,
@@ -122,6 +126,7 @@ export async function upsertPaperTrade(input: {
 }
 
 export async function createPaperExecution(input: {
+  campaignId?: string;
   executionKey: string;
   paperTradeId: string;
   simulationId?: string;
@@ -148,6 +153,7 @@ export async function createPaperExecution(input: {
   return prisma.paperExecution.upsert({
     where: { executionKey: input.executionKey },
     create: {
+      campaignId: input.campaignId,
       executionKey: input.executionKey,
       paperTradeId: input.paperTradeId,
       simulationId: input.simulationId,
@@ -172,6 +178,7 @@ export async function createPaperExecution(input: {
       metadata: input.metadata as Prisma.InputJsonValue,
     },
     update: {
+      campaignId: input.campaignId,
       executedQty: input.executedQty,
       avgFillPrice: input.avgFillPrice,
       fee: input.fee,

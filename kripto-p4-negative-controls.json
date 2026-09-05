@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "controls": [
+    {
+      "name": "LABEL_SHUFFLE",
+      "verdict": "PASS"
+    },
+    {
+      "name": "TIMESTAMP_SHUFFLE",
+      "verdict": "PASS"
+    },
+    {
+      "name": "RANDOM_STRATEGY_ASSIGNMENT",
+      "verdict": "PASS"
+    }
+  ],
+  "leakageDetected": false
+}

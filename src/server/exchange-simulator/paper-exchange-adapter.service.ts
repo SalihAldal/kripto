@@ -9,6 +9,11 @@ import { resolveCanonicalVenueConfig } from "@/src/server/exchange/venue-config.
 
 type PaperSimulatorOrderInput = {
   userId: string;
+  campaignId?: string;
+  jobId?: string;
+  sessionId?: string;
+  runId?: string;
+  roundId?: string;
   executionId?: string;
   lane?: string;
   executionVenue?: string;
@@ -136,6 +141,12 @@ export async function executePaperOrderViaExchangeSimulator(
 
   emitExchangeSimulatorEvent("paper.order.executed", {
     userId: input.userId,
+    campaignId: input.campaignId,
+    jobId: input.jobId,
+    sessionId: input.sessionId,
+    runId: input.runId,
+    roundId: input.roundId,
+    candidateId: input.candidateId,
     simulationId: simulation.simulationId,
     executionId: input.executionId,
     symbol: input.symbol,

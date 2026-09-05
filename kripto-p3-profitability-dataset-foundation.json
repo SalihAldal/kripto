@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "p2Verdict": "PASS",
+  "paperRunStarted": false,
+  "autoRoundStarted": false,
+  "liveOrderSubmission": false,
+  "datasetStatus": "DATASET_PARTIAL",
+  "sourceIsolation": {
+    "liveReplaySyntheticStrictSeparation": "PASS"
+  },
+  "lookaheadTests": [
+    "tests/phase05-shadow-outcome.test.ts",
+    "tests/p3-canonical-dataset-contract.test.ts"
+  ],
+  "candidateCount": 0,
+  "completeOutcomeCount": 0,
+  "groundTruthMoverCount": 0,
+  "configDrift": {
+    "strategyThresholdChanged": false,
+    "riskSizingExitChanged": false,
+    "unauthorizedDriftDetected": false
+  },
+  "p3EngineeringVerdict": "PASS",
+  "positiveEdgeProven": "INSUFFICIENT_SAMPLE",
+  "remainingBlockers": []
+}

@@ -28,6 +28,7 @@ import { buildTdiDecisionRecord } from "@/src/server/forensics/tdi-decision-fore
 import { recordCandidateFunnelStage } from "@/src/server/forensics/candidate-funnel-trace.service";
 import { evaluateFeeAwareEntryPolicy } from "@/src/server/forensics/fee-aware-entry-policy.service";
 import { runWithForensicSession, setForensicSession } from "@/src/server/forensics/forensic-context";
+import { buildCampaignId } from "@/src/server/forensics/campaign-identity.service";
 import type {
   AiExecutionMode,
   AiCallAudit,
@@ -52,6 +53,7 @@ import {
 
 export function beginForensicPaperSession(input: {
   sessionId?: string;
+  campaignId?: string;
   jobId?: string;
   runId?: string;
   roundId?: string;
@@ -60,6 +62,11 @@ export function beginForensicPaperSession(input: {
   const sessionId = input.sessionId ?? input.jobId ?? `paper-${randomUUID()}`;
   const session: ForensicSessionContext = {
     sessionId,
+    campaignId: buildCampaignId({
+      campaignId: input.campaignId,
+      jobId: input.jobId,
+      sessionId,
+    }),
     jobId: input.jobId,
     runId: input.runId,
     roundId: input.roundId,

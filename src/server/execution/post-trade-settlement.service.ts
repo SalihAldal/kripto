@@ -45,6 +45,7 @@ import { resolveBinanceTakerFeeRate } from "@/src/server/execution/fee-profile";
 import { classifyNetExitOutcome, isSuccessfulNetExit } from "@/src/server/execution/profit-thresholds";
 import { calibrateAIAnalysisFromTrade } from "@/src/server/ai/ai-analysis-memory.service";
 import { persistOrchestrationEnvelope } from "@/src/server/orchestration";
+import { persistPaperCloseFillForSettlement } from "@/src/server/execution/paper-close-persistence.service";
 
 function isRateLimitedCloseError(error: unknown) {
   const message = (error as Error)?.message?.toLowerCase?.() ?? "";
@@ -1014,6 +1015,32 @@ export async function settleOpenPosition(input: {
       ...variantTelemetryMeta,
     },
   });
+  let paperClosePersistence: { persisted: boolean; skipped: boolean; reason?: string } = {
+    persisted: false,
+    skipped: false,
+  };
+  const closeSimulationId = String(
+    (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
+      (closeOrder as { simulationId?: unknown }).simulationId ??
+      "",
+  ).trim();
+  if (input.mode === "paper") {
+    paperClosePersistence = await persistPaperCloseFillForSettlement({
+      executionId: input.executionId,
+      userId: position.userId,
+      symbol,
+      quantity: finalCloseQty,
+      avgFillPrice: closeFillPrice,
+      fee: closeFee,
+      simulationId: closeSimulationId || null,
+      campaignId: String(positionMeta.campaignId ?? ""),
+      candidateId: String(positionMeta.candidateId ?? ""),
+      orderId: createdCloseOrder.id,
+      positionId: position.id,
+      runId: String(positionMeta.runId ?? ""),
+      roundId: String(positionMeta.roundId ?? ""),
+    });
+  }
 
   await logTradeEvent({
     positionId: position.id,
@@ -1194,6 +1221,15 @@ export async function settleOpenPosition(input: {
     level: "TRADE",
     context: {
       positionId: position.id,
+      userId: position.userId,
+      campaignId: String(positionMeta.campaignId ?? ""),
+      runId: String(positionMeta.runId ?? ""),
+      roundId: String(positionMeta.roundId ?? ""),
+      candidateId: String(positionMeta.candidateId ?? ""),
+      closeSimulationId: closeSimulationId || null,
+      paperFillPersisted: paperClosePersistence.persisted,
+      paperFillPersistenceSkipped: paperClosePersistence.skipped,
+      paperFillPersistenceReason: paperClosePersistence.reason ?? null,
       pnl,
       tradeSummary: {
         symbol,

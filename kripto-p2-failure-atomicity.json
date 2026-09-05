@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "invariants": {
+    "wrongBreakerOpened": false,
+    "preOrderFailureProducesFill": false,
+    "fillAfterFailureReturnsCleanSuccess": false,
+    "orphanFillOrPosition": false,
+    "retryCreatesSecondOrderOrFill": false,
+    "timeoutReopensTerminalState": false,
+    "candidateIdentityLoss": false,
+    "firstBlockerGenericMessage": false
+  },
+  "coveredDomains": [
+    "PaperAdapter",
+    "RedisIdempotency",
+    "PositionPersistence"
+  ],
+  "remainingDomains": [],
+  "remainingBlockers": [],
+  "evidence": [
+    "tests/p0-orchestrator-success-and-timeout-atomicity.test.ts",
+    "tests/p0-paper-atomicity.test.ts",
+    "tests/p0-paper-event-bridge-dedup.test.ts",
+    "tests/endurance/recovery-idempotency.test.ts"
+  ]
+}

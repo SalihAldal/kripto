@@ -1,0 +1,80 @@
+{
+  "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+  "marketObservations": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 920
+  },
+  "opportunities": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 599
+  },
+  "candidates": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 69
+  },
+  "regimeEligibleCandidates": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "strategyEligibleCandidates": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "strategySignals": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "routerSelections": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "feeViableSignals": {
+    "scope": "UNKNOWN_SCOPE",
+    "value": 0
+  },
+  "riskApprovedSignals": {
+    "scope": "UNKNOWN_SCOPE",
+    "value": 0
+  },
+  "safetyApprovedSignals": {
+    "scope": "UNKNOWN_SCOPE",
+    "value": 0
+  },
+  "enter": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "wait": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 69
+  },
+  "reject": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "orderIntents": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "paperSubmits": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "fills": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "openPositions": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "closedPositions": {
+    "scope": "CAMPAIGN_SCOPED",
+    "value": 0
+  },
+  "historicalExcluded": {
+    "scope": "GLOBAL_HISTORICAL",
+    "openPositions": 0,
+    "closedPositions": 285
+  }
+}

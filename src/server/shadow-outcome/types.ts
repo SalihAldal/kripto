@@ -84,6 +84,7 @@ export type TrackedCandidate = {
 
 export type MoverEvent = {
   moverId: string;
+  campaignId: string | null;
   runId: string | null;
   symbol: string;
   moveClass: MoveClass;

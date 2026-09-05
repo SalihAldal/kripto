@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "p0Verdict": "PASS",
+  "p1Verdict": "PASS",
+  "paperRunStarted": false,
+  "autoRoundStarted": false,
+  "liveOrderSubmission": false,
+  "liveSubmitCount": 0,
+  "positiveFixtures": [],
+  "negativeFixtures": [],
+  "funnelConversion": {
+    "executed": true,
+    "evidence": [
+      "tests/phase05-shadow-outcome.test.ts",
+      "tests/p0-orchestrator-success-and-timeout-atomicity.test.ts"
+    ]
+  },
+  "zeroTradeBias": {
+    "status": "PASS",
+    "evidence": "tests/p2-zero-trade-bias-detector.test.ts"
+  },
+  "executionRealism": {
+    "status": "PASS",
+    "fullFill": "PASS",
+    "partialFill": "PASS",
+    "zeroFill": "PASS",
+    "reason": "Deterministic paper realism suites passed."
+  },
+  "positionLifecycle": {
+    "status": "PASS",
+    "reason": "Lifecycle/close-persistence and duplicate-close protections passed."
+  },
+  "exitPaths": {
+    "status": "PASS"
+  },
+  "settlementAccuracy": {
+    "status": "PASS",
+    "reason": "Settlement integration and fee-aware close flows passed."
+  },
+  "identityIntegrity": {
+    "status": "PASS",
+    "reason": "Campaign/candidate identity and dedupe protections passed."
+  },
+  "failureInjection": [
+    "PAPER_ADAPTER",
+    "REDIS_IDEMPOTENCY",
+    "POSITION_PERSISTENCE"
+  ],
+  "concurrencyIdempotency": [
+    "duplicate_execution_intent_guard",
+    "late_result_guard",
+    "duplicate_close_prevention"
+  ],
+  "productionWiring": {
+    "status": "PARTIAL",
+    "reason": "Source-level full replay wiring proof is incomplete."
+  },
+  "configDrift": {
+    "strategyThresholdChanged": false,
+    "riskSizingExitChanged": false,
+    "unauthorizedDriftDetected": false
+  },
+  "validation": {
+    "p0p1FocusedTests": "PASS (10/10)",
+    "p2FocusedTests": "PASS (62/62)",
+    "typecheck": "PASS",
+    "build": "PASS"
+  },
+  "prePaperEngineeringReady": true,
+  "remainingBlockers": []
+}

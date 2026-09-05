@@ -28,6 +28,9 @@ export class ShadowOutcomeEngine {
   private lastTickAt = 0;
   private lastPersistAt = 0;
   private persistWrites = 0;
+  private shadowRegistrationAttempts = 0;
+  private shadowRegistrationSuccess = 0;
+  private shadowRegistrationFailure = 0;
 
   constructor(config?: Partial<ShadowOutcomeConfig>) {
     this.config = resolveShadowConfig(config);
@@ -247,10 +250,12 @@ export class ShadowOutcomeEngine {
   }
 
   getMoverEvents(now = this.lastTickAt || Date.now()) {
-    const runId = getForensicSession()?.runId ?? null;
+    const session = getForensicSession();
+    const runId = session?.runId ?? null;
+    const campaignId = session?.campaignId ?? null;
     const events = [];
     for (const [symbol, points] of this.prices) {
-      events.push(...detectMoverEvents({ symbol, points, now, runId }));
+      events.push(...detectMoverEvents({ symbol, points, now, runId, campaignId }));
     }
     return events;
   }
@@ -268,8 +273,17 @@ export class ShadowOutcomeEngine {
       symbols: this.prices.size,
       lastTickAt: this.lastTickAt,
       persistWrites: this.persistWrites,
+      shadowRegistrationAttempts: this.shadowRegistrationAttempts,
+      shadowRegistrationSuccess: this.shadowRegistrationSuccess,
+      shadowRegistrationFailure: this.shadowRegistrationFailure,
       minTrackScore: this.config.minTrackScore,
     };
+  }
+
+  noteRegistration(input: { attempts?: number; success?: number; failure?: number }) {
+    this.shadowRegistrationAttempts += Math.max(0, Number(input.attempts ?? 0));
+    this.shadowRegistrationSuccess += Math.max(0, Number(input.success ?? 0));
+    this.shadowRegistrationFailure += Math.max(0, Number(input.failure ?? 0));
   }
 
   shouldPersist(now = Date.now()) {
@@ -292,6 +306,9 @@ export class ShadowOutcomeEngine {
     this.lastTickAt = 0;
     this.lastPersistAt = 0;
     this.persistWrites = 0;
+    this.shadowRegistrationAttempts = 0;
+    this.shadowRegistrationSuccess = 0;
+    this.shadowRegistrationFailure = 0;
   }
 
   private createTracked(

@@ -6,9 +6,6 @@ vi.mock("@/src/server/repositories/execution.repository", () => ({
     connection: { id: "conn-1" },
   }),
   getEmergencyStopState: vi.fn().mockResolvedValue(false),
-  getSafeModeState: vi.fn().mockResolvedValue({ enabled: false }),
-  persistAnalysisState: vi.fn().mockResolvedValue(undefined),
-  getIdempotentExecution: vi.fn().mockResolvedValue(null),
   listOpenPositionsByUser: vi.fn().mockResolvedValue([
     {
       id: "pos-open-1",
@@ -31,6 +28,15 @@ vi.mock("@/src/server/repositories/execution.repository", () => ({
   getPositionById: vi.fn(),
   updatePositionMarkPrice: vi.fn(),
   setEmergencyStopState: vi.fn(),
+}));
+
+vi.mock("@/src/server/recovery/failsafe-recovery.service", () => ({
+  getSafeModeState: vi.fn().mockResolvedValue({ enabled: false }),
+  persistAnalysisState: vi.fn().mockResolvedValue(undefined),
+  claimIdempotentExecutionIntent: vi.fn().mockResolvedValue({ claimed: true, existing: null }),
+  getIdempotentExecution: vi.fn().mockResolvedValue(null),
+  setIdempotentExecution: vi.fn().mockResolvedValue(undefined),
+  setSafeModeState: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/src/server/execution/position-monitor.service", () => ({
@@ -61,6 +67,10 @@ vi.mock("@/src/server/observability/trade-lifecycle", () => ({
   logTradeLifecycle: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("@/src/server/observability/trade-event-log", () => ({
+  logTradeEvent: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock("@/src/server/risk", () => ({
   evaluatePreTradeRisk: vi.fn(),
   evaluateRuntimeRisk: vi.fn().mockResolvedValue({ shouldClose: false }),
@@ -69,6 +79,12 @@ vi.mock("@/src/server/risk", () => ({
   registerApiFailure: vi.fn(),
   resetApiFailure: vi.fn(),
   resumeSystem: vi.fn(),
+}));
+
+vi.mock("@/src/server/trading-core/feedback-loop", () => ({
+  feedbackLoopEngine: {
+    rejectTrade: vi.fn().mockResolvedValue(undefined),
+  },
 }));
 
 vi.mock("@/src/server/risk/canonical-risk-decision.service", () => ({

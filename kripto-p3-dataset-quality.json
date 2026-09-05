@@ -1,0 +1,22 @@
+{
+  "status": "PARTIAL",
+  "requiredIdentity": "PASS",
+  "monotonicTimestamps": "PASS",
+  "finitePositivePrices": "PASS",
+  "venueSymbolConsistency": "PASS",
+  "sourceIsolation": "PASS",
+  "duplicateKeyControl": "PASS",
+  "horizonCompleteness": "PARTIAL",
+  "minimumTickCount": "PARTIAL",
+  "maximumGap": "PASS",
+  "clockSkew": "PASS",
+  "stageOrdering": "PASS",
+  "baselineBeforeOutcome": "PASS",
+  "futureDataLeakage": "PASS",
+  "peakTroughConsistency": "PASS",
+  "feeConsistency": "PASS",
+  "campaignBinding": "PASS",
+  "candidateMoverJoinIntegrity": "PASS",
+  "datasetStatus": "DATASET_PARTIAL",
+  "reason": "Engineering rules pass, but complete measurement cohort is insufficient."
+}

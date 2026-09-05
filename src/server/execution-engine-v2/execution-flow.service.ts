@@ -31,6 +31,11 @@ function parseSymbolAssets(symbol: string) {
 export async function executeApprovedSpotOrder(input: {
   executionId: string;
   userId: string;
+  campaignId?: string;
+  jobId?: string;
+  sessionId?: string;
+  runId?: string;
+  roundId?: string;
   candidateId?: string;
   executionIntentId?: string;
   symbol: string;
@@ -272,11 +277,17 @@ export async function executeApprovedSpotOrder(input: {
   let fillPrice = price;
   let fee = 0;
   let exchangeResponse: Record<string, unknown> | undefined;
+  let paperMetadata: Record<string, unknown> | undefined;
 
   try {
     if (mode === "paper" || mode === "dry-run") {
       const paper = await simulatePaperExecution({
         userId: input.userId,
+        campaignId: input.campaignId,
+        jobId: input.jobId,
+        sessionId: input.sessionId,
+        runId: input.runId,
+        roundId: input.roundId,
         executionId: input.executionId,
         candidateId: input.candidateId,
         executionIntentId: input.executionIntentId,
@@ -301,6 +312,7 @@ export async function executeApprovedSpotOrder(input: {
       filledQty = paper.quantity;
       fillPrice = paper.fillPrice;
       fee = paper.fee;
+      paperMetadata = paper.placed.metadata as Record<string, unknown> | undefined;
     } else {
       const placed =
         input.side === "BUY"
@@ -381,5 +393,6 @@ export async function executeApprovedSpotOrder(input: {
     slippagePct,
     latencyMs,
     orderType,
+    metadata: paperMetadata,
   };
 }

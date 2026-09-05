@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "costStressScenarios": [
+    "BASE_COST",
+    "FEE_PLUS_25_PERCENT",
+    "FEE_PLUS_50_PERCENT",
+    "SLIPPAGE_PLUS_25_PERCENT",
+    "SLIPPAGE_PLUS_50_PERCENT",
+    "SPREAD_PLUS_25_PERCENT",
+    "SPREAD_PLUS_50_PERCENT",
+    "COMBINED_STRESS"
+  ],
+  "parameterSensitivityScenarios": [
+    "-10%",
+    "-5%",
+    "baseline",
+    "+5%",
+    "+10%"
+  ],
+  "doubleCostCount": 0,
+  "result": "INSUFFICIENT_SAMPLE_FOR_PROMOTION",
+  "selectedStrategy": "NONE"
+}

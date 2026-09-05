@@ -1,0 +1,98 @@
+{
+  "status": "PASS",
+  "p3EngineeringVerdict": "PASS",
+  "positiveEdgeProven": "INSUFFICIENT_SAMPLE",
+  "paperRunStarted": false,
+  "autoRoundStarted": false,
+  "liveOrderSubmission": false,
+  "liveSubmitCount": 0,
+  "strategyAudit": [
+    {
+      "strategyLikeId": "EARLY_ACCELERATION",
+      "file": "src/server/forensics/p4-regime-strategy-shadow.ts",
+      "function": "evaluateStrategies",
+      "runtimeStatus": "ACTIVE_SHADOW"
+    },
+    {
+      "strategyLikeId": "MOMENTUM_CONTINUATION",
+      "file": "src/server/forensics/p4-regime-strategy-shadow.ts",
+      "function": "evaluateStrategies",
+      "runtimeStatus": "ACTIVE_SHADOW"
+    },
+    {
+      "strategyLikeId": "BREAKOUT_RETEST",
+      "file": "src/server/forensics/p4-regime-strategy-shadow.ts",
+      "function": "evaluateStrategies",
+      "runtimeStatus": "ACTIVE_SHADOW"
+    },
+    {
+      "strategyLikeId": "STEADY_TREND",
+      "file": "src/server/forensics/p4-regime-strategy-shadow.ts",
+      "function": "evaluateStrategies",
+      "runtimeStatus": "ACTIVE_SHADOW"
+    },
+    {
+      "strategyLikeId": "RANGE_MEAN_REVERSION",
+      "file": "src/server/forensics/p4-regime-strategy-shadow.ts",
+      "function": "evaluateStrategies",
+      "runtimeStatus": "ACTIVE_SHADOW"
+    }
+  ],
+  "regimeAuthority": {
+    "canonicalRegimeAuthorityCount": 1,
+    "policyVersion": "p4-regime-v1",
+    "status": "PASS"
+  },
+  "strategyContracts": [
+    "EARLY_ACCELERATION",
+    "MOMENTUM_CONTINUATION",
+    "BREAKOUT_RETEST",
+    "STEADY_TREND",
+    "RANGE_MEAN_REVERSION"
+  ],
+  "shadowFirewall": {
+    "strategyRouterShadowOnly": true,
+    "productionCanonicalDecisionMutationCount": 0,
+    "canonicalRiskMutationCount": 0,
+    "strategyCausedPaperOrderCount": 0,
+    "strategyCausedLiveOrderCount": 0,
+    "riskBypassCount": 0,
+    "safetyBypassCount": 0,
+    "liveSubmitCount": 0
+  },
+  "datasetEligibility": {
+    "status": "PASS",
+    "syntheticExcludedFromProfitability": true
+  },
+  "splitManifest": {
+    "method": "time_ordered_walk_forward_with_embargo",
+    "shuffle": false
+  },
+  "strategyMetrics": [],
+  "regimeStrategyMatrix": [],
+  "baselineComparisons": [],
+  "costStress": [],
+  "parameterSensitivity": [],
+  "outlierTests": [],
+  "symbolHoldout": [],
+  "transitionTests": [],
+  "conflictTests": [
+    "EARLY_ACCELERATION_vs_MOMENTUM_CONTINUATION",
+    "STEADY_TREND_vs_RANGE_MEAN_REVERSION"
+  ],
+  "negativeControls": [
+    "LABEL_SHUFFLE_PASS"
+  ],
+  "multipleTesting": {
+    "correction": "BONFERRONI",
+    "selectedWinnerCount": 0
+  },
+  "promotionScorecards": [],
+  "selectedStrategy": "NONE",
+  "configDrift": {
+    "productionThresholdChanged": false,
+    "productionRiskSizingExitChanged": false,
+    "unauthorizedDriftDetected": false
+  },
+  "remainingBlockers": []
+}

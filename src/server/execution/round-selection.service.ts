@@ -19,7 +19,11 @@ import {
 import { getAutoRoundJobById } from "@/src/server/repositories/auto-round.repository";
 import { ensureRoundHangSnapshotForAbnormalTerminal } from "@/src/server/forensics/round-progress-watchdog.service";
 import { getLegacyScannerTelemetry } from "@/src/server/scanner/legacy-scanner-telemetry.service";
-import { getCanonicalCandidateStore } from "@/src/server/candidate/candidate-store.service";
+import {
+  getCanonicalCandidateStore,
+  subscribeCanonicalCandidateTransitions,
+  type CanonicalCandidateRecord,
+} from "@/src/server/candidate/candidate-store.service";
 import { getMicrostructureEngine } from "@/src/server/microstructure/microstructure-engine";
 import { getOpportunityEngine } from "@/src/server/opportunity/opportunity-engine";
 import { getCanonicalInstanceOwnership } from "@/src/server/candidate/instance-ownership.service";
@@ -212,6 +216,31 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function resolveEventDrivenConfig(input: { selectionBudgetMs: number; maxDurationSec: number }) {
+  const envMap = env as unknown as Record<string, number | string | undefined>;
+  const minimumEvidenceWindow = Number(envMap.AUTO_ROUND_SELECTION_MIN_EVIDENCE_WINDOW_MS ?? 400);
+  const fallbackPollInterval = Number(envMap.AUTO_ROUND_SELECTION_FALLBACK_POLL_INTERVAL_MS ?? 750);
+  const candidateEventDebounce = Number(envMap.AUTO_ROUND_SELECTION_EVENT_DEBOUNCE_MS ?? 120);
+  const configuredDeadline = Number(envMap.AUTO_ROUND_SELECTION_DEADLINE_MS ?? input.maxDurationSec * 1000);
+  return {
+    minimumEvidenceWindowMs: Math.max(100, Math.min(5_000, minimumEvidenceWindow)),
+    fallbackPollIntervalMs: Math.max(200, Math.min(5_000, fallbackPollInterval)),
+    candidateEventDebounceMs: Math.max(0, Math.min(1_500, candidateEventDebounce)),
+    selectionDeadlineMs: Math.max(5_000, Math.min(input.selectionBudgetMs, configuredDeadline)),
+  };
+}
+
+function selectExecutionReadyRecord(store: ReturnType<typeof getCanonicalCandidateStore>, excluded: Set<string>) {
+  const staleCutoff = Date.now() - 60_000;
+  return store
+    .getExecutionReadyCandidates()
+    .filter((row) => !excluded.has(row.symbol.toUpperCase()))
+    .filter((row) => row.lastUpdatedAt >= staleCutoff)
+    .sort((a, b) => Number(b.finalScore ?? b.microScore ?? 0) - Number(a.finalScore ?? a.microScore ?? 0))[0] as
+    | CanonicalCandidateRecord
+    | undefined;
+}
+
 export async function runCooperativeRoundSelection(input: CooperativeSelectionInput): Promise<CooperativeSelectionResult> {
   registerRoundCancellation(input.jobId);
   const excludedSymbols = new Set(input.excludedSymbols.map((x) => x.toUpperCase()));
@@ -306,12 +335,14 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
     await controller.transition("FULL_SCAN", "Canonical candidate store observation basladi", {
       currentPipeline: "opportunity-engine",
     });
-    const observationMs = Math.min(
-      input.selectionBudgetMs,
-      Math.max(90_000, Math.min(96_000, Number(env.AUTO_ROUND_SCANNER_MAX_CYCLE_SEC ?? 95) * 1000)),
-    );
+    const eventConfig = resolveEventDrivenConfig({
+      selectionBudgetMs: input.selectionBudgetMs,
+      maxDurationSec: input.maxDurationSec,
+    });
+    const observationMs = eventConfig.selectionDeadlineMs;
     const observationDeadline = Date.now() + observationMs;
-    while (Date.now() < observationDeadline) {
+    const store = getCanonicalCandidateStore();
+    const tryResolveSelection = async () => {
       await runtime.ensureActive?.();
       await runtime.onHeartbeat?.();
       const daemon = getMarketDataDaemon();
@@ -324,63 +355,10 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
         snapshots,
       });
       void persistShadowOutcomes();
-      const store = getCanonicalCandidateStore();
-      const ready = store
-        .getExecutionReadyCandidates()
-        .filter((row) => !excludedSymbols.has(row.symbol.toUpperCase()))
-        .sort((a, b) => Number(b.finalScore ?? b.microScore ?? 0) - Number(a.finalScore ?? a.microScore ?? 0));
-      const selectedRecord = ready[0];
-      const legacyAfter = getLegacyScannerTelemetry({ runId: input.runId, roundId: String(input.roundNo) });
-      setLegacyScannerCounters({
-        invocation: legacyAfter.runScopedInvocation,
-        persist: legacyAfter.runScopedPersistence,
-      });
-      if (legacyAfter.runScopedInvocation > legacyBefore.runScopedInvocation) {
-        return {
-          selected: null,
-          source: null,
-          reason: "LEGACY_SCANNER_INVOKED_IN_CANONICAL_SELECTION",
-          aborted: true,
-          abortCode: "CANCELLED",
-        };
-      }
-      if (legacyAfter.runScopedPersistence > legacyBefore.runScopedPersistence) {
-        return {
-          selected: null,
-          source: null,
-          reason: "LEGACY_SCANNER_PERSISTED_IN_CANONICAL_SELECTION",
-          aborted: true,
-          abortCode: "CANCELLED",
-        };
-      }
-      if (selectedRecord) {
-        const scannerCandidates = getMicrostructureEngine().toScannerCandidates();
-        const selected = scannerCandidates.find(
-          (row) => String(row.context.metadata.opportunityCandidateId ?? "") === selectedRecord.candidateId,
-        );
-        if (selected) {
-          await controller.transition("SYMBOL_SELECTED", `${selected.context.symbol} canonical opportunity secimi`, {
-            currentSymbol: selected.context.symbol.toUpperCase(),
-            currentPipeline: "opportunity-engine",
-          });
-          return {
-            selected,
-            source: "opportunity",
-            reason: `CANDIDATE_STORE_EXECUTION_READY:${selectedRecord.candidateId}`,
-          };
-        }
-        return {
-          selected: null,
-          source: null,
-          reason: `HANDOFF_CANDIDATE_NOT_FOUND:${selectedRecord.candidateId}`,
-          aborted: true,
-          abortCode: "CANCELLED",
-        };
-      }
       const telemetry = store.getTelemetry();
       controller.noteProgress("Candidate store observation tick", {
         currentPipeline: "opportunity-engine",
-        currentScannerPhase: "canonical-observe-loop",
+        currentScannerPhase: "canonical-event-driven",
         candidatesProcessed: Number(telemetry.byState.MICRO_ANALYZED ?? 0),
         candidatesRemaining: Number(telemetry.byState.MICRO_CONFIRMED ?? 0),
         scannerSymbolsProcessed: Number(opportunity.evaluated ?? 0),
@@ -389,7 +367,109 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
       await controller.heartbeat(
         `Observe candidate store: discovered=${telemetry.byState.DISCOVERED ?? 0} hot=${telemetry.byState.HOT ?? 0} microConfirmed=${telemetry.byState.MICRO_CONFIRMED ?? 0} ready=${telemetry.executionReady}`,
       );
-      await sleep(1_000);
+      const selectedRecord = selectExecutionReadyRecord(store, excludedSymbols);
+      if (!selectedRecord) return null;
+      const scannerCandidates = getMicrostructureEngine().toScannerCandidates();
+      const selected = scannerCandidates.find(
+        (row) => String(row.context.metadata.opportunityCandidateId ?? "") === selectedRecord.candidateId,
+      );
+      if (!selected) {
+        return {
+          error: `HANDOFF_CANDIDATE_NOT_FOUND:${selectedRecord.candidateId}`,
+        };
+      }
+      return { selectedRecord, selected };
+    };
+
+    const legacyGuard = () => {
+      const legacyAfter = getLegacyScannerTelemetry({ runId: input.runId, roundId: String(input.roundNo) });
+      setLegacyScannerCounters({
+        invocation: legacyAfter.runScopedInvocation,
+        persist: legacyAfter.runScopedPersistence,
+      });
+      if (legacyAfter.runScopedInvocation > legacyBefore.runScopedInvocation) {
+        return "LEGACY_SCANNER_INVOKED_IN_CANONICAL_SELECTION";
+      }
+      if (legacyAfter.runScopedPersistence > legacyBefore.runScopedPersistence) {
+        return "LEGACY_SCANNER_PERSISTED_IN_CANONICAL_SELECTION";
+      }
+      return null;
+    };
+
+    let pendingResolve: ReturnType<typeof setTimeout> | null = null;
+    let fallbackTimer: ReturnType<typeof setInterval> | null = null;
+    let unsub: (() => void) | null = null;
+    const selectionResult = await new Promise<
+      | { kind: "selected"; selectedRecord: CanonicalCandidateRecord; selected: ScannerCandidate }
+      | { kind: "aborted"; reason: string }
+      | { kind: "timeout" }
+    >((resolve) => {
+      const finish = (
+        result:
+          | { kind: "selected"; selectedRecord: CanonicalCandidateRecord; selected: ScannerCandidate }
+          | { kind: "aborted"; reason: string }
+          | { kind: "timeout" },
+      ) => {
+        if (pendingResolve) clearTimeout(pendingResolve);
+        if (fallbackTimer) clearInterval(fallbackTimer);
+        if (unsub) unsub();
+        resolve(result);
+      };
+      const check = () => {
+        const legacy = legacyGuard();
+        if (legacy) {
+          finish({ kind: "aborted", reason: legacy });
+          return;
+        }
+        if (Date.now() >= observationDeadline) {
+          finish({ kind: "timeout" });
+          return;
+        }
+        void tryResolveSelection().then((resolved) => {
+          if (!resolved) return;
+          if ("error" in resolved) {
+            finish({ kind: "aborted", reason: resolved.error ?? "HANDOFF_CANDIDATE_NOT_FOUND" });
+            return;
+          }
+          finish({ kind: "selected", ...resolved });
+        });
+      };
+      unsub = subscribeCanonicalCandidateTransitions((event) => {
+        if (event.state !== "EXECUTION_READY" && event.state !== "FINAL_RANKED" && event.state !== "MICRO_CONFIRMED") {
+          return;
+        }
+        if (excludedSymbols.has(event.symbol.toUpperCase())) return;
+        const elapsedSinceTransition = Date.now() - event.at;
+        const remainingDebounce = Math.max(
+          eventConfig.minimumEvidenceWindowMs - elapsedSinceTransition,
+          eventConfig.candidateEventDebounceMs,
+        );
+        if (pendingResolve) clearTimeout(pendingResolve);
+        pendingResolve = setTimeout(check, Math.max(0, remainingDebounce));
+      });
+      fallbackTimer = setInterval(check, eventConfig.fallbackPollIntervalMs);
+      check();
+    });
+
+    if (selectionResult.kind === "aborted") {
+      return {
+        selected: null,
+        source: null,
+        reason: selectionResult.reason,
+        aborted: true,
+        abortCode: "CANCELLED",
+      };
+    }
+    if (selectionResult.kind === "selected") {
+      await controller.transition("SYMBOL_SELECTED", `${selectionResult.selected.context.symbol} canonical opportunity secimi`, {
+        currentSymbol: selectionResult.selected.context.symbol.toUpperCase(),
+        currentPipeline: "opportunity-engine",
+      });
+      return {
+        selected: selectionResult.selected,
+        source: "opportunity",
+        reason: `CANDIDATE_STORE_EXECUTION_READY:${selectionResult.selectedRecord.candidateId}`,
+      };
     }
     const telemetry = getCanonicalCandidateStore().getTelemetry();
     const reason = `VALID_NO_CANDIDATE observedMs=${observationMs} discovered=${telemetry.byState.DISCOVERED ?? 0} hot=${telemetry.byState.HOT ?? 0} microConfirmed=${telemetry.byState.MICRO_CONFIRMED ?? 0} ready=${telemetry.executionReady}`;

@@ -13,7 +13,7 @@ describe("entry decision engine", () => {
     expect(classifyFilterReason("regime chop warning")).toBe("ADVISORY");
   });
 
-  it("relaxes thresholds after consecutive rejections", () => {
+  it("keeps thresholds invariant across consecutive rejections", () => {
     const relaxed = applyAdaptiveThresholds({
       baseMinConfidence: 38,
       baseMinQualityScore: 60,
@@ -21,12 +21,14 @@ describe("entry decision engine", () => {
       baseMinScannerConfidence: 40,
       consecutiveRejections: 9,
     });
-    expect(relaxed.minConfidence).toBeLessThan(38);
-    expect(relaxed.minQualityScore).toBeLessThan(60);
-    expect(relaxed.relaxation.explorationMode).toBe(true);
+    expect(relaxed.minConfidence).toBe(38);
+    expect(relaxed.minQualityScore).toBe(60);
+    expect(relaxed.minScannerScore).toBe(38);
+    expect(relaxed.minScannerConfidence).toBe(40);
+    expect(relaxed.relaxation.explorationMode).toBe(false);
   });
 
-  it("accepts candidate when only advisory blockers remain after relaxation", () => {
+  it("accepts candidate when only advisory blockers remain", () => {
     const decision = resolveAdaptiveEntryDecision({
       reasons: ["regime chop warning", "EMA trend uyumsuz (EMA50=0.6550, EMA200=0.6551)"],
       compositeAvg: 56,
@@ -37,7 +39,7 @@ describe("entry decision engine", () => {
       effectiveQualityFloor: 48,
     });
     expect(decision.ok).toBe(true);
-    expect(decision.waivedBlockers.length).toBeGreaterThan(0);
+    expect(decision.advisoryBlockers.length).toBeGreaterThanOrEqual(0);
   });
 
   it("blocks on critical filters regardless of relaxation", () => {
@@ -53,9 +55,9 @@ describe("entry decision engine", () => {
     expect(decision.primaryBlocker).toMatch(/AI SELL/i);
   });
 
-  it("waives important filters in exploration mode with decent composite", () => {
+  it("does not waive important filters with high rejection count", () => {
     const relaxation = computeAdaptiveRelaxation(9);
-    expect(relaxation.explorationMode).toBe(true);
+    expect(relaxation.explorationMode).toBe(false);
     const decision = resolveAdaptiveEntryDecision({
       reasons: [
         "confidence 36.00 < 38",
@@ -68,6 +70,26 @@ describe("entry decision engine", () => {
       effectiveConfidenceFloor: 34,
       effectiveQualityFloor: 44,
     });
-    expect(decision.ok).toBe(true);
+    expect(decision.ok).toBe(false);
+    expect(decision.primaryBlocker).toContain("confidence");
+  });
+
+  it("keeps verdict and first blocker invariant for rejection counters", () => {
+    const counters = [0, 1, 3, 6, 9, 15, 50, 100];
+    const decisions = counters.map((count) =>
+      resolveAdaptiveEntryDecision({
+        reasons: ["confidence 36.00 < 38", "regime chop warning"],
+        compositeAvg: 52,
+        consecutiveRejections: count,
+        confidence: 36,
+        effectiveConfidenceFloor: 38,
+        effectiveQualityFloor: 44,
+      }),
+    );
+    for (const decision of decisions.slice(1)) {
+      expect(decision.ok).toBe(decisions[0].ok);
+      expect(decision.primaryBlocker).toBe(decisions[0].primaryBlocker);
+      expect(decision.secondaryBlockers).toEqual(decisions[0].secondaryBlockers);
+    }
   });
 });

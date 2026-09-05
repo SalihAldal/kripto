@@ -1,5 +1,6 @@
 import { getRuntimeExecutionContext } from "@/src/server/repositories/execution.repository";
 import {
+  type ApiFailureDomain,
   getApiFailureState,
   getApiFailureStateByDomain,
   getConsecutiveLossCount,
@@ -12,6 +13,21 @@ import {
 import { getEffectiveRiskConfig, RISK_GATE_POLICY } from "@/src/server/risk/risk-evaluation.service";
 
 export async function getRiskStatus(userId?: string) {
+  const domains: ApiFailureDomain[] = [
+    "MARKET_DATA",
+    "EXCHANGE_INFO",
+    "SYMBOL_FILTER",
+    "PRICE",
+    "ORDER_BOOK",
+    "BALANCE",
+    "DATABASE",
+    "REDIS",
+    "CLOCK_SYNC",
+    "AI_PROVIDER",
+    "PAPER_EXECUTION",
+    "LIVE_EXECUTION",
+    "UNKNOWN",
+  ];
   const { user } = await getRuntimeExecutionContext(userId);
   const [config, effective, paused, daily, weekly, openPositions, consecutiveLosses, apiFailures, apiFailuresByDomain] = await Promise.all([
     getRiskConfigByUser(user.id),
@@ -22,12 +38,7 @@ export async function getRiskStatus(userId?: string) {
     listOpenPositionsCount(user.id),
     getConsecutiveLossCount(user.id),
     getApiFailureState(user.id),
-    Promise.all([
-      getApiFailureStateByDomain(user.id, "EXECUTION"),
-      getApiFailureStateByDomain(user.id, "ACCOUNT"),
-      getApiFailureStateByDomain(user.id, "MARKET_DATA"),
-      getApiFailureStateByDomain(user.id, "METADATA"),
-    ]),
+    Promise.all(domains.map((domain) => getApiFailureStateByDomain(user.id, domain))),
   ]);
 
   return {
@@ -38,12 +49,9 @@ export async function getRiskStatus(userId?: string) {
     weekly,
     consecutiveLosses,
     apiFailures,
-    apiFailuresByDomain: {
-      EXECUTION: apiFailuresByDomain[0],
-      ACCOUNT: apiFailuresByDomain[1],
-      MARKET_DATA: apiFailuresByDomain[2],
-      METADATA: apiFailuresByDomain[3],
-    },
+    apiFailuresByDomain: Object.fromEntries(
+      domains.map((domain, index) => [domain, apiFailuresByDomain[index]]),
+    ),
     config,
     effective,
     gatePolicy: RISK_GATE_POLICY,

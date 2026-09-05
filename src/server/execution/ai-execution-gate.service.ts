@@ -146,6 +146,19 @@ export function evaluateAiExecutionGate(input: {
     return result;
   }
 
+  if (input.policy === "VETO") {
+    const result = blockEvaluation({
+      policy: "VETO",
+      aiRawDecision: aiRawDecision || "NO_OPINION",
+      aiFinalDecision: aiFinalDecision || "NO_OPINION",
+      consensusDecision,
+      reasonCode: "AI_VETO",
+      reasonDetail: `AI finalDecision=${aiRawDecision || "NO_OPINION"} blocked by explicit VETO policy`,
+    });
+    recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
+    return result;
+  }
+
   const noOpinion = NO_OPINION_DECISIONS.has(aiRawDecision);
   if (input.override?.overridePolicy === "ADVISORY" && input.learningLane && input.microTradeEligible) {
     const result = advisoryEvaluation({
@@ -178,7 +191,7 @@ export function evaluateAiExecutionReadiness(input: {
   microTradeEligible: boolean;
   override?: AiExecutionGateOverride;
 }): AiExecutionGateEvaluation {
-  const advisory = true;
+  const advisory = input.policy !== "VETO";
 
   if (!input.ai) {
     if (advisory) {
@@ -192,12 +205,13 @@ export function evaluateAiExecutionReadiness(input: {
       recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
       return result;
     }
-    const result = advisoryEvaluation({
+    const result = blockEvaluation({
+      policy: input.policy,
       aiRawDecision: "MISSING",
       aiFinalDecision: "MISSING",
       consensusDecision: null,
-      reasonCode: "AI_TIMEOUT",
-      reasonDetail: "AI consensus result missing; advisory only",
+      reasonCode: "AI_VERDICT_MISSING",
+      reasonDetail: "AI consensus result missing under explicit VETO policy",
     });
     recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
     return result;
@@ -216,12 +230,13 @@ export function evaluateAiExecutionReadiness(input: {
       recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
       return result;
     }
-    const result = advisoryEvaluation({
+    const result = blockEvaluation({
+      policy: input.policy,
       aiRawDecision: "MISSING",
       aiFinalDecision: "NO_OPINION",
       consensusDecision: resolveConsensusDecision(input.ai),
-      reasonCode: "AI_NO_OPINION",
-      reasonDetail: "AI finalDecision missing; advisory only",
+      reasonCode: "AI_VERDICT_MISSING",
+      reasonDetail: "AI finalDecision missing under explicit VETO policy",
     });
     recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
     return result;
@@ -241,12 +256,13 @@ export function evaluateAiExecutionReadiness(input: {
       recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
       return result;
     }
-    const result = advisoryEvaluation({
+    const result = blockEvaluation({
+      policy: input.policy,
       aiRawDecision: aiFinalDecision,
       aiFinalDecision,
       consensusDecision,
-      reasonCode: "AI_TIMEOUT",
-      reasonDetail: "No healthy AI provider outputs; advisory only",
+      reasonCode: "AI_EVIDENCE_MISSING",
+      reasonDetail: "No healthy AI provider outputs under explicit VETO policy",
     });
     recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
     return result;
@@ -264,12 +280,13 @@ export function evaluateAiExecutionReadiness(input: {
       recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
       return result;
     }
-    const result = advisoryEvaluation({
+    const result = blockEvaluation({
+      policy: input.policy,
       aiRawDecision: aiFinalDecision,
       aiFinalDecision,
       consensusDecision: null,
-      reasonCode: "AI_NO_OPINION",
-      reasonDetail: "AI verdict present but consensus decision missing; advisory only",
+      reasonCode: "AI_CONSENSUS_MISSING",
+      reasonDetail: "AI verdict present but consensus decision missing under explicit VETO policy",
     });
     recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
     return result;
@@ -296,12 +313,13 @@ export function evaluateAiExecutionReadiness(input: {
       recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
       return result;
     }
-    const result = advisoryEvaluation({
+    const result = blockEvaluation({
+      policy: input.policy,
       aiRawDecision: aiFinalDecision,
       aiFinalDecision,
       consensusDecision: normalizedConsensus,
       reasonCode: "AI_DECISION_CONFLICT",
-      reasonDetail: `AI finalDecision (${aiFinalDecision}) conflicts with consensus (${normalizedConsensus}); advisory only`,
+      reasonDetail: `AI finalDecision (${aiFinalDecision}) conflicts with consensus (${normalizedConsensus}) under explicit VETO policy`,
     });
     recordAiEvaluation({ verdict: result.verdict, reasonCode: result.reasonCode });
     return result;

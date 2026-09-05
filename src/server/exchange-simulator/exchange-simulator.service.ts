@@ -195,7 +195,7 @@ export async function simulateMarketExecution(input: MarketSimulationInput): Pro
     executionId: input.executionId,
     userId: input.userId,
     result,
-  }).catch(() => null);
+  });
 
   return result;
 }

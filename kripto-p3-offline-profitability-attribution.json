@@ -1,0 +1,41 @@
+{
+  "status": "PARTIAL",
+  "p2Verdict": "PASS",
+  "paperRunStarted": false,
+  "autoRoundStarted": false,
+  "liveOrderSubmission": false,
+  "datasetStatus": "DATASET_PARTIAL",
+  "sourceIsolation": {
+    "status": "PASS"
+  },
+  "lookaheadTests": [
+    "tests/phase05-shadow-outcome.test.ts"
+  ],
+  "candidateCount": 0,
+  "completeOutcomeCount": 0,
+  "groundTruthMoverCount": 0,
+  "stageAttribution": [],
+  "funnelValue": [],
+  "moverConversion": [],
+  "laneAttribution": [],
+  "regimeAttribution": [],
+  "baselines": [],
+  "systemVsBaselines": [],
+  "costWaterfall": [],
+  "entryGateValue": {},
+  "riskGateValue": {},
+  "statisticalReliability": {
+    "status": "INSUFFICIENT_SAMPLE",
+    "sampleCount": 0
+  },
+  "p4Targets": [],
+  "offlineEdgeAnalysisReady": "PARTIAL",
+  "positiveEdgeProven": "INSUFFICIENT_SAMPLE",
+  "configDrift": {
+    "strategyThresholdChanged": false,
+    "riskSizingExitChanged": false,
+    "unauthorizedDriftDetected": false
+  },
+  "p3EngineeringVerdict": "PASS",
+  "remainingBlockers": []
+}

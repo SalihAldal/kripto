@@ -18,6 +18,7 @@ export type FunnelStage =
 
 export type CandidateFunnelTrace = {
   candidateId: string;
+  campaignId?: string;
   runId?: string;
   roundId?: string;
   symbol: string;
@@ -35,6 +36,7 @@ function resolveScope(input: { runId?: string; roundId?: string; symbol: string;
   const session = getForensicSession();
   return {
     candidateId: createCandidateId(input.symbol, input.stage),
+    campaignId: session?.campaignId,
     runId: input.runId ?? session?.runId,
     roundId: input.roundId ?? session?.roundId,
   };
@@ -59,6 +61,7 @@ export function recordCandidateFunnelStage(input: {
   });
   const record: CandidateFunnelTrace = {
     candidateId: input.candidateId ?? scope.candidateId,
+    campaignId: scope.campaignId,
     runId: scope.runId,
     roundId: scope.roundId,
     symbol: input.symbol.toUpperCase(),

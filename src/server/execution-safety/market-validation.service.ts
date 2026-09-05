@@ -9,8 +9,14 @@ export async function validateMarketSafety(input: PreTradeSafetyInput): Promise<
   const symbol = input.symbol.toUpperCase();
 
   const circuits = getCircuitSnapshot();
-  const openCircuits = circuits.filter((row) => row.state === "OPEN");
-  if (openCircuits.some((row) => row.key.includes("placeMarket") || row.key.includes("getTicker"))) {
+  const venue = String(input.venue ?? "").toLowerCase();
+  const openCircuits = circuits.filter(
+    (row) =>
+      row.state === "OPEN" &&
+      ["MARKET_DATA", "PRICE", "ORDER_BOOK", "EXCHANGE_INFO", "SYMBOL_FILTER"].includes(row.domain) &&
+      (!venue || row.venue === "default" || row.venue.toLowerCase() === venue),
+  );
+  if (openCircuits.length > 0) {
     reasons.push("Exchange circuit breaker active");
   }
 

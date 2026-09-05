@@ -1070,21 +1070,39 @@ async function runAIConsensusFromInputImpl(
         withCircuitBreaker(
           "ai:technical",
           () => analyzeLaneWithSingleProvider(consensusInput, "technical", laneProviderMap.technical, consensusCandidateId, signal),
-          { threshold: 4, cooldownMs: 20_000 },
+          {
+            threshold: 4,
+            cooldownMs: 20_000,
+            domain: "AI_PROVIDER",
+            operation: "technical_specialist",
+            dependency: laneProviderMap.technical,
+          },
         ),
       ),
       runGuardedAsyncPhase("momentum_specialist", () =>
         withCircuitBreaker(
           "ai:momentum",
           () => analyzeLaneWithSingleProvider(consensusInput, "momentum", laneProviderMap.momentum, consensusCandidateId, signal),
-          { threshold: 4, cooldownMs: 20_000 },
+          {
+            threshold: 4,
+            cooldownMs: 20_000,
+            domain: "AI_PROVIDER",
+            operation: "momentum_specialist",
+            dependency: laneProviderMap.momentum,
+          },
         ),
       ),
       runGuardedAsyncPhase("risk_specialist", () =>
         withCircuitBreaker(
           "ai:risk",
           () => analyzeLaneWithSingleProvider(consensusInput, "risk", laneProviderMap.risk, consensusCandidateId, signal),
-          { threshold: 4, cooldownMs: 20_000 },
+          {
+            threshold: 4,
+            cooldownMs: 20_000,
+            domain: "AI_PROVIDER",
+            operation: "risk_specialist",
+            dependency: laneProviderMap.risk,
+          },
         ),
       ),
     ]);

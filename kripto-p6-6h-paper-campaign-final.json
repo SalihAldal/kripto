@@ -1,0 +1,1208 @@
+{
+  "campaignIdentity": {
+    "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+    "jobId": "cmtjfcizg0009un1knvxa9eqe",
+    "userId": "cmpbhrfn10000un90aroynt6t",
+    "gitCommitSha": "caa75fd8fa2cb0f53028bebb47e0e750d3776c90",
+    "startUtc": "2026-09-02T01:35:31.821Z",
+    "startLocal": "Wed Sep 02 2026 04:35:32 GMT+0300 (GMT+03:00)",
+    "plannedEndUtc": "2026-09-02T07:35:31.821Z",
+    "endUtc": "2026-09-02T07:36:09.137Z",
+    "actualDurationSec": 21634
+  },
+  "immutableConfig": {
+    "strategyHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "riskHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "thresholdHash": "3197ff27d3d95757e46f2373e6c7fd21843ca2b351eb62f3f18a7ed52ab4265f",
+    "costModelVersion": "default",
+    "datasetSchemaVersion": "default"
+  },
+  "preflight": {
+    "attemptId": "p6-1788312932341",
+    "userId": "cmpbhrfn10000un90aroynt6t",
+    "generatedAt": "2026-09-02T01:35:33.631Z",
+    "overallVerdict": "DEGRADED",
+    "canStart": true,
+    "blockReason": null,
+    "blockCode": null,
+    "database": {
+      "status": "PASS",
+      "reasonCode": "DB_HEALTHY",
+      "reasonDetail": "PostgreSQL reachable and AutoRound schema accessible",
+      "timestamp": "2026-09-02T01:35:32.365Z"
+    },
+    "binance": {
+      "status": "PASS",
+      "reasonCode": "BINANCE_TR_HEALTHY",
+      "reasonDetail": "BTCTRY ticker ok (3710896)",
+      "timestamp": "2026-09-02T01:35:33.396Z",
+      "metadata": {
+        "symbol": "BTCTRY",
+        "price": 3710896
+      }
+    },
+    "ai": {
+      "status": "PASS",
+      "reasonCode": "AI_CONFIGURED",
+      "reasonDetail": "3 enabled AI provider(s)",
+      "timestamp": "2026-09-02T01:35:33.507Z",
+      "metadata": {
+        "providers": [
+          {
+            "id": "provider-1",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-2",
+            "name": "OpenAI",
+            "model": "gpt-4o-mini"
+          },
+          {
+            "id": "provider-3",
+            "name": "Gemini",
+            "model": "gemini-1.5-flash-latest"
+          }
+        ],
+        "remoteRequired": false
+      }
+    },
+    "emergencyStop": {
+      "status": "PASS",
+      "reasonCode": "EMERGENCY_STOP_INACTIVE",
+      "reasonDetail": "Emergency stop inactive",
+      "timestamp": "2026-09-02T01:35:33.515Z"
+    },
+    "activeJobs": {
+      "status": "PASS",
+      "reasonCode": "NO_ACTIVE_JOB",
+      "reasonDetail": "No RUNNING auto-round job blocking startup",
+      "timestamp": "2026-09-02T01:35:33.585Z"
+    },
+    "zombieRounds": {
+      "status": "WARN",
+      "reasonCode": "ZOMBIE_ROUNDS_RECONCILED",
+      "reasonDetail": "Reconciled 1 stale round record(s) before startup",
+      "timestamp": "2026-09-02T01:35:33.590Z",
+      "metadata": {
+        "reconciledCount": 1
+      }
+    },
+    "workerLocks": {
+      "status": "PASS",
+      "reasonCode": "WORKER_LOCKS_CLEAR",
+      "reasonDetail": "No local scheduler loops registered",
+      "timestamp": "2026-09-02T01:35:33.590Z",
+      "metadata": {
+        "registry": {
+          "processOwnerId": "DESKTOP-3R7HR9F:18200:037941d9",
+          "loopCount": 0,
+          "ownerCount": 0,
+          "loops": [],
+          "leases": []
+        },
+        "staleLocalLoops": 0
+      }
+    },
+    "resolvedConfig": {
+      "status": "PASS",
+      "reasonCode": "PAPER_CONFIG_OK",
+      "reasonDetail": "Resolved runtime config confirms paper execution mode",
+      "timestamp": "2026-09-02T01:35:33.615Z",
+      "metadata": {
+        "executionMode": "paper",
+        "exchange": "binance"
+      }
+    },
+    "duplicatePaperJobs": {
+      "status": "PASS",
+      "reasonCode": "NO_DUPLICATE_PAPER_JOBS",
+      "reasonDetail": "At most one RUNNING paper job for user",
+      "timestamp": "2026-09-02T01:35:33.593Z"
+    },
+    "clockSync": {
+      "status": "PASS",
+      "reasonCode": "CLOCK_SYNC_OK",
+      "reasonDetail": "Clock skew 21ms within threshold",
+      "timestamp": "2026-09-02T01:35:33.507Z",
+      "metadata": {
+        "localTime": "2026-09-02T01:35:33.505Z",
+        "serverTime": "2026-09-02T01:35:33.526Z",
+        "clockOffsetMs": 21,
+        "clockSkewMs": 21,
+        "apiLatencyMs": 108,
+        "skewThresholdMs": 5000,
+        "endpoint": "https://www.binance.tr/api/v3/time",
+        "timestampSource": "binance.api.v3.time"
+      }
+    },
+    "reconciledRounds": [
+      {
+        "roundId": "cmtjf9fa9000nunlkpn78x3tj",
+        "jobId": "cmtjf9f630009unlkdfchw6ot",
+        "previousState": "tariyor",
+        "newState": "tur_basarisiz",
+        "reasonCode": "PREFLIGHT_STALE_RUNNING_JOB",
+        "reasonDetail": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE); prior=tariyor; evidence={\"heartbeatAt\":\"2026-09-02T01:35:32.562Z\",\"state\":\"tariyor\",\"jobSchedulerActive\":false}",
+        "timestamp": "2026-09-02T01:35:33.544Z"
+      }
+    ],
+    "reconciledJobs": [
+      {
+        "jobId": "cmtjf9f630009unlkdfchw6ot",
+        "previousStatus": "RUNNING",
+        "newStatus": "STOPPED",
+        "reasonCode": "PREFLIGHT_STALE_RUNNING_JOB",
+        "reasonDetail": "Stale RUNNING job reconciled before paper start (SCHEDULER_LEASE_STALE)",
+        "timestamp": "2026-09-02T01:35:33.544Z"
+      }
+    ],
+    "artifactPath": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\forensics\\preflight\\p6-1788312932341"
+  },
+  "checkpointSummary": {
+    "count": 33,
+    "first": {
+      "checkpointNo": 1,
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "timestamp": "2026-09-02T01:35:34.385Z",
+      "elapsedSec": 2,
+      "remainingSec": 21597,
+      "processHealth": {
+        "activeJob": true,
+        "scheduler": {
+          "registry": {
+            "processOwnerId": "DESKTOP-3R7HR9F:18200:037941d9",
+            "loopCount": 1,
+            "ownerCount": 1,
+            "loops": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "ownerId": "DESKTOP-3R7HR9F:18200:037941d9",
+                "generation": 1
+              }
+            ],
+            "leases": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "state": "RUNNING",
+                "generation": 1,
+                "ownerId": "DESKTOP-3R7HR9F:18200:037941d9"
+              }
+            ]
+          },
+          "activeLease": {
+            "jobId": "cmtjfcizg0009un1knvxa9eqe",
+            "ownerId": "DESKTOP-3R7HR9F:18200:037941d9",
+            "createdAt": "2026-09-02T01:35:34.304Z",
+            "lastHeartbeatAt": "2026-09-02T01:35:34.439Z",
+            "version": 2,
+            "generation": 1,
+            "state": "RUNNING"
+          },
+          "roundRegistry": {
+            "entries": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 1,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjfcjiu000pun1kjaaslgcg",
+                "status": "SELECTION_RUNNING",
+                "version": 2,
+                "createdAt": "2026-09-02T01:35:34.679Z",
+                "updatedAt": "2026-09-02T01:35:34.955Z"
+              }
+            ],
+            "activeCount": 1
+          },
+          "readOnly": true
+        },
+        "health": {
+          "generatedAt": "2026-09-02T01:35:36.455Z",
+          "overallScore": 100,
+          "schedulerHealth": 100,
+          "runtimeHealth": 100,
+          "recoveryHealth": 100,
+          "watchdogHealth": 100,
+          "scannerHealth": 100,
+          "aiHealth": 100,
+          "databaseHealth": 100,
+          "ownershipHealth": 100,
+          "heartbeatHealth": 100,
+          "leaseHealth": 100,
+          "registryHealth": 100,
+          "jobs": [
+            {
+              "jobId": "cmtjfcizg0009un1knvxa9eqe",
+              "jobStatus": "RUNNING",
+              "issues": [],
+              "score": 100,
+              "canRecover": true,
+              "hasLocalLoop": true,
+              "hasLiveLease": false,
+              "leaseOwnerId": "DESKTOP-3R7HR9F:18200:037941d9",
+              "activeRunId": "cmtjfcjiu000pun1kjaaslgcg",
+              "activeRunRoundNo": 1,
+              "progressAssessment": {
+                "progressState": "SCANNER_ACTIVE",
+                "reasonCode": "PROGRESS_ADVANCING",
+                "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+                "heartbeatAt": "2026-09-02T01:35:35.068Z",
+                "lastProgressAt": "2026-09-02T01:35:35.068Z",
+                "heartbeatAgeMs": 1339,
+                "progressAgeMs": 1339,
+                "stallElapsedMs": 1339,
+                "elapsedMs": 113,
+                "selectionBudgetMs": 2700000,
+                "selectionBudgetRemainingMs": 2699887,
+                "stallThresholdMs": 180000,
+                "progressStaleThresholdMs": 180000,
+                "possiblyHungGraceMs": 180000,
+                "evidence": {
+                  "step": "FULL_SCAN",
+                  "selectionAttempt": 1,
+                  "candidatesProcessed": 0,
+                  "aiProcessed": 0,
+                  "aiTotal": 0,
+                  "scannerTotal": 0,
+                  "intraRoundPct": 28,
+                  "currentPipeline": "opportunity-engine",
+                  "meaningfulProgress": true,
+                  "dependencyDegraded": false,
+                  "lastMeaningfulProgressAt": "2026-09-02T01:35:35.068Z",
+                  "lastRawProgressAt": "2026-09-02T01:35:35.068Z"
+                }
+              },
+              "progressTelemetry": {
+                "roundId": "1",
+                "stage": "FULL_SCAN",
+                "progressState": "SCANNER_ACTIVE",
+                "recoveryDecision": "CONTINUE",
+                "reasonCode": "PROGRESS_ADVANCING",
+                "reasonDetail": "Recent progress within stall threshold while selection budget remains",
+                "recoveryCount": 0,
+                "lastProgressAt": "2026-09-02T01:35:35.068Z",
+                "heartbeatAt": "2026-09-02T01:35:35.068Z",
+                "elapsedMs": 113,
+                "selectionBudgetMs": 2700000,
+                "stallElapsedMs": 1339,
+                "selectionBudgetRemainingMs": 2699887
+              },
+              "recoveryState": {
+                "recoveryCount": 0,
+                "recoverySuccess": 0,
+                "recoveryFailure": 0,
+                "lastRecoveryAt": null,
+                "lastCause": null,
+                "lastDurationMs": 0,
+                "escalationLevel": 0,
+                "windowStartedAt": "2026-09-02T01:35:34.529Z"
+              }
+            }
+          ],
+          "watchdog": {
+            "activeCount": 1,
+            "entries": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "ownerId": "DESKTOP-3R7HR9F:18200:037941d9",
+                "startedAt": "2026-09-02T01:35:34.360Z",
+                "tickCount": 1,
+                "intervalMs": 15000,
+                "hasSchedulerLoop": true
+              }
+            ]
+          },
+          "recoveryManager": {
+            "processOwnerId": "DESKTOP-3R7HR9F:18200:037941d9",
+            "pendingRecoveries": 0
+          }
+        }
+      },
+      "rounds": {
+        "completed": 0,
+        "failed": 0,
+        "active": 1
+      },
+      "funnel": {
+        "candidateCount": 1,
+        "enterCount": 0,
+        "waitRejectCount": 0,
+        "firstBlockerDistribution": {
+          "NONE": 1
+        }
+      },
+      "paper": {
+        "orderIntentCount": 0,
+        "submitCount": 0,
+        "fillCount": 0,
+        "partialFillCount": 0,
+        "zeroFillCount": 0,
+        "openPositions": 0,
+        "closedPositions": 285
+      },
+      "pnl": {
+        "grossPnl": 0,
+        "fee": 0,
+        "slippage": 0,
+        "netPnl": 0
+      },
+      "safety": {
+        "liveSubmitCount": 0,
+        "configDrift": false,
+        "duplicateOrOrphanDetected": false
+      }
+    },
+    "last": {
+      "checkpointNo": 33,
+      "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+      "timestamp": "2026-09-02T07:26:08.570Z",
+      "elapsedSec": 21034,
+      "remainingSec": 565,
+      "processHealth": {
+        "activeJob": false,
+        "scheduler": {
+          "registry": {
+            "processOwnerId": "DESKTOP-3R7HR9F:18200:037941d9",
+            "loopCount": 0,
+            "ownerCount": 1,
+            "loops": [],
+            "leases": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "state": "STOPPED",
+                "generation": 1,
+                "ownerId": "DESKTOP-3R7HR9F:18200:037941d9"
+              }
+            ]
+          },
+          "activeLease": null,
+          "roundRegistry": {
+            "entries": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 1,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjfcjiu000pun1kjaaslgcg",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T01:35:34.679Z",
+                "updatedAt": "2026-09-02T01:41:22.355Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 2,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjfjzyl00p4un1kfihv02sg",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T01:41:22.514Z",
+                "updatedAt": "2026-09-02T01:47:09.388Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 3,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjfrfrl05ygun1kwtzde9i4",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T01:47:09.591Z",
+                "updatedAt": "2026-09-02T01:52:56.840Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 4,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjfyvw50lopun1k7dciq4kn",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T01:52:57.084Z",
+                "updatedAt": "2026-09-02T01:58:44.615Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 5,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjg6ccn1uxsun1k5mbg4hzg",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T01:58:45.006Z",
+                "updatedAt": "2026-09-02T01:59:06.471Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 6,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjg6vlu23j1un1kk3166tuu",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T01:59:10.096Z",
+                "updatedAt": "2026-09-02T01:59:57.474Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 7,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjg7wj823mdun1kjcutfw5d",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T01:59:57.830Z",
+                "updatedAt": "2026-09-02T02:00:44.807Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 8,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjg8x2v24fyun1kjl6skwew",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:00:45.182Z",
+                "updatedAt": "2026-09-02T02:02:22.689Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 9,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgb0oo2nzxun1kbiqbgp6z",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:02:23.167Z",
+                "updatedAt": "2026-09-02T02:02:23.439Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 10,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgb1732o21un1kkbi3k7wc",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:02:23.832Z",
+                "updatedAt": "2026-09-02T02:02:24.155Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 11,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgb1qs2o4oun1kq8evqfkf",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:02:24.537Z",
+                "updatedAt": "2026-09-02T02:02:24.804Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 12,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgb29s2o82un1k68g0yjh2",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:02:25.222Z",
+                "updatedAt": "2026-09-02T02:02:25.492Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 13,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgb2ss2oc9un1k8kcrawlf",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:02:25.907Z",
+                "updatedAt": "2026-09-02T02:02:26.196Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 14,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgb3dx2ohkun1k975dyst8",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:02:26.669Z",
+                "updatedAt": "2026-09-02T02:03:12.217Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 15,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgc2wf2saiun1k1tgeggop",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:03:12.736Z",
+                "updatedAt": "2026-09-02T02:03:13.226Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 16,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgc3ni2sdhun1kxyplyijm",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:03:13.713Z",
+                "updatedAt": "2026-09-02T02:03:14.211Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 17,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgc4dy2siaun1k86go97cx",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:03:14.664Z",
+                "updatedAt": "2026-09-02T02:03:15.164Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 18,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgc54r2spqun1k27uynlfs",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:03:15.628Z",
+                "updatedAt": "2026-09-02T02:04:01.640Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 19,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgd5092vrlun1kivnl9wgk",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:04:02.121Z",
+                "updatedAt": "2026-09-02T02:04:48.279Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 20,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjge4z92wnvun1kfoconcmf",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:04:48.747Z",
+                "updatedAt": "2026-09-02T02:06:10.887Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 21,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgfwsv3lgzun1k10oqnhgn",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:06:11.461Z",
+                "updatedAt": "2026-09-02T02:06:57.458Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 22,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjggwos3lkbun1kiyecnkdd",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:06:57.964Z",
+                "updatedAt": "2026-09-02T02:07:43.965Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 23,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjghwkg3mjlun1k1ke9xf0i",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:07:44.466Z",
+                "updatedAt": "2026-09-02T02:13:31.874Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 24,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgpd746xmyun1k1sk5exaq",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:13:32.610Z",
+                "updatedAt": "2026-09-02T02:16:39.192Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 25,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgtdsd94zpun1kp5ylw2hj",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:16:40.002Z",
+                "updatedAt": "2026-09-02T02:17:26.052Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 26,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgudw896b5un1k3e520xcn",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:17:26.794Z",
+                "updatedAt": "2026-09-02T02:18:12.863Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 27,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgve1n97msun1kqzb8adh4",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:18:13.646Z",
+                "updatedAt": "2026-09-02T02:20:40.444Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 28,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgyk2xb02pun1ki483yy5d",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:20:41.437Z",
+                "updatedAt": "2026-09-02T02:21:27.486Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 29,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjgzk9mb2n7un1kmk6hnpx1",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:21:28.333Z",
+                "updatedAt": "2026-09-02T02:22:15.304Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 30,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh0l6hb42jun1kz9drrghd",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:22:16.173Z",
+                "updatedAt": "2026-09-02T02:22:20.534Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 31,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh0pa2b53nun1kcf25osdq",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:22:21.489Z",
+                "updatedAt": "2026-09-02T02:23:07.876Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 32,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh1pphbaxvun1kavwi2ftp",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:23:08.697Z",
+                "updatedAt": "2026-09-02T02:23:54.865Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 33,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh2pz5bb17un1k2ajorq2l",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:23:55.698Z",
+                "updatedAt": "2026-09-02T02:24:03.162Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 34,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh2wi4bdjbun1km91emd98",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:24:04.165Z",
+                "updatedAt": "2026-09-02T02:24:04.953Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 35,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh2xvtbe4bun1k5td469hw",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:24:05.963Z",
+                "updatedAt": "2026-09-02T02:24:06.761Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 36,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh2zaubeqlun1ktgbbu5uw",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:24:07.793Z",
+                "updatedAt": "2026-09-02T02:24:08.614Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 37,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh30qqbfglun1kdie6h523",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:24:09.664Z",
+                "updatedAt": "2026-09-02T02:24:10.504Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 38,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh3272bg7pun1k2e8iw6fb",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:24:11.548Z",
+                "updatedAt": "2026-09-02T02:24:12.437Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 39,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh33psbh0zun1kbu900ga2",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:24:13.521Z",
+                "updatedAt": "2026-09-02T02:25:00.885Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 40,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh45wxbvxkun1kp4vsyide",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:25:03.014Z",
+                "updatedAt": "2026-09-02T02:25:49.195Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 41,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjh5697bw0yun1k626rabqs",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:25:50.113Z",
+                "updatedAt": "2026-09-02T02:30:20.854Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 42,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb0b5fht4un1kwxum8e18",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:30:22.342Z",
+                "updatedAt": "2026-09-02T02:30:23.048Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 43,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb1rnfhv8un1k12fa0ab2",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:30:24.230Z",
+                "updatedAt": "2026-09-02T02:30:24.921Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 44,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb390fhxcun1kz0x54q13",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:30:26.155Z",
+                "updatedAt": "2026-09-02T02:30:26.847Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 45,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb4oyfhzgun1kqzteyygj",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:30:28.023Z",
+                "updatedAt": "2026-09-02T02:30:28.743Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 46,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb66mfi2fun1kaj3t2y55",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:30:29.953Z",
+                "updatedAt": "2026-09-02T02:30:30.661Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 47,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb7p8fi7iun1kxd35eein",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:30:31.916Z",
+                "updatedAt": "2026-09-02T02:30:32.621Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 48,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhb97lfifmun1kmkrw2o93",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:30:33.877Z",
+                "updatedAt": "2026-09-02T02:31:19.642Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 49,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhc99pfoewun1krrzr88ji",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 5,
+                "createdAt": "2026-09-02T02:31:20.609Z",
+                "updatedAt": "2026-09-02T02:31:34.574Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 50,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhckxmfrjtun1k7q26wqvl",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:31:35.726Z",
+                "updatedAt": "2026-09-02T02:32:22.486Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 51,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhdlsdg5nxun1k6lifxi5k",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:32:23.489Z",
+                "updatedAt": "2026-09-02T02:33:10.089Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 52,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhemidg5r9un1k7wt2737n",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:33:11.082Z",
+                "updatedAt": "2026-09-02T02:39:04.804Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 53,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhmdnxl4bnun1kk1twe435",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:39:13.316Z",
+                "updatedAt": "2026-09-02T02:45:08.045Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 54,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtjhu41yp8lgun1kj5lckslw",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:45:14.331Z",
+                "updatedAt": "2026-09-02T02:51:05.357Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 55,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:g1",
+                "runId": "cmtji1r4ftb7dun1kpnxjyary",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 4,
+                "createdAt": "2026-09-02T02:51:10.383Z",
+                "updatedAt": "2026-09-02T02:57:00.484Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 56,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtji9qugwy18un1k2bk3axg4",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T02:57:22.955Z",
+                "updatedAt": "2026-09-02T03:03:27.940Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 57,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjii13f0uy1un1ktjs2e902",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:03:49.515Z",
+                "updatedAt": "2026-09-02T03:10:07.100Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 58,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjiquma5hd9un1kk3lquth3",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:10:41.027Z",
+                "updatedAt": "2026-09-02T03:17:34.010Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 59,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjj0mzhahv8un1ky6h90f7u",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:18:17.693Z",
+                "updatedAt": "2026-09-02T03:24:59.390Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 60,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjja5nofhelun1ky1os7suo",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:25:41.797Z",
+                "updatedAt": "2026-09-02T03:32:40.492Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 61,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjjkdv3kpcbun1k49less9a",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:33:38.992Z",
+                "updatedAt": "2026-09-02T03:40:43.834Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 62,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjjusi5qhxrun1kfuiy2z07",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:41:44.525Z",
+                "updatedAt": "2026-09-02T03:48:52.654Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 63,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjk5e06w6msun1k4zm9qg0m",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:49:58.950Z",
+                "updatedAt": "2026-09-02T03:57:20.902Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 64,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjkgg1y2r6vun1k6j0abj9r",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T03:58:34.823Z",
+                "updatedAt": "2026-09-02T04:05:51.854Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 65,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjkr8i58cmvun1kfebr0tjx",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T04:06:58.253Z",
+                "updatedAt": "2026-09-02T04:14:17.888Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 66,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjl25wceeq0un1kx7nmblgs",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T04:15:28.092Z",
+                "updatedAt": "2026-09-02T04:23:10.877Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 67,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjldvugkxx6un1kastq71ty",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T04:24:34.936Z",
+                "updatedAt": "2026-09-02T04:32:11.946Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 68,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjlpohjrh2aun1kbauyejo7",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T04:33:45.272Z",
+                "updatedAt": "2026-09-02T04:41:35.951Z"
+              },
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "roundNo": 69,
+                "roundOwner": "DESKTOP-3R7HR9F:18200:037941d9:recovery",
+                "runId": "cmtjm234nywrlun1kv7r9tk6y",
+                "status": "OWNERSHIP_RELEASED",
+                "version": 3,
+                "createdAt": "2026-09-02T04:43:24.119Z",
+                "updatedAt": "2026-09-02T04:44:59.245Z"
+              }
+            ],
+            "activeCount": 0
+          },
+          "readOnly": true
+        },
+        "health": {
+          "generatedAt": "2026-09-02T07:26:08.824Z",
+          "overallScore": 100,
+          "schedulerHealth": 100,
+          "runtimeHealth": 100,
+          "recoveryHealth": 100,
+          "watchdogHealth": 100,
+          "scannerHealth": 100,
+          "aiHealth": 100,
+          "databaseHealth": 100,
+          "ownershipHealth": 100,
+          "heartbeatHealth": 100,
+          "leaseHealth": 100,
+          "registryHealth": 100,
+          "jobs": [],
+          "watchdog": {
+            "activeCount": 1,
+            "entries": [
+              {
+                "jobId": "cmtjfcizg0009un1knvxa9eqe",
+                "ownerId": "DESKTOP-3R7HR9F:18200:037941d9",
+                "startedAt": "2026-09-02T01:35:34.360Z",
+                "tickCount": 1392,
+                "intervalMs": 15000,
+                "hasSchedulerLoop": false
+              }
+            ]
+          },
+          "recoveryManager": {
+            "processOwnerId": "DESKTOP-3R7HR9F:18200:037941d9",
+            "pendingRecoveries": 0
+          }
+        }
+      },
+      "rounds": {
+        "completed": 40,
+        "failed": 29,
+        "active": 0
+      },
+      "funnel": {
+        "candidateCount": 69,
+        "enterCount": 0,
+        "waitRejectCount": 69,
+        "firstBlockerDistribution": {
+          "NONE": 40,
+          "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING": 28,
+          "PERSIST_TIMEOUT: round-runtime.patchJobActiveRound timed out after 15000ms": 1
+        }
+      },
+      "paper": {
+        "orderIntentCount": 0,
+        "submitCount": 0,
+        "fillCount": 0,
+        "partialFillCount": 0,
+        "zeroFillCount": 0,
+        "openPositions": 0,
+        "closedPositions": 285
+      },
+      "pnl": {
+        "grossPnl": 0,
+        "fee": 0,
+        "slippage": 0,
+        "netPnl": 0
+      },
+      "safety": {
+        "liveSubmitCount": 0,
+        "configDrift": false,
+        "duplicateOrOrphanDetected": false
+      }
+    }
+  },
+  "funnel": {
+    "campaignId": "cmp:cmtjfcizg0009un1knvxa9eqe",
+    "roundsTotal": 69,
+    "enterCount": 0,
+    "waitCount": 40,
+    "rejectCount": 29,
+    "topBlockers": [
+      [
+        "NONE",
+        40
+      ],
+      [
+        "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING",
+        28
+      ],
+      [
+        "PERSIST_TIMEOUT: round-runtime.patchJobActiveRound timed out after 15000ms",
+        1
+      ]
+    ]
+  },
+  "orders": {
+    "paperOrderCount": 0,
+    "paperFillCount": 0,
+    "openedPositions": 0,
+    "closedPositions": 0
+  },
+  "pnl": {
+    "grossPnl": 0,
+    "feeTotal": 0,
+    "slippageTotal": 0,
+    "netPnl": 0,
+    "winCount": 0,
+    "lossCount": 0,
+    "breakevenCount": 0
+  },
+  "safetyEvents": [],
+  "configDriftCount": 0,
+  "duplicateOrOrphanCount": 0,
+  "liveSubmitCount": 0,
+  "dataQuality": {
+    "status": "PARTIAL",
+    "note": "No trade sample"
+  },
+  "strategyClassifications": {
+    "EARLY": "NOT_TRIGGERED",
+    "MOMENTUM": "INSUFFICIENT_SAMPLE",
+    "BREAKOUT_RETEST": "NOT_TRIGGERED",
+    "STEADY": "NOT_TRIGGERED",
+    "RANGE": "NOT_TRIGGERED"
+  },
+  "finalVerdict": {
+    "CAMPAIGN_STATUS": "COMPLETED",
+    "PAPER_EXECUTION_INTEGRITY": "PASS",
+    "SAFETY_INTEGRITY": "PASS",
+    "DATA_QUALITY": "PARTIAL",
+    "SAMPLE_SUFFICIENCY": "INSUFFICIENT",
+    "POSITIVE_EDGE_EVIDENCE": "INSUFFICIENT_SAMPLE",
+    "LIVE_SUBMIT_COUNT": 0,
+    "NEXT_STEP": "Ayni immutable config ile ek paper sample topla ve attribution tekrar kos."
+  }
+}

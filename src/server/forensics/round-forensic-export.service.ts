@@ -52,6 +52,7 @@ function toMoveClass(value: number): MoveClass {
 
 export type RoundForensicExportInput = {
   session: ForensicSessionContext;
+  campaignId?: string;
   roundId: string;
   runId: string;
   jobId: string;
@@ -302,6 +303,7 @@ function buildSelectionTimeBudgetBreakdown(input: {
 
 export async function exportRoundForensicArtifacts(input: RoundForensicExportInput) {
   const { session, roundId, runId } = input;
+  const campaignId = input.campaignId ?? session.campaignId;
   const rootDir = path.join(process.cwd(), "artifacts", "forensics", session.sessionId, "rounds", roundId);
   mkdirSync(rootDir, { recursive: true });
   const tracker = { written: [] as string[], failed: [] as Array<{ file: string; reason: string }> };
@@ -601,6 +603,7 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
     safeWriteJson(path.join(rootDir, "resolved-config.json"), resolvedConfig, tracker);
   }
   const runIdentity = {
+    campaignId,
     runId,
     sessionId: session.sessionId,
     configHash: resolvedConfig?.configHash ?? null,
@@ -636,20 +639,30 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
   }, tracker);
   const runtimeTelemetry = buildRuntimeTelemetrySnapshot({ runId, roundId });
   safeWriteJson(path.join(rootDir, "runtime-telemetry.json"), runtimeTelemetry, tracker);
+  const checkpointSchema = ((runtimeTelemetry as Record<string, unknown>).checkpointSchema as Record<string, unknown> | undefined) ?? null;
+  if (checkpointSchema && checkpointSchema.ok === false) {
+    tracker.failed.push({
+      file: "runtime-telemetry.json",
+      reason: `CHECKPOINT_SCHEMA_INCOMPLETE:${JSON.stringify(checkpointSchema.missing ?? [])}`,
+    });
+  }
   const shadow = getShadowOutcomeEngine();
+  const shadowTelemetry = shadow.getTelemetry();
   const liveMovers = shadow.getMoverEvents();
   const persistedMovers = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(
     `SELECT
-      "moverId","runId","symbol","threshold","horizonMin","moveStartAt","moveStartPrice",
+      "moverId","campaignId","runId","symbol","threshold","horizonMin","moveStartAt","moveStartPrice",
       "thresholdReachedAt","thresholdPrice","peakAt","peakPrice","peakMovePercent","status"
      FROM "ShadowMoverEvent"
-     WHERE "runId" = $1`,
+     WHERE "campaignId" = $1 OR "runId" = $2`,
+    campaignId,
     runId,
   ).catch(() => []);
   const movers =
     persistedMovers.length > 0
       ? persistedMovers.map((row) => ({
           moverId: String(row.moverId ?? ""),
+          campaignId: String(row.campaignId ?? campaignId),
           runId: String(row.runId ?? ""),
           symbol: String(row.symbol ?? ""),
           moveClass: toMoveClass(Number(row.threshold ?? 0)),
@@ -665,16 +678,25 @@ export async function exportRoundForensicArtifacts(input: RoundForensicExportInp
         }))
       : liveMovers;
   const tracked = shadow.getTracked();
-  const settlementStatus = await getSettlementStatus(runId).catch(() => null);
+  const settlementStatus = await getSettlementStatus({ runId, campaignId }).catch(() => null);
   safeWriteJson(path.join(rootDir, "shadow-outcomes.json"), {
+    campaignId,
     runId,
     trackedCount: tracked.length,
     tracked,
     settlementStatus,
   }, tracker);
   safeWriteJson(path.join(rootDir, "mover-ground-truth.json"), {
+    campaignId,
     runId,
     moverCount: movers.length,
+    trackerStarted: shadowTelemetry.lastTickAt > 0,
+    symbolsTracked: shadowTelemetry.symbols,
+    marketEventsProcessed: shadowTelemetry.lastTickAt > 0 ? shadowTelemetry.symbols : 0,
+    movementWindowsEvaluated: shadowTelemetry.symbols * 8,
+    moversGenerated: liveMovers.length,
+    moversPersisted: persistedMovers.length,
+    persistFailures: Math.max(0, liveMovers.length - persistedMovers.length),
     events: movers,
   }, tracker);
   safeWriteJson(path.join(rootDir, "edge-analytics.json"), {

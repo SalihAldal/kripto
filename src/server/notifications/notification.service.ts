@@ -10,6 +10,7 @@ export type NotificationEventType =
   | "AI_RISK"
   | "DAILY_LOSS_WARNING"
   | "BINANCE_API_ERROR"
+  | "EXECUTION_DEPENDENCY_ERROR"
   | "EMERGENCY_STOP";
 
 export type NotificationLevel = "INFO" | "WARN" | "ERROR";

@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { buildCampaignId } from "@/src/server/forensics/campaign-identity.service";
 import type {
   AiCallAudit,
   CandidateTerminalRecord,
@@ -24,6 +25,7 @@ import type {
 
 export type ForensicSessionContext = {
   sessionId: string;
+  campaignId: string;
   roundId?: string;
   jobId?: string;
   runId?: string;
@@ -84,6 +86,12 @@ export function ensureForensicSession(input?: Partial<ForensicSessionContext>): 
   if (existing) return existing;
   const session: ForensicSessionContext = {
     sessionId: input?.sessionId ?? `forensic-${Date.now()}`,
+    campaignId: buildCampaignId({
+      campaignId: input?.campaignId,
+      jobId: input?.jobId,
+      sessionId: input?.sessionId,
+      startedAt: input?.startedAt,
+    }),
     roundId: input?.roundId,
     jobId: input?.jobId,
     runId: input?.runId,
@@ -114,12 +122,13 @@ export function ensureForensicSession(input?: Partial<ForensicSessionContext>): 
   return session;
 }
 
-export function attachForensicRound(input: { runId: string; roundId?: string; jobId?: string }) {
+export function attachForensicRound(input: { runId: string; roundId?: string; jobId?: string; campaignId?: string }) {
   const session = getForensicSession();
   if (!session) return null;
   session.runId = input.runId;
   session.roundId = input.roundId ?? input.runId;
   if (input.jobId) session.jobId = input.jobId;
+  if (input.campaignId) session.campaignId = buildCampaignId({ campaignId: input.campaignId, jobId: input.jobId, sessionId: session.sessionId });
   return session;
 }
 

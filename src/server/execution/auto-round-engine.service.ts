@@ -7,6 +7,7 @@ import {
   ensureOpenPositionMonitors,
   executeAnalyzeAndTrade,
 } from "@/src/server/execution/execution-orchestrator.service";
+import { normalizeExecutionTerminalReason } from "@/src/server/execution/execution-failure-contract";
 import { evaluateMomentumBreakout } from "@/src/server/scanner/momentum-breakout.service";
 import { resolvePumpRoundMaxWaitSec } from "@/src/server/scanner/pump-early-catcher.service";
 import type { ScannerCandidate } from "@/src/types/scanner";
@@ -54,6 +55,7 @@ import {
   isTerminalNonExecutableReason,
   recordCandidateFunnelStage,
 } from "@/src/server/forensics/candidate-funnel-trace.service";
+import { classifyTerminalReason } from "@/src/server/execution/p7-paper-strategy-contract";
 import { shouldBindSymbolOnTerminalFail } from "@/src/server/execution/auto-round-terminal-policy";
 import { getPositionById, getRuntimeExecutionContext, getEmergencyStopState, listOpenPositionsByUser } from "@/src/server/repositories/execution.repository";
 import { writeStructuredLog } from "@/src/server/observability/structured-log";
@@ -63,6 +65,7 @@ import { ensureScannerWorkerStarted } from "@/src/server/scanner/scanner-worker.
 import { getCanonicalCandidateStore } from "@/src/server/candidate/candidate-store.service";
 import { beginForensicPaperSession } from "@/src/server/forensics/forensic-bridge.service";
 import { attachForensicRound, getForensicSession, getOrCreateForensicSession } from "@/src/server/forensics/forensic-context";
+import { buildCampaignId } from "@/src/server/forensics/campaign-identity.service";
 import { runRoundForensicExport } from "@/src/server/forensics/forensic-export-runner.service";
 import { traceCandidateReject, traceCandidateTraded } from "@/src/server/forensics/candidate-lifecycle.service";
 import { terminalizeOpenAiCandidates } from "@/src/server/forensics/ai-runtime.service";
@@ -268,6 +271,32 @@ function normalizeRejectBucket(reason: string) {
   if (lower.includes("data quality") || lower.includes("veri")) return "DATA_QUALITY";
   if (lower.includes("acik pozisyon")) return "OPEN_POSITION_BLOCK";
   return "OTHER";
+}
+
+function resolveCampaignIdFromJob(job: { id: string; metadata?: unknown }) {
+  const metadata = ((job.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>;
+  const existing = String(metadata.campaignId ?? "").trim();
+  if (existing) return existing;
+  return buildCampaignId({ jobId: job.id });
+}
+
+function formatExecutionRejectReason(
+  result: Awaited<ReturnType<typeof executeAnalyzeAndTrade>> | null,
+  fallback: string,
+) {
+  return normalizeExecutionTerminalReason({
+    rejectReason: result?.rejectReason,
+    details: (result?.details as Record<string, unknown> | null) ?? null,
+    fallback,
+  });
+}
+
+function classifyRoundTerminal(reason: string) {
+  const parsed = classifyTerminalReason(reason);
+  if (isTerminalNonExecutableReason(reason)) {
+    return { ...parsed, decision: "WAIT" as const };
+  }
+  return parsed;
 }
 
 function sleep(ms: number) {
@@ -1367,6 +1396,7 @@ async function failRound(input: {
 }) {
   const job = await getAutoRoundJobById(input.jobId);
   if (!job) return;
+  const campaignId = resolveCampaignIdFromJob(job);
   const rejectBucket = normalizeRejectBucket(input.reason);
   const existingRun = await getAutoRoundRunById(input.runId).catch(() => null);
   const ownership =
@@ -1438,10 +1468,13 @@ async function failRound(input: {
     symbol: input.symbol,
   });
 
-  const forensicSession = getForensicSession() ?? getOrCreateForensicSession({ sessionId: input.jobId, jobId: input.jobId });
+  const forensicSession =
+    getForensicSession() ??
+    getOrCreateForensicSession({ sessionId: input.jobId, jobId: input.jobId, campaignId });
   if (forensicSession && existingRun) {
     await runRoundForensicExport({
       session: forensicSession,
+      campaignId,
       roundId: String(existingRun.roundNo ?? job.currentRound),
       runId: input.runId,
       jobId: input.jobId,
@@ -1471,6 +1504,7 @@ async function completeNoTradeRound(input: {
   const job = await getAutoRoundJobById(input.jobId);
   const run = await getAutoRoundRunById(input.runId).catch(() => null);
   if (!job || !run) return;
+  const campaignId = resolveCampaignIdFromJob(job);
   const ownership =
     getActiveRoundOwnershipForJob(input.jobId).find((row) => row.runId === input.runId)?.roundOwner ??
     input.roundOwnerId;
@@ -1505,9 +1539,12 @@ async function completeNoTradeRound(input: {
     roundNo: run.roundNo,
     reason: input.reason,
   });
-  const forensicSession = getForensicSession() ?? getOrCreateForensicSession({ sessionId: input.jobId, jobId: input.jobId });
+  const forensicSession =
+    getForensicSession() ??
+    getOrCreateForensicSession({ sessionId: input.jobId, jobId: input.jobId, campaignId });
   await runRoundForensicExport({
     session: forensicSession,
+    campaignId,
     roundId: String(run.roundNo),
     runId: input.runId,
     jobId: input.jobId,
@@ -1758,6 +1795,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
 
       assertSchedulerLoopOwnership(jobId, ctx);
       const roundNo = doneCount + 1;
+      const campaignId = resolveCampaignIdFromJob(job);
       const horizonProfile = resolveRoundHorizonProfile(job.maxWaitSec);
       const perRoundTargetProfitPct = Number(
         Math.max(
@@ -1792,6 +1830,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
             ownership: { ...ownershipSeed, status: "OWNERSHIP_ACQUIRED", runId: "pending" },
             state: "tariyor",
             metadata: {
+              campaignId,
               targetProfitPct: perRoundTargetProfitPct,
               totalTargetProfitPct: job.targetProfitPct,
               stopLossPct: perRoundStopLossPct,
@@ -1817,7 +1856,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         await sleep(500);
         continue;
       }
-      attachForensicRound({ runId: run.id, roundId: String(roundNo), jobId });
+      attachForensicRound({ runId: run.id, roundId: String(roundNo), jobId, campaignId });
       await updateAutoRoundJob({
         jobId,
         currentRound: roundNo,
@@ -1993,58 +2032,15 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
             targetProfitPct: perRoundTargetProfitPct,
             consecutiveRejections: consecutiveFilterRejections + attempt,
           });
-          const forceExplorationAccept =
-            attempt + 1 >= maxSelectionAttempts &&
-            learningFit.entryDecision?.wouldPassWithRelaxedThresholds === true;
-          if (!learningFit.ok && !forceExplorationAccept) {
-            excludedSymbols.add(symbol);
-            consecutiveFilterRejections += 1;
-            lastRejectReason = `SIM_TIGHT_FILTER_${learningFit.profile.label}: ${learningFit.reason}`;
-            const latestRunMeta = await loadLatestRunMetadata();
-            await updateAutoRoundRun({
-              runId: run.id,
-              state: "tariyor",
-              symbol,
-              metadata: {
-                ...latestRunMeta,
-                rejectedCandidate: symbol,
-                selectionAttempt: attempt + 1,
-                selectionSource,
-                excludedSymbols: Array.from(excludedSymbols),
-                horizonProfile: learningFit.profile.label,
-                tightFilterMetrics: learningFit.metrics,
-                tightFilterReason: learningFit.reason,
-                entryDecision: learningFit.entryDecision,
-                consecutiveFilterRejections,
-              },
-            });
-            await updateAutoRoundJob({
-              jobId,
-              metadata: {
-                ...jobMeta,
-                consecutiveFilterRejections,
-              },
-            }).catch(() => null);
-            await setJobState(jobId, "tariyor", `Tur ${roundNo}: ${symbol} sikilastirilmis sim filtresinden gecemedi`, {
-              roundNo,
-              runId: run.id,
-              reason: learningFit.reason,
-              profile: learningFit.profile.label,
-              primaryBlocker: learningFit.entryDecision?.primaryBlocker,
-            });
-            traceCandidateReject({
-              symbol,
-              stage: "decision",
-              reasonCode: "SIM_TIGHT_FILTER",
-              reasonDetail: lastRejectReason,
-            });
-            continue;
-          }
-          if (forceExplorationAccept) {
-            await setJobState(jobId, "tariyor", `Tur ${roundNo}: ${symbol} exploration accept (relaxed thresholds)`, {
+          if (!learningFit.ok) {
+            // P1: learning memory is advisory-only for admission.
+            await setJobState(jobId, "tariyor", `Tur ${roundNo}: ${symbol} learning advisory warning`, {
               roundNo,
               runId: run.id,
               selectionSource,
+              reason: learningFit.reason,
+              profile: learningFit.profile.label,
+              primaryBlocker: learningFit.entryDecision?.primaryBlocker,
             });
           }
         } else if (learningLane && shouldSkipLearningFilterForSelection(selected, selectionSource)) {
@@ -2151,6 +2147,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           preselectedCandidate: selected,
           learningLane,
           executionMode,
+          campaignId: resolveCampaignIdFromJob(job),
           roundId: String(roundNo),
           runId: run.id,
           sessionId: jobId,
@@ -2158,7 +2155,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         if (execution?.opened && execution.positionId) {
           break;
         }
-        lastRejectReason = execution?.rejectReason ?? "Alim acilisi basarisiz";
+        lastRejectReason = formatExecutionRejectReason(execution, "Alim acilisi basarisiz");
         const rejectReasonLower = lastRejectReason.toLowerCase();
         if (rejectReasonLower.includes("cooldown")) {
           aiNoResponseStreak = 0;
@@ -2183,17 +2180,21 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
       }
 
       if (!selected || !execution?.opened || !execution.positionId) {
-        const reason = lastRejectReason || "Alim acilisi basarisiz";
+        const reason = !selected ? "NO_ELIGIBLE_CANDIDATE" : (lastRejectReason || "Alim acilisi basarisiz");
+        const terminal = classifyRoundTerminal(reason);
         const noCandidateLike =
           !selected ||
           reason.includes("NO_CANDIDATE") ||
           reason.includes("Microstructure engine produced no confirmed candidate") ||
-          isTerminalNonExecutableReason(reason);
+          terminal.decision === "WAIT";
         if (noCandidateLike) {
-          const noCandidateObservationMs = Math.min(
-            120_000,
-            Math.max(30_000, Math.floor(Math.max(60, job.maxWaitSec) * 150)),
-          );
+          const noCandidateObservationMs =
+            process.env.NODE_ENV === "test"
+              ? 2_000
+              : Math.min(
+                  120_000,
+                  Math.max(30_000, Math.floor(Math.max(60, job.maxWaitSec) * 150)),
+                );
           const observeStart = Date.now();
           while (Date.now() - observeStart < noCandidateObservationMs) {
             await patchRoundRuntimeProgress({
@@ -2213,7 +2214,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           await completeNoTradeRound({
             jobId,
             runId: run.id,
-            reason: reason || "VALID_NO_CANDIDATE",
+            reason: `${terminal.reasonCode}:${reason || "VALID_NO_CANDIDATE"}`,
             roundOwnerId,
           });
           continue;
@@ -2221,7 +2222,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         await failRound({
           jobId,
           runId: run.id,
-          reason,
+          reason: `${terminal.reasonCode}:${reason}`,
           symbol:
             selected && execution && !isTerminalNonExecutableReason(reason)
               ? symbol
@@ -2410,10 +2411,13 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
         closeReason: closeResult.closeReason,
       });
 
-      const forensicSession = getForensicSession() ?? getOrCreateForensicSession({ sessionId: jobId, jobId });
+      const forensicSession =
+        getForensicSession() ??
+        getOrCreateForensicSession({ sessionId: jobId, jobId, campaignId });
       traceCandidateTraded({ symbol, reasonDetail: closeResult.closeReason });
       await runRoundForensicExport({
         session: forensicSession,
+        campaignId,
         roundId: String(roundNo),
         runId: run.id,
         jobId,
@@ -2537,8 +2541,16 @@ export async function startAutoRoundJob(input: StartRoundInput) {
     allowRepeatCoin: input.allowRepeatCoin,
     mode: input.mode,
   });
+  const campaignId = buildCampaignId({ jobId: job.id });
+  await updateAutoRoundJob({
+    jobId: job.id,
+    metadata: {
+      ...(((job.metadata as Record<string, unknown> | null) ?? {}) as Record<string, unknown>),
+      campaignId,
+    },
+  }).catch(() => null);
   if (paperMode) {
-    beginForensicPaperSession({ sessionId: job.id, jobId: job.id });
+    beginForensicPaperSession({ sessionId: job.id, jobId: job.id, campaignId });
   }
   await setJobState(job.id, "bekliyor", "Tur motoru baslatildi", {
     totalRounds: job.totalRounds,

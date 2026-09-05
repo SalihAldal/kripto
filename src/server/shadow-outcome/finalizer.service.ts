@@ -271,6 +271,7 @@ export async function analyzePendingShadowOutcomes(input: { now?: number; limit?
 }
 
 export type SettlementStatus = {
+  campaignId: string | null;
   runId: string;
   eligibleCandidates: number;
   m60Complete: number;
@@ -278,7 +279,7 @@ export type SettlementStatus = {
   invalid: number;
   historyUnavailable: number;
   progressPercent: number;
-  status: "PROVISIONAL" | "FINAL";
+  status: "FINAL_VALID" | "PROVISIONAL" | "NO_MEASUREMENT_DATA" | "INVALID_CAMPAIGN_DATASET";
 };
 
 const settlementMode = new Map<string, { enabledAt: string }>();
@@ -290,12 +291,31 @@ export function beginSettlementMode(runId: string) {
   return { runId: normalized, enabledAt: settlementMode.get(normalized)?.enabledAt ?? null };
 }
 
-export async function getSettlementStatus(runId: string): Promise<SettlementStatus> {
+export function resolveSettlementStatus(input: {
+  eligibleCandidates: number;
+  m60Pending: number;
+  invalid: number;
+  historyUnavailable: number;
+}) {
+  if (input.m60Pending > 0) return "PROVISIONAL" as const;
+  if (input.eligibleCandidates === 0) return "NO_MEASUREMENT_DATA" as const;
+  if (input.invalid + input.historyUnavailable >= input.eligibleCandidates) return "INVALID_CAMPAIGN_DATASET" as const;
+  return "FINAL_VALID" as const;
+}
+
+export async function getSettlementStatus(input: string | { runId: string; campaignId?: string | null }): Promise<SettlementStatus> {
+  const runId = typeof input === "string" ? input : input.runId;
+  const campaignId = typeof input === "string" ? null : (input.campaignId ?? null);
   const normalized = runId.trim();
-  const rows = await prisma.$queryRawUnsafe<Array<{ outcomes: unknown }>>(
-    `SELECT "outcomes" FROM "ShadowCandidateOutcome" WHERE "runId" = $1`,
-    normalized,
-  );
+  const rows = campaignId
+    ? await prisma.$queryRawUnsafe<Array<{ outcomes: unknown }>>(
+        `SELECT "outcomes" FROM "ShadowCandidateOutcome" WHERE "campaignId" = $1`,
+        campaignId,
+      )
+    : await prisma.$queryRawUnsafe<Array<{ outcomes: unknown }>>(
+        `SELECT "outcomes" FROM "ShadowCandidateOutcome" WHERE "runId" = $1`,
+        normalized,
+      );
   const evaluate = (value: unknown): HorizonOutcome["status"] => {
     if (!Array.isArray(value)) return "PENDING";
     const sixty = value.find((item) => Number((item as Record<string, unknown>).horizonMin) === 60) as
@@ -313,6 +333,7 @@ export async function getSettlementStatus(runId: string): Promise<SettlementStat
   const terminal = m60Complete + invalid + historyUnavailable;
   const progressPercent = eligibleCandidates > 0 ? Number(((terminal / eligibleCandidates) * 100).toFixed(2)) : 0;
   return {
+    campaignId,
     runId: normalized,
     eligibleCandidates,
     m60Complete,
@@ -320,7 +341,7 @@ export async function getSettlementStatus(runId: string): Promise<SettlementStat
     invalid,
     historyUnavailable,
     progressPercent,
-    status: m60Pending > 0 ? "PROVISIONAL" : "FINAL",
+    status: resolveSettlementStatus({ eligibleCandidates, m60Pending, invalid, historyUnavailable }),
   };
 }
 

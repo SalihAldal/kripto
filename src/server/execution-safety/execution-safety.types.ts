@@ -11,6 +11,13 @@ export type SafetyValidationStageResult = {
 
 export type PreTradeSafetyInput = {
   executionId: string;
+  campaignId?: string;
+  jobId?: string;
+  sessionId?: string;
+  runId?: string;
+  roundId?: string;
+  candidateId?: string;
+  venue?: string;
   userId: string;
   symbol: string;
   side: "BUY" | "SELL";
@@ -29,6 +36,7 @@ export type PreTradeSafetyInput = {
   atr?: number;
   bidDepth?: number;
   askDepth?: number;
+  suppressStartedEvent?: boolean;
 };
 
 export type PreTradeSafetyResult = {

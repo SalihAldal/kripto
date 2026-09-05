@@ -2,6 +2,11 @@ import { executePaperOrderViaExchangeSimulator } from "@/src/server/exchange-sim
 
 export type ExecutionPortOrderInput = {
   userId: string;
+  campaignId?: string;
+  jobId?: string;
+  sessionId?: string;
+  runId?: string;
+  roundId?: string;
   executionId: string;
   executionIntentId: string;
   candidateId: string;
@@ -100,8 +105,18 @@ export class CanonicalPaperExecutionAdapter implements ExecutionPort {
   }
 }
 
+/** Backward-compatible paper adapter name with an explicit live-submit hard stop. */
+export class PaperExecutionAdapter extends CanonicalPaperExecutionAdapter {
+  submitLiveBinanceOrder(): never {
+    throw new Error("NO_LIVE_ENDPOINT_IN_PAPER_ADAPTER");
+  }
+}
+
 export class BinanceLiveExecutionAdapter implements ExecutionPort {
   readonly kind = "LIVE" as const;
+  submit(): never {
+    throw new Error("LIVE_ADAPTER_HARD_LOCKED");
+  }
   async submitEntry(_intent: ExecutionPortOrderInput): Promise<ExecutionPortOrderResult> {
     throw new Error("LIVE_ADAPTER_HARD_LOCKED");
   }

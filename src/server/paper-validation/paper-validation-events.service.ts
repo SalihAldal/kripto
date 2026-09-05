@@ -32,11 +32,14 @@ export function ensurePaperValidationEventBridge() {
 }
 
 async function handlePaperOrderExecuted(payload: Record<string, unknown>) {
+  // Primary execution flow persists paper fills directly; event-bridge is fallback-only.
+  if (payload.executionId) return;
   const userId = String(payload.userId ?? "");
   const simulationId = String(payload.simulationId ?? "");
   if (!userId || !simulationId) return;
 
   await recordPaperFillEvent({
+    campaignId: payload.campaignId ? String(payload.campaignId) : undefined,
     userId,
     simulationId,
     executionId: payload.executionId ? String(payload.executionId) : undefined,
@@ -55,11 +58,13 @@ async function handlePaperSettlement(evt: {
   context?: Record<string, unknown>;
 }) {
   const ctx = evt.context ?? {};
+  if (ctx.paperFillPersisted === true) return;
   const simulationId = String(ctx.simulationId ?? ctx.closeSimulationId ?? "");
   const userId = String(ctx.userId ?? "");
   if (!simulationId || !userId) return;
 
   await recordPaperFillEvent({
+    campaignId: ctx.campaignId ? String(ctx.campaignId) : undefined,
     userId,
     simulationId,
     executionId: evt.executionId,

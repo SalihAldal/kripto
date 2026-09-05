@@ -1,0 +1,24 @@
+{
+  "status": "PARTIAL",
+  "sourceType": "RECORDED_REPLAY",
+  "groundTruthMoverCount": 0,
+  "moverClasses": [
+    "MOVE_1",
+    "MOVE_2",
+    "MOVE_3",
+    "MOVE_5",
+    "MOVE_7",
+    "MOVE_10",
+    "MOVE_15",
+    "MOVE_20"
+  ],
+  "candidateIndependentDetection": "PASS",
+  "dedupeRule": "PASS",
+  "notDetectedClassification": "PASS",
+  "evidence": [
+    "tests/phase05-shadow-outcome.test.ts"
+  ],
+  "remainingBlockers": [
+    "Campaign-level persisted mover cohort is insufficient for full attribution output."
+  ]
+}

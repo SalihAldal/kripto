@@ -42,15 +42,20 @@ function extractIds(context?: Record<string, unknown>) {
 export async function addTradeLifecycleEvent(event: ExecutionStatusEvent) {
   const context = event.context ?? undefined;
   const ids = extractIds(context);
+  const campaignId =
+    typeof context?.campaignId === "string" && context.campaignId.length > 0
+      ? context.campaignId
+      : null;
   const id = randomUUID();
 
   await prisma.$executeRawUnsafe(
     `
       INSERT INTO "TradeLifecycleEvent"
-      ("id","executionId","symbol","stage","status","level","message","orderId","positionId","context","createdAt")
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11::timestamp)
+      ("id","campaignId","executionId","symbol","stage","status","level","message","orderId","positionId","context","createdAt")
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12::timestamp)
     `,
     id,
+    campaignId,
     event.executionId ?? null,
     event.symbol ?? null,
     event.stage,
@@ -98,7 +103,7 @@ export async function listTradeLifecycleEvents(input?: {
   const rows = (await prisma.$queryRawUnsafe(
     `
       SELECT
-        "id","executionId","symbol","stage","status","level","message","orderId","positionId","context","createdAt"
+        "id","campaignId","executionId","symbol","stage","status","level","message","orderId","positionId","context","createdAt"
       FROM "TradeLifecycleEvent"
       ${whereSql}
       ORDER BY "createdAt" DESC
