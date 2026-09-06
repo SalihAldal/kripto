@@ -66,6 +66,7 @@ export type PlaceOrderRequest = {
   quoteOrderQty?: number;
   price?: number;
   timeInForce?: "GTC" | "IOC" | "FOK";
+  clientOrderId?: string;
   dryRun?: boolean;
 };
 

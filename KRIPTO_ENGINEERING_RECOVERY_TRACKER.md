@@ -435,3 +435,23 @@
 - Child-process crash testleri eklendi (`pre-commit kill rollback`, `restart exactly-once`).
 - Verdict: `FINAL_ENGINEERING_VERDICT=PARTIAL`, `PAPER_ENGINEERING_READINESS=NOT_READY`.
 - Açık kalan HIGH: ACK-loss no-orderId discovery e2e, full production chain no-manual-seed, crash post-commit barrier.
+
+## Settlement Completion (Prompt 17 devam)
+
+- Rapor: `KRIPTO_SETTLEMENT_COMPLETION_REPORT.md`
+- Findings: `KRIPTO_SETTLEMENT_COMPLETION_FINDINGS.md`
+- JSON: `kripto-settlement-completion.json`
+- `canonical-settlement-fill` duplicate execution üretimini durduracak şekilde mevcut execution eşleştirme ile düzeltildi.
+- `fix02-exit-reconciliation` aktif intent bulunamazken latest SELL/BUY fallback tüketimini bırakıp unresolved intent üretiyor.
+- Deterministic intent tabanlı `clientOrderId` üretimi eklendi (`exit-intent-identity`) ve reconcile tarafında clientOrderId discovery zinciri bağlandı.
+- Canonical fill identity artık trade kimliği olmadan order/client fallback yapmıyor; uppercase normalize kaldırıldı.
+- Reconcile path `openFeePortion=0` varsayımı kaldırılarak oransal open fee dağıtımı eklendi.
+- Yeni/sertleştirilen regresyonlar: `tests/settlement-reconciliation.integration.test.ts` içinde
+  - reconcile->normal no-op,
+  - mevcut execution + eksik settlement tek execution kontratı,
+  - aktif intent fallback engeli,
+  - clientOrderId ACK-loss discovery,
+  - gerçek RECONCILE multi-fill karışık durum.
+- QA koşuları: settlement/reconcile, execution-correction, fix02-durable, process-kill, replay/pr05, corrections-final ve post-fix-final paketleri PASS; crash/concurrency grubu 3 tur PASS; typecheck/build PASS.
+- Final verdict bu tur: `FINAL_ENGINEERING_VERDICT=PARTIAL`, `PAPER_ENGINEERING_READINESS=NOT_READY`.
+- Açık HIGH: gerçek IPC post-commit/pre-response kill bariyeri, no-manual-seed tek testte full entry->partial->stop zinciri, tam deterministic counterfactual execution modeli.

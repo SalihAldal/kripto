@@ -22,6 +22,7 @@ vi.mock("@/services/binance.service", () => ({
   placeMarketBuyEmergency: vi.fn(),
   placeMarketSellEmergency: vi.fn(),
   getOrderStatus: getOrderStatusMock,
+  getOrderStatusByClientOrderId: vi.fn(),
   estimateFees: estimateFeesMock,
   getAccountBalances: getAccountBalancesMock,
 }));

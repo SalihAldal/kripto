@@ -233,10 +233,10 @@ export class OkxExchangeProvider implements ExchangeProvider {
     return { orderId: String(row.ordId ?? ""), clientOrderId: String(row.clOrdId ?? ""), symbol, status: req.type === "MARKET" ? "FILLED" : "NEW", side: req.side, type: req.type, executedQty: req.quantity, price: req.price, dryRun: false };
   }
 
-  placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean) { return this.place({ symbol, side: "BUY", type: "MARKET", quantity, dryRun }); }
-  placeMarketSell(symbol: string, quantity: number, dryRun?: boolean) { return this.place({ symbol, side: "SELL", type: "MARKET", quantity, dryRun }); }
-  placeLimitBuy(symbol: string, quantity: number, price: number, dryRun?: boolean) { return this.place({ symbol, side: "BUY", type: "LIMIT", quantity, price, dryRun }); }
-  placeLimitSell(symbol: string, quantity: number, price: number, dryRun?: boolean) { return this.place({ symbol, side: "SELL", type: "LIMIT", quantity, price, dryRun }); }
+  placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string) { return this.place({ symbol, side: "BUY", type: "MARKET", quantity, dryRun, clientOrderId }); }
+  placeMarketSell(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string) { return this.place({ symbol, side: "SELL", type: "MARKET", quantity, dryRun, clientOrderId }); }
+  placeLimitBuy(symbol: string, quantity: number, price: number, dryRun?: boolean, clientOrderId?: string) { return this.place({ symbol, side: "BUY", type: "LIMIT", quantity, price, dryRun, clientOrderId }); }
+  placeLimitSell(symbol: string, quantity: number, price: number, dryRun?: boolean, clientOrderId?: string) { return this.place({ symbol, side: "SELL", type: "LIMIT", quantity, price, dryRun, clientOrderId }); }
 
   async cancelOrder(symbol: string, orderId: string) {
     if (this.dryRun || !this.key || !this.secret || !this.passphrase) return { symbol: symbol.toUpperCase(), orderId, status: "CANCELED_SIMULATED" };

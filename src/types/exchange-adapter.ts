@@ -81,6 +81,7 @@ export type PlaceOrderAdapterInput = {
   quoteOrderQty?: number;
   type: "MARKET" | "LIMIT";
   price?: number;
+  clientOrderId?: string;
   dryRun?: boolean;
 };
 
@@ -92,6 +93,7 @@ export type ExchangeAdapter = {
   placeBuyOrder(input: PlaceOrderAdapterInput): Promise<NormalizedOrderResponse>;
   placeSellOrder(input: PlaceOrderAdapterInput): Promise<NormalizedOrderResponse>;
   getOrderStatus(symbol: string, orderId: string): Promise<NormalizedOrderResponse>;
+  getOrderStatusByClientOrderId?(symbol: string, clientOrderId: string): Promise<NormalizedOrderResponse | null>;
   listOpenOrders(symbol?: string): Promise<NormalizedOpenOrder[]>;
   cancelOrder(symbol: string, orderId: string): Promise<{ symbol: string; orderId: string; status: NormalizedOrderStatus }>;
   normalizeFiltersAndPrecision(symbol: string, quantity: number, price?: number): Promise<{

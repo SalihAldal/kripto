@@ -47,6 +47,7 @@ import { persistPaperCloseFillForSettlement } from "@/src/server/execution/paper
 import { applyCanonicalPartialSettlementFill } from "@/src/server/execution/canonical-settlement-fill.service";
 import type { SettlementFillResult } from "@/src/server/execution/settlement-fill-result";
 import { buildCanonicalSettlementFillId } from "@/src/server/execution/canonical-fill-identity";
+import { buildClientOrderIdFromExitIntent } from "@/src/server/execution/exit-intent-identity";
 
 function isRateLimitedCloseError(error: unknown) {
   const message = (error as Error)?.message?.toLowerCase?.() ?? "";
@@ -105,12 +106,11 @@ function buildCanonicalFillIdentity(input: {
   venue: string;
   exchangeConnectionId: string;
   symbol: string;
-  exchangeOrderId?: string;
-  clientOrderId?: string;
-  exchangeTradeId?: string;
+  exchangeOrderId: string;
+  exchangeTradeId: string;
 }) {
-  const normalizedOrderId = (input.exchangeOrderId ?? input.clientOrderId ?? "").trim();
-  const normalizedTradeId = (input.exchangeTradeId ?? "").trim();
+  const normalizedOrderId = input.exchangeOrderId.trim();
+  const normalizedTradeId = input.exchangeTradeId.trim();
   if (!normalizedOrderId || !normalizedTradeId) return null;
   return buildCanonicalSettlementFillId({
     venue: input.venue,
@@ -449,6 +449,7 @@ export async function settleOpenPosition(input: {
     (positionMeta.executionVenue as string | undefined) ?? "BINANCE_TR",
   );
   const isGlobalVenue = venue === "BINANCE_GLOBAL";
+  const preferredClientOrderId = buildClientOrderIdFromExitIntent(input.settlementFillId ?? "");
   const closeSide = position.side === "LONG" ? "SELL" : "BUY";
   const resolvedCloseQty = await resolveCloseQuantity(position, closeSide, input.mode);
   const requestedQty =
@@ -637,10 +638,10 @@ export async function settleOpenPosition(input: {
           closeSide === "BUY"
             ? isGlobalVenue
               ? await placeGlobalMarketBuy(symbol, attemptedQty, input.mode === "dry-run")
-              : await placeMarketBuy(symbol, attemptedQty, input.mode === "dry-run")
+              : await placeMarketBuy(symbol, attemptedQty, input.mode === "dry-run", { clientOrderId: preferredClientOrderId ?? undefined })
             : isGlobalVenue
               ? await placeGlobalMarketSell(symbol, attemptedQty, input.mode === "dry-run")
-              : await placeMarketSell(symbol, attemptedQty, input.mode === "dry-run");
+              : await placeMarketSell(symbol, attemptedQty, input.mode === "dry-run", { clientOrderId: preferredClientOrderId ?? undefined });
         lastError = null;
         publishExecutionEvent({
           executionId: input.executionId,
@@ -786,7 +787,7 @@ export async function settleOpenPosition(input: {
       quantity: Number(effectiveCloseQty.toFixed(8)),
       price: exitPrice,
       status: normalizedCloseStatus,
-      clientOrderId: closeOrder.clientOrderId,
+      clientOrderId: closeOrder.clientOrderId ?? preferredClientOrderId ?? undefined,
       exchangeOrderId: closeOrder.orderId,
       submittedAt: new Date(),
       avgExecutionPrice: exitPrice,
@@ -799,6 +800,7 @@ export async function settleOpenPosition(input: {
         pr04DecisionKind: input.pr04DecisionKind ?? null,
         pr04PartialLegId: input.pr04PartialLegId ?? null,
         exitIntentId: input.settlementFillId ?? null,
+        preferredClientOrderId: preferredClientOrderId ?? null,
         linkedPositionId: position.id,
         pendingCloseOrder: true,
         ...variantTelemetryMeta,
@@ -897,20 +899,19 @@ export async function settleOpenPosition(input: {
     if (raw === "BASE" || raw === "QUOTE") return raw;
     return "UNKNOWN";
   })() as "BASE" | "QUOTE" | "UNKNOWN";
+  const exchangeOrderId = String(closeOrder.orderId ?? "").trim();
+  const exchangeTradeId = String(
+    (closeOrder.metadata as Record<string, unknown> | undefined)?.tradeId ??
+      (closeOrder.metadata as Record<string, unknown> | undefined)?.fillId ??
+      (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
+      "",
+  ).trim();
   const canonicalSettlementFillId = buildCanonicalFillIdentity({
     venue,
     exchangeConnectionId: position.exchangeConnectionId,
     symbol,
-    exchangeOrderId: closeOrder.orderId,
-    clientOrderId: closeOrder.clientOrderId,
-    exchangeTradeId: String(
-      (closeOrder.metadata as Record<string, unknown> | undefined)?.tradeId ??
-        (closeOrder.metadata as Record<string, unknown> | undefined)?.fillId ??
-        (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
-        closeOrder.orderId ??
-        closeOrder.clientOrderId ??
-        "",
-    ),
+    exchangeOrderId,
+    exchangeTradeId,
   });
   if (!canonicalSettlementFillId) {
     resumeScannerWorker();
@@ -920,14 +921,6 @@ export async function settleOpenPosition(input: {
       reason: "Canonical fill identity unavailable",
     };
   }
-  const exchangeTradeId = String(
-    (closeOrder.metadata as Record<string, unknown> | undefined)?.tradeId ??
-      (closeOrder.metadata as Record<string, unknown> | undefined)?.fillId ??
-      (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
-      closeOrder.orderId ??
-      closeOrder.clientOrderId ??
-      "",
-  ).trim();
   const canonical = await applyCanonicalPartialSettlementFill({
     positionId: position.id,
     settlementFillId: canonicalSettlementFillId,
@@ -948,7 +941,7 @@ export async function settleOpenPosition(input: {
       closeOrderMetadata: (closeOrder.metadata as Record<string, unknown> | undefined) ?? undefined,
     }),
     openFeePortion: openFee * (finalCloseQty / Math.max(position.quantity, finalCloseQty)),
-    clientOrderId: closeOrder.clientOrderId ?? `client-${input.positionId}`,
+    clientOrderId: closeOrder.clientOrderId ?? preferredClientOrderId ?? `client-${input.positionId}`,
     exchangeOrderId: closeOrder.orderId ?? `ex-${input.positionId}`,
     closeReason: input.reason,
     mode: input.mode,

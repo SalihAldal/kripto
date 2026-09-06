@@ -49,6 +49,10 @@ function deriveOrderStatus(input: { terminal: boolean; remaining: number }) {
   return "NEW" as const;
 }
 
+function nearlyEqual(a: number, b: number, epsilon = 1e-8) {
+  return Math.abs(a - b) <= epsilon;
+}
+
 function mutateExitStateFromFill(input: {
   state: ExitPolicyState;
   settlementFillId: string;
@@ -163,6 +167,7 @@ export async function applyCanonicalPartialSettlementFill(input: {
     expectedStateVersion: number;
     decisionKind: ExitDecisionKind;
     partialLegId?: string | null;
+    reconciliationStatus?: "OK" | "RECONCILE_REQUIRED";
   };
   metadata?: Record<string, unknown>;
 }): Promise<SettlementFillResult> {
@@ -308,6 +313,7 @@ export async function applyCanonicalPartialSettlementFill(input: {
         : 0;
       const terminal = input.orderTerminal ?? orderRemainingQuantity <= 0;
       const orderStatus = deriveOrderStatus({ terminal, remaining: orderRemainingQuantity });
+      const exchangeTradeId = String((input.metadata as Record<string, unknown> | undefined)?.exchangeTradeId ?? "").trim();
       const existingOrder = await tx.tradeOrder.findFirst({
         where: {
           positionId: input.positionId,
@@ -318,6 +324,33 @@ export async function applyCanonicalPartialSettlementFill(input: {
         },
         orderBy: { createdAt: "desc" },
       });
+      const matchedExecution = existingOrder
+        ? await tx.tradeExecution.findFirst({
+            where: {
+              tradeOrderId: existingOrder.id,
+              status: "SUCCESS",
+              OR: [
+                { metadata: { path: ["settlementFillId"], equals: input.settlementFillId } },
+                ...(exchangeTradeId
+                  ? [
+                      { metadata: { path: ["exchangeTradeId"], equals: exchangeTradeId } },
+                      { executionRef: exchangeTradeId },
+                    ]
+                  : []),
+              ],
+            },
+            orderBy: { executedAt: "desc" },
+          })
+        : null;
+      if (matchedExecution) {
+        if (
+          !nearlyEqual(matchedExecution.executedQty, input.filledQuantity) ||
+          !nearlyEqual(matchedExecution.executionPrice, input.fillPrice) ||
+          !nearlyEqual(Number(matchedExecution.fee ?? 0), input.closeFee)
+        ) {
+          throw new Error("SETTLEMENT_EXECUTION_IDENTITY_CONFLICT");
+        }
+      }
       const priorExecAgg = existingOrder
         ? await tx.tradeExecution.aggregate({
             where: { tradeOrderId: existingOrder.id, status: "SUCCESS" },
@@ -326,11 +359,13 @@ export async function applyCanonicalPartialSettlementFill(input: {
         : null;
       const prevQty = Number(priorExecAgg?._sum.executedQty ?? 0);
       const prevQuote = Number(priorExecAgg?._sum.quoteQty ?? 0);
-      const totalExecutedQty = toRounded(prevQty + input.filledQuantity);
-      const totalQuote = toRounded(prevQuote + input.filledQuantity * input.fillPrice);
+      const prevFeeFromExecutions = Number(priorExecAgg?._sum.fee ?? 0);
+      const shouldCreateExecution = !matchedExecution;
+      const totalExecutedQty = toRounded(prevQty + (shouldCreateExecution ? input.filledQuantity : 0));
+      const totalQuote = toRounded(prevQuote + (shouldCreateExecution ? input.filledQuantity * input.fillPrice : 0));
       const nextAvg = totalExecutedQty > 0 ? toRounded(totalQuote / totalExecutedQty) : input.fillPrice;
       const totalRequestedQty = toRounded(Math.max(existingOrder?.quantity ?? 0, totalExecutedQty + orderRemainingQuantity));
-      const totalFee = toRounded(Number(existingOrder?.fee ?? 0) + input.closeFee);
+      const totalFee = toRounded(prevFeeFromExecutions + (shouldCreateExecution ? input.closeFee : 0));
       const createdCloseOrder = existingOrder
         ? await tx.tradeOrder.update({
             where: { id: existingOrder.id },
@@ -381,24 +416,38 @@ export async function applyCanonicalPartialSettlementFill(input: {
         data: { tradeOrderId: createdCloseOrder.id },
       });
 
-      await tx.tradeExecution.create({
-        data: {
-          tradeOrderId: createdCloseOrder.id,
-          status: "SUCCESS",
-          executionPrice: input.fillPrice,
-          executedQty: input.filledQuantity,
-          quoteQty: Number((input.filledQuantity * input.fillPrice).toFixed(8)),
-          fee: input.closeFee,
-          executionRef: input.exchangeOrderId,
-          executedAt: new Date(input.fillAtMs ?? Date.now()),
-          metadata: {
-            mode: input.mode,
-            reason: input.closeReason,
-            settlementFillId: input.settlementFillId,
-            ...(input.metadata ?? {}),
-          } as Prisma.InputJsonValue,
-        },
-      });
+      if (shouldCreateExecution) {
+        await tx.tradeExecution.create({
+          data: {
+            tradeOrderId: createdCloseOrder.id,
+            status: "SUCCESS",
+            executionPrice: input.fillPrice,
+            executedQty: input.filledQuantity,
+            quoteQty: Number((input.filledQuantity * input.fillPrice).toFixed(8)),
+            fee: input.closeFee,
+            executionRef: exchangeTradeId || input.exchangeOrderId,
+            executedAt: new Date(input.fillAtMs ?? Date.now()),
+            metadata: {
+              mode: input.mode,
+              reason: input.closeReason,
+              settlementFillId: input.settlementFillId,
+              ...(input.metadata ?? {}),
+            } as Prisma.InputJsonValue,
+          },
+        });
+      } else {
+        const execMeta = (matchedExecution.metadata as Record<string, unknown> | null) ?? {};
+        await tx.tradeExecution.update({
+          where: { id: matchedExecution.id },
+          data: {
+            metadata: {
+              ...execMeta,
+              settlementFillId: input.settlementFillId,
+              ...(input.metadata ?? {}),
+            } as Prisma.InputJsonValue,
+          },
+        });
+      }
 
       const existingMeta = (position.metadata as Record<string, unknown> | null) ?? {};
       const nextQuantityRaw = toRounded(position.quantity - input.filledQuantity);
@@ -469,7 +518,7 @@ export async function applyCanonicalPartialSettlementFill(input: {
             terminalStatus: nextState.terminalStatus,
             processedFillIds: nextProcessed as Prisma.InputJsonValue,
             activeExitIntentId: null,
-            reconciliationStatus: "OK",
+            reconciliationStatus: input.exitStateUpdate.reconciliationStatus ?? "OK",
           },
         });
         if (updated.count !== 1) {

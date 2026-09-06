@@ -1660,6 +1660,7 @@ export class BinanceExchangeProvider implements ExchangeProvider {
               : undefined,
           price: req.type === "LIMIT" ? Number(req.price ?? 0).toFixed(8) : undefined,
           timeInForce: req.type === "LIMIT" ? this.mapTimeInForceToTr(req.timeInForce) : undefined,
+          clientOrderId: req.clientOrderId || undefined,
         }),
       );
       const orderId = String(
@@ -1696,6 +1697,7 @@ export class BinanceExchangeProvider implements ExchangeProvider {
             symbol,
             side: req.side,
             type: "MARKET" as const,
+            ...(req.clientOrderId ? { newClientOrderId: req.clientOrderId } : {}),
             ...(typeof req.quoteOrderQty === "number" && req.quoteOrderQty > 0
               ? { quoteOrderQty: Number(req.quoteOrderQty.toFixed(8)) }
               : { quantity: validQty }),
@@ -1707,6 +1709,7 @@ export class BinanceExchangeProvider implements ExchangeProvider {
             quantity: validQty,
             price: req.price!,
             timeInForce: req.timeInForce ?? "GTC",
+            ...(req.clientOrderId ? { newClientOrderId: req.clientOrderId } : {}),
           };
 
     let response: unknown = null;
@@ -1753,8 +1756,8 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     };
   }
 
-  async placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean) {
-    return this.internalPlaceOrder({ symbol, side: "BUY", type: "MARKET", quantity, dryRun });
+  async placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string) {
+    return this.internalPlaceOrder({ symbol, side: "BUY", type: "MARKET", quantity, dryRun, clientOrderId });
   }
   async placeMarketBuyByQuote(symbol: string, quoteOrderQty: number, dryRun?: boolean) {
     return this.internalPlaceOrder({
@@ -1766,14 +1769,14 @@ export class BinanceExchangeProvider implements ExchangeProvider {
       dryRun,
     });
   }
-  async placeMarketSell(symbol: string, quantity: number, dryRun?: boolean) {
-    return this.internalPlaceOrder({ symbol, side: "SELL", type: "MARKET", quantity, dryRun });
+  async placeMarketSell(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string) {
+    return this.internalPlaceOrder({ symbol, side: "SELL", type: "MARKET", quantity, dryRun, clientOrderId });
   }
-  async placeLimitBuy(symbol: string, quantity: number, price: number, dryRun?: boolean) {
-    return this.internalPlaceOrder({ symbol, side: "BUY", type: "LIMIT", quantity, price, dryRun });
+  async placeLimitBuy(symbol: string, quantity: number, price: number, dryRun?: boolean, clientOrderId?: string) {
+    return this.internalPlaceOrder({ symbol, side: "BUY", type: "LIMIT", quantity, price, dryRun, clientOrderId });
   }
-  async placeLimitSell(symbol: string, quantity: number, price: number, dryRun?: boolean) {
-    return this.internalPlaceOrder({ symbol, side: "SELL", type: "LIMIT", quantity, price, dryRun });
+  async placeLimitSell(symbol: string, quantity: number, price: number, dryRun?: boolean, clientOrderId?: string) {
+    return this.internalPlaceOrder({ symbol, side: "SELL", type: "LIMIT", quantity, price, dryRun, clientOrderId });
   }
 
   async cancelOrder(symbol: string, orderId: string) {
@@ -1824,6 +1827,35 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     const result = await this.call("getOrderStatus", async () => client.getOrder({ symbol: normalized, orderId: Number(orderId) }));
     const payload = this.pickOrderPayload(result);
     return { ...payload, orderId: payload.orderId ?? payload.order_id ?? orderId };
+  }
+
+  async getOrderStatusByClientOrderId(symbol: string, clientOrderId: string) {
+    const normalized = symbol.toUpperCase();
+    if (!clientOrderId.trim()) return null;
+    if (this.platform === "tr" && this.environment === "live") {
+      const payload = await this.call("trGetOrderStatusByClientOrderId", async () =>
+        this.fetchTrSignedJson<Record<string, unknown>>("GET", "/open/v1/orders/detail", {
+          clientOrderId,
+        }),
+      ).catch(() => null);
+      if (!payload) return null;
+      return {
+        ...payload,
+        orderId: payload.orderId ?? payload.order_id ?? null,
+        clientOrderId,
+        status: this.mapTrOrderStatus(payload.status),
+      };
+    }
+    if (this.dryRun || !this.client) {
+      return null;
+    }
+    const client = this.ensureClient("getOrderStatusByClientOrderId");
+    const result = await this.call("getOrderStatusByClientOrderId", async () =>
+      client.getOrder({ symbol: normalized, origClientOrderId: clientOrderId } as never),
+    ).catch(() => null);
+    if (!result) return null;
+    const payload = this.pickOrderPayload(result);
+    return { ...payload, orderId: payload.orderId ?? payload.order_id ?? null, clientOrderId };
   }
 
   async getExchangeInfo(): Promise<ExchangeInfoResponse> {

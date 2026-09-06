@@ -1,7 +1,8 @@
-import { getOrderStatus } from "@/services/binance.service";
+import { getOrderStatus, getOrderStatusByClientOrderId } from "@/services/binance.service";
 import { prisma } from "@/src/server/db/prisma";
 import { applyCanonicalPartialSettlementFill } from "@/src/server/execution/canonical-settlement-fill.service";
 import { buildCanonicalSettlementFillId } from "@/src/server/execution/canonical-fill-identity";
+import { buildClientOrderIdFromExitIntent } from "@/src/server/execution/exit-intent-identity";
 import type { ExitDecisionKind, ExitPolicyState } from "@/src/server/profitability/pr04-types";
 import { updateOrderStatus } from "@/src/server/repositories/execution.repository";
 import { Prisma } from "@prisma/client";
@@ -49,6 +50,7 @@ type ReconcileFillCandidate = {
   feeAsset: "BASE" | "QUOTE" | "UNKNOWN";
   fillAtMs: number;
   executionRef: string;
+  exchangeTradeId: string;
 };
 
 async function resolveLatestOrderState(order: ReconcileOrderRow | null) {
@@ -84,6 +86,115 @@ async function resolveLatestOrderState(order: ReconcileOrderRow | null) {
   return order;
 }
 
+async function recoverOrderByIntentClientOrderId(input: {
+  activeIntentId: string;
+  symbol: string;
+  positionId: string;
+  userId: string;
+  exchangeConnectionId: string;
+  tradingPairId: string;
+  closeSide: "BUY" | "SELL";
+}): Promise<ReconcileOrderRow | null> {
+  const clientOrderId = buildClientOrderIdFromExitIntent(input.activeIntentId);
+  if (!clientOrderId) return null;
+  const remote = await getOrderStatusByClientOrderId(input.symbol, clientOrderId).catch(() => null);
+  if (!remote) return null;
+  const exchangeOrderId = String(remote.orderId ?? "").trim();
+  const mappedStatus = mapOrderStatus(String(remote.status ?? "NEW"));
+  const avgExecutionPrice = Number(remote.price ?? 0);
+  const executedQty = Number(remote.executedQty ?? 0);
+  const existing = await prisma.tradeOrder.findFirst({
+    where: {
+      positionId: input.positionId,
+      side: input.closeSide,
+      OR: [{ exchangeOrderId }, { clientOrderId }],
+    },
+  });
+  const order = existing
+    ? await prisma.tradeOrder.update({
+        where: { id: existing.id },
+        data: {
+          status: mappedStatus,
+          exchangeOrderId: exchangeOrderId || existing.exchangeOrderId,
+          avgExecutionPrice: Number.isFinite(avgExecutionPrice) && avgExecutionPrice > 0 ? avgExecutionPrice : undefined,
+          quantity: Number.isFinite(executedQty) && executedQty > 0 ? executedQty : existing.quantity,
+          metadata: {
+            ...(((existing.metadata as Record<string, unknown> | null) ?? {}) as Prisma.InputJsonObject),
+            exitIntentId: input.activeIntentId,
+            discoveredBy: "clientOrderId",
+          } as Prisma.InputJsonValue,
+        },
+      })
+    : await prisma.tradeOrder.create({
+        data: {
+          userId: input.userId,
+          exchangeConnectionId: input.exchangeConnectionId,
+          tradingPairId: input.tradingPairId,
+          positionId: input.positionId,
+          side: input.closeSide,
+          type: "MARKET",
+          quantity: Number.isFinite(executedQty) && executedQty > 0 ? executedQty : 0,
+          price: Number.isFinite(avgExecutionPrice) && avgExecutionPrice > 0 ? avgExecutionPrice : 0,
+          status: mappedStatus,
+          clientOrderId,
+          exchangeOrderId: exchangeOrderId || undefined,
+          submittedAt: new Date(),
+          metadata: {
+            exitIntentId: input.activeIntentId,
+            discoveredBy: "clientOrderId",
+            closeReason: "MANUAL_CLOSE",
+          } as Prisma.InputJsonValue,
+        },
+      });
+  const raw = (remote.raw as Record<string, unknown> | undefined) ?? {};
+  const recoveredFills = Array.isArray(raw.fills) ? raw.fills : [];
+  for (const fill of recoveredFills) {
+    if (!fill || typeof fill !== "object") continue;
+    const row = fill as Record<string, unknown>;
+    const tradeId = String(row.tradeId ?? row.id ?? row.fillId ?? "").trim();
+    const qty = Number(row.executedQty ?? row.qty ?? row.quantity ?? 0);
+    const price = Number(row.price ?? 0);
+    const fee = Number(row.fee ?? 0);
+    const fillAtMs = Number(row.filledAtMs ?? row.time ?? Date.now());
+    if (!tradeId || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price <= 0) continue;
+    const existingExec = await prisma.tradeExecution.findFirst({
+      where: {
+        tradeOrderId: order.id,
+        status: "SUCCESS",
+        OR: [
+          { metadata: { path: ["exchangeTradeId"], equals: tradeId } },
+          { executionRef: tradeId },
+        ],
+      },
+    });
+    if (existingExec) continue;
+    await prisma.tradeExecution.create({
+      data: {
+        tradeOrderId: order.id,
+        status: "SUCCESS",
+        executionPrice: price,
+        executedQty: qty,
+        quoteQty: Number((qty * price).toFixed(8)),
+        fee: Number.isFinite(fee) ? fee : 0,
+        executionRef: tradeId,
+        executedAt: new Date(fillAtMs),
+        metadata: {
+          exchangeTradeId: tradeId,
+          discoveredBy: "clientOrderId",
+        } as Prisma.InputJsonValue,
+      },
+    });
+  }
+  return prisma.tradeOrder.findUnique({
+    where: { id: order.id },
+    include: {
+      tradingPair: true,
+      position: true,
+      executions: { orderBy: { executedAt: Prisma.SortOrder.asc } },
+    },
+  });
+}
+
 function buildFillCandidateFromExecution(input: {
   venue: string;
   exchangeConnectionId: string;
@@ -96,17 +207,20 @@ function buildFillCandidateFromExecution(input: {
   const exchangeTradeId = String(
     metadata.exchangeTradeId ??
       metadata.fillId ??
-      metadata.tradeId ??
-      input.execution.executionRef ??
-      input.execution.id,
+      metadata.tradeId,
   ).trim();
-  const settlementFillId = existingSettlementId || buildCanonicalSettlementFillId({
+  if (!exchangeTradeId) return null;
+  const canonicalSettlementId = buildCanonicalSettlementFillId({
     venue: input.venue,
     exchangeConnectionId: input.exchangeConnectionId,
     symbol: input.symbol,
     exchangeOrderId: input.exchangeOrderId,
     exchangeTradeId,
   });
+  if (existingSettlementId && existingSettlementId !== canonicalSettlementId) {
+    return null;
+  }
+  const settlementFillId = existingSettlementId || canonicalSettlementId;
   const feeAssetRaw = String(metadata.feeAsset ?? "UNKNOWN").toUpperCase();
   const feeAsset: "BASE" | "QUOTE" | "UNKNOWN" =
     feeAssetRaw === "BASE" || feeAssetRaw === "QUOTE" ? feeAssetRaw : "UNKNOWN";
@@ -120,6 +234,7 @@ function buildFillCandidateFromExecution(input: {
     feeAsset,
     fillAtMs,
     executionRef: input.execution.executionRef ?? input.exchangeOrderId,
+    exchangeTradeId,
   };
 }
 
@@ -157,7 +272,14 @@ function buildFillCandidateFromOrderCumulative(input: {
     feeAsset,
     fillAtMs,
     executionRef: exchangeOrderId,
+    exchangeTradeId,
   };
+}
+
+function resolveReconcileOpenFee(position: ReconcileOrderRow["position"]) {
+  const metadata = (position?.metadata as Record<string, unknown> | null) ?? {};
+  const openFee = Number(metadata.buyFee ?? metadata.openFee ?? 0);
+  return Number.isFinite(openFee) && openFee > 0 ? openFee : 0;
 }
 
 export async function reconcileFix02ExitBundles(limit = 20) {
@@ -177,6 +299,7 @@ export async function reconcileFix02ExitBundles(limit = 20) {
   let recovered = 0;
   let stillPending = 0;
   let unresolvedIdentity = 0;
+  let unresolvedIntent = 0;
   for (const row of rows) {
     const position = row.position;
     if (!position) {
@@ -201,19 +324,38 @@ export async function reconcileFix02ExitBundles(limit = 20) {
             orderBy: { createdAt: Prisma.SortOrder.desc },
           })
         : null;
+    const recoveredIntentOrder =
+      activeIntentId && !intentMatchedOrder
+        ? await recoverOrderByIntentClientOrderId({
+            activeIntentId,
+            symbol: position.tradingPair.symbol,
+            positionId: position.id,
+            userId: position.userId,
+            exchangeConnectionId: position.exchangeConnectionId,
+            tradingPairId: position.tradingPairId,
+            closeSide,
+          })
+        : null;
+    if (activeIntentId && !intentMatchedOrder && !recoveredIntentOrder) {
+      unresolvedIntent += 1;
+      stillPending += 1;
+      continue;
+    }
     const latestOrder = await resolveLatestOrderState(
-      intentMatchedOrder ?? await prisma.tradeOrder.findFirst({
-        where: {
-          positionId: position.id,
-          side: closeSide,
-        },
-        include: {
-          tradingPair: true,
-          position: true,
-          executions: { orderBy: { executedAt: Prisma.SortOrder.asc } },
-        },
-        orderBy: { createdAt: Prisma.SortOrder.desc },
-      }),
+      recoveredIntentOrder ??
+        intentMatchedOrder ??
+        await prisma.tradeOrder.findFirst({
+          where: {
+            positionId: position.id,
+            side: closeSide,
+          },
+          include: {
+            tradingPair: true,
+            position: true,
+            executions: { orderBy: { executedAt: Prisma.SortOrder.asc } },
+          },
+          orderBy: { createdAt: Prisma.SortOrder.desc },
+        }),
     );
     if (!latestOrder) {
       stillPending += 1;
@@ -251,6 +393,7 @@ export async function reconcileFix02ExitBundles(limit = 20) {
     }
 
     let appliedAny = false;
+    let allSuccessful = true;
     let executedRunning = 0;
     for (const fill of fillRows.sort((a, b) => a.fillAtMs - b.fillAtMs)) {
       if (!Number.isFinite(fill.executedQty) || fill.executedQty <= 0) continue;
@@ -272,6 +415,13 @@ export async function reconcileFix02ExitBundles(limit = 20) {
       const orderQty = Number(latestOrder.quantity);
       const remainingOrderQty = Number.isFinite(orderQty) ? Math.max(0, orderQty - (executedRunning + fill.executedQty)) : 0;
       const result = await applyCanonicalPartialSettlementFill({
+        // Current position is re-read for open-fee apportioning under concurrent reconcile steps.
+        // This avoids unconditional openFeePortion=0 accounting.
+        openFeePortion: (() => {
+          const openFee = resolveReconcileOpenFee(latestOrder.position);
+          const denominator = Math.max(latestOrder.position?.quantity ?? fill.executedQty, fill.executedQty);
+          return denominator > 0 ? openFee * (fill.executedQty / denominator) : 0;
+        })(),
         positionId: position.id,
         settlementFillId: fill.settlementFillId,
         userId: position.userId,
@@ -285,7 +435,6 @@ export async function reconcileFix02ExitBundles(limit = 20) {
         closeFee: fill.fee,
         feeAsset: fill.feeAsset,
         feeCurrency: position.tradingPair.quoteAsset,
-        openFeePortion: 0,
         clientOrderId: latestOrder.clientOrderId ?? `client-${position.id}`,
         exchangeOrderId: latestOrder.exchangeOrderId ?? `ex-${position.id}`,
         closeReason: String((latestOrder.metadata as Record<string, unknown> | null)?.closeReason ?? "MANUAL_CLOSE"),
@@ -297,22 +446,33 @@ export async function reconcileFix02ExitBundles(limit = 20) {
           expectedStateVersion: currentBundle.stateVersion,
           decisionKind,
           partialLegId,
+          reconciliationStatus: "RECONCILE_REQUIRED",
         },
         metadata: {
           reconciled: true,
           reconcileSource: "execution-engine-v2",
           exitIntentId: (latestOrder.metadata as Record<string, unknown> | null)?.exitIntentId ?? null,
-          exchangeTradeId: fill.executionRef,
+          exchangeTradeId: fill.exchangeTradeId,
         },
       });
       if (result.status === "APPLIED" || result.status === "ALREADY_APPLIED") {
         appliedAny = true;
         executedRunning += fill.executedQty;
+      } else {
+        allSuccessful = false;
       }
     }
 
-    if (appliedAny) {
+    if (appliedAny && allSuccessful && latestOrder.status === "FILLED") {
+      await prisma.positionExitPersistedState.updateMany({
+        where: { positionId: row.positionId },
+        data: { reconciliationStatus: "OK", activeExitIntentId: null },
+      });
       recovered += 1;
+      continue;
+    }
+    if (appliedAny) {
+      stillPending += 1;
       continue;
     }
 
@@ -348,6 +508,6 @@ export async function reconcileFix02ExitBundles(limit = 20) {
 
     stillPending += 1;
   }
-  return { scanned: rows.length, recovered, stillPending, unresolvedIdentity };
+  return { scanned: rows.length, recovered, stillPending, unresolvedIdentity, unresolvedIntent };
 }
 

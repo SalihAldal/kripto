@@ -33,6 +33,7 @@ vi.mock("@/services/binance.service", () => ({
   placeMarketSellEmergency: vi.fn(),
   placeMarketBuyEmergency: vi.fn(),
   getOrderStatus: vi.fn(),
+  getOrderStatusByClientOrderId: vi.fn(),
   estimateFees: vi.fn().mockResolvedValue({ estimatedTakerFee: 0.12 }),
   getAccountBalances: vi.fn().mockResolvedValue([{ asset: "BTC", free: 10 }]),
   getKlines: vi.fn().mockResolvedValue([]),
@@ -169,7 +170,7 @@ describe("Corrections Final QA — PostgreSQL adversarial", () => {
       price: 90,
       dryRun: true,
       fee: 0.08,
-      metadata: { fee: 0.08 },
+      metadata: { fee: 0.08, feeAsset: "QUOTE", simulationId: `sim-${Date.now()}` },
     }));
     await prisma.positionSettlementFill.deleteMany();
     await prisma.positionExitPersistedState.deleteMany();
@@ -273,7 +274,7 @@ describe("Corrections Final QA — PostgreSQL adversarial", () => {
       price: 88.5,
       dryRun: true,
       fee: 0.15,
-      metadata: { fee: 0.15 },
+      metadata: { fee: 0.15, feeAsset: "QUOTE", simulationId: "sim-adv-fill-1" },
     }));
     const snapshot = buildExitPolicySnapshotAtEntry({
       positionId: position.id,

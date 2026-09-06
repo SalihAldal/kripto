@@ -20,13 +20,14 @@ export interface ExchangeProvider {
   getKlines(symbol: string, interval?: string, limit?: number): Promise<KlineItem[]>;
   getOrderBook(symbol: string, limit?: number): Promise<OrderBookSnapshot>;
   getRecentTrades(symbol: string, limit?: number): Promise<RecentTrade[]>;
-  placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean): Promise<PlaceOrderResult>;
+  placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string): Promise<PlaceOrderResult>;
   placeMarketBuyByQuote?(symbol: string, quoteOrderQty: number, dryRun?: boolean): Promise<PlaceOrderResult>;
-  placeMarketSell(symbol: string, quantity: number, dryRun?: boolean): Promise<PlaceOrderResult>;
-  placeLimitBuy(symbol: string, quantity: number, price: number, dryRun?: boolean): Promise<PlaceOrderResult>;
-  placeLimitSell(symbol: string, quantity: number, price: number, dryRun?: boolean): Promise<PlaceOrderResult>;
+  placeMarketSell(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string): Promise<PlaceOrderResult>;
+  placeLimitBuy(symbol: string, quantity: number, price: number, dryRun?: boolean, clientOrderId?: string): Promise<PlaceOrderResult>;
+  placeLimitSell(symbol: string, quantity: number, price: number, dryRun?: boolean, clientOrderId?: string): Promise<PlaceOrderResult>;
   cancelOrder(symbol: string, orderId: string): Promise<{ symbol: string; orderId: string; status: string }>;
   getOrderStatus(symbol: string, orderId: string): Promise<Record<string, unknown>>;
+  getOrderStatusByClientOrderId?(symbol: string, clientOrderId: string): Promise<Record<string, unknown> | null>;
   getExchangeInfo(): Promise<ExchangeInfoResponse>;
   validateSymbolFilters(symbol: string, quantity: number, price?: number): Promise<SymbolValidationResult>;
   calculateValidQuantity(symbol: string, quantity: number): Promise<number>;

@@ -134,7 +134,13 @@ export class BinanceTrExchangeAdapter implements ExchangeAdapter {
     const normalizedSymbol = input.symbol.toUpperCase();
     if (input.type === "LIMIT") {
       if (!input.quantity || !input.price) throw new Error("validation: quantity and price required for limit buy");
-      const row = await this.provider.placeLimitBuy(normalizedSymbol, input.quantity, input.price, input.dryRun);
+      const row = await this.provider.placeLimitBuy(
+        normalizedSymbol,
+        input.quantity,
+        input.price,
+        input.dryRun,
+        input.clientOrderId,
+      );
       return this.toNormalizedOrder(row as unknown as Record<string, unknown>, "BUY", "LIMIT");
     }
     if (typeof input.quoteOrderQty === "number" && input.quoteOrderQty > 0 && this.provider.placeMarketBuyByQuote) {
@@ -142,7 +148,7 @@ export class BinanceTrExchangeAdapter implements ExchangeAdapter {
       return this.toNormalizedOrder(row as unknown as Record<string, unknown>, "BUY", "MARKET");
     }
     if (!input.quantity) throw new Error("validation: quantity required for market buy");
-    const row = await this.provider.placeMarketBuy(normalizedSymbol, input.quantity, input.dryRun);
+    const row = await this.provider.placeMarketBuy(normalizedSymbol, input.quantity, input.dryRun, input.clientOrderId);
     return this.toNormalizedOrder(row as unknown as Record<string, unknown>, "BUY", "MARKET");
   }
 
@@ -151,15 +157,30 @@ export class BinanceTrExchangeAdapter implements ExchangeAdapter {
     if (!input.quantity) throw new Error("validation: quantity required for sell order");
     if (input.type === "LIMIT") {
       if (!input.price) throw new Error("validation: price required for limit sell");
-      const row = await this.provider.placeLimitSell(normalizedSymbol, input.quantity, input.price, input.dryRun);
+      const row = await this.provider.placeLimitSell(
+        normalizedSymbol,
+        input.quantity,
+        input.price,
+        input.dryRun,
+        input.clientOrderId,
+      );
       return this.toNormalizedOrder(row as unknown as Record<string, unknown>, "SELL", "LIMIT");
     }
-    const row = await this.provider.placeMarketSell(normalizedSymbol, input.quantity, input.dryRun);
+    const row = await this.provider.placeMarketSell(normalizedSymbol, input.quantity, input.dryRun, input.clientOrderId);
     return this.toNormalizedOrder(row as unknown as Record<string, unknown>, "SELL", "MARKET");
   }
 
   async getOrderStatus(symbol: string, orderId: string) {
     const row = (await this.provider.getOrderStatus(symbol.toUpperCase(), orderId)) as Record<string, unknown>;
+    const side = String(row.side ?? "BUY").toUpperCase() === "SELL" ? "SELL" : "BUY";
+    const type = String(row.type ?? "MARKET").toUpperCase() === "LIMIT" ? "LIMIT" : "MARKET";
+    return this.toNormalizedOrder(row, side, type);
+  }
+
+  async getOrderStatusByClientOrderId(symbol: string, clientOrderId: string) {
+    if (!this.provider.getOrderStatusByClientOrderId) return null;
+    const row = await this.provider.getOrderStatusByClientOrderId(symbol.toUpperCase(), clientOrderId);
+    if (!row) return null;
     const side = String(row.side ?? "BUY").toUpperCase() === "SELL" ? "SELL" : "BUY";
     const type = String(row.type ?? "MARKET").toUpperCase() === "LIMIT" ? "LIMIT" : "MARKET";
     return this.toNormalizedOrder(row, side, type);

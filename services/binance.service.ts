@@ -161,7 +161,12 @@ export async function getRecentTrades(symbol: string, limit = 50, priority: Mark
   return rows;
 }
 
-export async function placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean): Promise<PlaceOrderResult> {
+export async function placeMarketBuy(
+  symbol: string,
+  quantity: number,
+  dryRun?: boolean,
+  options?: { clientOrderId?: string },
+): Promise<PlaceOrderResult> {
   assertLiveOrderAllowed("market-buy");
   const adapter = getExchangeAdapter();
   const normalized = await resolveSymbolForExchange(symbol);
@@ -170,6 +175,7 @@ export async function placeMarketBuy(symbol: string, quantity: number, dryRun?: 
     symbol: normalized,
     quantity,
     type: "MARKET",
+    clientOrderId: options?.clientOrderId,
     dryRun,
   }).catch((error) => {
     if (isBusinessOrderRejectError(error)) {
@@ -182,6 +188,7 @@ export async function placeMarketBuy(symbol: string, quantity: number, dryRun?: 
           symbol: normalized,
           quantity,
           type: "MARKET",
+          clientOrderId: options?.clientOrderId,
           dryRun,
         }),
       { threshold: 3, cooldownMs: 20_000 },
@@ -240,7 +247,12 @@ export async function placeMarketBuyByQuote(symbol: string, quoteOrderQty: numbe
   };
 }
 
-export async function placeMarketSell(symbol: string, quantity: number, dryRun?: boolean): Promise<PlaceOrderResult> {
+export async function placeMarketSell(
+  symbol: string,
+  quantity: number,
+  dryRun?: boolean,
+  options?: { clientOrderId?: string },
+): Promise<PlaceOrderResult> {
   assertLiveOrderAllowed("market-sell");
   const adapter = getExchangeAdapter();
   const normalized = await resolveSymbolForExchange(symbol);
@@ -249,6 +261,7 @@ export async function placeMarketSell(symbol: string, quantity: number, dryRun?:
     symbol: normalized,
     quantity,
     type: "MARKET",
+    clientOrderId: options?.clientOrderId,
     dryRun,
   }).catch((error) => {
     if (isBusinessOrderRejectError(error)) {
@@ -261,6 +274,7 @@ export async function placeMarketSell(symbol: string, quantity: number, dryRun?:
           symbol: normalized,
           quantity,
           type: "MARKET",
+          clientOrderId: options?.clientOrderId,
           dryRun,
         }),
       { threshold: 3, cooldownMs: 20_000 },
@@ -393,6 +407,27 @@ export async function getOrderStatus(symbol: string, orderId: string) {
   const row = await adapter.getOrderStatus(normalized, orderId);
   return {
     orderId: row.orderId,
+    symbol: row.symbol,
+    status: row.status,
+    side: row.side,
+    type: row.type,
+    executedQty: row.executedQty,
+    price: row.price,
+    raw: row.raw,
+  };
+}
+
+export async function getOrderStatusByClientOrderId(symbol: string, clientOrderId: string) {
+  const adapter = getExchangeAdapter();
+  const normalized = await resolveSymbolForExchange(symbol);
+  if (!adapter.getOrderStatusByClientOrderId) {
+    return null;
+  }
+  const row = await adapter.getOrderStatusByClientOrderId(normalized, clientOrderId);
+  if (!row) return null;
+  return {
+    orderId: row.orderId,
+    clientOrderId,
     symbol: row.symbol,
     status: row.status,
     side: row.side,

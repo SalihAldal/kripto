@@ -1,0 +1,99 @@
+{
+  "task": "KRIPTO — MEVCUT GOREVIN EKSIKLERINI TAMAMLA, KOPYA EXECUTION HATASINI DUZELT VE ENTEGRE QA YAP",
+  "startCommit": "662a495be5b2b60a5f843b1e6de77c4dcbd30803",
+  "finalCommit": "662a495be5b2b60a5f843b1e6de77c4dcbd30803",
+  "worktreeFingerprintSha256": "6db604d51525613e24651a0f0ac06fb9fd788e28f6d47fd18442f5ad0e5e502f",
+  "paperCampaignStarted": false,
+  "liveAuthorization": "DISABLED",
+  "environment": {
+    "node": "v24.13.0",
+    "npm": "11.6.2",
+    "database": "disposable-postgresql"
+  },
+  "checks": [
+    {
+      "name": "settlement-reconciliation.integration",
+      "command": "npx vitest run tests/settlement-reconciliation.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "9.31s"
+    },
+    {
+      "name": "execution-fix02-crash-replay-pack",
+      "command": "npx vitest run tests/execution-correction.integration.test.ts tests/fix02-durable-exit-and-settlement.integration.test.ts tests/execution-process-kill.integration.test.ts tests/replay-correction.test.ts tests/pr05-offline-comparison.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "12.22s"
+    },
+    {
+      "name": "crash-concurrency-round-1",
+      "command": "npx vitest run tests/execution-correction.integration.test.ts tests/settlement-reconciliation.integration.test.ts tests/execution-process-kill.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "11.11s"
+    },
+    {
+      "name": "crash-concurrency-round-2",
+      "command": "npx vitest run tests/execution-correction.integration.test.ts tests/settlement-reconciliation.integration.test.ts tests/execution-process-kill.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "11.02s"
+    },
+    {
+      "name": "crash-concurrency-round-3",
+      "command": "npx vitest run tests/execution-correction.integration.test.ts tests/settlement-reconciliation.integration.test.ts tests/execution-process-kill.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "11.41s"
+    },
+    {
+      "name": "final-qa-packs",
+      "command": "npx vitest run tests/corrections-final-qa.integration.test.ts tests/post-fix-final-qa.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "11.06s"
+    },
+    {
+      "name": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "36.265s"
+    },
+    {
+      "name": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS",
+      "duration": "503.605s"
+    }
+  ],
+  "verdicts": {
+    "EXECUTION_RECORD_UNIQUENESS": "PASS",
+    "CANONICAL_FILL_IDENTITY": "PARTIAL",
+    "MULTI_FILL_RECONCILIATION": "PASS",
+    "INTENT_ORDER_BINDING": "PASS",
+    "ACK_LOSS_DISCOVERY": "PARTIAL",
+    "ACCOUNTING_AND_RESERVATION": "PARTIAL",
+    "COUNTERFACTUAL_EXECUTION": "PARTIAL",
+    "PROCESS_CRASH_RECOVERY": "PARTIAL",
+    "PRODUCTION_ENTRY_PARTIAL_STOP": "PARTIAL",
+    "FINAL_ENGINEERING_VERDICT": "PARTIAL",
+    "REQUIRED_CHECKS_NOT_RUN": [
+      "REAL_POST_COMMIT_PRE_RESPONSE_IPC_KILL",
+      "NO_MANUAL_SEED_SINGLE_TEST_ENTRY_PARTIAL_STOP_CHAIN"
+    ],
+    "OPEN_CRITICAL_COUNT": 0,
+    "OPEN_HIGH_COUNT": 5,
+    "PAPER_ENGINEERING_READINESS": "NOT_READY",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED"
+  },
+  "supersedes": [
+    "KRIPTO_SETTLEMENT_RECONCILIATION_FINAL_REPORT.md",
+    "KRIPTO_SETTLEMENT_RECONCILIATION_FINAL_FINDINGS.md",
+    "kripto-settlement-reconciliation-final.json"
+  ]
+}
+

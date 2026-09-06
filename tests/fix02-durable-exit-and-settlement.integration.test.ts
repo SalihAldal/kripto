@@ -17,6 +17,7 @@ vi.mock("@/services/binance.service", () => ({
   placeMarketBuyEmergency: vi.fn(),
   placeMarketSellEmergency: vi.fn(),
   getOrderStatus: vi.fn(),
+  getOrderStatusByClientOrderId: vi.fn(),
   estimateFees: estimateFeesMock,
   getAccountBalances: getAccountBalancesMock,
   getKlines: vi.fn().mockResolvedValue([]),
@@ -115,7 +116,7 @@ describe("FIX02 durable exit and settlement (PostgreSQL)", () => {
       price: 112,
       dryRun: true,
       fee: 0.05,
-      metadata: { fee: 0.05 },
+      metadata: { fee: 0.05, feeAsset: "QUOTE", simulationId: `sim-${Date.now()}` },
     }));
     await prisma.positionExitPersistedState.deleteMany();
     await prisma.position.deleteMany();

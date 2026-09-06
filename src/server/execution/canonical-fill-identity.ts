@@ -9,7 +9,7 @@ export type CanonicalFillIdentityInput = {
 };
 
 function normalize(value: string) {
-  return value.trim().toUpperCase();
+  return value.trim();
 }
 
 export function buildCanonicalSettlementFillId(input: CanonicalFillIdentityInput) {

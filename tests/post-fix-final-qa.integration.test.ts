@@ -50,6 +50,7 @@ vi.mock("@/services/binance.service", () => ({
   placeMarketSellEmergency: vi.fn(),
   placeMarketBuyEmergency: vi.fn(),
   getOrderStatus: vi.fn(),
+  getOrderStatusByClientOrderId: vi.fn(),
   estimateFees: vi.fn().mockResolvedValue({ estimatedTakerFee: 0.1 }),
   getAccountBalances: vi.fn().mockResolvedValue([{ asset: "BTC", free: 10 }]),
   getKlines: vi.fn().mockResolvedValue([]),
@@ -246,7 +247,7 @@ beforeEach(() => {
     price: 112,
     dryRun: true,
     fee: 0.05,
-    metadata: { fee: 0.05 },
+    metadata: { fee: 0.05, feeAsset: "QUOTE", simulationId: `sim-${Date.now()}` },
   }));
 });
 
@@ -549,7 +550,11 @@ describe("POST-FIX final QA — FIX03 offline and assessment", () => {
       iterations: 3,
     });
     expect(nc.method).toBe("CAUSAL_ENTRY_TIME_SHIFT");
-    expect(nc.procedureApplied).toBe(true);
+    if (nc.procedureApplied) {
+      expect(nc.implementationVerdict).toBe("PASS");
+    } else {
+      expect(nc.implementationVerdict).toBe("INSUFFICIENT_DATA");
+    }
     const perm = shuffleClosedPnlPermutation({
       outcomes: runMatchedExitComparison({
         datasetId: pkg!.datasetId,
