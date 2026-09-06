@@ -2,6 +2,7 @@ import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-
 import type { DeepMarketState, MarketTradeEvent } from "@/src/server/market-data/spine/events";
 import type { EarlyContextExtension } from "@/src/server/profitability/pr02-types";
 import type { CausalCandle, StrategyContextExtension } from "@/src/server/profitability/pr03-types";
+import type { KlineItem } from "@/src/types/exchange";
 
 export type StrategyContextBuildInput = {
   symbol: string;
@@ -24,7 +25,7 @@ export type StrategyContextDataCoverage = {
   hasProducerData: boolean;
   missingReasons: string[];
   dataSource: "MARKET_DATA_DAEMON" | "INJECTED_DEEP_STATE";
-  schemaVersion: "fix01-strategy-context-v1";
+  schemaVersion: "fix01-strategy-context-v2";
 };
 
 export type StrategyContextBuildResult = {
@@ -33,12 +34,34 @@ export type StrategyContextBuildResult = {
   dataCoverage: StrategyContextDataCoverage;
 };
 
-function tradeEventAt(trade: MarketTradeEvent) {
-  return trade.tradeTime || trade.eventTime || trade.receiveTime;
+export function tradeEventAtMs(trade: MarketTradeEvent) {
+  return trade.tradeTime || trade.eventTime;
+}
+
+export function tradeAvailableAtMs(trade: MarketTradeEvent) {
+  return trade.receiveTime;
 }
 
 export function filterTradesAtDecision(trades: MarketTradeEvent[], decisionAtMs: number): MarketTradeEvent[] {
-  return trades.filter((trade) => tradeEventAt(trade) <= decisionAtMs);
+  return trades.filter((trade) => {
+    const eventAt = tradeEventAtMs(trade);
+    const availableAt = tradeAvailableAtMs(trade);
+    return eventAt <= decisionAtMs && availableAt <= decisionAtMs;
+  });
+}
+
+function klineRevisionAtDecision(kline: KlineItem, decisionAtMs: number): KlineItem | null {
+  const eventAt = klineEventAtMs(kline);
+  if (eventAt > decisionAtMs) return null;
+  const availableAt = kline.availableAt;
+  if (availableAt == null) return null;
+  if (availableAt > decisionAtMs) return null;
+  return kline;
+}
+
+function klineEventAtMs(kline: KlineItem) {
+  if (kline.closed === false) return kline.openTime;
+  return kline.eventAt ?? kline.closeTime;
 }
 
 export function klinesToCausalCandles(
@@ -47,34 +70,35 @@ export function klinesToCausalCandles(
 ): CausalCandle[] {
   const rows: CausalCandle[] = [];
   for (const kline of klines) {
-    if (kline.openTime > decisionAtMs) continue;
-    const closed = kline.closeTime <= decisionAtMs;
+    const eventAt = klineEventAtMs(kline);
+    if (eventAt > decisionAtMs) continue;
+    const revision = klineRevisionAtDecision(kline, decisionAtMs);
+    if (!revision) continue;
+    const closed = revision.closed === true && revision.closeTime <= decisionAtMs;
     if (!closed) {
       rows.push({
-        openTime: kline.openTime,
-        closeTime: kline.closeTime,
-        open: kline.open,
-        high: kline.open,
-        low: kline.open,
-        close: kline.open,
+        openTime: revision.openTime,
+        closeTime: revision.closeTime,
+        open: revision.open,
+        high: revision.open,
+        low: revision.open,
+        close: revision.open,
         volume: 0,
         closed: false,
-        availableAt: decisionAtMs,
+        availableAt: revision.availableAt!,
       });
       continue;
     }
-    const availableAt = kline.closeTime;
-    if (availableAt > decisionAtMs) continue;
     rows.push({
-      openTime: kline.openTime,
-      closeTime: kline.closeTime,
-      open: kline.open,
-      high: kline.high,
-      low: kline.low,
-      close: kline.close,
-      volume: kline.volume,
+      openTime: revision.openTime,
+      closeTime: revision.closeTime,
+      open: revision.open,
+      high: revision.high,
+      low: revision.low,
+      close: revision.close,
+      volume: revision.volume,
       closed: true,
-      availableAt,
+      availableAt: revision.availableAt!,
     });
   }
   return rows.filter((row) => row.availableAt <= decisionAtMs);
@@ -86,20 +110,22 @@ export function buildStrategyEvaluationContexts(input: StrategyContextBuildInput
   const trades = filterTradesAtDecision(deep?.recentTrades ?? [], input.decisionAtMs);
   const candles = klinesToCausalCandles(deep?.klines1m ?? [], input.decisionAtMs);
   const bookTicker = deep?.bookTicker ?? null;
+  const bookAvailableAt = bookTicker ? bookTicker.lastUpdateAt || bookTicker.eventTime : null;
   const book =
-    bookTicker &&
-    (bookTicker.lastUpdateAt || bookTicker.eventTime) <= input.decisionAtMs &&
-    !bookTicker.stale
+    bookTicker && bookAvailableAt != null && bookAvailableAt <= input.decisionAtMs && !bookTicker.stale
       ? bookTicker
       : null;
 
-  const baselinePrice = input.baselinePrice ?? trades.at(-1)?.price ?? null;
-  const firstDetectionPrice = input.firstDetectionPrice ?? baselinePrice ?? null;
+  const baselinePrice =
+    input.baselinePrice ?? (trades.length ? trades[trades.length - 1]!.price : null);
+  const firstDetectionPrice = input.firstDetectionPrice ?? input.baselinePrice ?? null;
 
   const missingReasons: string[] = [];
   if (!trades.length) missingReasons.push("TRADES_MISSING");
   if (!candles.length) missingReasons.push("CANDLES_MISSING");
   if (!book) missingReasons.push("BOOK_MISSING");
+  if (baselinePrice == null) missingReasons.push("BASELINE_PRICE_MISSING");
+  if (firstDetectionPrice == null) missingReasons.push("FIRST_DETECTION_PRICE_MISSING");
 
   const earlyContext: EarlyContextExtension = {
     trades,
@@ -127,7 +153,7 @@ export function buildStrategyEvaluationContexts(input: StrategyContextBuildInput
     earlyContext,
     strategyContext,
     dataCoverage: {
-      schemaVersion: "fix01-strategy-context-v1",
+      schemaVersion: "fix01-strategy-context-v2",
       tradeCount: trades.length,
       candleCount: candles.length,
       closedCandleCount: candles.filter((row) => row.closed).length,

@@ -6,11 +6,12 @@ import {
   savePersistedExitState,
   syncExitStateToDb,
 } from "@/src/server/execution/fix02-exit-persistence.service";
-import { claimExitQuantity } from "@/src/server/profitability/pr04-exit-coordinator";
+import { claimExitQuantity, registerOpenExitOrder } from "@/src/server/profitability/pr04-exit-coordinator";
 import {
   applyExitFill,
   evaluateExitPolicyTick,
   getExitPolicyState,
+  hydrateExitPolicyState,
 } from "@/src/server/profitability/pr04-exit-evaluator";
 import {
   isPr04ExitEvaluationEnabled,
@@ -18,6 +19,11 @@ import {
 } from "@/src/server/profitability/pr04-exit-bridge";
 import type { ExitDecisionKind, ExitTickObservation } from "@/src/server/profitability/pr04-types";
 import { createHash } from "node:crypto";
+import {
+  isSuccessfulSettlementFill,
+  requireSettlementFillEvidence,
+  type SettlementFillResult,
+} from "@/src/server/execution/settlement-fill-result";
 
 export type Fix02ExitTickInput = {
   executionId: string;
@@ -101,6 +107,9 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
   }
 
   const bundle = await loadPersistedExitBundle(input.positionId);
+  if (bundle && !getExitPolicyState(input.positionId)) {
+    hydrateExitPolicyState(bundle.state);
+  }
   if (bundle && bundle.reconciliationStatus === "RECONCILE_REQUIRED") {
     return {
       handled: true,
@@ -179,10 +188,6 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
       reconciliationRequired: true,
     };
   }
-  evaluation.state.reservedSellQuantity += decision.closeQuantity;
-  evaluation.state.orderState = "SUBMITTED";
-  await syncExitStateToDb(input.positionId);
-
   const fillId = buildSettlementFillId({
     positionId: input.positionId,
     decisionKind: decision.kind,
@@ -190,6 +195,14 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
     eventId: input.observation.eventId,
     partialLegId: decision.partialLegId,
   });
+  registerOpenExitOrder({
+    state: evaluation.state,
+    intentId: fillId,
+    requestedQuantity: decision.closeQuantity,
+    partialLegId: decision.partialLegId,
+  });
+  await syncExitStateToDb(input.positionId);
+
   const refreshedBundle = await loadPersistedExitBundle(input.positionId);
   if (refreshedBundle && refreshedBundle.processedFillIds.includes(fillId)) {
     return {
@@ -209,7 +222,7 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
     decision.kind === "PARTIAL_TAKE_PROFIT" ||
     (decision.closeQuantity < evaluation.state.remainingQuantity && decision.kind !== "RISK_OVERRIDE");
 
-  const settlement = await settleOpenPosition({
+  const settlement = (await settleOpenPosition({
     executionId: input.executionId,
     positionId: input.positionId,
     reason: closeReason,
@@ -219,22 +232,15 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
     pr04DecisionKind: decision.kind,
     pr04PartialLegId: decision.partialLegId,
     decisionPrice: decision.decisionPrice,
-  }) as {
-    closed?: boolean;
-    partial?: boolean;
-    reason?: string;
-    filledQuantity?: number;
-    fillPrice?: number;
-    fillFee?: number;
-    feeAsset?: "BASE" | "QUOTE" | "UNKNOWN";
-  };
+  })) as SettlementFillResult & { closed?: boolean; partial?: boolean; reason?: string };
 
-  if (!settlement.closed && !settlement.partial) {
+  if (!isSuccessfulSettlementFill(settlement)) {
     evaluation.state.reservedSellQuantity = Math.max(
       0,
       evaluation.state.reservedSellQuantity - decision.closeQuantity,
     );
     evaluation.state.orderState = "CANCELED";
+    evaluation.state.activeExitOrder = null;
     await savePersistedExitState({
       positionId: input.positionId,
       expectedVersion: evaluation.state.version,
@@ -253,32 +259,52 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
     };
   }
 
-  const fillQty = settlement.filledQuantity ?? decision.closeQuantity;
-  const fillPrice = settlement.fillPrice ?? decision.decisionPrice ?? 0;
-  const fillFee = settlement.fillFee ?? 0;
+  const fillEvidence = requireSettlementFillEvidence(settlement);
+  if (!fillEvidence) {
+    evaluation.state.orderState = "CANCELED";
+    evaluation.state.activeExitOrder = null;
+    await savePersistedExitState({
+      positionId: input.positionId,
+      expectedVersion: evaluation.state.version,
+      state: evaluation.state,
+      reconciliationStatus: "RECONCILE_REQUIRED",
+    });
+    return {
+      handled: true,
+      authorityActive: true,
+      decisionKind: decision.kind,
+      closed: false,
+      partial: false,
+      reasonCode: "SETTLEMENT_FILL_EVIDENCE_MISSING",
+      remainingQuantity: evaluation.state.remainingQuantity,
+      reconciliationRequired: true,
+    };
+  }
+
   applyExitFill({
     positionId: input.positionId,
     fill: {
-      price: fillPrice,
-      quantity: fillQty,
-      fee: fillFee,
-      feeAsset: settlement.feeAsset ?? "QUOTE",
+      price: fillEvidence.fillPrice,
+      quantity: fillEvidence.executedQuantity,
+      fee: fillEvidence.fillFee,
+      feeAsset: fillEvidence.feeAsset,
       atMs: input.observation.eventAtMs,
     },
     decisionKind: decision.kind,
     partialLegId: decision.partialLegId,
+    openOrderRemainingQuantity: settlement.orderRemainingQuantity,
   });
   await markProcessedFillId(input.positionId, fillId);
   await syncExitStateToDb(input.positionId);
 
   const finalState = getExitPolicyState(input.positionId);
-  const closed = Boolean(settlement.closed) || (finalState?.remainingQuantity ?? 0) <= 0;
+  const closed = Boolean(settlement.positionClosed) || (finalState?.remainingQuantity ?? 0) <= 0;
   return {
     handled: true,
     authorityActive: true,
     decisionKind: decision.kind,
     closed,
-    partial: Boolean(settlement.partial) || (!closed && fillQty > 0),
+    partial: Boolean(settlement.partial) || (!closed && fillEvidence.executedQuantity > 0),
     reasonCode: decision.reasonCode,
     remainingQuantity: finalState?.remainingQuantity ?? null,
     reconciliationRequired: false,

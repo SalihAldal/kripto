@@ -142,6 +142,10 @@ function deepState(input: {
       low: row.low,
       close: row.close,
       volume: row.volume,
+      availableAt: row.availableAt,
+      receivedAt: row.availableAt,
+      closed: row.closed,
+      eventAt: row.closed ? row.closeTime : row.openTime,
     })),
     orderBookValid: true,
     orderBookGap: false,
@@ -339,15 +343,32 @@ describe("FIX01 strategy context and invalidation", () => {
         low: row.low,
         close: row.close,
         volume: row.volume,
+        availableAt: row.availableAt,
+        receivedAt: row.availableAt,
+        closed: row.closed,
       })),
       baseNow,
     );
     expect(causal.every((row) => row.availableAt <= baseNow)).toBe(true);
+    expect(causal.length).toBeLessThan(futureCandles.length);
   });
 
   it("11 partial candle gelecekteki kapanışla tamamlanmaz", () => {
     const partial = klinesToCausalCandles(
-      [{ openTime: baseNow - 10_000, closeTime: baseNow + 50_000, open: 100, high: 105, low: 99, close: 104, volume: 10 }],
+      [
+        {
+          openTime: baseNow - 10_000,
+          closeTime: baseNow + 50_000,
+          open: 100,
+          high: 105,
+          low: 99,
+          close: 104,
+          volume: 10,
+          availableAt: baseNow,
+          receivedAt: baseNow,
+          closed: false,
+        },
+      ],
       baseNow,
     );
     expect(partial[0]?.closed).toBe(false);

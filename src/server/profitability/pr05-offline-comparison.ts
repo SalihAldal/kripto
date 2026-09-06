@@ -23,8 +23,10 @@ function resolveClosedAtMs(input: {
   manifest: Pr05MatchedExitInput["manifests"][number];
   ticks: Pr05MatchedExitInput["ticksByManifestId"][string];
   closed: boolean;
+  closedAtMs?: number | null;
 }) {
   if (!input.closed) return null;
+  if (input.closedAtMs != null) return input.closedAtMs;
   const lastTick = input.ticks.length ? input.ticks[input.ticks.length - 1]!.observation.eventAtMs : null;
   return lastTick ?? input.manifest.replayWindow.toMs;
 }
@@ -53,7 +55,12 @@ export function runMatchedExitComparison(input: Pr05MatchedExitInput): {
         ticks,
       });
       const censored = replay.terminalStatus === "CENSORED" || replay.terminalStatus === "OPEN";
-      const closedAtMs = resolveClosedAtMs({ manifest, ticks, closed: replay.closed });
+      const closedAtMs = resolveClosedAtMs({
+        manifest,
+        ticks,
+        closed: replay.closed,
+        closedAtMs: replay.closedAtMs,
+      });
       const holdingMs = closedAtMs != null ? closedAtMs - manifest.entryAtMs : null;
       outcomes.push({
         manifestId: manifest.manifestId,

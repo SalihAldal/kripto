@@ -1,0 +1,54 @@
+{
+  "reportId": "kripto-replay-correction-v1",
+  "generatedAt": "2026-09-06T20:40:00.000Z",
+  "baselineCommit": "e0f3ac1df41f0421906d2e315c63e8623f2c7a7b",
+  "finalHead": "e0f3ac1df41f0421906d2e315c63e8623f2c7a7b",
+  "finalDirtyFingerprint": "sha256:replay-correction-v1:30aa687,a3c1a0f,66cf2a3,1e17b33,cbcbb0a,61b3d93",
+  "REPLAY_CORRECTION_VERDICT": "PASS",
+  "AVAILABILITY_CAUSALITY_VERDICT": "PASS",
+  "COUNTERFACTUAL_FILL_VERDICT": "PASS",
+  "NEGATIVE_CONTROL_IMPLEMENTATION_VERDICT": "PASS",
+  "PORTFOLIO_TIME_AND_CAPITAL_VERDICT": "PASS",
+  "MARKET_EXPERIMENT_STATUS": "NOT_RUN",
+  "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+  "PAPER_CAMPAIGN_STARTED": false,
+  "LIVE_AUTHORIZATION": "DISABLED",
+  "OVERALL_QA_STATUS": "QA_PENDING",
+  "REQUIRED_CHECKS_NOT_RUN": [
+    "EXECUTION_CORRECTION_POSTGRES_RE_RUN_DOCKER_DOWN",
+    "POST_FIX_FINAL_QA_INTEGRATION_DOCKER_DOWN",
+    "RECORDED_MARKET_PROFITABILITY_EXPERIMENT",
+    "FULL_36_SCENARIO_TIME_MATRIX_ALL_ITEMS"
+  ],
+  "reportPath": "KRIPTO_REPLAY_CORRECTION_REPORT.md",
+  "bugsFixed": {
+    "A_context_times": {
+      "verdict": "PASS",
+      "files": ["fix01-strategy-context-builder.ts", "market-state-store.ts", "exchange.ts"]
+    },
+    "B_negative_control": {
+      "verdict": "PASS",
+      "files": ["pr05-negative-control.ts", "pr05-replay-clock.ts"]
+    },
+    "C_portfolio_replay": {
+      "verdict": "PASS",
+      "files": ["pr05-portfolio-replay.ts"]
+    },
+    "D_fill_replay": {
+      "verdict": "PASS",
+      "files": ["pr04-replay.ts"]
+    }
+  },
+  "testResults": {
+    "replay_correction": { "passed": 7, "failed": 0, "runs": 3 },
+    "fix01": { "passed": 32, "failed": 0 },
+    "pr05": { "passed": 36, "failed": 0 },
+    "pr04": { "passed": 47, "failed": 0 },
+    "typecheck": { "exitCode": 0 }
+  },
+  "generalQaHandoff": [
+    "npm run test:run -- tests/execution-correction.integration.test.ts",
+    "npm run test:run -- tests/post-fix-final-qa.integration.test.ts",
+    "npm run test:run -- tests/replay-correction.test.ts tests/pr05-offline-comparison.test.ts"
+  ]
+}

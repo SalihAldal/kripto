@@ -156,6 +156,7 @@ export type Pr05NegativeControlResult = {
   distributionDiffers?: boolean | null;
   implementationVerdict?: "PASS" | "FAIL" | "INSUFFICIENT_DATA";
   significanceVerdict?: "DIFFERS" | "NOT_DIFFERENT" | "INSUFFICIENT_DATA" | "NOT_EVALUATED";
+  marketTimestampsPreserved?: boolean;
 };
 
 export type Pr05CostStressResult = {

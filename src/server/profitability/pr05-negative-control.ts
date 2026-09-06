@@ -4,7 +4,27 @@ import type { Pr04ExitReplayTick } from "@/src/server/profitability/pr04-replay"
 import { buildMatchedEntryManifest } from "@/src/server/profitability/pr04-matched-entry-manifest";
 import { computeNetExpectancyFromPnls } from "@/src/server/profitability/pr05-metrics";
 import { runMatchedExitComparison } from "@/src/server/profitability/pr05-offline-comparison";
+import { findMarketQuoteAtMs } from "@/src/server/profitability/pr05-replay-clock";
+import { buildRiskReference } from "@/src/server/profitability/pr04-structural-stop";
 import type { Pr05NegativeControlResult, Pr05TradeOutcome } from "@/src/server/profitability/pr05-types";
+
+function computeMaxEntryShiftMs(input: {
+  manifest: MatchedEntryManifest;
+  marketTicks: Pr04ExitReplayTick[];
+  minShiftMs: number;
+  maxShiftMs: number;
+}) {
+  const windowSpan = input.manifest.replayWindow.toMs - input.manifest.entryAtMs;
+  const futureTicks = input.marketTicks.filter((tick) => tick.observation.eventAtMs > input.manifest.entryAtMs);
+  const earliestFutureAt =
+    futureTicks.length > 0
+      ? Math.min(...futureTicks.map((tick) => tick.observation.eventAtMs))
+      : input.manifest.replayWindow.toMs;
+  const tickBound = Math.max(0, earliestFutureAt - input.manifest.entryAtMs - 1);
+  const windowBound = Math.max(0, windowSpan - 15_000);
+  const effectiveMax = Math.min(input.maxShiftMs, tickBound, windowBound);
+  return effectiveMax >= input.minShiftMs ? effectiveMax : null;
+}
 
 function mulberry32(seed: number) {
   let t = seed >>> 0;
@@ -90,34 +110,38 @@ export function shuffleClosedPnlPermutation(input: {
   };
 }
 
-export function shiftMatchedManifestEntryTime(input: {
+export function buildCounterfactualEntryShift(input: {
   manifest: MatchedEntryManifest;
-  ticks: Pr04ExitReplayTick[];
+  marketTicks: Pr04ExitReplayTick[];
   shiftMs: number;
 }) {
   const newEntryAt = input.manifest.entryAtMs + input.shiftMs;
   if (newEntryAt >= input.manifest.replayWindow.toMs) {
-    return null;
+    return { status: "UNSUPPORTED" as const, reason: "SHIFT_OUTSIDE_REPLAY_WINDOW" };
   }
-  const shiftedTicks = input.ticks
-    .filter((tick) => tick.observation.eventAtMs + input.shiftMs <= input.manifest.replayWindow.toMs)
-    .map((tick) => ({
-      ...tick,
-      observation: {
-        ...tick.observation,
-        eventId: `${tick.observation.eventId}:shift:${input.shiftMs}`,
-        eventAtMs: tick.observation.eventAtMs + input.shiftMs,
-        availableAtMs: tick.observation.availableAtMs + input.shiftMs,
-      },
-    }));
-  if (!shiftedTicks.length) return null;
+  const entryPrice = findMarketQuoteAtMs(input.marketTicks, newEntryAt);
+  if (entryPrice == null || !Number.isFinite(entryPrice)) {
+    return { status: "UNSUPPORTED" as const, reason: "NO_QUOTE_AT_SHIFTED_ENTRY" };
+  }
+  const totalQty = input.manifest.fills.reduce((acc, row) => acc + row.quantity, 0);
+  const totalFee = input.manifest.fills.reduce((acc, row) => acc + row.fee, 0);
+  const feeRate = totalQty > 0 && entryPrice > 0 ? totalFee / (totalQty * input.manifest.fills[0]!.price) : 0;
+  const closeFee = Number((totalQty * entryPrice * feeRate).toFixed(8));
+  const stopPrice = input.manifest.invalidation?.invalidationThreshold ?? entryPrice * 0.992;
   const shiftedManifest = buildMatchedEntryManifest({
-    entrySignalId: `${input.manifest.entrySignalId}:shift:${input.shiftMs}`,
+    entrySignalId: `${input.manifest.entrySignalId}:nc:${input.shiftMs}`,
     strategyId: input.manifest.strategyId,
     entryPolicyVersion: input.manifest.entryPolicyVersion,
     entryAtMs: newEntryAt,
-    fills: input.manifest.fills.map((fill) => ({ ...fill, atMs: fill.atMs + input.shiftMs })),
-    riskReference: input.manifest.riskReference,
+    fills: [{ price: entryPrice, quantity: totalQty, fee: closeFee, atMs: newEntryAt }],
+    riskReference: buildRiskReference({
+      entryPrice,
+      initialStopPrice: stopPrice,
+      initialQuantity: totalQty,
+      entryFee: closeFee,
+      includesFeesInBreakEven: true,
+      computedAtMs: newEntryAt,
+    }),
     invalidation: input.manifest.invalidation,
     featureEvidenceIds: input.manifest.featureEvidenceIds,
     dataSource: input.manifest.dataSource,
@@ -125,7 +149,36 @@ export function shiftMatchedManifestEntryTime(input: {
     symbol: input.manifest.symbol ?? null,
     regime: input.manifest.regime ?? null,
   });
-  return { manifest: shiftedManifest, ticks: shiftedTicks };
+  const exitTicks = input.marketTicks.filter(
+    (tick) =>
+      tick.observation.eventAtMs >= newEntryAt &&
+      tick.observation.eventAtMs <= input.manifest.replayWindow.toMs,
+  );
+  if (!exitTicks.length) {
+    return { status: "UNSUPPORTED" as const, reason: "NO_EXIT_TICKS_AFTER_SHIFT" };
+  }
+  return {
+    status: "OK" as const,
+    manifest: shiftedManifest,
+    exitTicks,
+    marketTicksUnchanged: true,
+    entryPrice,
+  };
+}
+
+/** @deprecated Shifts market ticks — breaks causal negative control. Use buildCounterfactualEntryShift. */
+export function shiftMatchedManifestEntryTime(input: {
+  manifest: MatchedEntryManifest;
+  ticks: Pr04ExitReplayTick[];
+  shiftMs: number;
+}) {
+  const built = buildCounterfactualEntryShift({
+    manifest: input.manifest,
+    marketTicks: input.ticks,
+    shiftMs: input.shiftMs,
+  });
+  if (built.status !== "OK") return null;
+  return { manifest: built.manifest, ticks: built.exitTicks };
 }
 
 export function runCausalEntryShiftNegativeControl(input: {
@@ -162,6 +215,7 @@ export function runCausalEntryShiftNegativeControl(input: {
       unmatchedIterations: input.iterations,
       implementationVerdict: "INSUFFICIENT_DATA",
       significanceVerdict: "INSUFFICIENT_DATA",
+      marketTimestampsPreserved: true,
     };
   }
   const rng = mulberry32(input.seed);
@@ -175,18 +229,25 @@ export function runCausalEntryShiftNegativeControl(input: {
     const shiftedTicks: Record<string, Pr04ExitReplayTick[]> = {};
     let iterationOk = true;
     for (const manifest of input.manifests) {
-      const shiftMs = minShift + Math.floor(rng() * Math.max(1, maxShift - minShift));
-      const shifted = shiftMatchedManifestEntryTime({
+      const marketTicks = input.ticksByManifestId[manifest.manifestId] ?? [];
+      const effectiveMax = computeMaxEntryShiftMs({
         manifest,
-        ticks: input.ticksByManifestId[manifest.manifestId] ?? [],
-        shiftMs,
+        marketTicks,
+        minShiftMs: minShift,
+        maxShiftMs: maxShift,
       });
-      if (!shifted) {
+      if (effectiveMax == null) {
         iterationOk = false;
         break;
       }
-      shiftedManifests.push(shifted.manifest);
-      shiftedTicks[shifted.manifest.manifestId] = shifted.ticks;
+      const shiftMs = minShift + Math.floor(rng() * Math.max(1, effectiveMax - minShift));
+      const built = buildCounterfactualEntryShift({ manifest, marketTicks, shiftMs });
+      if (built.status !== "OK") {
+        iterationOk = false;
+        break;
+      }
+      shiftedManifests.push(built.manifest);
+      shiftedTicks[built.manifest.manifestId] = built.exitTicks;
     }
     if (!iterationOk) {
       unmatchedIterations += 1;
@@ -239,6 +300,7 @@ export function runCausalEntryShiftNegativeControl(input: {
     distributionDiffers,
     implementationVerdict,
     significanceVerdict,
+    marketTimestampsPreserved: true,
   };
 }
 

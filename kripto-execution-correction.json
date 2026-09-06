@@ -1,0 +1,68 @@
+{
+  "reportId": "kripto-execution-correction-v1",
+  "generatedAt": "2026-09-06T20:30:00.000Z",
+  "baselineCommit": "e0f3ac1df41f0421906d2e315c63e8623f2c7a7b",
+  "finalHead": "e0f3ac1df41f0421906d2e315c63e8623f2c7a7b",
+  "finalDirtyFingerprint": "sha256:exec-correction-v1:87a2d33,b1ee162,058e759,db1e660,8f82de2,f957738,4126acd,0d4a6e28",
+  "EXECUTION_CORRECTION_VERDICT": "PARTIAL_PASS",
+  "POST_PARTIAL_STOP_VERDICT": "PASS",
+  "ATOMIC_SETTLEMENT_VERDICT": "PARTIAL",
+  "ACTUAL_FILL_PROPAGATION_VERDICT": "PASS",
+  "CONCURRENT_FILL_VERDICT": "PASS",
+  "CRASH_RECONCILIATION_VERDICT": "PARTIAL",
+  "PAPER_CAMPAIGN_STARTED": false,
+  "LIVE_AUTHORIZATION": "DISABLED",
+  "OVERALL_QA_STATUS": "QA_PENDING",
+  "REQUIRED_CHECKS_NOT_RUN": [
+    "POSTGRES_RE_RUN_BLOCKED_DOCKER_DOWN",
+    "PROCESS_LEVEL_CRASH_RESTART_E",
+    "RECONCILIATION_RACE_G_FULL_CHAIN",
+    "FULL_CLOSE_CANONICAL_ATOMIC",
+    "POST_FIX_FINAL_QA_INTEGRATION_RE_RUN"
+  ],
+  "migrationPath": "prisma/migrations/20260906163000_execution_correction_settlement_fill/migration.sql",
+  "reportPath": "KRIPTO_EXECUTION_CORRECTION_REPORT.md",
+  "bugsFixed": {
+    "A_post_partial_stop_blocked": {
+      "before": "applyExitFill set orderState=PARTIALLY_FILLED when position qty remained; shouldSuppressDuplicateExit blocked stop with ORDER_IN_FLIGHT",
+      "after": "releaseCompletedExitOrder clears reservation when openOrderRemainingQuantity=0; suppress only when reservedSellQuantity>0 and order open",
+      "verdict": "PASS",
+      "evidence": "tests/execution-correction.integration.test.ts::A (3x consecutive PASS)"
+    },
+    "B_non_atomic_partial_settlement": {
+      "before": "applyPartialPositionClose read-then-update with JSON dedup",
+      "after": "applyCanonicalPartialSettlementFill single prisma.$transaction with PositionSettlementFill unique claim",
+      "verdict": "PARTIAL",
+      "evidence": "tests/execution-correction.integration.test.ts::D rollback; full close not yet canonical"
+    },
+    "C_full_close_missing_fill_fields": {
+      "before": "routing fell back to decision.closeQuantity/decisionPrice/0 fee",
+      "after": "SettlementFillResult + requireSettlementFillEvidence; full close returns executedQuantity/fillPrice/fillFee",
+      "verdict": "PASS",
+      "evidence": "tests/execution-correction.integration.test.ts::C"
+    }
+  },
+  "stateModel": {
+    "orderFields": ["orderState", "reservedSellQuantity", "activeExitOrder"],
+    "positionFields": ["remainingQuantity", "terminalStatus", "completedPartialLegs"],
+    "dedupTable": "PositionSettlementFill",
+    "dedupKey": ["positionId", "settlementFillId"]
+  },
+  "testResults": {
+    "execution_correction_integration": { "passed": 5, "failed": 0, "runs": 3, "note": "verified earlier session; docker down at final re-run" },
+    "pr04_exit_and_position_management": { "passed": 47, "failed": 0 },
+    "fix02_durable_exit_settlement": { "passed": 8, "failed": 0 },
+    "typecheck": { "exitCode": 0 },
+    "build": { "exitCode": 0, "durationMs": 549512 }
+  },
+  "invalidatedPriorClaims": [
+    "partial settlement atomic via JSON metadata only",
+    "stop after completed partial without ORDER_IN_FLIGHT in production path",
+    "full close fill propagation via decision fields"
+  ],
+  "reconciliationConsumer": {
+    "exitBundle": "processFix02Pr04ExitTick blocks when reconciliationStatus=RECONCILE_REQUIRED",
+    "engineV2": "execution-engine-v2.workers.ts RECONCILE interval job",
+    "failsafe": "failsafe-recovery.service.ts reconcile state"
+  }
+}

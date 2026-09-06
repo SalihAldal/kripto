@@ -26,10 +26,52 @@ export function shouldSuppressDuplicateExit(input: {
   decision: ExitDecision;
 }) {
   if (input.decision.reasonCode === "DUPLICATE_EVENT_SUPPRESSED") return false;
-  if (input.state.orderState === "SUBMITTED" || input.state.orderState === "PARTIALLY_FILLED") {
+  const hasOpenExitOrder =
+    input.state.reservedSellQuantity > 0 &&
+    (input.state.orderState === "SUBMITTED" || input.state.orderState === "PARTIALLY_FILLED");
+  if (hasOpenExitOrder) {
     return input.decision.kind !== "RISK_OVERRIDE";
   }
   return false;
+}
+
+export function registerOpenExitOrder(input: {
+  state: ExitPolicyState;
+  intentId: string;
+  requestedQuantity: number;
+  partialLegId?: string | null;
+}) {
+  input.state.activeExitOrder = {
+    intentId: input.intentId,
+    requestedQuantity: input.requestedQuantity,
+    executedQuantity: 0,
+    openQuantity: input.requestedQuantity,
+    partialLegId: input.partialLegId ?? null,
+    terminal: false,
+  };
+  input.state.reservedSellQuantity = input.requestedQuantity;
+  input.state.orderState = "SUBMITTED";
+}
+
+export function releaseCompletedExitOrder(input: {
+  state: ExitPolicyState;
+  filledQuantity: number;
+  openOrderRemainingQuantity?: number;
+}) {
+  const openRemaining = input.openOrderRemainingQuantity ?? 0;
+  if (openRemaining > 0) {
+    input.state.reservedSellQuantity = openRemaining;
+    input.state.orderState = "PARTIALLY_FILLED";
+    if (input.state.activeExitOrder) {
+      input.state.activeExitOrder.executedQuantity += input.filledQuantity;
+      input.state.activeExitOrder.openQuantity = openRemaining;
+      input.state.activeExitOrder.terminal = false;
+    }
+    return;
+  }
+  input.state.reservedSellQuantity = Math.max(0, input.state.reservedSellQuantity - input.filledQuantity);
+  input.state.orderState = input.state.remainingQuantity <= 0 ? "FILLED" : "NONE";
+  input.state.activeExitOrder = null;
 }
 
 export function claimExitQuantity(input: {

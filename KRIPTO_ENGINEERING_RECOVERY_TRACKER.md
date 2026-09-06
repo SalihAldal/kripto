@@ -36,6 +36,76 @@
 
 **QA durumu:** `OVERALL_QA_STATUS=QA_PENDING` (FIX03 tamamlandı; genel post-fix QA tamamlandı).
 
+## EXEC CORRECTION — Kademeli Stop, Atomik Settlement, Gerçek Fill (Düzeltme 1/2)
+
+| Alan | Durum |
+|---|---|
+| Post-partial stop (`ORDER_IN_FLIGHT` engeli kaldırıldı) | `PASS` |
+| Açık partial emir rezervasyonu | `PASS` |
+| Canonical partial settlement (tek transaction) | `PASS` |
+| Full close gerçek fill aktarımı | `PASS` |
+| Full close atomik settlement | `PARTIAL` (legacy path) |
+| Eşzamanlı fill dedup (`PositionSettlementFill`) | `PASS` |
+| Transaction rollback injection (D) | `PASS` |
+| Process crash/restart (E) | `NOT_RUN` |
+| Reconciliation geç-fill tam zincir (G) | `NOT_RUN` |
+| Disposable PostgreSQL harness | `PASS` (Corrections Final QA — `kripto_fix02_*`, fingerprint `986947de949587aa`) |
+| Rapor | `KRIPTO_EXECUTION_CORRECTION_REPORT.md` |
+| JSON | `kripto-execution-correction.json` |
+| Migration | `20260906163000_execution_correction_settlement_fill` |
+
+**Verdict:** `EXECUTION_CORRECTION_VERDICT=PARTIAL_PASS` — üretim yolu düzeltildi ve DB ile doğrulandı; full-close atomiklik ve crash/reconciliation tam zinciri bekliyor.
+
+**QA durumu:** `OVERALL_QA_STATUS=QA_PENDING` (Düzeltme 2 tamamlandı; **Corrections Final QA tamamlandı** — açık HIGH: full-close atomik).
+
+## REPLAY CORRECTION — Context, NC, Portfolio (Düzeltme 2/2)
+
+| Alan | Durum |
+|---|---|
+| Trade/candle availability causality | `PASS` |
+| REST backfill anti-lookahead | `PASS` |
+| Counterfactual NC (market fixed) | `PASS` |
+| Chronological portfolio replay | `PASS` |
+| Fill replay session (no orphan fill) | `PASS` |
+| Engineering synthetic fixture validation | `PASS` |
+| Recorded market experiment | `NOT_RUN` |
+| PostgreSQL execution-correction re-run | `PASS` (Corrections Final QA, 3× crash run) |
+| Rapor | `KRIPTO_REPLAY_CORRECTION_REPORT.md` |
+| JSON | `kripto-replay-correction.json` |
+
+**Verdict:** `REPLAY_CORRECTION_VERDICT=PASS` — `PROFITABILITY_EVIDENCE=INSUFFICIENT_DATA` (sentetik fixture only).
+
+**QA durumu:** `OVERALL_QA_STATUS=QA_PENDING` → **superseded** by Corrections Final QA (bu bölüm).
+
+## CORRECTIONS FINAL QA — Düzeltme 1/2 + 2/2 Adversarial Doğrulama
+
+| Alan | Durum |
+|---|---|
+| Post-partial stop (ADV-STOP-01, DB PnL/fill/rezervasyon) | `PASS` |
+| Açık partial rezervasyon (execution-correction B) | `PASS` |
+| Canonical partial atomik settlement (ADV-ATOMIC-01 + D) | `PASS` |
+| Gerçek fill aktarımı (ADV-FILL-01 + C) | `PASS` |
+| Eşzamanlı fill dedup (ADV-CONCURRENT-01 + F, 3×) | `PASS` |
+| Full close atomik canonical | `NOT_RUN` (legacy path — CFQA-OPEN-01) |
+| Reconciliation consumer e2e | `NOT_RUN` (CFQA-OPEN-02) |
+| Availability causality (ADV-AVAIL-01/02) | `PASS` |
+| Negatif kontrol tick hash (ADV-NC-01) | `PASS` |
+| Portföy zaman/sermaye (ADV-PORT-01) | `PASS` |
+| Orphan replay fill (ADV-FILL-02) | `PASS` |
+| Settlement integration zinciri (ADV-STOP-01) | `PARTIAL` (entry orchestrator yok) |
+| `closePositionRecord` quantity sıfırlama | `FIXED` (CFQA-FIXED-02) |
+| Prisma disposable harness | `FIXED` (CFQA-FIXED-03) |
+| Typecheck / build | `PASS` (exit 0) |
+| Rapor | `KRIPTO_CORRECTIONS_FINAL_QA_REPORT.md` |
+| JSON | `kripto-corrections-final-qa.json` |
+| Findings | `KRIPTO_CORRECTIONS_FINAL_QA_FINDINGS.md` |
+| Matrix | `KRIPTO_CORRECTIONS_FINAL_QA_MATRIX.md` |
+| Content fingerprint | `986947de949587aa` |
+
+**Verdict:** `FINAL_ENGINEERING_VERDICT=PARTIAL` — `OPEN_HIGH_COUNT=1` (full-close atomik); `REQUIRED_CHECKS_NOT_RUN`: EXEC-RECONCILE-01, EXEC-FULL-ATOMIC-01.
+
+**Önceki rapor geçerliliği:** `KRIPTO_EXECUTION_CORRECTION_REPORT.md` → **PARTIALLY_VALID**; `KRIPTO_REPLAY_CORRECTION_REPORT.md` → **VALID**; `KRIPTO_POST_FIX_FINAL_QA_REPORT.md` → **SUPERSEDED**.
+
 ## POST-FIX FINAL QA — Düzeltme 1–3 Entegrasyon Denetimi
 
 | Alan | Durum |

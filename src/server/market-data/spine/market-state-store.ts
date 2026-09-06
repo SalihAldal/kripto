@@ -99,9 +99,16 @@ export class MarketStateStore {
     }
   }
 
-  applyCandle(event: MarketCandleEvent) {
+  applyCandle(event: MarketCandleEvent, now = Date.now()) {
     if (event.interval !== "1m") return;
     const slot = this.ensure(event.symbol);
+    const receivedAt = event.receiveTime > 0 ? event.receiveTime : now;
+    const isRestBackfill = event.source === "binance-rest-bootstrap" || event.source === "binance-rest-recovery";
+    const availableAt = isRestBackfill
+      ? receivedAt
+      : event.closed
+        ? Math.max(event.closeTime, receivedAt)
+        : receivedAt;
     const next: KlineItem = {
       openTime: event.openTime,
       closeTime: event.closeTime,
@@ -110,11 +117,18 @@ export class MarketStateStore {
       low: event.low,
       close: event.close,
       volume: event.volume,
+      eventAt: event.closeTime,
+      receivedAt,
+      availableAt,
+      closed: event.closed,
+      source: event.source,
     };
     const last = slot.klines1m[slot.klines1m.length - 1];
     if (last && last.openTime === next.openTime) {
+      next.revision = (last.revision ?? 0) + 1;
       slot.klines1m[slot.klines1m.length - 1] = next;
     } else {
+      next.revision = 0;
       slot.klines1m.push(next);
       if (slot.klines1m.length > KLINE_BUFFER_LIMIT) {
         slot.klines1m.splice(0, slot.klines1m.length - KLINE_BUFFER_LIMIT);
@@ -122,9 +136,17 @@ export class MarketStateStore {
     }
   }
 
-  seedKlines(symbol: string, rows: KlineItem[]) {
+  seedKlines(symbol: string, rows: KlineItem[], receivedAtMs = Date.now()) {
     const slot = this.ensure(symbol);
-    slot.klines1m = rows.slice(-KLINE_BUFFER_LIMIT).map((row) => ({ ...row }));
+    slot.klines1m = rows.slice(-KLINE_BUFFER_LIMIT).map((row) => ({
+      ...row,
+      eventAt: row.eventAt ?? row.closeTime,
+      receivedAt: row.receivedAt ?? receivedAtMs,
+      availableAt: row.availableAt ?? receivedAtMs,
+      closed: row.closed ?? true,
+      source: row.source ?? "binance-rest-bootstrap",
+      revision: row.revision ?? 0,
+    }));
   }
 
   setOrderBook(symbol: string, book: OrderBookSnapshot | null, valid: boolean, gap: boolean) {

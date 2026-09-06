@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type { StrategyId } from "@/src/server/forensics/p4-regime-strategy-shadow";
 import type { InvalidationContract } from "@/src/server/profitability/pr03-types";
 import { getExitPolicyDefinition } from "@/src/server/profitability/pr04-policy-registry";
-import { pickHighestPriorityDecision, shouldSuppressDuplicateExit } from "@/src/server/profitability/pr04-exit-coordinator";
+import { pickHighestPriorityDecision, releaseCompletedExitOrder, shouldSuppressDuplicateExit } from "@/src/server/profitability/pr04-exit-coordinator";
 import { buildExitPnlSnapshot } from "@/src/server/profitability/pr04-pnl-accounting";
 import { computePartialLegQuantity } from "@/src/server/profitability/pr04-partial-exit";
 import { buildRiskReference, resolveStructuralStopFromInvalidation } from "@/src/server/profitability/pr04-structural-stop";
@@ -26,6 +26,7 @@ export function resetExitPolicyStoreForTests() {
 }
 
 export function hydrateExitPolicyState(state: ExitPolicyState) {
+  if (state.activeExitOrder === undefined) state.activeExitOrder = null;
   stateStore.set(state.positionId, JSON.parse(JSON.stringify(state)) as ExitPolicyState);
 }
 
@@ -127,6 +128,7 @@ export function initializeExitPolicyState(input: {
     lastReasonCode: null,
     lastEventId: null,
     orderState: "NONE",
+    activeExitOrder: null,
     exitFills: [],
     terminalStatus: "OPEN",
     version: 1,
@@ -279,12 +281,12 @@ export function applyExitFill(input: {
   fill: { price: number; quantity: number; fee: number; feeAsset: "BASE" | "QUOTE" | "UNKNOWN"; atMs: number };
   decisionKind: ExitEvaluationResult["decision"]["kind"];
   partialLegId?: string | null;
+  openOrderRemainingQuantity?: number;
 }) {
   const state = stateStore.get(input.positionId);
   if (!state) return null;
   const filled = Math.min(input.fill.quantity, state.remainingQuantity);
   state.remainingQuantity = Number((state.remainingQuantity - filled).toFixed(8));
-  state.reservedSellQuantity = Math.max(0, state.reservedSellQuantity - filled);
   state.exitFills.push({
     fillId: createHash("sha256").update(`${input.positionId}:${input.fill.atMs}:${filled}`).digest("hex").slice(0, 16),
     side: "SELL",
@@ -296,7 +298,11 @@ export function applyExitFill(input: {
     decisionKind: input.decisionKind,
   });
   if (input.partialLegId) state.completedPartialLegs.push(input.partialLegId);
-  state.orderState = state.remainingQuantity <= 0 ? "FILLED" : "PARTIALLY_FILLED";
+  releaseCompletedExitOrder({
+    state,
+    filledQuantity: filled,
+    openOrderRemainingQuantity: input.openOrderRemainingQuantity,
+  });
   state.terminalStatus = state.remainingQuantity <= 0 ? "CLOSED" : "REDUCING";
   stateStore.set(input.positionId, state);
   return state;

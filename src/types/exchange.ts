@@ -24,6 +24,15 @@ export type KlineItem = {
   low: number;
   close: number;
   volume: number;
+  /** Market event time (typically candle close for closed bars). */
+  eventAt?: number;
+  /** First system observation time (receiveTime). */
+  receivedAt?: number;
+  /** When this revision became decision-eligible (never back-dated before receivedAt). */
+  availableAt?: number;
+  closed?: boolean;
+  source?: string;
+  revision?: number;
 };
 
 export type OrderBookLevel = {

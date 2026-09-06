@@ -49,6 +49,11 @@ function runMigrate(databaseUrl: string) {
   });
 }
 
+export function resetPrismaClientForFix02Tests() {
+  const g = globalThis as typeof globalThis & { __prisma__?: unknown };
+  delete g.__prisma__;
+}
+
 export async function createFix02DisposablePostgres(): Promise<Fix02DisposablePostgres> {
   const adminUrl = process.env.FIX02_PG_ADMIN_URL ?? DEFAULT_ADMIN_URL;
   const { host, port } = parseHostPort(adminUrl);
@@ -65,6 +70,7 @@ export async function createFix02DisposablePostgres(): Promise<Fix02DisposablePo
   runMigrate(databaseUrl);
   process.env.DATABASE_URL = databaseUrl;
   process.env.FIX02_TEST_DATABASE_URL = databaseUrl;
+  resetPrismaClientForFix02Tests();
 
   return {
     dbName,

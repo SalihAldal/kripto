@@ -382,6 +382,7 @@ export async function closePositionRecord(input: {
     where: { id: input.positionId },
     data: {
       status: "CLOSED",
+      quantity: 0,
       closePrice: input.closePrice,
       realizedPnl: input.realizedPnl,
       feeTotal: input.feeTotal,

@@ -429,6 +429,42 @@ describe("PR04 exit and position management", () => {
     expect(result.decision.reasonCode).toBe("ORDER_IN_FLIGHT");
   });
 
+  it("31b completed partial leg does not block subsequent stop", () => {
+    initState("STRUCTURAL_PARTIAL_TRAIL", 100, 1);
+    applyExitFill({
+      positionId: "pos-1",
+      fill: { price: 102.5, quantity: 0.5, fee: 0.05, feeAsset: "QUOTE", atMs: baseNow + 1 },
+      decisionKind: "PARTIAL_TAKE_PROFIT",
+      partialLegId: "leg-25",
+    });
+    const state = getExitPolicyState("pos-1")!;
+    expect(state.remainingQuantity).toBe(0.5);
+    expect(state.orderState).toBe("NONE");
+    expect(state.reservedSellQuantity).toBe(0);
+    state.activeStopPrice = 99;
+    const stop = evaluateExitPolicyTick({ positionId: "pos-1", side: "LONG", observation: obs(90) });
+    expect(stop.decision.kind).toBe("STRUCTURAL_STOP");
+    expect(stop.decision.reasonCode).not.toBe("ORDER_IN_FLIGHT");
+    expect(stop.decision.closeQuantity).toBe(0.5);
+  });
+
+  it("31c open partial order still blocks duplicate sell", () => {
+    initState("STRUCTURAL_STOP_TARGET");
+    const state = getExitPolicyState("pos-1")!;
+    state.orderState = "PARTIALLY_FILLED";
+    state.reservedSellQuantity = 0.3;
+    state.activeExitOrder = {
+      intentId: "intent-open",
+      requestedQuantity: 0.5,
+      executedQuantity: 0.2,
+      openQuantity: 0.3,
+      partialLegId: null,
+      terminal: false,
+    };
+    const result = evaluateExitPolicyTick({ positionId: "pos-1", side: "LONG", observation: obs(103) });
+    expect(result.decision.reasonCode).toBe("ORDER_IN_FLIGHT");
+  });
+
   it("32 late partial fill updates remaining quantity", () => {
     initState("STRUCTURAL_PARTIAL_TRAIL", 100, 2);
     applyExitFill({

@@ -692,6 +692,7 @@ model Position {
   profitLossRecords    ProfitLossRecord[]
   learningTrades       LearningTrade[]
   exitPersistedState   PositionExitPersistedState?
+  settlementFills      PositionSettlementFill[]
 
   @@index([userId, status, openedAt])
   @@index([tradingPairId, status])
@@ -719,6 +720,23 @@ model PositionExitPersistedState {
 
   @@index([userId, terminalStatus])
   @@index([ownerExecutionId])
+}
+
+model PositionSettlementFill {
+  id               String   @id @default(cuid())
+  positionId       String
+  settlementFillId String
+  tradeOrderId     String?
+  executedQty      Float
+  fillPrice        Float
+  fee              Float    @default(0)
+  feeAsset         String?
+  createdAt        DateTime @default(now())
+
+  position Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@unique([positionId, settlementFillId])
+  @@index([positionId, createdAt])
 }
 
 model ProfitLossRecord {

@@ -24,6 +24,15 @@ export type ExitDecisionKind =
 
 export type ExitOrderState = "NONE" | "INTENT" | "SUBMITTED" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "UNKNOWN";
 
+export type ExitActiveOrderState = {
+  intentId: string;
+  requestedQuantity: number;
+  executedQuantity: number;
+  openQuantity: number;
+  partialLegId: string | null;
+  terminal: boolean;
+};
+
 export type RiskReference = {
   entryPrice: number;
   initialStopPrice: number | null;
@@ -87,6 +96,7 @@ export type ExitPolicyState = {
   lastReasonCode: string | null;
   lastEventId: string | null;
   orderState: ExitOrderState;
+  activeExitOrder: ExitActiveOrderState | null;
   exitFills: ExitFillRecord[];
   terminalStatus: "OPEN" | "REDUCING" | "CLOSED" | "CENSORED";
   version: number;
