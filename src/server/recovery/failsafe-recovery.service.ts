@@ -62,7 +62,16 @@ async function upsertUserSetting(userId: string, key: string, value: Prisma.Inpu
 export async function getSafeModeState(userId?: string): Promise<SafeModeState> {
   const { user } = await getRuntimeExecutionContext(userId);
   const key = buildKey(SAFE_MODE_PREFIX, user.id);
-  const row = await prisma.appSetting.findUnique({ where: { key } });
+  const row = await prisma.appSetting.findUnique({ where: { key } }).catch((error) => {
+    if (
+      error instanceof Prisma.PrismaClientInitializationError ||
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      error instanceof Prisma.PrismaClientUnknownRequestError
+    ) {
+      return null;
+    }
+    throw error;
+  });
   const value = (row?.value as Record<string, unknown> | undefined) ?? {};
   return {
     enabled: Boolean(value.enabled),

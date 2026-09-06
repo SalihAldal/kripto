@@ -11,9 +11,11 @@ import {
 import { resetMarketDataDaemonForTests } from "@/src/server/market-data/spine/market-data-daemon";
 import {
   computeHorizons,
+  computeOneHorizon,
   computeReachTimes,
   moveKey,
 } from "@/src/server/shadow-outcome/metrics";
+import { buildCanonicalCandidateObservation, buildOutcomeHorizonRows } from "@/src/server/shadow-outcome/canonical-dataset";
 import { detectMoverEvents } from "@/src/server/shadow-outcome/mover-truth";
 import {
   classifyMiss,
@@ -292,6 +294,104 @@ describe("phase 05 shadow outcome engine", () => {
     expect(m60.status).toBe("HISTORY_UNAVAILABLE");
     expect(m60.complete).toBe(true);
     expect(m60.quality).toBe("HISTORY_UNAVAILABLE");
+  });
+
+  it("5c horizon is bounded: 1m outcome is not overwritten by 10m price", () => {
+    const out = computeOneHorizon({
+      detectedAt: T0,
+      detectionPrice: 100,
+      points: [
+        { t: T0, price: 100 },
+        { t: T0 + 60_000, price: 101 },
+        { t: T0 + 10 * 60_000, price: 140 },
+      ],
+      now: T0 + 10 * 60_000,
+      gapMs: 15 * 60_000,
+      horizonMin: 1,
+    });
+    expect(out.status).toBe("COMPLETE");
+    expect(out.returnPct).toBeCloseTo(1, 6);
+    expect((out.mfePct ?? 0) < 5).toBe(true);
+  });
+
+  it("5c2 matured horizon with stale end coverage is INVALID_DATA", () => {
+    const out = computeOneHorizon({
+      detectedAt: T0,
+      detectionPrice: 100,
+      points: [
+        { t: T0, price: 100 },
+        { t: T0 + 15_000, price: 101 },
+      ],
+      now: T0 + 60_000,
+      gapMs: 20_000,
+      horizonMin: 1,
+    });
+    expect(out.status).toBe("INVALID_DATA");
+    expect(out.invalidReason).toBe("HORIZON_END_PRICE_STALE");
+    expect(out.returnPct).toBeNull();
+  });
+
+  it("5d baseline-specific rows are independently recalculated", () => {
+    const engine = new ShadowOutcomeEngine({ minTrackScore: 50 });
+    const id = "BASEUSDT:" + T0;
+    engine.observeOpportunity([opp("BASEUSDT", { candidateId: id, firstDetectionPrice: 100, state: "DISCOVERED" })], { now: T0 });
+    engine.ingestPrice("BASEUSDT", { t: T0 + 60_000, price: 101 }, T0 + 60_000);
+    engine.ingestPrice("BASEUSDT", { t: T0 + 2 * 60_000, price: 102 }, T0 + 2 * 60_000);
+    engine.ingestPrice("BASEUSDT", { t: T0 + 5 * 60_000, price: 110 }, T0 + 5 * 60_000);
+    engine.observeOpportunity([opp("BASEUSDT", { candidateId: id, firstDetectionPrice: 100, score: 90, state: "HOT" })], { now: T0 + 5 * 60_000 });
+    engine.ingestPrice("BASEUSDT", { t: T0 + 7 * 60_000, price: 109 }, T0 + 7 * 60_000);
+    engine.ingestPrice("BASEUSDT", { t: T0 + 12 * 60_000, price: 125 }, T0 + 12 * 60_000);
+    const tracked = engine.getTracked()[0]!;
+    const firstRows = buildOutcomeHorizonRows({ datasetId: "ds-1", tracked, baselineStage: "FIRST_DETECTED", nowMs: T0 + 8 * 60_000 });
+    const hotRows = buildOutcomeHorizonRows({ datasetId: "ds-1", tracked, baselineStage: "HOT", nowMs: T0 + 8 * 60_000 });
+    const first3 = firstRows.find((row) => row.horizonMinutes === 3)!;
+    const hot3 = hotRows.find((row) => row.horizonMinutes === 3)!;
+    expect(first3.endReturnPercent).not.toBe(hot3.endReturnPercent);
+    expect(first3.horizonEndAt).not.toBe(hot3.horizonEndAt);
+  });
+
+  it("5e missing or stale baseline does not fabricate horizon rows", () => {
+    const engine = new ShadowOutcomeEngine({ minTrackScore: 50 });
+    const id = "MISSBASE:" + T0;
+    engine.observeOpportunity([opp("MISSBASE", { candidateId: id, firstDetectionPrice: 100 })], { now: T0 });
+    const tracked = engine.getTracked()[0]!;
+    expect(buildOutcomeHorizonRows({ datasetId: "ds-2", tracked, baselineStage: "HOT", nowMs: T0 + 10 * 60_000 })).toEqual([]);
+    tracked.hotAt = T0 + 10 * 60_000;
+    expect(buildOutcomeHorizonRows({ datasetId: "ds-2", tracked, baselineStage: "HOT", nowMs: T0 + 10 * 60_000 })).toEqual([]);
+  });
+
+  it("5f null outcomes are preserved as null, never coerced to zero", () => {
+    const engine = new ShadowOutcomeEngine({ minTrackScore: 50 });
+    const id = "NULLOUT:" + T0;
+    engine.observeOpportunity([opp("NULLOUT", { candidateId: id, firstDetectionPrice: 100 })], { now: T0 });
+    engine.observeOpportunity([opp("NULLOUT", { candidateId: id, firstDetectionPrice: 100, state: "HOT" })], { now: T0 + 60_000 });
+    const tracked = engine.getTracked()[0]!;
+    const rows = buildOutcomeHorizonRows({ datasetId: "ds-3", tracked, baselineStage: "HOT", nowMs: T0 + 10 * 60_000 });
+    const row1m = rows.find((row) => row.horizonMinutes === 1)!;
+    expect(row1m.status).toBe("HISTORY_UNAVAILABLE");
+    expect(row1m.mfePercent).toBeNull();
+    expect(row1m.maePercent).toBeNull();
+    expect(row1m.endReturnPercent).toBeNull();
+  });
+
+  it("5g rejected candidate can still keep complete price outcome quality", () => {
+    const engine = new ShadowOutcomeEngine({ minTrackScore: 50 });
+    const id = "REJUSDT:" + T0;
+    engine.observeOpportunity([opp("REJUSDT", { candidateId: id, firstDetectionPrice: 100 })], { now: T0 });
+    for (const point of ramp(100, 106, 61)) engine.ingestPrice("REJUSDT", point, point.t);
+    const tracked = engine.getTracked()[0]!;
+    tracked.latestStage = "MICRO_REJECTED";
+    const observation = buildCanonicalCandidateObservation({
+      datasetId: "ds-4",
+      campaignId: "cmp-1",
+      tracked,
+      observedAtMs: T0 + 61 * 60_000,
+      persistedAtMs: T0 + 61 * 60_000,
+      inputSnapshotId: "snap-1",
+      policyVersion: "p5-test",
+    });
+    expect(observation.terminalStage).toBe("REJECTED");
+    expect(observation.dataQuality).not.toBe("INCOMPLETE");
   });
 
   it("6 first-detection snapshot is immutable", () => {

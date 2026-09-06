@@ -33,7 +33,10 @@ import { addSystemLog } from "@/src/server/repositories/log.repository";
 import { getRiskConfigByUser } from "@/src/server/repositories/risk.repository";
 import { evaluateCanonicalRiskDecision } from "@/src/server/risk/canonical-risk-decision.service";
 import { upsertCandidatePipelineTrace } from "@/src/server/hot-path/candidate-pipeline-trace.service";
-import { claimCanonicalExecutionAttempt } from "@/src/server/hot-path/execution-attempt-lock.service";
+import {
+  claimDurableCanonicalExecutionAttempt,
+  releaseDurableCanonicalExecutionAttempt,
+} from "@/src/server/hot-path/execution-attempt-lock.service";
 import { addAuditLog } from "@/src/server/repositories/audit.repository";
 import {
   getScannerWorkerSnapshot,
@@ -180,8 +183,15 @@ import {
 } from "@/src/server/execution/execution-failure-contract";
 import { recordPaperFillEvent } from "@/src/server/paper-validation/paper-trade-recorder.service";
 import { markPaperPersistenceReconciliation } from "@/src/server/execution/paper-persistence-reconciliation.service";
-import { evaluateCanonicalRegime, routeStrategies } from "@/src/server/forensics/p4-regime-strategy-shadow";
+import { evaluateCanonicalRegime, routeStrategies, type StrategyId } from "@/src/server/forensics/p4-regime-strategy-shadow";
+import { bootstrapPr04ExitStateFromEntry, buildPr04ExitMetadataAtEntry, resolveInvalidationForSelectedStrategy } from "@/src/server/profitability/pr04-exit-bridge";
 import { resolveStrategyActivationMode, type StrategyStatus } from "@/src/server/execution/p7-paper-strategy-contract";
+import { buildFeatureContractSnapshot } from "@/src/server/execution/er02-feature-contract";
+import {
+  resolveCanonicalAdmissionVerdict,
+  resolveExecutionAuthorization,
+  sortCanonicalBlockers,
+} from "@/src/server/execution/er03-canonical-policy";
 
 type CanonicalEntryDecision = {
   candidateId: string;
@@ -203,6 +213,9 @@ type CanonicalEntryDecision = {
   evaluatedAt: string;
   policyVersion: string;
 };
+
+const STRATEGY_POLICY_VERSION = "er03-strategy-router-v1";
+const REGIME_POLICY_VERSION = "er02-regime-input-v1";
 
 function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED" {
   const upper = raw.toUpperCase();
@@ -1133,7 +1146,12 @@ export async function ensureOpenPositionMonitors(userId?: string) {
         symbol: position.tradingPair.symbol,
         side: position.side,
         quantity: Number(position.quantity ?? 0),
-        strategy: typeof metadata.marketRegimeStrategy === "string" ? metadata.marketRegimeStrategy : undefined,
+        strategy:
+          typeof metadata.strategyId === "string"
+            ? metadata.strategyId
+            : typeof metadata.marketRegimeStrategy === "string"
+              ? metadata.marketRegimeStrategy
+              : undefined,
         regime: typeof metadata.marketRegime === "string" ? metadata.marketRegime : undefined,
         openedAt: position.openedAt.toISOString(),
         entryPrice: position.entryPrice,
@@ -1271,7 +1289,7 @@ function pickBestCandidate(candidates: ScannerCandidate[], requestedSymbol?: str
 async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise<ExecutionResult> {
   const executionId = randomUUID();
   const mode = getMode(input);
-  const paperRelaxed = mode === "paper";
+  const paperMode = mode === "paper";
   const learningLane = mode === "paper" && input.learningLane === true;
   const forensicSession = getForensicSession();
   const executionIdentity = {
@@ -1296,6 +1314,8 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
   let obsQualityGate: SignalQualityResult | undefined;
   let obsResult: ExecutionResult | undefined;
   let canonicalCandidateId = "";
+  let runtimeUserId: string | null = null;
+  let claimedExecutionAttemptCandidateId: string | null = null;
   const idempotencyKey = String(
     input.requestedSymbol ?? "auto",
   ) + `:${String(input.requestedQuoteAmountTry ?? input.requestedQuantity ?? "default")}:${mode}`;
@@ -1336,6 +1356,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       throw new ExternalServiceError("Canli islem icin Binance API key/secret eksik.");
     }
     const { user, connection } = await getRuntimeExecutionContext(input.userId);
+    runtimeUserId = user.id;
     const safeMode = await getSafeModeState(user.id);
     if (safeMode.enabled) {
       publishExecutionEvent({
@@ -1472,7 +1493,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     if (!selected) {
       const fast = await getBestFastEntry({
         excludeSymbols: [],
-        forcePaperProfile: paperRelaxed,
+        forcePaperProfile: paperMode,
         runtime: {
           forceFreshScanner: true,
           roundId: input.roundId,
@@ -1506,30 +1527,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         if (custom) {
           selected = custom.candidate;
         }
-      }
-    }
-
-    if ((!selected || !selected.ai) && paperRelaxed && input.requestedSymbol) {
-      const fallbackContext = await buildMarketContext(input.requestedSymbol).catch(() => null);
-      if (fallbackContext) {
-        const fallbackScore = scoreContext(fallbackContext);
-        const inferredDecision = Number(fallbackContext.metadata.shortMomentumPercent ?? 0) >= 0 ? "BUY" : "SELL";
-        selected = {
-          rank: 1,
-          context: fallbackContext,
-          score: fallbackScore,
-          ai: {
-            finalDecision: inferredDecision,
-            finalConfidence: Math.max(55, Math.min(85, fallbackScore.confidence)),
-            finalRiskScore: 35,
-            score: fallbackScore.score,
-            rejected: false,
-            explanation: "Paper fallback: requested symbol used with inferred direction.",
-            outputs: [],
-            roleScores: [],
-            generatedAt: new Date().toISOString(),
-          },
-        } as ScannerCandidate;
       }
     }
 
@@ -1599,7 +1596,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       },
     });
     const liveDataHealthy = Boolean(selected.context.metadata.liveDataHealthy ?? true);
-    if (!liveDataHealthy && !paperRelaxed) {
+    if (!liveDataHealthy) {
       await logTradeEvent({
         symbol: selected.context.symbol,
         eventType: "RISK_GATE_BLOCKED",
@@ -1654,17 +1651,15 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           issues: dataQualityIssues,
         },
       }).catch(() => null);
-      if (!paperRelaxed) {
-        return finishExecution({
-          executionId,
-          mode,
-          opened: false,
-          rejected: true,
-          rejectReason: reason,
-          symbol: selected.context.symbol,
-          decision: ai.finalDecision,
-        });
-      }
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: reason,
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+      });
     }
     const scorecardConfidenceRaw = Number(ai.analysisScorecard?.confidenceScore ?? ai.finalConfidence ?? 0);
     const scorecardConfidence = learningLane
@@ -1740,7 +1735,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       confidencePercent: ai.finalConfidence,
       aiRiskScore: ai.finalRiskScore,
     });
-    if (entryQuality.reject && !paperRelaxed && !learningLane) {
+    if (entryQuality.reject) {
       await logTradeEvent({
         symbol: selected.context.symbol,
         eventType: "RISK_GATE_BLOCKED",
@@ -1789,7 +1784,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
       // Learning lane is advisory-only by design; never hard-veto execution authority.
     }
-    if (noTradeReasons.length > 0 && !paperRelaxed) {
+    if (noTradeReasons.length > 0) {
       const orchestration = await evaluateOrchestration({
         userId: user.id,
         candidate: selected,
@@ -1839,54 +1834,29 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       strategyStatus,
       liveTradingEnabled: env.LIVE_TRADING_ENABLED,
     });
-    const p4Regime = evaluateCanonicalRegime({
-      marketEventAt: String(selected.context.metadata.marketDataTimestamp ?? new Date().toISOString()),
-      detectedAt: new Date().toISOString(),
-      trend: Number(selected.context.metadata.trendStrength ?? 0),
-      volatility: Number(selected.context.volatilityPercent ?? 0) / 100,
-      momentum: Number(selected.context.metadata.shortMomentumPercent ?? 0),
-      transitionProbability: Number(selected.context.metadata.regimeTransitionProbability ?? 0) / 100,
-      chaosProbability: Number(selected.context.metadata.regimeChaosProbability ?? 0) / 100,
-      pumpScore: Number(selected.context.metadata.pumpScore ?? selected.context.pumpRisk ?? 0),
+    const featureContract = buildFeatureContractSnapshot({
+      context: selected.context,
+      ai,
+      now: Date.now(),
+      staleAfterMs: Math.max(60_000, env.SCANNER_SHORT_HORIZON_SEC * 2_000),
     });
-    const strategyRouter = routeStrategies(
-      {
-        candidateId: String(selected.context.metadata.opportunityCandidateId ?? createCandidateId(selected.context.symbol, "strategy")),
-        sourceType: "LIVE_MARKET",
-        marketEventAt: p4Regime.marketEventAt,
-        evaluatedAt: new Date().toISOString(),
-        velocity: Number(selected.context.metadata.tradeVelocity ?? 0),
-        acceleration: Number(selected.context.metadata.priceAcceleration ?? 0),
-        volumeAcceleration: Number(selected.context.metadata.volumeAcceleration ?? 0),
-        relativeStrength: Number(selected.context.metadata.relativeStrength ?? 0),
-        spreadBps: Number(selected.context.spreadPercent ?? 0) * 100,
-        liquidityScore: Math.max(0, Math.min(1, Number(selected.context.metadata.liquidityScore ?? 0.6))),
-        exhaustion: Math.max(0, Math.min(1, Number(selected.context.metadata.exhaustion ?? 0.2))),
-        momentum: Number(selected.context.metadata.shortMomentumPercent ?? 0),
-        retracement: Number(selected.context.metadata.retracement ?? 0.4),
-        breakoutHeld: Boolean(selected.context.metadata.breakoutHeld ?? false),
-        rangeScore: Number(selected.context.metadata.rangeScore ?? 0.4),
-        distanceFromMean: Number(selected.context.metadata.distanceFromMean ?? 0.4),
-        flowRecovery: Number(selected.context.metadata.flowRecovery ?? 0.5),
-        staleFeatures: Array.isArray(selected.context.metadata.staleFeatures)
-          ? (selected.context.metadata.staleFeatures as string[])
-          : [],
-        missingFeatures: Array.isArray(selected.context.metadata.missingFeatures)
-          ? (selected.context.metadata.missingFeatures as string[])
-          : [],
-        entrySpread: Number(selected.context.metadata.entrySpread ?? selected.context.spreadPercent ?? 0),
-        entrySlippage: Number(selected.context.metadata.entrySlippage ?? 0),
-        entryFee: Number(selected.context.metadata.entryFee ?? 0.1),
-        exitSpread: Number(selected.context.metadata.exitSpread ?? selected.context.spreadPercent ?? 0),
-        exitSlippage: Number(selected.context.metadata.exitSlippage ?? 0),
-        exitFee: Number(selected.context.metadata.exitFee ?? 0.1),
-        strategyProfitBuffer: Number(selected.context.metadata.strategyProfitBuffer ?? 0.12),
-        expectedMovePercent: Number(selected.context.metadata.expectedMovePercent ?? Math.max(0, Number(ai.score ?? 0))),
-      },
-      p4Regime,
-    );
+    selected.context.metadata = {
+      ...selected.context.metadata,
+      featureContract: featureContract.snapshot,
+      sourceType: featureContract.snapshot.sourceType,
+      marketDataTimestamp: featureContract.snapshot.marketEventAt,
+      missingFeatures: featureContract.snapshot.missingFeatures,
+      staleFeatures: featureContract.snapshot.staleFeatures,
+      invalidFeatures: featureContract.snapshot.invalidFeatures,
+      expectedMovePercent: featureContract.snapshot.expectedMove.value,
+      expectedMoveSource: featureContract.snapshot.expectedMove.source,
+      expectedMoveHorizonMinutes: featureContract.snapshot.expectedMove.horizonMinutes,
+      costSource: featureContract.snapshot.costs.source,
+    };
+    const p4Regime = evaluateCanonicalRegime(featureContract.regimeInput);
+    const strategyRouter = routeStrategies(featureContract.strategyInput, p4Regime);
     const selectedStrategyId = strategyRouter.preferredStrategy ?? marketRegime.strategy;
-    if (!marketRegime.openAllowed && !paperRelaxed) {
+    if (!marketRegime.openAllowed) {
       return finishExecution({
         executionId,
         mode,
@@ -1897,7 +1867,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
       });
     }
-    if (!paperRelaxed && (marketRegime.mode === "HIGH_VOLATILITY_CHAOS" || marketRegime.mode === "NEWS_DRIVEN_UNSTABLE")) {
+    if (marketRegime.mode === "HIGH_VOLATILITY_CHAOS" || marketRegime.mode === "NEWS_DRIVEN_UNSTABLE") {
       if (selected.context.spreadPercent > 0.12 || selected.context.fakeSpikeScore > 1.8 || ai.finalConfidence < 94) {
         return finishExecution({
           executionId,
@@ -1910,7 +1880,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         });
       }
     }
-    if (!paperRelaxed && (marketRegime.mode === "STRONG_BEARISH_TREND" || marketRegime.mode === "WEAK_BEARISH_TREND")) {
+    if (marketRegime.mode === "STRONG_BEARISH_TREND" || marketRegime.mode === "WEAK_BEARISH_TREND") {
       const shortMomentum = Number(selected.context.metadata.shortMomentumPercent ?? 0);
       const shortFlow = Number(selected.context.metadata.shortFlowImbalance ?? 0);
       if (!(shortMomentum > 0.12 && shortFlow > 0.04 && ai.finalDecision === "BUY")) {
@@ -1942,13 +1912,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         details: { conflictStatus: strategyRouter.conflictStatus, evaluations: strategyRouter.evaluations },
       });
     }
-    if (mode === "paper" && strategyActivation !== "PAPER_ELIGIBLE") {
-      canonicalEntryBlockers.push({
-        code: "ROUTER_SHADOW_ONLY",
-        reason: `Strategy mode ${strategyActivation} cannot create paper intent`,
-        details: { strategyStatus, strategyActivation },
-      });
-    }
     const orchestration = await evaluateOrchestration({
       userId: user.id,
       candidate: selected,
@@ -1958,7 +1921,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       mode,
       decisionStage: qualityGate.ok ? "PRE_TRADE" : "REJECT",
     });
-    if (!qualityGate.ok && !paperRelaxed) {
+    if (!qualityGate.ok) {
       publishExecutionEvent({
         executionId,
         symbol: selected.context.symbol,
@@ -1995,7 +1958,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         },
       });
     }
-    if ((orchestration.action === "BLOCK" || orchestration.action === "SUPPRESS") && !paperRelaxed) {
+    if (orchestration.action === "BLOCK" || orchestration.action === "SUPPRESS") {
       publishExecutionEvent({
         executionId,
         symbol: selected.context.symbol,
@@ -2024,7 +1987,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       candidate: selected,
       ai,
     });
-    if (!adaptiveEval.ok && !paperRelaxed) {
+    if (!adaptiveEval.ok) {
       publishExecutionEvent({
         executionId,
         symbol: selected.context.symbol,
@@ -2190,9 +2153,13 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
     const forensicCandidateId = canonicalCandidateId || String(selected.context.metadata.decisionId ?? "").trim() || createCandidateId(symbol, "execution");
-    const executionClaim = claimCanonicalExecutionAttempt({
+    const executionClaim = await claimDurableCanonicalExecutionAttempt({
+      userId: user.id,
       candidateId: canonicalCandidateId || forensicCandidateId,
       executionId,
+      decisionId: executionId,
+      executionMode: mode,
+      venue: executionIdentity.venue,
     });
     if (!executionClaim.ok) {
       return finishExecution({
@@ -2205,10 +2172,11 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
       });
     }
+    claimedExecutionAttemptCandidateId = canonicalCandidateId || forensicCandidateId;
     const intentIdentity = getCanonicalCandidateStore().registerExecutionIntent({
       candidateId: canonicalCandidateId,
       executionIntentId: executionId,
-      strategyContext: `${String(selected.context.metadata.marketRegimeStrategy ?? "default")}:${ai.finalDecision === "SELL" ? "SELL" : "BUY"}`,
+      strategyContext: `${String(selectedStrategyId ?? "default")}:${ai.finalDecision === "SELL" ? "SELL" : "BUY"}`,
     });
     if (!intentIdentity.ok) {
       return finishExecution({
@@ -2368,21 +2336,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
       });
     }
-    if (paperRelaxed && side === "SELL") {
-      side = "BUY";
-      publishExecutionEvent({
-        executionId,
-        symbol: selected.context.symbol,
-        stage: "selection",
-        status: "RUNNING",
-        message: "Paper modda short acilisi yerine long kullanildi",
-        level: "WARN",
-        context: {
-          originalDecision: ai.finalDecision,
-          normalizedDecision: side,
-        },
-      });
-    }
     if (mode === "live" && side === "SELL") {
       return finishExecution({
         executionId,
@@ -2493,7 +2446,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
 
-    if (env.AI_QUALITY_PROFILE === "elite" && !liveDataHealthy && !paperRelaxed) {
+    if (env.AI_QUALITY_PROFILE === "elite" && !liveDataHealthy) {
       return finishExecution({
         executionId,
         mode,
@@ -2510,7 +2463,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     const ultraMaxRisk = useGlobalLeverageVenue
       ? env.AI_ULTRA_MAX_RISK_SCORE_LEVERAGE
       : env.AI_ULTRA_MAX_RISK_SCORE_SPOT;
-    if (!isUltraPrecisionConsensus(selected, ultraMinConfidence, ultraMaxRisk) && !paperRelaxed) {
+    if (!isUltraPrecisionConsensus(selected, ultraMinConfidence, ultraMaxRisk)) {
       return finishExecution({
         executionId,
         mode,
@@ -2684,7 +2637,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           stopLossPercent,
           env.EXECUTION_PUMP_MIN_STOP_LOSS_PERCENT,
           pumpStopLossFloor,
-          paperRelaxed ? 0.68 : 0.58,
+          paperMode ? 0.68 : 0.58,
           env.EXECUTION_DEFAULT_STOP_LOSS_PERCENT * 0.75,
         ).toFixed(4),
       );
@@ -2718,7 +2671,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       spreadPercent: selected.context.spreadPercent,
       leverageMultiplier: useGlobalLeverageVenue ? requestedLeverageSafe : 1,
     });
-    if (!edgeGate.pass && !paperRelaxed) {
+    if (!edgeGate.pass) {
       return finishExecution({
         executionId,
         mode,
@@ -3082,7 +3035,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       liquidityScore: Number(selected.context.metadata.liquidityScore ?? 60),
       orderType,
       marketRegime: String(selected.context.metadata.marketRegime ?? ""),
-      paperRelaxed,
     });
     if (!preSubmitExecution.allowed) {
       const reason = preSubmitExecution.reason ?? "Execution pre-submit guard blocked order";
@@ -3138,7 +3090,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           ? entryShortMomentum <= -0.05 && entryShortFlow <= -0.01
           : true;
     const entryVelocityOk = tradeVelocity >= 0.01;
-    if (!paperRelaxed && (!entryMomentumOk || !entryVelocityOk)) {
+    if (!entryMomentumOk || !entryVelocityOk) {
       const reason = !entryMomentumOk
         ? "Entry momentum/flow teyidi zayif"
         : "Entry trade velocity dusuk";
@@ -3182,7 +3134,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       "analysisId" in smartEntry.details.entryAi
         ? String(smartEntry.details.entryAi.analysisId)
         : undefined;
-    if (!smartEntry.pass && !paperRelaxed) {
+    if (!smartEntry.pass) {
       publishExecutionEvent({
         executionId,
         symbol: executionSymbol,
@@ -3206,22 +3158,16 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         },
       });
     }
-    const paperBlockingCodes = new Set(["ROUTER_SHADOW_ONLY", "NO_ELIGIBLE_STRATEGY", "STRATEGY_CONFLICT"]);
-    const hasPaperBlockingCode = canonicalEntryBlockers.some((row) => paperBlockingCodes.has(row.code));
-    const canonicalVerdict: CanonicalEntryDecision["verdict"] =
-      canonicalEntryBlockers.length === 0
-        ? "ENTER"
-        : paperRelaxed
-          ? hasPaperBlockingCode
-            ? "WAIT"
-            : "ENTER"
-          : "REJECT";
+    const orderedCanonicalBlockers = sortCanonicalBlockers(canonicalEntryBlockers);
+    const canonicalVerdict: CanonicalEntryDecision["verdict"] = resolveCanonicalAdmissionVerdict(
+      orderedCanonicalBlockers.map((row) => row.code),
+    );
     const canonicalEntryDecision: CanonicalEntryDecision = {
       candidateId: canonicalCandidateId,
       symbol: executionSymbol,
       verdict: canonicalVerdict,
-      firstBlocker: canonicalEntryBlockers[0]?.code ?? null,
-      reasonCodes: canonicalEntryBlockers.map((row) => row.code),
+      firstBlocker: orderedCanonicalBlockers[0]?.code ?? null,
+      reasonCodes: orderedCanonicalBlockers.map((row) => row.code),
       qualityComponents: {
         confidence: Number(ai.finalConfidence ?? 0),
         quality: Number(qualityGate.qualityScore ?? 0),
@@ -3229,9 +3175,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         orchestration: Number(orchestration.orchestrationScore ?? 0),
       },
       dataQuality: {
-        status: dataQualityIssues.length > 0 ? "DEGRADED" : "COMPLETE",
-        missing: [],
-        stale: [],
+        status:
+          featureContract.snapshot.missingFeatures.length > 0 || featureContract.snapshot.staleFeatures.length > 0
+            ? "INSUFFICIENT"
+            : dataQualityIssues.length > 0
+              ? "DEGRADED"
+              : "COMPLETE",
+        missing: featureContract.snapshot.missingFeatures,
+        stale: featureContract.snapshot.staleFeatures,
       },
       advisory: {
         aiDecision: ai.finalDecision ?? null,
@@ -3247,7 +3198,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         symbol: executionSymbol,
         stage: "canonical-entry",
         status: "SKIPPED",
-        message: canonicalEntryBlockers[0]?.reason ?? "Canonical entry not entered",
+        message: orderedCanonicalBlockers[0]?.reason ?? "Canonical entry not entered",
         level: "WARN",
         context: canonicalEntryDecision as unknown as Record<string, unknown>,
       });
@@ -3257,12 +3208,47 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         opened: false,
         rejected: true,
         rejectReason:
-          `${canonicalEntryDecision.verdict}:${canonicalEntryBlockers[0]?.code ?? "ENTRY_CONTRACT_NOT_MET"} ${canonicalEntryBlockers[0]?.reason ?? "Canonical entry not entered"}`,
+          `${canonicalEntryDecision.verdict}:${orderedCanonicalBlockers[0]?.code ?? "ENTRY_CONTRACT_NOT_MET"} ${orderedCanonicalBlockers[0]?.reason ?? "Canonical entry not entered"}`,
         symbol: executionSymbol,
         decision: ai.finalDecision,
         details: {
           canonicalEntryDecision,
-          blockers: canonicalEntryBlockers,
+          blockers: orderedCanonicalBlockers,
+        },
+      });
+    }
+    const executionAuthorization = resolveExecutionAuthorization({
+      mode,
+      strategyActivation,
+    });
+    if (executionAuthorization !== "PAPER_ELIGIBLE") {
+      publishExecutionEvent({
+        executionId,
+        symbol: executionSymbol,
+        stage: "execution-authorization",
+        status: "SKIPPED",
+        message: `Execution authorization blocked: ${executionAuthorization}`,
+        level: "WARN",
+        context: {
+          mode,
+          strategyStatus,
+          strategyActivation,
+          executionAuthorization,
+        },
+      });
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: `EXECUTION_AUTHORIZATION:${executionAuthorization}`,
+        symbol: executionSymbol,
+        decision: ai.finalDecision,
+        details: {
+          canonicalEntryDecision,
+          strategyStatus,
+          strategyActivation,
+          executionAuthorization,
         },
       });
     }
@@ -4107,6 +4093,19 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       metadata: {
         mode,
         executionId,
+        executionIntentId: executionId,
+        decisionId: executionId,
+        candidateId: canonicalCandidateId,
+        campaignId: executionIdentity.campaignId,
+        runId: executionIdentity.runId,
+        roundId: executionIdentity.roundId,
+        sessionId: executionIdentity.sessionId,
+        strategyId: selectedStrategyId,
+        strategyPolicyVersion: STRATEGY_POLICY_VERSION,
+        regime: p4Regime.regime,
+        regimePolicyVersion: REGIME_POLICY_VERSION,
+        featureSnapshotId: featureContract.snapshot.snapshotId,
+        sourceType: featureContract.snapshot.sourceType,
         source: "analyze-and-trade",
         aiFinalDecision: aiGate.aiFinalDecision,
         aiConsensusDecision: aiGate.consensusDecision,
@@ -4140,6 +4139,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         rawStatus: placedOrder.status,
         fillStatus: executionTelemetry.fillStatus,
         latencyMs: executionTelemetry.fillTimeMs,
+        decisionId: executionId,
+        candidateId: canonicalCandidateId,
+        strategyId: selectedStrategyId,
+        strategyPolicyVersion: STRATEGY_POLICY_VERSION,
+        regime: p4Regime.regime,
+        regimePolicyVersion: REGIME_POLICY_VERSION,
+        featureSnapshotId: featureContract.snapshot.snapshotId,
+        sourceType: featureContract.snapshot.sourceType,
       },
     });
 
@@ -4184,7 +4191,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       candidate: selected,
       ai,
       decisionId: executionId,
-      candidateId: forensicCandidateId,
+      candidateId: canonicalCandidateId,
       roundId: input.roundId ?? forensicSession?.roundId ?? (typeof selected.context.metadata.roundId === "string" ? selected.context.metadata.roundId : null),
       runId: input.runId ?? forensicSession?.runId ?? (typeof selected.context.metadata.runId === "string" ? selected.context.metadata.runId : null),
       sessionId:
@@ -4224,7 +4231,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         displaySymbol: symbol,
         marketRegime: marketRegime.mode,
         marketRegimeReason: marketRegime.reason,
-        marketRegimeStrategy: marketRegime.strategy,
+        marketRegimeStrategy: selectedStrategyId,
+        strategyId: selectedStrategyId,
+        strategyPolicyVersion: STRATEGY_POLICY_VERSION,
+        regimePolicyVersion: REGIME_POLICY_VERSION,
+        featureSnapshotId: featureContract.snapshot.snapshotId,
+        sourceType: featureContract.snapshot.sourceType,
+        decisionId: executionId,
+        executionIntentId: executionId,
         learningLane,
         requestedLeverage: requestedLeverageSafe,
         requestedQuoteAmountTry: requestedQuoteAmountTry > 0 ? requestedQuoteAmountTry : undefined,
@@ -4393,6 +4407,28 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
 
+    const pr04ExitSnapshot = buildPr04ExitMetadataAtEntry({
+      positionId: position.id,
+      strategyId: selectedStrategyId as StrategyId,
+      entryPolicyVersion: STRATEGY_POLICY_VERSION,
+      entrySignalId: executionId,
+      setupId: forensicCandidateId,
+      takeProfitPercent,
+      invalidation: resolveInvalidationForSelectedStrategy({
+        strategyId: selectedStrategyId as StrategyId,
+        strategyInput: featureContract.strategyInput,
+        regime: p4Regime,
+      }),
+    });
+    bootstrapPr04ExitStateFromEntry({
+      snapshot: pr04ExitSnapshot,
+      side: position.side,
+      entryPrice,
+      quantity: submittedQty,
+      entryFee: fee.estimatedTakerFee,
+      openedAtMs: position.openedAt.getTime(),
+    });
+
     await attachPositionMonitor({
       executionId,
       userId: user.id,
@@ -4401,7 +4437,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       symbol: executionSymbol,
       side: position.side,
       quantity: submittedQty,
-      strategy: marketRegime.strategy,
+      strategy: selectedStrategyId,
       regime: marketRegime.mode,
       openedAt: position.openedAt.toISOString(),
       entryPrice,
@@ -4494,6 +4530,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       symbol: executionSymbol,
       orderId: orderRecord.id,
       positionId: position.id,
+      candidateId: canonicalCandidateId,
+      decisionId: executionId,
+      strategyId: selectedStrategyId,
+      strategyPolicyVersion: STRATEGY_POLICY_VERSION,
+      regime: p4Regime.regime,
+      regimePolicyVersion: REGIME_POLICY_VERSION,
+      featureSnapshotId: featureContract.snapshot.snapshotId,
+      sourceType: featureContract.snapshot.sourceType,
       updatedAt: new Date().toISOString(),
     });
     getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_OPENED", ["PAPER_POSITION_OPENED"]);
@@ -4712,6 +4756,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       details: { ...failure },
     });
   } finally {
+    if (runtimeUserId && claimedExecutionAttemptCandidateId) {
+      await releaseDurableCanonicalExecutionAttempt({
+        userId: runtimeUserId,
+        candidateId: claimedExecutionAttemptCandidateId,
+        executionMode: mode,
+        venue: executionIdentity.venue,
+      }).catch(() => null);
+    }
     markHeartbeat({ service: "execution", status: "UP", message: "Execution flow finished", details: { executionId } });
     if (obsResult) {
       observeDeferredExecutionResult({

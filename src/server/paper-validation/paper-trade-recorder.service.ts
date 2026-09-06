@@ -29,16 +29,21 @@ export async function recordPaperFillEvent(input: {
     },
   });
 
-  const position = !input.positionId && input.executionId && input.side === "SELL"
-    ? await prisma.position.findFirst({
-        where: {
-          userId: input.userId,
-          status: "CLOSED",
-        },
-        orderBy: { updatedAt: "desc" },
+  const linkedPosition = input.positionId
+    ? await prisma.position.findUnique({
+        where: { id: input.positionId },
         include: { tradingPair: true },
       })
-    : null;
+    : !input.positionId && input.executionId && input.side === "SELL"
+      ? await prisma.position.findFirst({
+          where: {
+            userId: input.userId,
+            metadata: { path: ["executionId"], equals: input.executionId },
+          },
+          orderBy: { updatedAt: "desc" },
+          include: { tradingPair: true },
+        })
+      : null;
 
   const decisionLog = input.executionId
     ? await prisma.decisionLog.findFirst({
@@ -63,6 +68,17 @@ export async function recordPaperFillEvent(input: {
   });
 
   const accuracy = computeFillAccuracy(simulation, input.avgFillPrice);
+  const positionMeta = (linkedPosition?.metadata as Record<string, unknown> | null) ?? {};
+  const resolvedStrategy =
+    (typeof positionMeta.strategyId === "string" && positionMeta.strategyId.trim().length > 0
+      ? positionMeta.strategyId
+      : decisionLog?.strategyUsed) ?? undefined;
+  const resolvedRegime =
+    (typeof positionMeta.marketRegime === "string" && positionMeta.marketRegime.trim().length > 0
+      ? positionMeta.marketRegime
+      : decisionLog?.marketState
+        ? String((decisionLog.marketState as Record<string, unknown>).regime ?? "")
+        : undefined) ?? undefined;
 
   if (input.side === "BUY") {
     const trade = await upsertPaperTrade({
@@ -79,12 +95,20 @@ export async function recordPaperFillEvent(input: {
       slippagePct: simulation?.totalSlippagePct ?? 0,
       decisionId: decisionLog?.decisionId,
       executionId: input.executionId,
-      positionId: input.positionId ?? position?.id,
+      positionId: input.positionId ?? linkedPosition?.id,
       simulationId: input.simulationId,
-      strategy: decisionLog?.strategyUsed ?? undefined,
-      marketRegime: decisionLog?.marketState ? String((decisionLog.marketState as Record<string, unknown>).regime ?? "") : undefined,
+      strategy: resolvedStrategy,
+      marketRegime: resolvedRegime,
       scores,
-      metadata: { source: "paper-validation", simulationId: input.simulationId },
+      metadata: {
+        source: "paper-validation",
+        simulationId: input.simulationId,
+        decisionId: decisionLog?.decisionId ?? null,
+        strategyId: resolvedStrategy ?? null,
+        regime: resolvedRegime ?? null,
+        executionId: input.executionId ?? null,
+        candidateId: positionMeta.candidateId ?? null,
+      },
     });
 
     await createPaperExecution({
@@ -114,7 +138,12 @@ export async function recordPaperFillEvent(input: {
   }
 
   const openTrade = await prisma.paperTrade.findFirst({
-    where: { userId: input.userId, symbol: input.symbol, status: "OPEN" },
+    where: {
+      userId: input.userId,
+      status: "OPEN",
+      ...(input.positionId ? { positionId: input.positionId } : { symbol: input.symbol }),
+      ...(input.executionId ? { executionId: input.executionId } : {}),
+    },
     orderBy: { openedAt: "desc" },
   });
 
@@ -125,6 +154,10 @@ export async function recordPaperFillEvent(input: {
   const returnPct = entryPrice > 0 ? ((input.avgFillPrice - entryPrice) / entryPrice) * 100 : 0;
   const holdSec = Math.floor((Date.now() - openTrade.openedAt.getTime()) / 1000);
 
+  const closedQuantity =
+    Number.isFinite(input.executedQty) && input.executedQty > 0
+      ? Math.min(openTrade.quantity, input.executedQty)
+      : openTrade.quantity;
   const closedTrade = await upsertPaperTrade({
     campaignId: input.campaignId ?? openTrade.campaignId ?? undefined,
     tradeKey: openTrade.tradeKey,
@@ -134,7 +167,7 @@ export async function recordPaperFillEvent(input: {
     status: "CLOSED",
     entryPrice: openTrade.entryPrice,
     exitPrice: input.avgFillPrice,
-    quantity: openTrade.quantity,
+    quantity: closedQuantity,
     avgEntryPrice: entryPrice,
     realizedPnl: pnl,
     returnPct,
@@ -147,7 +180,13 @@ export async function recordPaperFillEvent(input: {
     simulationId: input.simulationId,
     scores: { ...scores, exitScore: scores.exitScore },
     closedAt: new Date(),
-    metadata: { closeSimulationId: input.simulationId },
+    metadata: {
+      closeSimulationId: input.simulationId,
+      strategyId: openTrade.strategy ?? resolvedStrategy ?? null,
+      regime: openTrade.marketRegime ?? resolvedRegime ?? null,
+      executionId: input.executionId ?? openTrade.executionId ?? null,
+      positionId: input.positionId ?? openTrade.positionId ?? null,
+    },
   });
 
   await createPaperExecution({

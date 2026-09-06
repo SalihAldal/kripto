@@ -7,6 +7,7 @@ import { evaluateTakeProfitStopLoss } from "@/src/server/execution/tp-sl-evaluat
 import { isExecutionTimedOut } from "@/src/server/execution/timeout-closer";
 import type { PositionCloseReason, TradingMode } from "@/src/server/execution/types";
 import { evaluateSmartExitEngine, type SmartExitEngineState } from "@/src/server/execution/smart-exit-engine.service";
+import { evaluatePr04ExitShadowTick } from "@/src/server/profitability/pr04-exit-bridge";
 import { observeVariantDShadowNonBlocking } from "@/src/server/forensics/variant-d-shadow-observer.service";
 import {
   evaluateExitForOpenPosition,
@@ -446,6 +447,16 @@ export function startPositionMonitor(payload: MonitorPayload) {
         return;
       }
       await payload.onTick?.({ positionId: payload.positionId, markPrice: ticker.price });
+      try {
+        evaluatePr04ExitShadowTick({
+          positionId: payload.positionId,
+          side: payload.side,
+          markPrice: ticker.price,
+          eventAtMs: Date.now(),
+        });
+      } catch {
+        // PR04 shadow evaluation is optional and must not block canonical monitor.
+      }
       emitVariantDShadow({
         baselineExitEligible: false,
         baselineReason: "NONE",

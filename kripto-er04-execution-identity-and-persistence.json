@@ -1,0 +1,150 @@
+{
+  "assessmentId": "ER04-execution-identity-and-persistence",
+  "generatedAt": "2026-09-06T02:10:00.000Z",
+  "scope": "PROMPT_4_OF_7",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2",
+      "diskFreeGb": 477.68
+    }
+  },
+  "dependencyCheck": {
+    "er03ContractsVerified": true,
+    "er01TelemetryContractVerified": true,
+    "er02FeatureContractVerified": true,
+    "liveDisabledPathStillBlockedBeforeSubmit": true
+  },
+  "fixes": [
+    {
+      "id": "ER04-A",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/execution-orchestrator.service.ts"
+      ],
+      "summary": "Authoritative selectedStrategyId and identity metadata now persist across order/execution/position/monitor."
+    },
+    {
+      "id": "ER04-B",
+      "status": "FIXED",
+      "files": [
+        "src/server/hot-path/execution-attempt-lock.service.ts",
+        "src/server/execution/execution-orchestrator.service.ts"
+      ],
+      "summary": "Durable DB-backed execution attempt lock added and wired into orchestrator."
+    },
+    {
+      "id": "ER04-C",
+      "status": "FIXED",
+      "files": [
+        "src/server/paper-validation/paper-trade-recorder.service.ts",
+        "src/server/execution/paper-close-persistence.service.ts"
+      ],
+      "summary": "Paper close persistence now resolves OPEN trades by position/execution identity and preserves executed quantity."
+    },
+    {
+      "id": "ER04-D",
+      "status": "BLOCKED",
+      "summary": "Real DB integration evidence blocked by unreachable PostgreSQL and unavailable Docker daemon."
+    }
+  ],
+  "checks": [
+    {
+      "checkId": "er04-focused-suite-run-1",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p0-paper-persistence.test.ts tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "er04-focused-suite-run-2",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p0-paper-persistence.test.ts tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "er04-focused-suite-run-3",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p0-paper-persistence.test.ts tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "consumer-regressions",
+      "required": true,
+      "status": "PARTIAL",
+      "command": "npm run test:run -- tests/phase01-core-reset.test.ts tests/phase06-paper-production.test.ts tests/p0-paper-close-persistence.test.ts tests/execution-settlement.integration.test.ts",
+      "exitCode": 1,
+      "details": "First three suites passed; execution-settlement integration timed out with localhost:5432 connectivity failures."
+    },
+    {
+      "checkId": "db-validation-smoke",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/forensics/db-validation-smoke.integration.test.ts",
+      "exitCode": 1,
+      "details": "Prisma cannot reach localhost:5432."
+    },
+    {
+      "checkId": "docker-daemon-check",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "docker ps -a --filter name=kripto-er04-db --format {{.ID}}",
+      "exitCode": 1,
+      "details": "Docker daemon pipe dockerDesktopLinuxEngine unavailable."
+    },
+    {
+      "checkId": "typecheck",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run build",
+      "exitCode": 0
+    }
+  ],
+  "safety": {
+    "paperCampaignStarted": false,
+    "autoRoundStarted": false,
+    "liveTradingStarted": false,
+    "exchangeOrderSent": false,
+    "productionDbMutationPerformed": false
+  },
+  "assessment": {
+    "PHASE4_VERDICT": "PARTIAL",
+    "REAL_PERSISTENCE_VERDICT": "BLOCKED",
+    "LATE_FILL_RECONCILIATION_VERDICT": "PARTIAL",
+    "STRATEGY_IDENTITY_CHAIN_VERDICT": "PARTIAL",
+    "OVERALL_ENGINEERING_READINESS": "PARTIAL",
+    "NEXT_PAPER_PREFLIGHT": "NO_GO",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED"
+  },
+  "openBlockers": [
+    {
+      "id": "ER04-D",
+      "severity": "P0",
+      "reason": "No reachable disposable PostgreSQL runtime in current environment."
+    },
+    {
+      "id": "ER04-E",
+      "severity": "P1",
+      "reason": "Settlement integration path still depends on DB-backed side repositories in tests."
+    }
+  ],
+  "prompt5Handoff": {
+    "identityMetadataEnriched": true,
+    "durableLockPresent": true,
+    "staleLeaseReclaimPending": true,
+    "fullLifecycleRealDbEvidencePending": true,
+    "lateFillAndCrashMatrixPending": true
+  }
+}

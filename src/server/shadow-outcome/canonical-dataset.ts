@@ -1,4 +1,6 @@
 import type { HorizonOutcome, OutcomeHorizonMin, PriceSource, TrackedCandidate } from "@/src/server/shadow-outcome/types";
+import { OUTCOME_HORIZONS_MIN } from "@/src/server/shadow-outcome/types";
+import { computeOneHorizon, type PricePoint } from "@/src/server/shadow-outcome/metrics";
 
 export type CanonicalSourceType = "LIVE_MARKET" | "RECORDED_REPLAY" | "SYNTHETIC_FIXTURE";
 
@@ -38,23 +40,28 @@ export type CandidateOutcomeHorizon = {
   datasetId: string;
   candidateId: string;
   horizonMinutes: OutcomeHorizonMin;
-  baselineStage: "FIRST_DETECTED" | "HOT" | "MICRO_CONFIRMED" | "EXECUTION_READY" | "CANONICAL_ENTER";
+  baselineStage: "FIRST_DETECTED" | "HOT" | "MICRO_CONFIRMED" | "EXECUTION_READY" | "CANONICAL_ENTER" | "EXECUTION_FILL";
   baselineAt: string;
   baselinePrice: number;
   horizonEndAt: string;
   lastObservedAt: string;
-  mfePercent: number;
-  maePercent: number;
-  endReturnPercent: number;
+  mfePercent: number | null;
+  maePercent: number | null;
+  endReturnPercent: number | null;
   timeToMfeMs: number | null;
   timeToMaeMs: number | null;
-  peakPrice: number;
-  troughPrice: number;
+  peakPrice: number | null;
+  troughPrice: number | null;
   observedTicks: number;
   maxGapMs: number;
   quality: "OK" | "INCOMPLETE" | "INVALID";
+  status: HorizonOutcome["status"];
+  invalidReason?: string | null;
   final: boolean;
 };
+
+const DEFAULT_GAP_MS = 120_000;
+const BASELINE_PRICE_MAX_AGE_MS = 120_000;
 
 export function mapCanonicalSourceType(source: PriceSource): CanonicalSourceType {
   if (source === "replay") return "RECORDED_REPLAY";
@@ -74,13 +81,13 @@ export function buildCanonicalCandidateObservation(input: {
   venue?: string;
 }): CanonicalCandidateObservation {
   const prev = input.previous ?? null;
-  const firstDetectedAtIso = prev?.firstDetectedAt ?? toIso(input.tracked.snapshot.firstDetectedAt);
-  const firstDetectedPrice = prev?.firstDetectedPrice ?? input.tracked.snapshot.firstDetectionPrice;
-  const firstScore = prev?.firstScore ?? toNum(input.tracked.snapshot.opportunityScore);
-  const firstRank = prev?.firstRank ?? input.tracked.snapshot.initialRank ?? null;
-  const marketEventAt = prev?.marketEventAt ?? firstDetectedAtIso;
-  const sourceType = prev?.sourceType ?? mapCanonicalSourceType(input.tracked.snapshot.source);
-  const inputSnapshotId = prev?.inputSnapshotId ?? input.inputSnapshotId;
+  const firstDetectedAtIso = prev ? prev.firstDetectedAt : toIso(input.tracked.snapshot.firstDetectedAt);
+  const firstDetectedPrice = prev ? prev.firstDetectedPrice : input.tracked.snapshot.firstDetectionPrice;
+  const firstScore = prev ? prev.firstScore : toNum(input.tracked.snapshot.opportunityScore);
+  const firstRank = prev ? prev.firstRank : input.tracked.snapshot.initialRank ?? null;
+  const marketEventAt = prev ? prev.marketEventAt : firstDetectedAtIso;
+  const sourceType = prev ? prev.sourceType : mapCanonicalSourceType(input.tracked.snapshot.source);
+  const inputSnapshotId = prev ? prev.inputSnapshotId : input.inputSnapshotId;
 
   const terminalStage = resolveTerminalStage(input.tracked.latestStage);
   const dataQuality = resolveObservationQuality(input.tracked, terminalStage);
@@ -118,100 +125,32 @@ export function buildCanonicalCandidateObservation(input: {
   };
 }
 
-export function buildOutcomeHorizonRows(input: {
-  datasetId: string;
-  tracked: TrackedCandidate;
-  baselineStage: CandidateOutcomeHorizon["baselineStage"];
-}): CandidateOutcomeHorizon[] {
-  const baselineAtMs = resolveBaselineMs(input.tracked, input.baselineStage);
-  const baselinePrice = resolveBaselinePrice(input.tracked, input.baselineStage);
-  if (baselineAtMs == null || baselinePrice == null || !Number.isFinite(baselinePrice) || baselinePrice <= 0) return [];
-  const points = input.tracked.pricePoints.filter((row) => row.t >= baselineAtMs).sort((a, b) => a.t - b.t);
-  const lastObservedAt = points.length ? points[points.length - 1]!.t : baselineAtMs;
-  const maxGapMs = computeMaxGap(points);
-  const peak = points.reduce((acc, row) => Math.max(acc, row.high ?? row.price), baselinePrice);
-  const trough = points.reduce((acc, row) => Math.min(acc, row.low ?? row.price), baselinePrice);
-
-  return input.tracked.outcomes.map((out) => toOutcomeRow({
-    datasetId: input.datasetId,
-    candidateId: input.tracked.snapshot.candidateId,
-    baselineAtMs,
-    baselinePrice,
-    lastObservedAt,
-    maxGapMs,
-    peak,
-    trough,
-    out,
-    observedTicks: points.length,
-    baselineStage: input.baselineStage,
-  }));
-}
-
-function toOutcomeRow(input: {
-  datasetId: string;
-  candidateId: string;
-  baselineAtMs: number;
-  baselinePrice: number;
-  lastObservedAt: number;
-  maxGapMs: number;
-  peak: number;
-  trough: number;
-  out: HorizonOutcome;
-  observedTicks: number;
-  baselineStage: CandidateOutcomeHorizon["baselineStage"];
-}): CandidateOutcomeHorizon {
-  const horizonEndAtMs = input.baselineAtMs + input.out.horizonMin * 60_000;
-  const final = input.out.status !== "PENDING";
-  const quality: CandidateOutcomeHorizon["quality"] =
-    input.out.status === "INVALID_DATA" || input.out.status === "HISTORY_UNAVAILABLE"
-      ? "INVALID"
-      : input.out.quality === "OUTCOME_DATA_INCOMPLETE"
-        ? "INCOMPLETE"
-        : "OK";
-  return {
-    datasetId: input.datasetId,
-    candidateId: input.candidateId,
-    horizonMinutes: input.out.horizonMin,
-    baselineStage: input.baselineStage,
-    baselineAt: toIso(input.baselineAtMs),
-    baselinePrice: input.baselinePrice,
-    horizonEndAt: toIso(horizonEndAtMs),
-    lastObservedAt: toIso(input.lastObservedAt),
-    mfePercent: input.out.mfePct ?? 0,
-    maePercent: input.out.maePct ?? 0,
-    endReturnPercent: input.out.returnPct ?? 0,
-    timeToMfeMs: input.out.timeToMfeMs,
-    timeToMaeMs: null,
-    peakPrice: input.peak,
-    troughPrice: input.trough,
-    observedTicks: input.observedTicks,
-    maxGapMs: input.maxGapMs,
-    quality,
-    final,
-  };
-}
-
 function resolveBaselineMs(tracked: TrackedCandidate, baseline: CandidateOutcomeHorizon["baselineStage"]): number | null {
   if (baseline === "FIRST_DETECTED") return tracked.snapshot.firstDetectedAt;
   if (baseline === "HOT") return tracked.hotAt;
   if (baseline === "MICRO_CONFIRMED") return tracked.microConfirmedAt;
   if (baseline === "EXECUTION_READY") return tracked.executionReadyAt;
+  if (baseline === "EXECUTION_FILL") return fromIsoOrNull(stageAt(tracked, "PAPER_OPENED"));
   return fromIsoOrNull(stageAt(tracked, "CANONICAL_ENTER"));
 }
 
 function resolveBaselinePrice(tracked: TrackedCandidate, baseline: CandidateOutcomeHorizon["baselineStage"]): number | null {
   if (baseline === "FIRST_DETECTED") return tracked.snapshot.firstDetectionPrice;
-  if (baseline === "HOT") return priceAt(tracked, tracked.hotAt);
-  if (baseline === "MICRO_CONFIRMED") return priceAt(tracked, tracked.microConfirmedAt);
-  if (baseline === "EXECUTION_READY") return priceAt(tracked, tracked.executionReadyAt);
+  if (baseline === "HOT") return priceAt(tracked, tracked.hotAt, BASELINE_PRICE_MAX_AGE_MS);
+  if (baseline === "MICRO_CONFIRMED") return priceAt(tracked, tracked.microConfirmedAt, BASELINE_PRICE_MAX_AGE_MS);
+  if (baseline === "EXECUTION_READY") return priceAt(tracked, tracked.executionReadyAt, BASELINE_PRICE_MAX_AGE_MS);
+  if (baseline === "EXECUTION_FILL") return stagePrice(tracked, "PAPER_OPENED");
   return stagePrice(tracked, "CANONICAL_ENTER");
 }
 
 function resolveObservationQuality(tracked: TrackedCandidate, terminalStage: string | null): CanonicalCandidateObservation["dataQuality"] {
   if (tracked.invalidReason) return "INVALID";
-  if (terminalStage === "OPEN" || terminalStage === "CLOSED") return "COMPLETE_OK";
-  if (terminalStage === "REJECTED") return "INCOMPLETE";
-  return "PENDING";
+  const outcomes = tracked.outcomes ?? [];
+  if (!outcomes.length) return terminalStage === "REJECTED" ? "INCOMPLETE" : "PENDING";
+  const statuses = outcomes.map((row) => row.status);
+  if (statuses.some((row) => row === "PENDING")) return "PENDING";
+  if (statuses.every((row) => row === "COMPLETE")) return "COMPLETE_OK";
+  return "INCOMPLETE";
 }
 
 function resolveTerminalStage(latestStage: string): string | null {
@@ -239,18 +178,97 @@ function stagePrice(tracked: TrackedCandidate, stage: string): number | null {
   return event ? priceAt(tracked, event.at) : null;
 }
 
-function priceAt(tracked: TrackedCandidate, at: number | null): number | null {
+function priceAt(tracked: TrackedCandidate, at: number | null, maxAgeMs = Number.POSITIVE_INFINITY): number | null {
   if (at == null) return null;
   const point = [...tracked.pricePoints].reverse().find((row) => row.t <= at);
-  return point?.price ?? null;
+  if (!point) return null;
+  if (at - point.t > maxAgeMs) return null;
+  return point.price;
 }
 
-function computeMaxGap(points: Array<{ t: number }>): number {
-  let max = 0;
-  for (let i = 1; i < points.length; i += 1) {
-    max = Math.max(max, points[i]!.t - points[i - 1]!.t);
+function toWindowStats(points: PricePoint[], baselineAtMs: number, horizonEndAtMs: number) {
+  const window = points
+    .filter((row) => row.t >= baselineAtMs && row.t <= horizonEndAtMs)
+    .sort((a, b) => a.t - b.t);
+  const observedTicks = window.length;
+  const lastObservedAtMs = window.length ? window[window.length - 1]!.t : baselineAtMs;
+  let maxGapMs = 0;
+  if (window.length > 0) {
+    maxGapMs = Math.max(maxGapMs, window[0]!.t - baselineAtMs);
   }
-  return max;
+  for (let i = 1; i < window.length; i += 1) {
+    maxGapMs = Math.max(maxGapMs, window[i]!.t - window[i - 1]!.t);
+  }
+  const peakPrice = window.reduce<number | null>(
+    (acc, row) => {
+      const high = row.high ?? row.price;
+      return acc == null ? high : Math.max(acc, high);
+    },
+    null,
+  );
+  const troughPrice = window.reduce<number | null>(
+    (acc, row) => {
+      const low = row.low ?? row.price;
+      return acc == null ? low : Math.min(acc, low);
+    },
+    null,
+  );
+  return { window, observedTicks, lastObservedAtMs, maxGapMs, peakPrice, troughPrice };
+}
+
+export function buildOutcomeHorizonRows(input: {
+  datasetId: string;
+  tracked: TrackedCandidate;
+  baselineStage: CandidateOutcomeHorizon["baselineStage"];
+  nowMs?: number;
+}): CandidateOutcomeHorizon[] {
+  const baselineAtMs = resolveBaselineMs(input.tracked, input.baselineStage);
+  const baselinePrice = resolveBaselinePrice(input.tracked, input.baselineStage);
+  if (baselineAtMs == null || baselinePrice == null || !Number.isFinite(baselinePrice) || baselinePrice <= 0) return [];
+  const points = [...input.tracked.pricePoints].sort((a, b) => a.t - b.t);
+  const nowMs = input.nowMs ?? Date.now();
+  return OUTCOME_HORIZONS_MIN.map((horizonMin) => {
+    const horizonEndAtMs = baselineAtMs + horizonMin * 60_000;
+    const out = computeOneHorizon({
+      detectedAt: baselineAtMs,
+      detectionPrice: baselinePrice,
+      points,
+      now: nowMs,
+      gapMs: DEFAULT_GAP_MS,
+      horizonMin,
+      lookaheadSafe: true,
+    });
+    const quality: CandidateOutcomeHorizon["quality"] =
+      out.status === "INVALID_DATA" || out.status === "HISTORY_UNAVAILABLE"
+        ? "INVALID"
+        : out.quality === "OUTCOME_DATA_INCOMPLETE"
+          ? "INCOMPLETE"
+          : "OK";
+    const stats = toWindowStats(points, baselineAtMs, horizonEndAtMs);
+    return {
+      datasetId: input.datasetId,
+      candidateId: input.tracked.snapshot.candidateId,
+      horizonMinutes: horizonMin,
+      baselineStage: input.baselineStage,
+      baselineAt: toIso(baselineAtMs),
+      baselinePrice,
+      horizonEndAt: toIso(horizonEndAtMs),
+      lastObservedAt: toIso(stats.lastObservedAtMs),
+      mfePercent: out.mfePct,
+      maePercent: out.maePct,
+      endReturnPercent: out.returnPct,
+      timeToMfeMs: out.timeToMfeMs,
+      timeToMaeMs: out.timeToMaeMs ?? null,
+      peakPrice: stats.peakPrice,
+      troughPrice: stats.troughPrice,
+      observedTicks: stats.observedTicks,
+      maxGapMs: stats.maxGapMs,
+      quality,
+      status: out.status,
+      invalidReason: out.invalidReason ?? null,
+      final: out.status !== "PENDING",
+    };
+  });
 }
 
 function toIso(ms: number): string {

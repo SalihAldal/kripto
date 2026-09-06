@@ -31,6 +31,7 @@ export function computeOneHorizon(input: {
 }): HorizonOutcome {
   const end = input.detectedAt + input.horizonMin * 60_000;
   const matured = input.now >= end;
+  const endPriceMaxAgeMs = Math.max(1_000, Math.min(120_000, input.gapMs));
   const window = input.points
     .filter((row) => {
       if (row.t < input.detectedAt) return false;
@@ -47,6 +48,7 @@ export function computeOneHorizon(input: {
       maePct: null,
       returnPct: null,
       timeToMfeMs: null,
+        timeToMaeMs: null,
       complete: status !== "PENDING",
       quality: matured ? "HISTORY_UNAVAILABLE" : "OUTCOME_DATA_INCOMPLETE",
       status,
@@ -56,6 +58,7 @@ export function computeOneHorizon(input: {
   let high = window[0].high ?? window[0].price;
   let low = window[0].low ?? window[0].price;
   let highAt = window[0].t;
+  let lowAt = window[0].t;
   let prevT = window[0].t;
   let gapped = false;
   for (const row of window) {
@@ -67,11 +70,29 @@ export function computeOneHorizon(input: {
       high = h;
       highAt = row.t;
     }
-    if (l < low) low = l;
+    if (l < low) {
+      low = l;
+      lowAt = row.t;
+    }
   }
   const last = window[window.length - 1];
-  const complete = last.t >= end - 1_000 || matured;
+  const endCoverageGapMs = Math.max(0, end - last.t);
+  const complete = matured && endCoverageGapMs <= endPriceMaxAgeMs;
   const quality = gapped ? "OUTCOME_DATA_INCOMPLETE" : "OK";
+  if (matured && !complete) {
+    return {
+      horizonMin: input.horizonMin,
+      mfePct: null,
+      maePct: null,
+      returnPct: null,
+      timeToMfeMs: null,
+      timeToMaeMs: null,
+      complete: true,
+      quality: "OUTCOME_DATA_INCOMPLETE",
+      status: "INVALID_DATA",
+      invalidReason: "HORIZON_END_PRICE_STALE",
+    };
+  }
   if (quality === "OUTCOME_DATA_INCOMPLETE") {
     const status = complete ? "INVALID_DATA" : "PENDING";
     return {
@@ -80,6 +101,7 @@ export function computeOneHorizon(input: {
       maePct: null,
       returnPct: null,
       timeToMfeMs: null,
+      timeToMaeMs: null,
       complete: status !== "PENDING",
       quality,
       status,
@@ -92,6 +114,7 @@ export function computeOneHorizon(input: {
     maePct: pctChange(input.detectionPrice, low),
     returnPct: pctChange(input.detectionPrice, last.price),
     timeToMfeMs: highAt - input.detectedAt,
+    timeToMaeMs: lowAt - input.detectedAt,
     complete,
     quality,
     status: complete ? "COMPLETE" : "PENDING",

@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "pr04-exit-and-position-management-v1",
+  "policyVersion": "pr04-exit-and-position-management-v1",
+  "generatedAt": "2026-09-06T12:53:00.000+03:00",
+  "headCommit": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+  "worktreeStatus": "DIRTY",
+  "verdicts": {
+    "PROMPT10_ENGINEERING_VERDICT": "PARTIAL",
+    "EXIT_POLICY_CONTRACT_VERDICT": "PASS",
+    "STRUCTURAL_STOP_VERDICT": "PASS",
+    "TRAILING_CAUSALITY_VERDICT": "PASS",
+    "PARTIAL_EXIT_ACCOUNTING_VERDICT": "PASS",
+    "EXIT_IDEMPOTENCY_AND_RECOVERY_VERDICT": "PARTIAL",
+    "MATCHED_ENTRY_REPLAY_VERDICT": "PASS",
+    "MARKET_BEHAVIOR_ANALYSIS": "NOT_RUN",
+    "PROFITABILITY_EVIDENCE": "NOT_ESTABLISHED",
+    "EXIT_POLICY_WINNER": "NOT_SELECTED",
+    "STRATEGY_PROMOTION": "NOT_EVALUATED",
+    "OVERALL_QA_STATUS": "QA_PENDING",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED"
+  },
+  "exitPolicies": {
+    "BASELINE_FIXED_TP_SL": {
+      "activeDefault": true,
+      "experimentalDefault": false,
+      "structuralStop": false,
+      "trailing": false,
+      "partialLegs": 0,
+      "timeExitMs": null
+    },
+    "STRUCTURAL_STOP_TARGET": {
+      "activeDefault": false,
+      "experimentalDefault": true,
+      "structuralStop": true,
+      "trailing": false,
+      "partialLegs": 0,
+      "timeExitMs": null
+    },
+    "STRUCTURAL_STOP_TRAIL": {
+      "activeDefault": false,
+      "experimentalDefault": true,
+      "structuralStop": true,
+      "trailing": true,
+      "trailingActivationPct": 1.2,
+      "trailingGapPct": 0.45,
+      "partialLegs": 0,
+      "timeExitMs": null
+    },
+    "STRUCTURAL_PARTIAL_TRAIL": {
+      "activeDefault": false,
+      "experimentalDefault": true,
+      "structuralStop": true,
+      "trailing": true,
+      "trailingActivationPct": 1.5,
+      "trailingGapPct": 0.4,
+      "partialLegs": 1,
+      "timeExitMs": null
+    },
+    "STRUCTURAL_TIME_DECAY": {
+      "activeDefault": false,
+      "experimentalDefault": true,
+      "structuralStop": true,
+      "trailing": false,
+      "partialLegs": 0,
+      "timeExitMs": 5400000
+    }
+  },
+  "modules": [
+    "pr04-types.ts",
+    "pr04-policy-registry.ts",
+    "pr04-structural-stop.ts",
+    "pr04-trailing.ts",
+    "pr04-partial-exit.ts",
+    "pr04-time-exit.ts",
+    "pr04-exit-coordinator.ts",
+    "pr04-pnl-accounting.ts",
+    "pr04-exit-evaluator.ts",
+    "pr04-matched-entry-manifest.ts",
+    "pr04-replay.ts",
+    "pr04-exit-bridge.ts"
+  ],
+  "productionHooks": {
+    "orchestrator": "src/server/execution/execution-orchestrator.service.ts#buildPr04ExitMetadataAtEntry",
+    "monitor": "src/server/execution/position-monitor.service.ts#evaluatePr04ExitShadowTick",
+    "envGate": "EXECUTION_PR04_EXIT_EVAL_ENABLED",
+    "envGateDefault": false
+  },
+  "metrics": {
+    "pr04TestsPass": 45,
+    "pr04TestsRuns": 3,
+    "regressionBundlePass": 169,
+    "exitPolicyVariants": 5,
+    "paperTrades": 0,
+    "liveTrades": 0
+  },
+  "tests": [
+    {
+      "command": "npm run test:run -- tests/pr04-exit-and-position-management.test.ts",
+      "runs": 3,
+      "exitCode": 0,
+      "passed": 45,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:run -- tests/er02-feature-contract-and-router-input.test.ts tests/er03-canonical-policy.test.ts tests/er04-durable-execution-attempt-lock.test.ts tests/er05-canonical-dataset-persistence.test.ts tests/pr01-opportunity-universe-and-net-economics.test.ts tests/pr02-early-acceleration.test.ts tests/pr03-momentum-and-retest.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": 169,
+      "failed": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "command": "npm run build",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": true,
+      "note": "Turbopack broad-pattern warnings only; ~9.5min total"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "PR04-DATA-01",
+      "severity": "P0",
+      "status": "OPEN",
+      "reason": "No recorded market dataset for exit policy comparison"
+    },
+    {
+      "id": "PR04-PERSIST-01",
+      "severity": "P1",
+      "status": "OPEN",
+      "reason": "Exit policy state in-memory only; no durable restore"
+    },
+    {
+      "id": "PR04-SETTLE-01",
+      "severity": "P1",
+      "status": "OPEN",
+      "reason": "Partial close not wired to canonical settlement path"
+    },
+    {
+      "id": "PR04-INVALID-01",
+      "severity": "P1",
+      "status": "OPEN",
+      "reason": "Orchestrator entry passes invalidation:null pending evaluator handoff"
+    },
+    {
+      "id": "ER06-A",
+      "severity": "P0",
+      "status": "BLOCKED",
+      "reason": "Disposable PostgreSQL unavailable"
+    }
+  ],
+  "handoff": {
+    "prompt11": {
+      "manifest": "src/server/profitability/pr04-matched-entry-manifest.ts",
+      "replay": "src/server/profitability/pr04-replay.ts",
+      "policyRegistry": "src/server/profitability/pr04-policy-registry.ts",
+      "experimentId": "pr04-exit-and-position-management-v1",
+      "report": "KRIPTO_PR04_EXIT_AND_POSITION_MANAGEMENT_REPORT.md",
+      "json": "kripto-pr04-exit-and-position-management.json"
+    }
+  }
+}

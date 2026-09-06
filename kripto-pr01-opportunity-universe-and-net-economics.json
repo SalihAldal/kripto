@@ -1,0 +1,169 @@
+{
+  "assessmentId": "PR01-opportunity-universe-and-net-economics",
+  "generatedAt": "2026-09-06T08:50:00.000+03:00",
+  "scope": "PROMPT_7_OF_12",
+  "planRevision": {
+    "previousPhase7": "Independent heavy QA",
+    "currentPhase7": "Tradeable opportunity universe, detection latency, net economics",
+    "generalQaMovedTo": "PROMPT_12"
+  },
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "worktreeFingerprintSha256": "03dc720902e9330a7bb06bcb652c242015c9f1730fbb9ad8d31775b1dcd7dc13",
+    "worktreeChangedPathCount": 48,
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2"
+    }
+  },
+  "schemas": {
+    "pr01SchemaVersion": "pr01-opportunity-universe-v1",
+    "pr01PolicyVersion": "pr01-net-economics-v1",
+    "featureContractSchemaVersion": "er02-feature-contract-v1",
+    "datasetSchemaVersion": "er05-dataset-v1"
+  },
+  "dependencyMatrix": {
+    "ER01": { "status": "VERIFIED_TEST", "openBlockers": [] },
+    "ER02": { "status": "VERIFIED_TEST", "openBlockers": [] },
+    "ER03": { "status": "VERIFIED_TEST", "openBlockers": [] },
+    "ER04": { "status": "PARTIAL", "openBlockers": ["ER06-A"] },
+    "ER05": { "status": "VERIFIED_TEST", "openBlockers": ["ER06-A"] },
+    "ER06": { "status": "PARTIAL", "openBlockers": ["ER06-A", "ER06-B"], "boundedSmoke": "NOT_RUN" }
+  },
+  "implementedModules": [
+    "src/server/profitability/pr01-universe.ts",
+    "src/server/profitability/pr01-opportunity-inventory.ts",
+    "src/server/profitability/pr01-latency.ts",
+    "src/server/profitability/pr01-economics.ts",
+    "src/server/profitability/pr01-analysis.ts",
+    "src/server/profitability/experiment-registry.ts"
+  ],
+  "checks": [
+    {
+      "checkId": "pr01-focused-suite",
+      "status": "PASS",
+      "command": "npm run test:run -- tests/pr01-opportunity-universe-and-net-economics.test.ts",
+      "exitCode": 0,
+      "details": "39/39 PASS"
+    },
+    {
+      "checkId": "pr01-focused-suite-repeat-1",
+      "status": "PASS",
+      "command": "cmd /c for /l %i in (1,1,3) do npm run test:run -- tests/pr01-opportunity-universe-and-net-economics.test.ts",
+      "exitCode": 0,
+      "details": "run 1/3 PASS"
+    },
+    {
+      "checkId": "pr01-focused-suite-repeat-2",
+      "status": "PASS",
+      "command": "cmd /c for /l %i in (1,1,3) do npm run test:run -- tests/pr01-opportunity-universe-and-net-economics.test.ts",
+      "exitCode": 0,
+      "details": "run 2/3 PASS"
+    },
+    {
+      "checkId": "pr01-focused-suite-repeat-3",
+      "status": "PASS",
+      "command": "cmd /c for /l %i in (1,1,3) do npm run test:run -- tests/pr01-opportunity-universe-and-net-economics.test.ts",
+      "exitCode": 0,
+      "details": "run 3/3 PASS"
+    },
+    {
+      "checkId": "er01-er06-regression",
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er01-telemetry-verdict.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er03-canonical-policy.test.ts tests/er04-durable-execution-attempt-lock.test.ts tests/phase05-shadow-outcome.test.ts tests/er05-canonical-dataset-persistence.test.ts tests/er06-assessment-renderer.test.ts",
+      "exitCode": 0,
+      "details": "97/97 PASS"
+    },
+    {
+      "checkId": "typecheck",
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build",
+      "status": "PASS",
+      "command": "npm run build",
+      "exitCode": 0,
+      "details": "Completed with Turbopack tracing warnings"
+    },
+    {
+      "checkId": "offline-market-analysis",
+      "status": "NOT_RUN",
+      "reason": "No provenance-recorded market dataset available in this environment"
+    }
+  ],
+  "marketDataUsage": {
+    "recordedDataUsed": false,
+    "syntheticFixtureUsedForContractTestsOnly": true,
+    "requiredDataSourcesIfBlocked": [
+      "recorded tick/book history with availableAt",
+      "historical listing/delist metadata per venue",
+      "disposable PostgreSQL for ER04 realized-net joins"
+    ]
+  },
+  "experimentRegistry": {
+    "baselineExperimentId": "pr01-opportunity-universe-v1",
+    "status": "PLANNED",
+    "variantCount": 0
+  },
+  "openBlockers": [
+    {
+      "id": "PR01-DATA-01",
+      "severity": "P0",
+      "reason": "Recorded market dataset unavailable; MARKET_ANALYSIS_RESULT remains NOT_RUN"
+    },
+    {
+      "id": "ER06-A",
+      "severity": "P0",
+      "reason": "Disposable PostgreSQL unavailable for authoritative settlement joins"
+    },
+    {
+      "id": "PR01-DATA-02",
+      "severity": "P1",
+      "reason": "Historical venue/listing metadata missing for full point-in-time universe"
+    }
+  ],
+  "verdicts": {
+    "PROMPT7_ENGINEERING_VERDICT": "PARTIAL",
+    "UNIVERSE_COVERAGE_VERDICT": "PARTIAL",
+    "OPPORTUNITY_ATTRIBUTION_VERDICT": "PARTIAL",
+    "COST_MODEL_CORRECTNESS_VERDICT": "PASS",
+    "MARKET_ANALYSIS_RESULT": "NOT_RUN",
+    "EXPECTANCY_EVIDENCE_STATUS": "NOT_EVALUATED",
+    "OVERALL_QA_STATUS": "QA_PENDING",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "STRATEGY_PROMOTION": "NOT_EVALUATED"
+  },
+  "safety": {
+    "paperCampaignStarted": false,
+    "autoRoundStarted": false,
+    "liveTradingStarted": false,
+    "exchangeOrderSent": false,
+    "productionDbMutationPerformed": false,
+    "admissionGateModified": false,
+    "strategyThresholdsRelaxed": false
+  },
+  "evidenceArtifacts": {
+    "report": "KRIPTO_PR01_OPPORTUNITY_UNIVERSE_AND_NET_ECONOMICS_REPORT.md",
+    "forensicsDir": "artifacts/forensics/pr01-assessment-20260906T085600+0300",
+    "runtimeFingerprint": "artifacts/forensics/pr01-assessment-20260906T085600+0300/runtime-fingerprint.redacted.json",
+    "commandEvidence": "artifacts/forensics/pr01-assessment-20260906T085600+0300/command-evidence.redacted.json"
+  },
+  "prompt8Handoff": {
+    "readyContracts": [
+      "latency timeline segments",
+      "post-detection remaining move buckets",
+      "MOVER_SPECS versioned move buckets",
+      "trade economics separation (cost/viability/expectancy/realized)"
+    ],
+    "missingDataForEarlyStrategy": [
+      "recorded microstructure acceleration features",
+      "historical causal threshold crossing archive",
+      "realized-net settlement joins on disposable DB"
+    ]
+  }
+}

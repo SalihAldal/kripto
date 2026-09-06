@@ -1,0 +1,86 @@
+{
+  "assessmentId": "PR02-early-acceleration-implementation",
+  "generatedAt": "2026-09-06T09:40:00.000+03:00",
+  "scope": "PROMPT_8_OF_12",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "runtime": { "nodeVersion": "v24.13.0", "npmVersion": "11.6.2" }
+  },
+  "schemas": {
+    "pr02SchemaVersion": "pr02-early-acceleration-v1",
+    "pr02PolicyVersion": "pr02-early-acceleration-v1",
+    "featureContractSchemaVersion": "er02-feature-contract-v1",
+    "datasetSchemaVersion": "er05-dataset-v1"
+  },
+  "dependencyMatrix": {
+    "PR01": { "status": "VERIFIED_TEST", "openBlockers": ["PR01-DATA-01"] },
+    "ER02": { "status": "VERIFIED_TEST", "openBlockers": [] },
+    "ER03": { "status": "VERIFIED_TEST", "openBlockers": [] },
+    "ER04": { "status": "PARTIAL", "openBlockers": ["ER06-A"] },
+    "ER05": { "status": "PARTIAL", "openBlockers": ["PR02-DATA-01"] },
+    "ER06": { "status": "PARTIAL", "openBlockers": ["ER06-A", "ER06-B"] }
+  },
+  "implementedModules": [
+    "src/server/profitability/pr02-types.ts",
+    "src/server/profitability/pr02-early-features.ts",
+    "src/server/profitability/pr02-early-setup.ts",
+    "src/server/profitability/pr02-early-evaluator.ts",
+    "src/server/profitability/pr02-early-replay.ts",
+    "src/server/forensics/p4-regime-strategy-shadow.ts"
+  ],
+  "checks": [
+    { "checkId": "pr02-focused-suite", "status": "PASS", "exitCode": 0, "details": "38/38 PASS" },
+    { "checkId": "pr02-focused-suite-repeat-1", "status": "PASS", "exitCode": 0 },
+    { "checkId": "pr02-focused-suite-repeat-2", "status": "PASS", "exitCode": 0 },
+    { "checkId": "pr02-focused-suite-repeat-3", "status": "PASS", "exitCode": 0 },
+    { "checkId": "pr01-er03-regression-bundle", "status": "PASS", "exitCode": 0, "details": "147/147 PASS" },
+    { "checkId": "typecheck", "status": "PASS", "exitCode": 0 },
+    { "checkId": "build", "status": "PASS", "exitCode": 0 },
+    { "checkId": "market-behavior-analysis", "status": "NOT_RUN", "reason": "No provenance-recorded market dataset" }
+  ],
+  "experimentRegistry": {
+    "experimentId": "pr02-early-acceleration-v1",
+    "status": "PLANNED",
+    "variantCount": 0
+  },
+  "openBlockers": [
+    { "id": "PR02-DATA-01", "severity": "P0", "reason": "Recorded market dataset unavailable; MARKET_BEHAVIOR_ANALYSIS NOT_RUN" },
+    { "id": "ER06-A", "severity": "P0", "reason": "Disposable PostgreSQL unavailable for ER04 realized-net joins" },
+    { "id": "PR02-DATA-02", "severity": "P1", "reason": "Historical listing metadata partial for point-in-time universe" }
+  ],
+  "verdicts": {
+    "PROMPT8_ENGINEERING_VERDICT": "PARTIAL",
+    "EARLY_FEATURE_PROVENANCE_VERDICT": "PASS",
+    "EARLY_SETUP_LIFECYCLE_VERDICT": "PASS",
+    "EARLY_ROUTER_INTEGRATION_VERDICT": "PASS",
+    "CAUSAL_REPLAY_VERDICT": "PARTIAL",
+    "MARKET_BEHAVIOR_ANALYSIS": "NOT_RUN",
+    "PROFITABILITY_EVIDENCE": "NOT_ESTABLISHED",
+    "STRATEGY_PROMOTION": "NOT_EVALUATED",
+    "OVERALL_QA_STATUS": "QA_PENDING",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED"
+  },
+  "safety": {
+    "paperCampaignStarted": false,
+    "autoRoundStarted": false,
+    "liveTradingStarted": false,
+    "exchangeOrderSent": false,
+    "productionDbMutationPerformed": false,
+    "strategyAutoActivated": false
+  },
+  "evidenceArtifacts": {
+    "report": "KRIPTO_PR02_EARLY_ACCELERATION_IMPLEMENTATION_REPORT.md",
+    "forensicsDir": "artifacts/forensics/pr02-assessment-20260906T094000+0300"
+  },
+  "prompt9Handoff": {
+    "readyContracts": ["early feature producer", "setup lifecycle store", "router delegation", "replay harness"],
+    "missingData": ["recorded tick/book archive", "disposable DB settlement joins"]
+  },
+  "prompt10Handoff": {
+    "invalidationFields": ["exhaustion.reasonCodes", "trigger.validUntil", "setupState INVALIDATED/EXPIRED"],
+    "economicsStatus": "UNKNOWN unless explicit cost/move inputs"
+  }
+}

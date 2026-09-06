@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "pr05-offline-comparison-v1",
+  "policyVersion": "pr05-offline-comparison-v1",
+  "generatedAt": "2026-09-06T13:07:00.000+03:00",
+  "headCommit": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+  "worktreeStatus": "DIRTY",
+  "verdicts": {
+    "PROMPT11_ENGINEERING_VERDICT": "PARTIAL",
+    "DATA_FITNESS_VERDICT": "BLOCKED",
+    "SPLIT_AND_LEAKAGE_VERDICT": "PASS",
+    "REPLAY_PARITY_VERDICT": "PASS",
+    "NET_ACCOUNTING_VERDICT": "PASS",
+    "NEGATIVE_CONTROL_VERDICT": "PARTIAL",
+    "COST_STRESS_VERDICT": "PASS",
+    "HOLDOUT_PROVENANCE_VERDICT": "HOLDOUT_PROVENANCE_UNKNOWN",
+    "HOLDOUT_EVALUATION_STATUS": "NOT_RUN",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+    "OFFLINE_CANDIDATE_VERDICT": "BLOCKED",
+    "SELECTED_CANDIDATE_IDS": [],
+    "OVERALL_QA_STATUS": "QA_PENDING",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "PRODUCTION_POLICY_CHANGED": false
+  },
+  "experiment": {
+    "experimentId": "pr05-offline-comparison-v1",
+    "plannedVariants": 15,
+    "strategies": ["EARLY_ACCELERATION", "MOMENTUM_CONTINUATION", "BREAKOUT_RETEST"],
+    "exitPolicies": [
+      "BASELINE_FIXED_TP_SL",
+      "STRUCTURAL_STOP_TARGET",
+      "STRUCTURAL_STOP_TRAIL",
+      "STRUCTURAL_PARTIAL_TRAIL",
+      "STRUCTURAL_TIME_DECAY"
+    ],
+    "baselinePolicyId": "BASELINE_FIXED_TP_SL",
+    "marketExperimentStatus": "BLOCKED",
+    "marketExperimentReason": "PR05-DATA-01"
+  },
+  "dataInventory": {
+    "recordedMarketDatasetAvailable": false,
+    "holdoutProvenance": "HOLDOUT_PROVENANCE_UNKNOWN",
+    "blockers": ["PR05-DATA-01", "PR01-DATA-01", "PR04-DATA-01"]
+  },
+  "metrics": {
+    "pr05TestsPass": 36,
+    "pr05TestsRuns": 3,
+    "regressionBundlePass": 177,
+    "evaluatedVariants": 0,
+    "independentLifecycleGroups": 0,
+    "closedTrades": 0,
+    "netExpectancy": null,
+    "winRate": null,
+    "profitFactor": null,
+    "censoredTrades": 0
+  },
+  "tests": [
+    {
+      "command": "npm run test:run -- tests/pr05-offline-comparison.test.ts",
+      "runs": 3,
+      "exitCode": 0,
+      "passed": 36,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:run -- tests/er05-canonical-dataset-persistence.test.ts tests/pr01-opportunity-universe-and-net-economics.test.ts tests/pr02-early-acceleration.test.ts tests/pr03-momentum-and-retest.test.ts tests/pr04-exit-and-position-management.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": 177,
+      "failed": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "command": "npm run build",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": true,
+      "note": "Turbopack broad-pattern warnings only; ~9.7min"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "PR05-DATA-01",
+      "severity": "P0",
+      "status": "BLOCKED",
+      "reason": "No recorded market replay package with causal eventAt/availableAt ticks"
+    },
+    {
+      "id": "PR05-HOLDOUT-01",
+      "severity": "P1",
+      "status": "OPEN",
+      "reason": "HOLDOUT_PROVENANCE_UNKNOWN; prior development data touched"
+    },
+    {
+      "id": "ER06-A",
+      "severity": "P0",
+      "status": "BLOCKED",
+      "reason": "Disposable PostgreSQL unavailable for settlement joins"
+    }
+  ],
+  "handoff": {
+    "prompt12": {
+      "report": "KRIPTO_PR05_OFFLINE_COMPARISON_AND_CANDIDATE_REPORT.md",
+      "json": "kripto-pr05-offline-comparison-and-candidate.json",
+      "experimentManifest": "artifacts/forensics/pr05-assessment-20260906T130700+0300/experiment-manifest.json",
+      "dataInventory": "artifacts/forensics/pr05-assessment-20260906T130700+0300/data-inventory.json",
+      "modules": [
+        "pr05-offline-comparison.ts",
+        "pr05-experiment-manifest.ts",
+        "pr05-split-manifest.ts",
+        "pr05-data-inventory.ts",
+        "pr05-negative-control.ts",
+        "pr05-cost-stress.ts",
+        "pr05-candidate-evaluation.ts"
+      ]
+    }
+  }
+}

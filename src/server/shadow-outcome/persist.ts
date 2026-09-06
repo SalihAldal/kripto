@@ -2,11 +2,31 @@ import { getShadowOutcomeEngine } from "@/src/server/shadow-outcome/shadow-outco
 import { getForensicSession } from "@/src/server/forensics/forensic-context";
 import { matchingCandidate } from "@/src/server/shadow-outcome/analytics";
 import { assertCampaignId } from "@/src/server/forensics/campaign-identity.service";
+import {
+  buildCanonicalCandidateObservation,
+  buildOutcomeHorizonRows,
+  type CandidateOutcomeHorizon,
+  type CanonicalCandidateObservation,
+} from "@/src/server/shadow-outcome/canonical-dataset";
 
 type DynamicPrisma = {
-  shadowCandidateOutcome?: { upsert: (args: unknown) => Promise<unknown> };
+  shadowCandidateOutcome?: {
+    upsert: (args: unknown) => Promise<unknown>;
+    findUnique: (args: unknown) => Promise<unknown>;
+  };
   shadowMoverEvent?: { upsert: (args: unknown) => Promise<unknown> };
 };
+
+const CANONICAL_DATASET_SCHEMA_VERSION = "er05-dataset-v1";
+const CANONICAL_POLICY_VERSION = "er05-canonical-baseline-v1";
+const CANONICAL_BASELINES: CandidateOutcomeHorizon["baselineStage"][] = [
+  "FIRST_DETECTED",
+  "HOT",
+  "MICRO_CONFIRMED",
+  "EXECUTION_READY",
+  "CANONICAL_ENTER",
+  "EXECUTION_FILL",
+];
 
 /** Best-effort batch persist. Never blocks the market tick. Never places orders. */
 export async function persistShadowOutcomes() {
@@ -32,13 +52,24 @@ export async function persistShadowOutcomes() {
     for (const row of rows) {
       if (row.snapshot.source === "synthetic") continue;
       try {
+        const existingRaw = await prisma.shadowCandidateOutcome.findUnique({
+          where: { candidateId: row.snapshot.candidateId },
+          select: { snapshot: true },
+        });
+        const existing = (existingRaw ?? null) as { snapshot?: unknown } | null;
+        const snapshot = buildCanonicalSnapshot({
+          tracked: row,
+          campaignId,
+          runId,
+          existingSnapshot: existing?.snapshot ?? null,
+        });
         await prisma.shadowCandidateOutcome.upsert({
           where: { candidateId: row.snapshot.candidateId },
-          create: toRow(row, runId, campaignId),
+          create: toRow(row, runId, campaignId, snapshot),
           update: {
             runId,
             campaignId,
-            snapshot: row.snapshot,
+            snapshot,
             latestStage: row.latestStage,
             latestScore: row.latestScore,
             latestRank: row.latestRank,
@@ -144,6 +175,7 @@ function toRow(
   row: ReturnType<ReturnType<typeof getShadowOutcomeEngine>["getTracked"]>[number],
   runId: string | null,
   campaignId: string,
+  snapshot: Record<string, unknown>,
 ) {
   return {
     campaignId,
@@ -155,7 +187,7 @@ function toRow(
     lane: row.snapshot.primaryLane,
     finalScore: row.snapshot.finalScore,
     moveKey: row.moveKey,
-    snapshot: row.snapshot,
+    snapshot,
     journey: row.journey,
     latestStage: row.latestStage,
     latestScore: row.latestScore,
@@ -165,4 +197,93 @@ function toRow(
     invalidReason: row.invalidReason,
     source: row.snapshot.source,
   };
+}
+
+function buildCanonicalSnapshot(input: {
+  tracked: ReturnType<ReturnType<typeof getShadowOutcomeEngine>["getTracked"]>[number];
+  campaignId: string;
+  runId: string | null;
+  existingSnapshot: unknown;
+}) {
+  const datasetId = resolveDatasetId(input.campaignId, input.runId);
+  const existingSnapshot = asRecord(input.existingSnapshot);
+  const existingCanonical = asRecord(existingSnapshot?.canonicalDataset);
+  const previousObservation = asCanonicalObservation(existingCanonical?.observation);
+  const now = Date.now();
+  const observation = buildCanonicalCandidateObservation({
+    datasetId,
+    campaignId: input.campaignId,
+    tracked: input.tracked,
+    observedAtMs: now,
+    persistedAtMs: now,
+    inputSnapshotId: resolveInputSnapshotId(input.tracked),
+    policyVersion: CANONICAL_POLICY_VERSION,
+    previous: previousObservation,
+    venue: "BINANCE_TR",
+  });
+  const horizonsByBaseline = Object.fromEntries(
+    CANONICAL_BASELINES.map((baseline) => [
+      baseline,
+      buildOutcomeHorizonRows({
+        datasetId,
+        tracked: input.tracked,
+        baselineStage: baseline,
+        nowMs: now,
+      }),
+    ]),
+  ) as Record<string, CandidateOutcomeHorizon[]>;
+  const identityQuality = observation.candidateId ? "LINKED" : "UNRESOLVED";
+  const featureQuality = observation.inputSnapshotId ? "SNAPSHOT_PRESENT" : "SNAPSHOT_MISSING";
+  const firstDetectedRows = horizonsByBaseline.FIRST_DETECTED ?? [];
+  const hasPending = firstDetectedRows.some((row) => row.status === "PENDING");
+  const hasInvalid = firstDetectedRows.some((row) => row.status === "INVALID_DATA" || row.status === "HISTORY_UNAVAILABLE");
+  const priceCoverageQuality = hasInvalid ? "GAPPED_OR_MISSING" : hasPending ? "PENDING" : "COVERED";
+  const executionEvidenceQuality =
+    observation.paperOpenedAt != null && observation.terminalStage === "CLOSED"
+      ? "SETTLED_PAPER_EVIDENCE"
+      : observation.paperOpenedAt != null
+        ? "OPEN_ONLY"
+        : "NO_EXECUTION_EVIDENCE";
+  const finalizationState = hasPending ? "PENDING" : "FINALIZED";
+  return {
+    ...input.tracked.snapshot,
+    canonicalDataset: {
+      schemaVersion: CANONICAL_DATASET_SCHEMA_VERSION,
+      policyVersion: CANONICAL_POLICY_VERSION,
+      datasetId,
+      observation,
+      horizonsByBaseline,
+      qualityDimensions: {
+        identityQuality,
+        featureQuality,
+        priceCoverageQuality,
+        executionEvidenceQuality,
+        finalizationState,
+      },
+      generatedAt: new Date(now).toISOString(),
+    },
+  } as Record<string, unknown>;
+}
+
+function resolveDatasetId(campaignId: string, runId: string | null) {
+  const normalizedRun = (runId ?? "run-unknown").trim() || "run-unknown";
+  return `${campaignId}:${normalizedRun}:${CANONICAL_DATASET_SCHEMA_VERSION}`;
+}
+
+function resolveInputSnapshotId(row: ReturnType<ReturnType<typeof getShadowOutcomeEngine>["getTracked"]>[number]) {
+  return `${row.snapshot.candidateId}:${row.snapshot.firstDetectedAt}`;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
+function asCanonicalObservation(value: unknown): CanonicalCandidateObservation | null {
+  const rec = asRecord(value);
+  if (!rec) return null;
+  if (typeof rec.candidateId !== "string") return null;
+  if (typeof rec.datasetId !== "string") return null;
+  if (typeof rec.firstDetectedAt !== "string") return null;
+  return rec as unknown as CanonicalCandidateObservation;
 }

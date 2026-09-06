@@ -1,0 +1,145 @@
+{
+  "assessmentId": "ER03-canonical-policy-and-selection",
+  "generatedAt": "2026-09-06T01:30:00.000Z",
+  "scope": "PROMPT_3_OF_7",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2",
+      "diskFreeGb": 477.52
+    }
+  },
+  "dependencyCheck": {
+    "phase1ContractPresent": true,
+    "phase2ContractPresent": true,
+    "expectedMoveAiScoreFallbackRemoved": true,
+    "sourceTimeUnitHandoffPreserved": true,
+    "blockingNotes": [
+      {
+        "id": "ER01-K",
+        "status": "BLOCKED",
+        "reason": "auto-round integration path still requires PostgreSQL at localhost:5432"
+      }
+    ]
+  },
+  "fixes": [
+    {
+      "id": "ER03-A",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/execution-orchestrator.service.ts"
+      ],
+      "summary": "Paper-mode admission bypass branches removed."
+    },
+    {
+      "id": "ER03-B",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/er03-canonical-policy.ts",
+        "src/server/execution/execution-orchestrator.service.ts"
+      ],
+      "summary": "Canonical blocker ordering and verdict resolution made deterministic."
+    },
+    {
+      "id": "ER03-C",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/er03-canonical-policy.ts",
+        "src/server/execution/execution-orchestrator.service.ts"
+      ],
+      "summary": "Execution authorization separated from admission; LIVE_DISABLED blocks submit path."
+    },
+    {
+      "id": "ER03-D",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/execution-intelligence.service.ts"
+      ],
+      "summary": "Pre-submit execution check no longer bypassed by paper mode."
+    },
+    {
+      "id": "ER03-E",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/round-selection.service.ts"
+      ],
+      "summary": "Selection lifecycle guard added for race/cancel/deadline safety and exception closure."
+    }
+  ],
+  "checks": [
+    {
+      "checkId": "focused-suite-run-1",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/entry-decision-engine.test.ts tests/p7-paper-only-activation.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "focused-suite-run-2",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/entry-decision-engine.test.ts tests/p7-paper-only-activation.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "focused-suite-run-3",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/entry-decision-engine.test.ts tests/p7-paper-only-activation.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "orchestrator-p4-auto-round-regression",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/execution-orchestrator.integration.test.ts tests/p4-regime-strategy-shadow.test.ts tests/auto-round-engine.integration.test.ts",
+      "exitCode": 1,
+      "details": "auto-round integration timed out due to Prisma DB connectivity failures (localhost:5432)."
+    },
+    {
+      "checkId": "typecheck",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build-attempt-1",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run build",
+      "exitCode": null,
+      "details": "Long finalization cycle; process was terminated after extended runtime."
+    },
+    {
+      "checkId": "build-attempt-2",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run build",
+      "exitCode": 0,
+      "details": "Build completed with Turbopack tracing warnings."
+    }
+  ],
+  "safety": {
+    "paperCampaignStarted": false,
+    "autoRoundStarted": false,
+    "liveTradingStarted": false,
+    "exchangeOrderSent": false,
+    "productionDbMutationPerformed": false
+  },
+  "assessment": {
+    "PHASE3_VERDICT": "PARTIAL",
+    "OVERALL_ENGINEERING_READINESS": "PARTIAL",
+    "NEXT_PAPER_PREFLIGHT": "NO_GO",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED"
+  },
+  "prompt4Handoff": {
+    "decisionIdentityPersistencePending": true,
+    "legacyConsumerCleanupPending": true,
+    "distributedClaimGuaranteePending": true,
+    "autoRoundDbIsolationPending": true
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "qa12-final-assessment-v1",
+  "generatedAt": "2026-09-06T13:20:00.000+03:00",
+  "headCommit": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+  "worktreeStatus": "DIRTY",
+  "worktreeFileCount": 65,
+  "runtime": { "node": "v24.13.0", "npm": "11.6.2" },
+  "verdicts": {
+    "FINAL_ENGINEERING_VERDICT": "PARTIAL",
+    "PRODUCTION_PATH_INTEGRATION_VERDICT": "PARTIAL",
+    "EXECUTION_AND_ACCOUNTING_VERDICT": "PARTIAL",
+    "CAUSALITY_AND_DATASET_VERDICT": "PARTIAL",
+    "STRATEGY_LIFECYCLE_VERDICT": "PARTIAL",
+    "EXIT_MANAGEMENT_VERDICT": "PARTIAL",
+    "OFFLINE_EVIDENCE_VERDICT": "BLOCKED",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+    "OFFLINE_CANDIDATE_VERDICT": "BLOCKED",
+    "OPEN_CRITICAL_COUNT": 1,
+    "OPEN_HIGH_COUNT": 4,
+    "REQUIRED_CHECKS_NOT_RUN": [
+      "DB_SETTLEMENT_INTEGRATION",
+      "MARKET_REPLAY_EXPERIMENT",
+      "ER06_BOUNDED_SMOKE_LIVE"
+    ],
+    "OVERALL_QA_STATUS": "QA_COMPLETED_WITH_GAPS",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "PRODUCTION_POLICY_CHANGED": false
+  },
+  "phaseStatus": {
+    "ER01": "PASS",
+    "ER02": "PASS",
+    "ER03": "PASS",
+    "ER04": "PARTIAL",
+    "ER05": "PARTIAL",
+    "ER06": "PARTIAL",
+    "PR01": "PARTIAL",
+    "PR02": "PARTIAL",
+    "PR03": "PARTIAL",
+    "PR04": "PARTIAL",
+    "PR05": "BLOCKED"
+  },
+  "fixes": [
+    {
+      "id": "QA12-FIX-01",
+      "severity": "HIGH",
+      "description": "PR03 invalidation wired at orchestrator entry via resolveInvalidationForSelectedStrategy",
+      "files": [
+        "src/server/profitability/pr04-exit-bridge.ts",
+        "src/server/execution/execution-orchestrator.service.ts"
+      ]
+    },
+    {
+      "id": "QA12-FIX-02",
+      "severity": "MEDIUM",
+      "description": "QA12 integrated chain tests and assessment module",
+      "files": [
+        "tests/qa12-integrated-chain.test.ts",
+        "src/server/forensics/qa12-final-assessment.ts"
+      ]
+    }
+  ],
+  "metrics": {
+    "qaBundleTestsPass": 331,
+    "qa12IntegratedTestsPass": 17,
+    "qa12IntegratedRuns": 3
+  },
+  "tests": [
+    {
+      "command": "npm run test:run -- tests/er01-telemetry-verdict.test.ts ... tests/qa12-integrated-chain.test.ts ... (16 files)",
+      "exitCode": 0,
+      "passed": 331,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:run -- tests/qa12-integrated-chain.test.ts (x3)",
+      "exitCode": 0,
+      "passed": 17,
+      "failed": 0,
+      "runs": 3
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "command": "npm run test:run -- tests/execution-settlement.integration.test.ts",
+      "status": "NOT_RUN",
+      "reason": "ER06-A disposable PostgreSQL BLOCKED"
+    }
+  ],
+  "artifacts": {
+    "report": "KRIPTO_FINAL_QA_12_REPORT.md",
+    "matrix": "KRIPTO_FINAL_QA_REQUIREMENT_MATRIX.md",
+    "findings": "KRIPTO_FINAL_QA_FINDINGS.md",
+    "forensics": "artifacts/forensics/qa12-assessment-20260906T132000+0300/"
+  }
+}

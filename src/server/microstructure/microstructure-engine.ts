@@ -308,13 +308,25 @@ function resolveHardReject(
 }
 
 function toMarketContext(row: FinalRankedCandidate): MarketContext {
+  const opportunityFeatures = row.opportunityBreakdown;
+  const spreadPercent = row.features.spreadBps / 100;
+  const marketEventAt = row.features.lastAggTradeAt > 0 ? new Date(row.features.lastAggTradeAt).toISOString() : null;
+  const observedAt = new Date(row.timing.microAnalyzedAt).toISOString();
+  const volumeAccelerationRatio =
+    row.features.takerBuyVolume15s + row.features.takerSellVolume15s > 0
+      ? row.features.netFlowAcceleration / Math.max(1, row.features.takerBuyVolume15s + row.features.takerSellVolume15s)
+      : null;
+  const inferredSourceType =
+    row.features.tradeCount > 0 || row.features.lastAggTradeAt > 0 || row.features.lastBookTickerAt > 0
+      ? "LIVE_MARKET"
+      : "UNKNOWN";
   return {
     symbol: row.symbol,
     lastPrice: row.currentPrice,
     change24h: 0,
     volume24h: row.features.takerBuyVolume60s + row.features.takerSellVolume60s,
     volumeSpikePercent: Math.max(0, row.features.tradeRateAcceleration * 10),
-    spreadPercent: row.features.spreadBps / 100,
+    spreadPercent,
     volatilityPercent: Math.max(0.1, row.features.microExhaustion * 4),
     momentumPercent: row.features.flowImbalance5s * 5,
     orderBookImbalance: row.features.depthImbalance10bps,
@@ -327,12 +339,39 @@ function toMarketContext(row: FinalRankedCandidate): MarketContext {
     rejectReasons: row.hardReject ? [row.hardReject] : [],
     metadata: {
       opportunityCandidateId: row.candidateId,
+      sourceType: inferredSourceType,
+      marketDataTimestamp: marketEventAt,
+      featureObservedAt: observedAt,
+      featureSchemaVersion: "er02-feature-contract-v1",
+      featureTransformVersion: "er02-v1",
       primaryLane: row.lane,
       opportunityScore: row.opportunityScore,
       opportunityBreakdown: row.opportunityBreakdown,
       microScore: row.microScore,
       microBreakdown: row.microBreakdown,
       liquidityScore: row.liquidityScore,
+      exhaustion: Number(Math.max(0, Math.min(1, row.features.microExhaustion)).toFixed(6)),
+      trendStrength: Number((opportunityFeatures.priceAcceleration * 0.02).toFixed(6)),
+      priceAcceleration: Number((opportunityFeatures.priceAcceleration / 100).toFixed(6)),
+      volumeAcceleration: volumeAccelerationRatio != null ? Number(volumeAccelerationRatio.toFixed(6)) : null,
+      relativeStrength: Number((opportunityFeatures.relativeStrength / 100).toFixed(6)),
+      breakoutHeld: row.features.breakoutHoldTime > 0,
+      rangeScore: Number((opportunityFeatures.compressionExpansion / 100).toFixed(6)),
+      flowRecovery: Number(Math.max(0, Math.min(1, row.features.buyAbsorption)).toFixed(6)),
+      retracement: Number(Math.max(0, Math.min(1, row.features.breakoutRetestQuality < 0 ? 1 : 1 - row.features.breakoutRetestQuality)).toFixed(6)),
+      distanceFromMean: Number(Math.max(0, Math.min(1, Math.abs(row.features.priceFlowDivergence))).toFixed(6)),
+      shortMomentumPercent: Number((row.features.flowImbalance5s * 100).toFixed(4)),
+      tradeVelocity: Number(row.features.tradeRate5s.toFixed(6)),
+      expectedSlippageBps: Number(row.features.expectedSlippageBps.toFixed(6)),
+      takerFeePercent: null,
+      strategyProfitBuffer: null,
+      expectedMovePercent: null,
+      volatilityRatio: Number((Math.max(0, row.features.microExhaustion) / 4).toFixed(6)),
+      regimeTransitionProbability: null,
+      regimeChaosProbability: null,
+      pumpScore: Number(Math.max(0, Math.min(1, row.opportunityScore / 100)).toFixed(6)),
+      missingFeatures: ["expectedMovePercent", "entryFee", "exitFee", "strategyProfitBuffer", "regimeTransitionProbability", "regimeChaosProbability"],
+      staleFeatures: marketEventAt ? [] : ["marketEventAt"],
       executionQuality: row.executionQuality,
       finalScore: row.smoothedScore,
       firstDetectedAt: new Date(row.firstDetectedAt).toISOString(),

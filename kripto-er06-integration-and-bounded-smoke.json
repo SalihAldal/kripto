@@ -1,0 +1,275 @@
+{
+  "assessmentId": "ER06-integration-and-bounded-smoke",
+  "generatedAt": "2026-09-06T02:45:00.000+03:00",
+  "scope": "PROMPT_6_OF_7",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "worktreeFingerprintSha256": "934166a888d809201e4623d0f06513481521c09085d839dfd0c4fc8a70b75865",
+    "worktreeChangedPathCount": 43,
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2",
+      "diskFreeGbAtStart": 486.163291931152
+    }
+  },
+  "snapshot": {
+    "database": {
+      "databaseUrlState": "UNSET",
+      "observedTestDbEndpoint": "localhost:5432",
+      "engine": "postgresql",
+      "dockerDaemonReachable": false
+    },
+    "schemas": {
+      "featureContractSchemaVersion": "er02-feature-contract-v1",
+      "datasetSchemaVersion": "er05-dataset-v1",
+      "datasetPolicyVersion": "er05-canonical-baseline-v1"
+    },
+    "policyVersions": {
+      "strategyPolicyVersion": "er03-strategy-router-v1",
+      "regimePolicyVersion": "er02-regime-input-v1",
+      "canonicalEntryPolicyVersion": "p1-canonical-entry-v1"
+    },
+    "policyHashesSha256": {
+      "src/server/execution/er02-feature-contract.ts": "3157483c0d3f9094a5096738799a3883cc562082d009283e7a390f4a2c89962f",
+      "src/server/execution/er03-canonical-policy.ts": "58ab65b2b6aaf0a33cbb6186b9247eb381138408691d76c00ca6846fc8c44f70",
+      "src/server/forensics/p4-regime-strategy-shadow.ts": "fe01ab20fe1eaeb7ca171000fca765d1566e93d425667294047a4a28c4720db4",
+      "src/server/shadow-outcome/persist.ts": "58f366d1fe7a0beaa39c005a9324ce9e7a1bf7edc5a080800b03e577a333d9e0",
+      "src/server/shadow-outcome/canonical-dataset.ts": "0da364e590ad4dbd5c968073ae4a7c40939d72e2fead4e533ce5ae890455ee0d"
+    },
+    "activeProcessScope": {
+      "conflictingJobDetected": false,
+      "activeNodeProcesses": [
+        "typescript tsserver",
+        "typescript typingsInstaller"
+      ]
+    }
+  },
+  "dependencyMatrix": {
+    "ER01": {
+      "codeImplemented": true,
+      "runtimeIntegrated": true,
+      "testEvidence": "PASS",
+      "currentWorktreeAligned": true,
+      "openBlockers": [
+        "ER01-K external DB dependency"
+      ],
+      "smokeImpact": "BLOCKING"
+    },
+    "ER02": {
+      "codeImplemented": true,
+      "runtimeIntegrated": true,
+      "testEvidence": "PASS",
+      "currentWorktreeAligned": true,
+      "openBlockers": [],
+      "smokeImpact": "NON_BLOCKING"
+    },
+    "ER03": {
+      "codeImplemented": true,
+      "runtimeIntegrated": true,
+      "testEvidence": "PASS",
+      "currentWorktreeAligned": true,
+      "openBlockers": [],
+      "smokeImpact": "NON_BLOCKING"
+    },
+    "ER04": {
+      "codeImplemented": true,
+      "runtimeIntegrated": "PARTIAL",
+      "testEvidence": "BLOCKED",
+      "currentWorktreeAligned": true,
+      "openBlockers": [
+        "ER06-A",
+        "ER06-B"
+      ],
+      "smokeImpact": "BLOCKING"
+    },
+    "ER05": {
+      "codeImplemented": true,
+      "runtimeIntegrated": "PARTIAL",
+      "testEvidence": "PASS_WITH_DB_BLOCKER",
+      "currentWorktreeAligned": true,
+      "openBlockers": [
+        "ER06-A"
+      ],
+      "smokeImpact": "BLOCKING"
+    }
+  },
+  "integrationFixes": [
+    {
+      "id": "ER06-C",
+      "status": "FIXED",
+      "files": [
+        "tests/auto-round-engine.integration.test.ts"
+      ],
+      "summary": "Isolated failsafe/worker/log boundaries to stop DB-dependent timeout leakage in auto-round integration test."
+    },
+    {
+      "id": "ER06-ARTIFACT-COMPAT",
+      "status": "FIXED",
+      "files": [
+        "kripto-er01-telemetry-verdict.json"
+      ],
+      "summary": "Added compatibility alias for ER01 artifact filename expected by prompt input list."
+    }
+  ],
+  "checks": [
+    {
+      "checkId": "er01-er05-focused-suite",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er01-telemetry-verdict.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er03-canonical-policy.test.ts tests/er04-durable-execution-attempt-lock.test.ts tests/phase05-shadow-outcome.test.ts tests/er05-canonical-dataset-persistence.test.ts",
+      "exitCode": 0,
+      "details": "96/96 PASS"
+    },
+    {
+      "checkId": "integration-regression-bundle",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/execution-orchestrator.integration.test.ts tests/auto-round-engine.integration.test.ts tests/p0-paper-persistence.test.ts tests/p0-paper-close-persistence.test.ts tests/p1-round-selection-event-driven.test.ts tests/phase06-paper-production.test.ts",
+      "exitCode": 0,
+      "details": "37/37 PASS"
+    },
+    {
+      "checkId": "db-validation-smoke",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/forensics/db-validation-smoke.integration.test.ts",
+      "exitCode": 1,
+      "details": "Cannot reach localhost:5432"
+    },
+    {
+      "checkId": "execution-settlement-integration",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/execution-settlement.integration.test.ts",
+      "exitCode": 1,
+      "details": "DB connection failures + timeout on 3 settlement scenarios"
+    },
+    {
+      "checkId": "critical-lifecycle-concurrency-run-1",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p1-round-selection-event-driven.test.ts tests/execution-settlement.integration.test.ts",
+      "exitCode": 1
+    },
+    {
+      "checkId": "critical-lifecycle-concurrency-run-2",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p1-round-selection-event-driven.test.ts tests/execution-settlement.integration.test.ts",
+      "exitCode": 1
+    },
+    {
+      "checkId": "critical-lifecycle-concurrency-run-3",
+      "required": true,
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p1-round-selection-event-driven.test.ts tests/execution-settlement.integration.test.ts",
+      "exitCode": 1
+    },
+    {
+      "checkId": "typecheck",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run build",
+      "exitCode": 0,
+      "details": "Succeeded with Turbopack tracing warnings"
+    },
+    {
+      "checkId": "assessment-renderer-contract",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er06-assessment-renderer.test.ts",
+      "exitCode": 0
+    }
+  ],
+  "preflightChecks": [
+    { "id": 1, "status": "FAIL", "evidence": "ER06-A/B open" },
+    { "id": 2, "status": "PARTIAL", "evidence": "chain test-present, real DB missing" },
+    { "id": 3, "status": "PASS", "evidence": "typecheck exit 0" },
+    { "id": 4, "status": "PASS", "evidence": "build exit 0" },
+    { "id": 5, "status": "PARTIAL", "evidence": "required regressions except DB-dependent blocked" },
+    { "id": 6, "status": "FAIL", "evidence": "no real DB persistence proof" },
+    { "id": 7, "status": "FAIL", "evidence": "isolated paper DB namespace not bootstrapped" },
+    { "id": 8, "status": "PASS", "evidence": "no live submit path executed; guards preserved" },
+    { "id": 9, "status": "PARTIAL", "evidence": "market read path observed only in tests" },
+    { "id": 10, "status": "PASS", "evidence": "no conflicting campaign process detected" },
+    { "id": 11, "status": "PARTIAL", "evidence": "campaign telemetry only test-observed" },
+    { "id": 12, "status": "PASS", "evidence": "disk free > 486 GB" },
+    { "id": 13, "status": "PASS", "evidence": "kill/cancel/deadline paths covered in code/tests" },
+    { "id": 14, "status": "PASS", "evidence": "single-campaign lock seen in integration test" },
+    { "id": 15, "status": "PASS", "evidence": "source/policy fingerprint captured and fixed" },
+    { "id": 16, "status": "PASS", "evidence": "ER02 feature contract strategy support verified" },
+    { "id": 17, "status": "PASS", "evidence": "deterministic positive strategy path in focused suites" },
+    { "id": 18, "status": "FAIL", "evidence": "no real DB reconciliation evidence for unresolved states" }
+  ],
+  "smoke": {
+    "BOUNDED_SMOKE_PREFLIGHT": "NO_GO",
+    "BOUNDED_SMOKE_RESULT": "NOT_RUN",
+    "campaignStarted": false,
+    "campaignId": null,
+    "maxRounds": 10,
+    "maxWallClockMinutes": 10,
+    "cleanupSeconds": null,
+    "reason": "Required fail-closed checks #1, #6, #7, #18 not satisfied."
+  },
+  "runtimeCoverage": {
+    "realMarketSmoke": "NOT_RUN",
+    "observedPathsInDeterministicTests": [
+      "candidate selection",
+      "canonical decision routing",
+      "execution attempt locking",
+      "paper persistence path",
+      "single campaign lock"
+    ],
+    "notObservedRuntimePaths": [
+      "real DB-backed settlement lifecycle",
+      "late-fill + restart reconciliation on real test DB",
+      "bounded smoke campaign telemetry"
+    ]
+  },
+  "metrics": {
+    "enterWaitReject": "NOT_RUN_REAL_SMOKE",
+    "orderFillOpenClosed": "NOT_RUN_REAL_SMOKE",
+    "liveMutationAttemptCount": 0,
+    "realLiveSubmitEvidence": false,
+    "policyConfigDriftDetected": false,
+    "artifactGrowth": {
+      "nextDirBytesAfterBuild": 8541584925,
+      "nextStandaloneBytesAfterBuild": 7725290190
+    }
+  },
+  "verdicts": {
+    "PHASE6_VERDICT": "PARTIAL",
+    "INTEGRATION_TEST_VERDICT": "PARTIAL",
+    "BOUNDED_SMOKE_PREFLIGHT": "NO_GO",
+    "BOUNDED_SMOKE_RESULT": "NOT_RUN",
+    "OVERALL_ENGINEERING_READINESS": "QA_PENDING",
+    "LONG_PAPER_AUTHORIZATION": "NOT_GRANTED",
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED"
+  },
+  "evidencePaths": [
+    "artifacts/forensics/er06-assessment-20260906T022418+0300/runtime-fingerprint.redacted.json",
+    "artifacts/forensics/er06-assessment-20260906T022418+0300/command-evidence.redacted.json"
+  ],
+  "openBlockers": [
+    {
+      "id": "ER06-A",
+      "severity": "P0",
+      "reason": "Disposable PostgreSQL unavailable; real DB persistence proof cannot be produced."
+    },
+    {
+      "id": "ER06-B",
+      "severity": "P0",
+      "reason": "Settlement integration remains DB-blocked and times out under unreachable localhost:5432."
+    }
+  ]
+}

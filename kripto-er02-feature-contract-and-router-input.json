@@ -1,0 +1,178 @@
+{
+  "assessmentId": "ER02-feature-contract-and-router-input",
+  "generatedAt": "2026-09-06T01:13:00.000Z",
+  "scope": "PROMPT_2_OF_7",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2",
+      "diskFreeGb": 480.78
+    }
+  },
+  "dependencyCheck": {
+    "phase1ContractPresent": true,
+    "phase1Followup": [
+      {
+        "id": "ER01-K",
+        "status": "BLOCKED",
+        "reason": "auto-round integration deterministic run needs external DB path"
+      }
+    ]
+  },
+  "fixes": [
+    {
+      "id": "ER02-A",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/execution-orchestrator.service.ts",
+        "src/server/execution/er02-feature-contract.ts"
+      ],
+      "summary": "Default strategy input fallbacks replaced with contract adapter."
+    },
+    {
+      "id": "ER02-B",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/execution-orchestrator.service.ts",
+        "src/server/execution/er02-feature-contract.ts"
+      ],
+      "summary": "ai.score to expectedMove fallback removed."
+    },
+    {
+      "id": "ER02-C",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/er02-feature-contract.ts"
+      ],
+      "summary": "Liquidity normalization corrected for 0-100 and 0-1 domains."
+    },
+    {
+      "id": "ER02-D",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/er02-feature-contract.ts"
+      ],
+      "summary": "pumpStrength mapped independently from pumpRisk."
+    },
+    {
+      "id": "ER02-E",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/er02-feature-contract.ts"
+      ],
+      "summary": "Missing/stale/future market timestamps now explicit."
+    },
+    {
+      "id": "ER02-F",
+      "status": "FIXED",
+      "files": [
+        "src/server/execution/er02-feature-contract.ts"
+      ],
+      "summary": "SourceType provenance preserved for replay/synthetic/live/unknown."
+    },
+    {
+      "id": "ER02-G",
+      "status": "FIXED",
+      "files": [
+        "src/server/forensics/p4-regime-strategy-shadow.ts"
+      ],
+      "summary": "Strategy-specific required feature gating implemented."
+    },
+    {
+      "id": "ER02-H",
+      "status": "FIXED",
+      "files": [
+        "src/server/microstructure/microstructure-engine.ts",
+        "src/server/opportunity/opportunity-engine.ts"
+      ],
+      "summary": "Producer metadata expanded for router-consumable fields."
+    }
+  ],
+  "featureContract": {
+    "schemaVersion": "er02-feature-contract-v1",
+    "qualityEnum": [
+      "VALID",
+      "MISSING",
+      "STALE",
+      "INVALID"
+    ],
+    "sourceTypeEnum": [
+      "LIVE_MARKET",
+      "RECORDED_REPLAY",
+      "SYNTHETIC_FIXTURE",
+      "UNKNOWN"
+    ]
+  },
+  "checks": [
+    {
+      "checkId": "focused-suite-run-1",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er02-feature-contract-and-router-input.test.ts tests/p4-regime-strategy-shadow.test.ts tests/p7-paper-only-activation.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "focused-suite-run-2",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er02-feature-contract-and-router-input.test.ts tests/p4-regime-strategy-shadow.test.ts tests/p7-paper-only-activation.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "focused-suite-run-3",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er02-feature-contract-and-router-input.test.ts tests/p4-regime-strategy-shadow.test.ts tests/p7-paper-only-activation.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "producer-router-regression",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run test:run -- tests/phase04-microstructure-engine.test.ts tests/p1-round-selection-event-driven.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "typecheck",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build",
+      "required": true,
+      "status": "PASS",
+      "command": "npm run build",
+      "exitCode": 0,
+      "details": "Completed with Turbopack tracing warnings; no build stop."
+    }
+  ],
+  "assessment": {
+    "PHASE2_VERDICT": "PASS",
+    "OVERALL_ENGINEERING_READINESS": "PARTIAL",
+    "NEXT_PAPER_PREFLIGHT": "NO_GO",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED"
+  },
+  "safety": {
+    "paperCampaignStarted": false,
+    "autoRoundStarted": false,
+    "liveTradingStarted": false,
+    "exchangeOrderSent": false
+  },
+  "prompt3Handoff": {
+    "canonicalInputType": "selected.context.metadata.featureContract",
+    "legacyConsumersRemain": true,
+    "regimeAuthorityConflictAreas": [
+      "market-regime metadata vs p4 evaluateCanonicalRegime runtime"
+    ],
+    "paperRelaxedPolicyChangedInPhase2": false,
+    "unsupportedDependencies": [
+      "measured fee source may be missing for some producer flows",
+      "regime transition/chaos probabilities may be missing outside enriched contexts"
+    ]
+  }
+}

@@ -67,6 +67,28 @@ vi.mock("@/src/server/repositories/execution.repository", () => ({
   }),
 }));
 
+vi.mock("@/src/server/recovery/failsafe-recovery.service", () => ({
+  getSafeModeState: vi.fn().mockResolvedValue({
+    enabled: false,
+    requireManualAck: false,
+    updatedAt: new Date(0).toISOString(),
+    unresolvedOrders: [],
+  }),
+  persistRoundState: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("@/src/server/market-data/spine/daemon-worker", () => ({
+  ensureMarketDataDaemonStarted: vi.fn(),
+}));
+
+vi.mock("@/src/server/scanner/scanner-worker.service", () => ({
+  ensureScannerWorkerStarted: vi.fn(),
+}));
+
+vi.mock("@/services/log.service", () => ({
+  pushLog: vi.fn(),
+}));
+
 const mockCandidate = {
   context: {
     symbol: "BTCTRY",

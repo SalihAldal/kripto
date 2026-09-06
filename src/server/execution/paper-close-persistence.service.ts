@@ -49,7 +49,7 @@ export async function persistPaperCloseFillForSettlement(input: {
       positionId: input.positionId,
       orderId: input.orderId,
       simulationId: input.simulationId,
-      candidateId: input.candidateId ?? "unknown",
+      candidateId: input.candidateId ?? "LEGACY_UNRESOLVED",
       campaignId: input.campaignId ?? null,
       runId: input.runId ?? null,
       roundId: input.roundId ?? null,

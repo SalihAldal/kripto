@@ -1,0 +1,157 @@
+{
+  "assessmentId": "ER05-dataset-and-causal-replay",
+  "generatedAt": "2026-09-06T02:23:12.152+03:00",
+  "scope": "PROMPT_5_OF_7",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2"
+    }
+  },
+  "contracts": {
+    "er04IdentityAndPersistenceVerified": true,
+    "er01TelemetryContractVerified": true,
+    "er02FeatureContractVerified": true,
+    "er03PolicyContractVerified": true,
+    "realDbEvidenceAvailable": false
+  },
+  "implementedFixes": [
+    {
+      "id": "ER05-F1",
+      "status": "FIXED",
+      "files": [
+        "src/server/shadow-outcome/canonical-dataset.ts",
+        "src/server/shadow-outcome/metrics.ts",
+        "src/server/shadow-outcome/types.ts"
+      ],
+      "summary": "Baseline/horizon calculations are now independent per baseline with bounded windows, stale end-price guard, and null-preserving outcomes."
+    },
+    {
+      "id": "ER05-F2",
+      "status": "FIXED",
+      "files": [
+        "src/server/shadow-outcome/persist.ts"
+      ],
+      "summary": "Production persist path now executes canonical dataset builders and stores versioned canonicalDataset snapshot payload."
+    },
+    {
+      "id": "ER05-F3",
+      "status": "FIXED",
+      "files": [
+        "src/server/forensics/p4-regime-strategy-shadow.ts",
+        "tests/p4-regime-strategy-shadow.test.ts"
+      ],
+      "summary": "Negative control and multiple-testing helpers were fail-closed hardened; walk-forward split now uses labelEndAtMs for purge/embargo."
+    }
+  ],
+  "checks": [
+    {
+      "checkId": "er04-dependency-regression",
+      "status": "PASS",
+      "command": "npm run test:run -- tests/er04-durable-execution-attempt-lock.test.ts tests/p0-paper-persistence.test.ts tests/er03-canonical-policy.test.ts tests/p1-round-selection-event-driven.test.ts tests/er02-feature-contract-and-router-input.test.ts tests/er01-telemetry-verdict.test.ts",
+      "exitCode": 0,
+      "details": "71/71 PASS"
+    },
+    {
+      "checkId": "er05-focused-suite",
+      "status": "PASS",
+      "command": "npm run test:run -- tests/phase05-shadow-outcome.test.ts tests/p4-regime-strategy-shadow.test.ts tests/er05-canonical-dataset-persistence.test.ts",
+      "exitCode": 0,
+      "details": "39/39 PASS"
+    },
+    {
+      "checkId": "er05-focused-suite-repeat-1",
+      "status": "PASS",
+      "command": "cmd /c for /l %i in (1,1,3) do npm run test:run -- tests/phase05-shadow-outcome.test.ts tests/p4-regime-strategy-shadow.test.ts tests/er05-canonical-dataset-persistence.test.ts",
+      "exitCode": 0,
+      "details": "Run 1/3 PASS (39/39)"
+    },
+    {
+      "checkId": "er05-focused-suite-repeat-2",
+      "status": "PASS",
+      "command": "cmd /c for /l %i in (1,1,3) do npm run test:run -- tests/phase05-shadow-outcome.test.ts tests/p4-regime-strategy-shadow.test.ts tests/er05-canonical-dataset-persistence.test.ts",
+      "exitCode": 0,
+      "details": "Run 2/3 PASS (39/39)"
+    },
+    {
+      "checkId": "er05-focused-suite-repeat-3",
+      "status": "PASS",
+      "command": "cmd /c for /l %i in (1,1,3) do npm run test:run -- tests/phase05-shadow-outcome.test.ts tests/p4-regime-strategy-shadow.test.ts tests/er05-canonical-dataset-persistence.test.ts",
+      "exitCode": 0,
+      "details": "Run 3/3 PASS (39/39)"
+    },
+    {
+      "checkId": "db-validation-smoke",
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/forensics/db-validation-smoke.integration.test.ts",
+      "exitCode": 1,
+      "details": "Cannot reach PostgreSQL at localhost:5432"
+    },
+    {
+      "checkId": "execution-settlement-integration",
+      "status": "BLOCKED",
+      "command": "npm run test:run -- tests/execution-settlement.integration.test.ts",
+      "exitCode": 1,
+      "details": "Prisma DB connection failures + 3 timeout failures"
+    },
+    {
+      "checkId": "docker-daemon",
+      "status": "BLOCKED",
+      "command": "docker ps --format {{.ID}} {{.Image}} {{.Status}}",
+      "exitCode": 1,
+      "details": "dockerDesktopLinuxEngine pipe unavailable"
+    },
+    {
+      "checkId": "typecheck",
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build",
+      "status": "BLOCKED",
+      "command": "npm run build",
+      "exitCode": 1,
+      "details": "Next guard: another build process already running (orphan process/lock behavior)"
+    }
+  ],
+  "safety": {
+    "paperCampaignStarted": false,
+    "autoRoundStarted": false,
+    "liveTradingStarted": false,
+    "exchangeOrderSent": false,
+    "productionDbMutationPerformed": false,
+    "productionBackfillExecuted": false
+  },
+  "verdicts": {
+    "PHASE5_VERDICT": "PARTIAL",
+    "DATASET_PERSISTENCE_VERDICT": "PARTIAL",
+    "HORIZON_BASELINE_CORRECTNESS_VERDICT": "PARTIAL",
+    "CAUSAL_REPLAY_VERDICT": "PARTIAL",
+    "EXECUTION_REALISM_CAPABILITY": "PRICE_ONLY",
+    "HISTORICAL_DATA_QUALITY": "PARTIAL_MEASURED",
+    "OVERALL_ENGINEERING_READINESS": "PARTIAL",
+    "NEXT_PAPER_PREFLIGHT": "NO_GO",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED"
+  },
+  "openBlockers": [
+    {
+      "id": "ER05-A",
+      "severity": "P0",
+      "reason": "No reachable disposable PostgreSQL runtime for real persistence integration proof."
+    },
+    {
+      "id": "ER05-B",
+      "severity": "P1",
+      "reason": "Execution settlement integration still depends on unavailable DB-backed repositories in this environment."
+    },
+    {
+      "id": "ER05-C",
+      "severity": "P2",
+      "reason": "Build guard reports another running next build process; stable isolated build evidence pending."
+    }
+  ]
+}

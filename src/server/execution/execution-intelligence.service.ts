@@ -132,7 +132,6 @@ export function evaluatePreSubmitExecution(input: {
   orderType?: string;
   urgency?: "normal" | "high" | "emergency";
   marketRegime?: string;
-  paperRelaxed?: boolean;
 }): PreSubmitExecutionDecision {
   const bidDepth = Number(input.bidDepth ?? 0);
   const askDepth = Number(input.askDepth ?? 0);
@@ -148,9 +147,6 @@ export function evaluatePreSubmitExecution(input: {
   });
   const slippageCheck = validateSlippage(Math.max(estimatedSlippagePct, impactSlippagePct));
   const liquidityWeak = depth > 0 && input.notional > depth * 1.5;
-  if (input.paperRelaxed) {
-    return { allowed: true, estimatedSlippagePct, depthCoverage, spreadPct };
-  }
   if (depth <= 0) {
     return {
       allowed: false,

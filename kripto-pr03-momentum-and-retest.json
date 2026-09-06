@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "pr03-momentum-and-retest-v1",
+  "policyVersion": "pr03-momentum-and-retest-v1",
+  "generatedAt": "2026-09-06T09:45:00.000+03:00",
+  "headCommit": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+  "worktreeStatus": "DIRTY",
+  "verdicts": {
+    "PROMPT9_ENGINEERING_VERDICT": "PARTIAL",
+    "MOMENTUM_LIFECYCLE_VERDICT": "PASS",
+    "BREAKOUT_RETEST_LIFECYCLE_VERDICT": "PASS",
+    "LEVEL_CAUSALITY_VERDICT": "PASS",
+    "STATE_IDEMPOTENCY_VERDICT": "PASS",
+    "ROUTER_INTEGRATION_VERDICT": "PASS",
+    "CAUSAL_REPLAY_VERDICT": "PARTIAL",
+    "MARKET_BEHAVIOR_ANALYSIS": "NOT_RUN",
+    "PROFITABILITY_EVIDENCE": "NOT_ESTABLISHED",
+    "STRATEGY_PROMOTION": "NOT_EVALUATED",
+    "OVERALL_QA_STATUS": "QA_PENDING",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED"
+  },
+  "strategies": {
+    "BREAKOUT_RETEST": {
+      "policyVersion": "pr03-momentum-and-retest-v1",
+      "states": [
+        "WARMUP",
+        "LEVEL_READY",
+        "BREAKOUT_CONFIRMED",
+        "RETEST_PENDING",
+        "RETEST_OBSERVED",
+        "HOLD_CONFIRMED",
+        "TRIGGERED",
+        "INVALIDATED",
+        "EXPIRED"
+      ],
+      "modules": [
+        "pr03-causal-features.ts",
+        "pr03-breakout-setup.ts",
+        "pr03-breakout-evaluator.ts"
+      ]
+    },
+    "MOMENTUM_CONTINUATION": {
+      "policyVersion": "pr03-momentum-and-retest-v1",
+      "states": [
+        "WARMUP",
+        "OBSERVING",
+        "IMPULSE_CONFIRMED",
+        "PAUSE_OBSERVED",
+        "RESUMPTION_ARMED",
+        "TRIGGERED",
+        "INVALIDATED",
+        "EXPIRED"
+      ],
+      "modules": [
+        "pr03-causal-features.ts",
+        "pr03-momentum-setup.ts",
+        "pr03-momentum-evaluator.ts"
+      ]
+    }
+  },
+  "metrics": {
+    "pr03TestsPass": 45,
+    "pr03TestsRuns": 3,
+    "regressionBundlePass": 85,
+    "syntheticBreakoutTriggers": 1,
+    "syntheticMomentumTriggers": 1,
+    "recordedMarketTriggers": 0,
+    "paperTrades": 0,
+    "liveTrades": 0
+  },
+  "tests": [
+    {
+      "command": "npm run test:run -- tests/pr03-momentum-and-retest.test.ts",
+      "runs": 3,
+      "exitCode": 0,
+      "passed": 45,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:run -- tests/er02-feature-contract-and-router-input.test.ts tests/er03-canonical-policy.test.ts tests/er04-durable-execution-attempt-lock.test.ts tests/er05-canonical-dataset-persistence.test.ts tests/pr02-early-acceleration.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": 85,
+      "failed": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "command": "npm run build",
+      "runs": 1,
+      "exitCode": 0,
+      "passed": true,
+      "note": "Turbopack broad-pattern warnings only"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "PR03-DATA-01",
+      "severity": "P0",
+      "status": "OPEN",
+      "reason": "No recorded market dataset for behavior analysis"
+    },
+    {
+      "id": "ER06-A",
+      "severity": "P0",
+      "status": "BLOCKED",
+      "reason": "Disposable PostgreSQL unavailable"
+    }
+  ],
+  "handoff": {
+    "prompt10": {
+      "invalidationContract": "src/server/profitability/pr03-types.ts#InvalidationContract",
+      "triggerContract": "src/server/profitability/pr03-types.ts#StrategyTriggerResult",
+      "evaluators": [
+        "src/server/profitability/pr03-breakout-evaluator.ts",
+        "src/server/profitability/pr03-momentum-evaluator.ts"
+      ]
+    }
+  }
+}

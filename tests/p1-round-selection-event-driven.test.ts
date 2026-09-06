@@ -129,9 +129,10 @@ const scannerCandidate = {
   },
 };
 
+const opportunityScanMock = vi.fn(() => ({ ranked: [], evaluated: 1 }));
 vi.mock("@/src/server/opportunity/opportunity-engine", () => ({
   getOpportunityEngine: vi.fn(() => ({
-    scan: () => ({ ranked: [], evaluated: 1 }),
+    scan: opportunityScanMock,
   })),
 }));
 vi.mock("@/src/server/microstructure/microstructure-engine", () => ({
@@ -147,6 +148,8 @@ vi.mock("@/src/server/candidate/instance-ownership.service", () => ({
 describe("P1 event-driven round selection", () => {
   beforeEach(() => {
     resetCanonicalCandidateStoreForTests();
+    opportunityScanMock.mockReset();
+    opportunityScanMock.mockImplementation(() => ({ ranked: [], evaluated: 1 }));
   });
 
   it("selects eligible candidate without fixed 90s wait", async () => {
@@ -231,5 +234,68 @@ describe("P1 event-driven round selection", () => {
     const result = await runPromise;
     expect(result.selected?.context.symbol).toBe("BTCTRY");
     expect(result.reason).toContain("cand-evt-1");
+  });
+
+  it("applies minimum evidence window to fallback path", async () => {
+    const store = getCanonicalCandidateStore();
+    store.createCandidate({
+      candidateId: "cand-evt-1",
+      symbol: "BTCTRY",
+      lane: "EARLY",
+      detectedAt: Date.now(),
+      detectedPrice: 100,
+    });
+    store.transitionCandidate("cand-evt-1", "WATCHING", ["watch"]);
+    store.transitionCandidate("cand-evt-1", "HOT", ["hot"]);
+    store.transitionCandidate("cand-evt-1", "MICRO_WARMING", ["warm"]);
+    store.transitionCandidate("cand-evt-1", "MICRO_ANALYZED", ["analyzed"]);
+    store.transitionCandidate("cand-evt-1", "MICRO_CONFIRMED", ["confirmed"]);
+    store.transitionCandidate("cand-evt-1", "FINAL_RANKED", ["ranked"]);
+    store.transitionCandidate("cand-evt-1", "EXECUTION_READY", ["ready"]);
+    const { runCooperativeRoundSelection } = await import("@/src/server/execution/round-selection.service");
+    const startedAt = Date.now();
+    const result = await runCooperativeRoundSelection({
+      jobId: "job-min-window",
+      runId: "run-min-window",
+      roundNo: 1,
+      totalRounds: 1,
+      attempt: 0,
+      maxAttempts: 2,
+      selectionStartedAt: Date.now(),
+      selectionBudgetMs: 10_000,
+      excludedSymbols: [],
+      forcePaperProfile: true,
+      maxDurationSec: 30,
+      scanLimit: 30,
+      scanCycles: 1,
+      includeLivePumpScan: false,
+    });
+    expect(result.selected?.context.symbol).toBe("BTCTRY");
+    expect(Date.now() - startedAt).toBeGreaterThanOrEqual(90);
+  });
+
+  it("converts async selection exceptions to explicit aborted result", async () => {
+    opportunityScanMock.mockImplementation(() => {
+      throw new Error("boom");
+    });
+    const { runCooperativeRoundSelection } = await import("@/src/server/execution/round-selection.service");
+    const result = await runCooperativeRoundSelection({
+      jobId: "job-exception",
+      runId: "run-exception",
+      roundNo: 1,
+      totalRounds: 1,
+      attempt: 0,
+      maxAttempts: 2,
+      selectionStartedAt: Date.now(),
+      selectionBudgetMs: 10_000,
+      excludedSymbols: [],
+      forcePaperProfile: true,
+      maxDurationSec: 30,
+      scanLimit: 30,
+      scanCycles: 1,
+      includeLivePumpScan: false,
+    });
+    expect(result.aborted).toBe(true);
+    expect(result.reason).toContain("SELECTION_EXCEPTION:boom");
   });
 });

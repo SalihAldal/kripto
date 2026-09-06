@@ -397,8 +397,13 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
     };
 
     let pendingResolve: ReturnType<typeof setTimeout> | null = null;
+    let pendingResolveAt = 0;
     let fallbackTimer: ReturnType<typeof setInterval> | null = null;
     let unsub: (() => void) | null = null;
+    let settled = false;
+    let inFlight = false;
+    let pendingRecheck = false;
+    let minimumCheckAt = Date.now() + eventConfig.minimumEvidenceWindowMs;
     const selectionResult = await new Promise<
       | { kind: "selected"; selectedRecord: CanonicalCandidateRecord; selected: ScannerCandidate }
       | { kind: "aborted"; reason: string }
@@ -410,31 +415,72 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
           | { kind: "aborted"; reason: string }
           | { kind: "timeout" },
       ) => {
+        if (settled) return;
+        settled = true;
         if (pendingResolve) clearTimeout(pendingResolve);
         if (fallbackTimer) clearInterval(fallbackTimer);
         if (unsub) unsub();
         resolve(result);
       };
-      const check = () => {
+      const scheduleCheck = (delayMs: number) => {
+        if (settled) return;
+        if (pendingResolve && pendingResolveAt <= Date.now() + delayMs) {
+          return;
+        }
+        if (pendingResolve) clearTimeout(pendingResolve);
+        pendingResolveAt = Date.now() + Math.max(0, delayMs);
+        pendingResolve = setTimeout(() => {
+          pendingResolve = null;
+          pendingResolveAt = 0;
+          void check();
+        }, Math.max(0, delayMs));
+      };
+      const check = async () => {
+        if (settled) return;
+        if (Date.now() < minimumCheckAt) return;
+        if (inFlight) {
+          pendingRecheck = true;
+          return;
+        }
+        inFlight = true;
         const legacy = legacyGuard();
         if (legacy) {
           finish({ kind: "aborted", reason: legacy });
+          inFlight = false;
           return;
         }
         if (Date.now() >= observationDeadline) {
           finish({ kind: "timeout" });
+          inFlight = false;
           return;
         }
-        void tryResolveSelection().then((resolved) => {
-          if (!resolved) return;
-          if ("error" in resolved) {
-            finish({ kind: "aborted", reason: resolved.error ?? "HANDOFF_CANDIDATE_NOT_FOUND" });
-            return;
-          }
-          finish({ kind: "selected", ...resolved });
-        });
+        await tryResolveSelection()
+          .then((resolved) => {
+            if (settled || !resolved) return;
+            if ("error" in resolved) {
+              finish({ kind: "aborted", reason: resolved.error ?? "HANDOFF_CANDIDATE_NOT_FOUND" });
+              return;
+            }
+            finish({ kind: "selected", ...resolved });
+          })
+          .catch((error) => {
+            if (settled) return;
+            finish({
+              kind: "aborted",
+              reason: `SELECTION_EXCEPTION:${error instanceof Error ? error.message : String(error)}`,
+            });
+          })
+          .finally(() => {
+            inFlight = false;
+            if (settled) return;
+            if (pendingRecheck) {
+              pendingRecheck = false;
+              scheduleCheck(0);
+            }
+          });
       };
       unsub = subscribeCanonicalCandidateTransitions((event) => {
+        if (settled) return;
         if (event.state !== "EXECUTION_READY" && event.state !== "FINAL_RANKED" && event.state !== "MICRO_CONFIRMED") {
           return;
         }
@@ -444,11 +490,13 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
           eventConfig.minimumEvidenceWindowMs - elapsedSinceTransition,
           eventConfig.candidateEventDebounceMs,
         );
-        if (pendingResolve) clearTimeout(pendingResolve);
-        pendingResolve = setTimeout(check, Math.max(0, remainingDebounce));
+        minimumCheckAt = Math.max(minimumCheckAt, event.at + eventConfig.minimumEvidenceWindowMs);
+        scheduleCheck(Math.max(0, remainingDebounce));
       });
-      fallbackTimer = setInterval(check, eventConfig.fallbackPollIntervalMs);
-      check();
+      fallbackTimer = setInterval(() => {
+        void check();
+      }, eventConfig.fallbackPollIntervalMs);
+      void check();
     });
 
     if (selectionResult.kind === "aborted") {

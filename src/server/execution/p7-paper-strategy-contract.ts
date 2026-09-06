@@ -1,4 +1,5 @@
 import type { TradingMode } from "@/src/server/execution/types";
+import { resolveTerminalEvidence } from "@/src/server/forensics/er01-telemetry-verdict";
 
 export const P7_TERMINAL_REASON_CODES = [
   "UNSUPPORTED_REGIME",
@@ -55,35 +56,39 @@ export function classifyTerminalReason(reason: string): {
   reasonCode: P7TerminalReasonCode;
   secondary: P7TerminalReasonCode[];
 } {
-  const upper = String(reason ?? "").toUpperCase();
-  const codes: P7TerminalReasonCode[] = [];
-  const add = (code: P7TerminalReasonCode) => {
-    if (!codes.includes(code)) codes.push(code);
+  const resolved = resolveTerminalEvidence({
+    structured: null,
+    legacyReason: reason,
+    runState: null,
+    hasCandidate: true,
+    openedPosition: false,
+    submittedOrder: false,
+    fillCount: 0,
+    executionFailed: false,
+  });
+  const toCode = (code: string | null): P7TerminalReasonCode => {
+    if (!code) return "INTERNAL_ERROR";
+    const upper = code.toUpperCase();
+    if ((P7_TERMINAL_REASON_CODES as readonly string[]).includes(code)) {
+      return code as P7TerminalReasonCode;
+    }
+    if (upper.includes("SPREAD")) return "SPREAD_TOO_HIGH";
+    if (upper.includes("SLIPPAGE")) return "SLIPPAGE_TOO_HIGH";
+    if (upper.includes("RISK")) return "RISK_REJECTED";
+    if (upper.includes("FEE")) return "FEE_NOT_VIABLE";
+    if (upper.includes("NO_ELIGIBLE_STRATEGY")) return "NO_ELIGIBLE_STRATEGY";
+    if (upper.includes("STRATEGY_CONFLICT")) return "STRATEGY_CONFLICT";
+    if (upper.includes("STALE")) return "STALE_DATA";
+    if (upper.includes("INSUFFICIENT")) return "INSUFFICIENT_DATA";
+    if (code === "LEGACY_REASON_NOT_RECORDED") return "INTERNAL_ERROR";
+    if (code === "SELECTION_TIMEOUT") return "ENTRY_CONTRACT_NOT_MET";
+    if (code === "NO_CANDIDATE_EXPECTED") return "ENTRY_CONTRACT_NOT_MET";
+    return "INTERNAL_ERROR";
   };
-
-  if (upper.includes("NO_CANDIDATE")) add("ENTRY_CONTRACT_NOT_MET");
-  if (upper.includes("STALE")) add("STALE_DATA");
-  if (upper.includes("INSUFFICIENT")) add("INSUFFICIENT_DATA");
-  if (upper.includes("REGIME")) add("UNSUPPORTED_REGIME");
-  if (upper.includes("NO_ELIGIBLE_STRATEGY")) add("NO_ELIGIBLE_STRATEGY");
-  if (upper.includes("NO_SIGNAL")) add("STRATEGY_NO_SIGNAL");
-  if (upper.includes("CONFLICT")) add("STRATEGY_CONFLICT");
-  if (upper.includes("SHADOW_ONLY")) add("ROUTER_SHADOW_ONLY");
-  if (upper.includes("FEE")) add("FEE_NOT_VIABLE");
-  if (upper.includes("MINIMUM_MOVE")) add("MINIMUM_MOVE_NOT_MET");
-  if (upper.includes("SPREAD")) add("SPREAD_TOO_HIGH");
-  if (upper.includes("SLIPPAGE")) add("SLIPPAGE_TOO_HIGH");
-  if (upper.includes("RISK")) add("RISK_REJECTED");
-  if (upper.includes("EXPOSURE")) add("EXPOSURE_LIMIT");
-  if (upper.includes("LOSS_CAP")) add("LOSS_CAP");
-  if (upper.includes("EXECUTION")) add("EXECUTION_NOT_REACHED");
-  if (upper.includes("ERROR") || upper.includes("FAILED")) add("INTERNAL_ERROR");
-
-  const first = codes[0] ?? "ENTRY_CONTRACT_NOT_MET";
-  const isWait = first === "STALE_DATA" || first === "INSUFFICIENT_DATA" || first === "ENTRY_CONTRACT_NOT_MET";
+  const first = toCode(resolved.firstBlocker);
   return {
-    decision: isWait ? "WAIT" : "REJECT",
+    decision: resolved.decision ?? "WAIT",
     reasonCode: first,
-    secondary: codes.slice(1),
+    secondary: resolved.secondaryBlockers.map((x) => toCode(x)),
   };
 }

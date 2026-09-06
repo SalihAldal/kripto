@@ -1,0 +1,156 @@
+{
+  "assessmentId": "ER01-telemetry-verdict-recovery",
+  "generatedAt": "2026-09-06T00:00:00.000Z",
+  "scope": "PROMPT_1_OF_7",
+  "inspectedVersion": {
+    "head": "a85a04677acc8dba27af3362f238f86a1d463ea5",
+    "branch": "main",
+    "worktreeStatus": "DIRTY",
+    "dirtyFilesObserved": [
+      "data/exchange-info-tr.json",
+      "scripts/p7-zero-entry-forensic.ts",
+      "src/server/execution/p7-paper-strategy-contract.ts",
+      "src/server/recovery/failsafe-recovery.service.ts",
+      "src/server/forensics/er01-telemetry-verdict.ts",
+      "tests/er01-telemetry-verdict.test.ts",
+      "KRIPTO_ENGINEERING_RECOVERY_TRACKER.md",
+      "KRIPTO_ER01_TELEMETRY_AND_VERDICT_REPORT.md",
+      "kripto-er01-telemetry-and-verdict.json"
+    ],
+    "runtime": {
+      "nodeVersion": "v24.13.0",
+      "npmVersion": "11.6.2",
+      "diskFreeGb": 476.84
+    }
+  },
+  "blockers": [
+    {
+      "id": "ER01-A",
+      "severity": "P0",
+      "title": "Tautology-based GO",
+      "status": "FIXED",
+      "files": [
+        "scripts/p7-zero-entry-forensic.ts",
+        "src/server/forensics/er01-telemetry-verdict.ts"
+      ]
+    },
+    {
+      "id": "ER01-B",
+      "severity": "P0",
+      "title": "Unmeasured values were emitted as PASS/false/0",
+      "status": "FIXED",
+      "files": [
+        "src/server/forensics/er01-telemetry-verdict.ts"
+      ]
+    },
+    {
+      "id": "ER01-C",
+      "severity": "P0",
+      "title": "Round and candidate identity mixing",
+      "status": "FIXED",
+      "files": [
+        "scripts/p7-zero-entry-forensic.ts"
+      ]
+    },
+    {
+      "id": "ER01-D",
+      "severity": "P0",
+      "title": "Legacy free-text parser produced wrong admission classes",
+      "status": "FIXED",
+      "files": [
+        "src/server/forensics/er01-telemetry-verdict.ts",
+        "src/server/execution/p7-paper-strategy-contract.ts"
+      ]
+    },
+    {
+      "id": "ER01-E",
+      "severity": "P1",
+      "title": "Auto-round integration deterministic isolation",
+      "status": "BLOCKED",
+      "reason": "Local PostgreSQL not reachable at localhost:5432 during integration runtime path",
+      "files": [
+        "src/server/recovery/failsafe-recovery.service.ts",
+        "tests/auto-round-engine.integration.test.ts"
+      ]
+    }
+  ],
+  "contracts": {
+    "terminal": "src/server/forensics/er01-telemetry-verdict.ts::resolveTerminalEvidence",
+    "funnel": "src/server/forensics/er01-telemetry-verdict.ts::summarizeFunnel",
+    "verdict": "src/server/forensics/er01-telemetry-verdict.ts::evaluateRecoveryAssessment"
+  },
+  "checks": [
+    {
+      "checkId": "focused-suite-run-1",
+      "required": true,
+      "status": "PASS",
+      "evidenceSource": "vitest",
+      "command": "npm run test:run -- tests/er01-telemetry-verdict.test.ts tests/p7-paper-only-activation.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "focused-suite-run-2",
+      "required": true,
+      "status": "PASS",
+      "evidenceSource": "vitest",
+      "command": "npm run test:run -- tests/er01-telemetry-verdict.test.ts tests/p7-paper-only-activation.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "focused-suite-run-3",
+      "required": true,
+      "status": "PASS",
+      "evidenceSource": "vitest",
+      "command": "npm run test:run -- tests/er01-telemetry-verdict.test.ts tests/p7-paper-only-activation.test.ts tests/p4-regime-strategy-shadow.test.ts",
+      "exitCode": 0
+    },
+    {
+      "checkId": "auto-round-consumer-regression",
+      "required": true,
+      "status": "BLOCKED",
+      "evidenceSource": "vitest",
+      "command": "npm run test:run -- tests/auto-round-engine.integration.test.ts tests/entry-decision-engine.test.ts tests/execution-orchestrator.integration.test.ts",
+      "exitCode": 1,
+      "details": "auto-round-engine.integration timed out, DB access path failed (localhost:5432 unreachable)"
+    },
+    {
+      "checkId": "typecheck",
+      "required": true,
+      "status": "PASS",
+      "evidenceSource": "tsc",
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "checkId": "build",
+      "required": true,
+      "status": "PASS",
+      "evidenceSource": "next build",
+      "command": "npm run build",
+      "exitCode": 0
+    },
+    {
+      "checkId": "campaign-smoke",
+      "required": true,
+      "status": "NOT_RUN",
+      "evidenceSource": "phase policy",
+      "details": "Prompt 1 boundary and explicit no campaign start rule"
+    }
+  ],
+  "assessment": {
+    "PHASE1_VERDICT": "PARTIAL",
+    "OVERALL_ENGINEERING_READINESS": "PARTIAL",
+    "NEXT_PAPER_PREFLIGHT": "NO_GO",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED"
+  },
+  "supersededHistoricalClaims": [
+    {
+      "artifact": "kripto-p7-zero-entry-forensic.json",
+      "whyUnreliable": "Contained tautological GO rule and static PASS-style fields without measured evidence"
+    },
+    {
+      "artifact": "KRIPTO_P7_NEXT_6H_PAPER_PREFLIGHT.md",
+      "whyUnreliable": "Could diverge from JSON verdict; not generated from a single assessment object"
+    }
+  ]
+}

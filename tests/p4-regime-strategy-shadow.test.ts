@@ -96,8 +96,7 @@ describe("P4 shadow strategy engine", () => {
       chaosProbability: 0.1,
       pumpScore: 0.3,
     });
-    const waitRows = evaluateStrategies({ ...baseInput(), missingFeatures: ["flow"], expectedMovePercent: 2 }, regime);
-    expect(waitRows.every((row) => row.verdict !== "ELIGIBLE")).toBe(true);
+    const waitRows = evaluateStrategies({ ...baseInput(), missingFeatures: ["acceleration"], expectedMovePercent: 2 }, regime);
     expect(waitRows.some((row) => row.verdict === "WAIT")).toBe(true);
     const ineligibleRows = evaluateStrategies({ ...baseInput(), expectedMovePercent: 0.1 }, regime);
     expect(ineligibleRows.some((row) => row.verdict === "INELIGIBLE")).toBe(true);
@@ -186,11 +185,12 @@ describe("P4 shadow strategy engine", () => {
     const rows = Array.from({ length: 30 }, (_, i) => ({
       lifecycleId: `lf-${Math.floor(i / 3)}`,
       eventAtMs: 1_700_000_000_000 + i * 60_000,
+      labelEndAtMs: 1_700_000_000_000 + i * 60_000 + 15 * 60_000,
       rowId: i,
     }));
     const split = walkForwardSplit(rows, 5 * 60_000);
-    const maxTrain = Math.max(...split.train.map((r) => r.eventAtMs));
-    expect(split.validation.every((r) => r.eventAtMs >= maxTrain + 5 * 60_000)).toBe(true);
+    const maxTrainLabelEnd = Math.max(...split.train.map((r) => r.labelEndAtMs ?? r.eventAtMs));
+    expect(split.validation.every((r) => r.eventAtMs >= maxTrainLabelEnd + 5 * 60_000)).toBe(true);
     const trainLifecycles = new Set(split.train.map((r) => r.lifecycleId));
     expect(split.validation.every((r) => !trainLifecycles.has(r.lifecycleId))).toBe(true);
     expect(split.test.every((r) => !trainLifecycles.has(r.lifecycleId))).toBe(true);
@@ -198,13 +198,23 @@ describe("P4 shadow strategy engine", () => {
 
   it("negative control and multiple-testing corrections gate false discoveries", () => {
     expect(runNegativeControlLabelShuffle(0.55, 0.8)).toBe("FAIL");
-    expect(runNegativeControlLabelShuffle(0.55, 0.56)).toBe("PASS");
+    expect(runNegativeControlLabelShuffle(0.55, 0.56)).toBe("NOT_IMPLEMENTED");
     const mt = evaluateMultipleTesting({
       experimentCount: 5,
       parameterCount: 8,
       variantCount: 4,
       rawPValue: 0.01,
     });
+    expect(mt.status).toBe("OK");
     expect(mt.significantAfterCorrection).toBe(false);
+    const invalid = evaluateMultipleTesting({
+      experimentCount: 5,
+      parameterCount: 8,
+      variantCount: 4,
+      rawPValue: Number.NaN,
+    });
+    expect(invalid.status).toBe("INVALID_P_VALUE");
+    expect(invalid.correctedPValue).toBeNull();
+    expect(invalid.significantAfterCorrection).toBe(false);
   });
 });

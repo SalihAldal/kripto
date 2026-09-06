@@ -1,3 +1,7 @@
+import { evaluateEarlyAccelerationStrategy } from "@/src/server/profitability/pr02-early-evaluator";
+import { evaluateBreakoutRetestStrategy } from "@/src/server/profitability/pr03-breakout-evaluator";
+import { evaluateMomentumContinuationStrategy } from "@/src/server/profitability/pr03-momentum-evaluator";
+
 export type MarketRegime =
   | "BULL_TREND"
   | "BEAR_TREND"
@@ -33,7 +37,7 @@ export type StrategyEvaluation = {
   candidateId: string;
   strategyId: StrategyId;
   policyVersion: string;
-  sourceType: "LIVE_MARKET" | "RECORDED_REPLAY" | "SYNTHETIC_FIXTURE";
+  sourceType: "LIVE_MARKET" | "RECORDED_REPLAY" | "SYNTHETIC_FIXTURE" | "UNKNOWN";
   evaluatedAt: string;
   marketEventAt: string;
   verdict: "ELIGIBLE" | "WAIT" | "INELIGIBLE";
@@ -47,6 +51,7 @@ export type StrategyEvaluation = {
   firstBlocker: string | null;
   missingFeatures: string[];
   staleFeatures: string[];
+  invalidFeatures: string[];
   entryTrigger: string;
   invalidationReason: string | null;
   suggestedHorizon: string;
@@ -82,8 +87,13 @@ export type StrategyInput = {
   rangeScore: number;
   distanceFromMean: number;
   flowRecovery: number;
+  flowImbalance?: number;
+  tradeRateAcceleration?: number;
+  priceReturnShortPct?: number;
+  extensionFromBaselinePct?: number;
   staleFeatures?: string[];
   missingFeatures?: string[];
+  invalidFeatures?: string[];
   entrySpread: number;
   entrySlippage: number;
   entryFee: number;
@@ -92,6 +102,8 @@ export type StrategyInput = {
   exitFee: number;
   strategyProfitBuffer: number;
   expectedMovePercent: number;
+  earlyContext?: import("@/src/server/profitability/pr02-types").EarlyContextExtension;
+  strategyContext?: import("@/src/server/profitability/pr03-types").StrategyContextExtension;
 };
 
 const STRATEGIES: StrategyId[] = [
@@ -201,7 +213,7 @@ export function computeMinimumViableMove(input: Pick<StrategyInput, "entrySpread
   ).toFixed(6));
 }
 
-export function walkForwardSplit<T extends { eventAtMs: number; lifecycleId: string }>(rows: T[], embargoMs: number): {
+export function walkForwardSplit<T extends { eventAtMs: number; lifecycleId: string; labelEndAtMs?: number }>(rows: T[], embargoMs: number): {
   train: T[];
   validation: T[];
   test: T[];
@@ -221,31 +233,81 @@ export function walkForwardSplit<T extends { eventAtMs: number; lifecycleId: str
   const validationGroups = groups.slice(trainEnd, valEnd);
   const testGroups = groups.slice(valEnd);
   const train = trainGroups.flat();
-  const maxTrain = train.length ? Math.max(...train.map((row) => row.eventAtMs)) : Number.NEGATIVE_INFINITY;
-  const validation = validationGroups.flat().filter((row) => row.eventAtMs >= maxTrain + embargoMs);
-  const maxVal = validation.length ? Math.max(...validation.map((row) => row.eventAtMs)) : maxTrain;
-  const test = testGroups.flat().filter((row) => row.eventAtMs >= maxVal + embargoMs);
+  const maxTrainLabelEnd = train.length
+    ? Math.max(...train.map((row) => row.labelEndAtMs ?? row.eventAtMs))
+    : Number.NEGATIVE_INFINITY;
+  const validation = validationGroups.flat().filter((row) => row.eventAtMs >= maxTrainLabelEnd + embargoMs);
+  const maxValidationLabelEnd = validation.length
+    ? Math.max(...validation.map((row) => row.labelEndAtMs ?? row.eventAtMs))
+    : maxTrainLabelEnd;
+  const test = testGroups.flat().filter((row) => row.eventAtMs >= maxValidationLabelEnd + embargoMs);
   return { train, validation, test };
 }
 
-export function runNegativeControlLabelShuffle(winRate: number, shuffledWinRate: number): "PASS" | "FAIL" {
-  return shuffledWinRate > winRate + 0.05 ? "FAIL" : "PASS";
+export function runNegativeControlLabelShuffle(
+  winRate: number,
+  shuffledWinRate: number,
+): "FAIL" | "NOT_IMPLEMENTED" {
+  if (!Number.isFinite(winRate) || !Number.isFinite(shuffledWinRate)) return "NOT_IMPLEMENTED";
+  if (shuffledWinRate > winRate + 0.05) return "FAIL";
+  return "NOT_IMPLEMENTED";
 }
 
 export function evaluateMultipleTesting(input: { experimentCount: number; parameterCount: number; variantCount: number; rawPValue: number }) {
+  if (!Number.isFinite(input.rawPValue) || input.rawPValue < 0 || input.rawPValue > 1) {
+    return {
+      comparisons: Math.max(1, input.experimentCount * input.parameterCount * input.variantCount),
+      correctedPValue: null,
+      significantAfterCorrection: false,
+      status: "INVALID_P_VALUE" as const,
+    };
+  }
   const comparisons = Math.max(1, input.experimentCount * input.parameterCount * input.variantCount);
   const corrected = Math.min(1, input.rawPValue * comparisons);
   return {
     comparisons,
     correctedPValue: Number(corrected.toFixed(6)),
     significantAfterCorrection: corrected < 0.05,
+    status: "OK" as const,
   };
 }
 
 function evaluateOneStrategy(strategyId: StrategyId, input: StrategyInput, regime: RegimeSnapshot): StrategyEvaluation {
+  if (strategyId === "EARLY_ACCELERATION") {
+    return evaluateEarlyAccelerationStrategy(input, regime, input.earlyContext).strategyEvaluation;
+  }
+  if (strategyId === "MOMENTUM_CONTINUATION") {
+    return evaluateMomentumContinuationStrategy(input, regime, input.strategyContext).strategyEvaluation;
+  }
+  if (strategyId === "BREAKOUT_RETEST") {
+    return evaluateBreakoutRetestStrategy(input, regime, input.strategyContext).strategyEvaluation;
+  }
   const reasons: string[] = [];
-  const missingFeatures = [...new Set(input.missingFeatures ?? [])];
-  const staleFeatures = [...new Set(input.staleFeatures ?? [])];
+  const missingAll = new Set(input.missingFeatures ?? []);
+  const staleAll = new Set(input.staleFeatures ?? []);
+  const invalidAll = new Set(input.invalidFeatures ?? []);
+  const commonRequired = [
+    "expectedMovePercent",
+    "entrySpread",
+    "entrySlippage",
+    "entryFee",
+    "exitSpread",
+    "exitSlippage",
+    "exitFee",
+    "liquidityScore",
+    "marketEventAt",
+  ];
+  const perStrategyRequired: Record<StrategyId, string[]> = {
+    EARLY_ACCELERATION: ["velocity", "acceleration", "volumeAcceleration", "relativeStrength"],
+    MOMENTUM_CONTINUATION: ["momentum", "acceleration", "flowRecovery"],
+    BREAKOUT_RETEST: ["breakoutHeld", "flowRecovery", "acceleration"],
+    STEADY_TREND: ["relativeStrength", "exhaustion", "spreadBps"],
+    RANGE_MEAN_REVERSION: ["rangeScore", "distanceFromMean", "flowRecovery", "retracement"],
+  };
+  const required = [...commonRequired, ...perStrategyRequired[strategyId]];
+  const missingFeatures = required.filter((key) => missingAll.has(key));
+  const staleFeatures = required.filter((key) => staleAll.has(key));
+  const invalidFeatures = required.filter((key) => invalidAll.has(key));
   const minimumViableMovePercent = computeMinimumViableMove(input);
   const regimeCompatibility = regimeScore(strategyId, regime.regime);
   const setupQuality = setupScore(strategyId, input);
@@ -254,12 +316,13 @@ function evaluateOneStrategy(strategyId: StrategyId, input: StrategyInput, regim
   const estimatedCostPercent = minimumViableMovePercent - input.strategyProfitBuffer;
   if (missingFeatures.length > 0) reasons.push("MISSING_FEATURES");
   if (staleFeatures.length > 0) reasons.push("STALE_FEATURES");
+  if (invalidFeatures.length > 0) reasons.push("INVALID_FEATURES");
   if (input.expectedMovePercent <= minimumViableMovePercent) reasons.push("COST_NOT_VIABLE");
   if (regimeCompatibility < 0.35) reasons.push("REGIME_MISMATCH");
   if (setupQuality < 0.45) reasons.push("SETUP_WEAK");
   if (entryTimingQuality < 0.4) reasons.push("ENTRY_TIMING_WEAK");
   if (executionQuality < 0.45) reasons.push("EXECUTION_QUALITY_WEAK");
-  const verdict = resolveVerdict(reasons, missingFeatures.length > 0 || staleFeatures.length > 0);
+  const verdict = resolveVerdict(reasons, missingFeatures.length > 0 || staleFeatures.length > 0 || invalidFeatures.length > 0);
   return {
     evaluationId: `${input.candidateId}:${strategyId}:${regime.policyVersion}`,
     candidateId: input.candidateId,
@@ -279,11 +342,12 @@ function evaluateOneStrategy(strategyId: StrategyId, input: StrategyInput, regim
     firstBlocker: reasons[0] ?? null,
     missingFeatures,
     staleFeatures,
+    invalidFeatures,
     entryTrigger: strategyId,
     invalidationReason: verdict === "INELIGIBLE" ? reasons[0] ?? "INELIGIBLE" : null,
     suggestedHorizon: strategyId === "STEADY_TREND" ? "15-60m" : "3-30m",
     suggestedRiskProfile: strategyId === "RANGE_MEAN_REVERSION" ? "MEAN_REVERT" : "TREND_FOLLOW",
-    suggestedExitProfile: strategyId === "BREAKOUT_RETEST" ? "RETEST_FAIL_EXIT" : "STANDARD",
+    suggestedExitProfile: "STANDARD",
     shadowOnly: true,
   };
 }

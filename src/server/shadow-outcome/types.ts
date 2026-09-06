@@ -14,6 +14,7 @@ export type HorizonOutcome = {
   maePct: number | null;
   returnPct: number | null;
   timeToMfeMs: number | null;
+  timeToMaeMs: number | null;
   complete: boolean;
   quality: "OK" | "OUTCOME_DATA_INCOMPLETE" | "HISTORY_UNAVAILABLE";
   status: "PENDING" | "COMPLETE" | "INVALID_DATA" | "HISTORY_UNAVAILABLE";
