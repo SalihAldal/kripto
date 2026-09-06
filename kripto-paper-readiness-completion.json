@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "paper-readiness-completion-v1",
+  "startedAtHead": "eba87a621c5dddcecf9e8c5d7600429fa397ce48",
+  "completedAt": "2026-09-07T02:45:00+03:00",
+  "finalHead": "eba87a621c5dddcecf9e8c5d7600429fa397ce48",
+  "dirty": true,
+  "paperCampaignStarted": false,
+  "liveAuthorization": "DISABLED",
+  "verdicts": {
+    "FILL_IDENTITY_AND_ADAPTER_CONTRACT": "PASS",
+    "EXECUTION_RECORD_UNIQUENESS": "PASS",
+    "RECONCILIATION_TERMINAL_STATE": "PASS",
+    "ENTRY_FEE_ACCOUNTING": "PASS",
+    "RESERVATION_AND_BALANCE": "PARTIAL",
+    "ACK_LOSS_PROCESS_RECOVERY": "PARTIAL",
+    "POST_COMMIT_IPC_KILL": "PASS",
+    "PRODUCTION_ENTRY_PARTIAL_STOP": "PASS",
+    "COUNTERFACTUAL_EXECUTION": "PASS",
+    "PAPER_RUNNER_PREFLIGHT": "PASS",
+    "FINAL_ENGINEERING_VERDICT": "PARTIAL",
+    "PAPER_ENGINEERING_READINESS": "NOT_READY",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA"
+  },
+  "openCounts": {
+    "OPEN_CRITICAL_COUNT": 0,
+    "OPEN_HIGH_COUNT": 2
+  },
+  "requiredChecksNotRun": [
+    "ACK_LOSS_SUBMIT_TIMEOUT_PROCESS_DEATH_E2E",
+    "AUTHORITATIVE_PAPER_CASH_EXPOSURE_SINGLE_TEST"
+  ],
+  "qa": {
+    "settlementReconciliation": { "status": "PASS", "tests": 14 },
+    "processKill3Rounds": { "status": "PASS", "rounds": 3 },
+    "paperProductionChain": { "status": "PASS", "tests": 1 },
+    "counterfactualExitExecution": { "status": "PASS", "tests": 5 },
+    "executionCorrection": { "status": "PASS" },
+    "correctionsFinalQa": { "status": "PASS" },
+    "replayCorrection": { "status": "PASS" },
+    "executionSettlement": { "status": "PASS" },
+    "typecheck": { "status": "PASS" },
+    "build": { "status": "PASS", "compileSeconds": 210 }
+  },
+  "paperPreflight": {
+    "command": "pnpm tsx scripts/run-5round-paper-validation.ts --rounds=5 --max-round-minutes=30 --mode=PAPER --ai=REAL_AI --no-force-trade --no-threshold-relax --emit-forensics --emit-funnel --emit-pnl --emit-runtime",
+    "resultArtifact": "kripto-5round-paper-validation.json",
+    "envNames": [
+      "DATABASE_URL",
+      "EXECUTION_MODE",
+      "CANONICAL_RUNTIME_ENFORCE_NO_LEGACY_PERSIST",
+      "SCANNER_WORKER_USE_LEGACY_PIPELINE",
+      "EXECUTION_PR04_EXIT_EVAL_ENABLED",
+      "EXECUTION_PR04_EXIT_ROUTING_ENABLED",
+      "LIVE_TRADING_ENABLED",
+      "LIVE_TRADING_ACK"
+    ]
+  }
+}

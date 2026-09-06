@@ -495,7 +495,7 @@ describe("EXEC correction — PostgreSQL integration", () => {
       quoteQty: 90,
       fee: 0.1,
       executionRef: "ack-lost-order",
-      metadata: { reconciled: true },
+      metadata: { reconciled: true, exchangeTradeId: "ack-lost-trade-1", feeAsset: "QUOTE" },
     });
     await runExecutionEngineV2Job({ type: "RECONCILE" });
     const after = await prisma.position.findUnique({ where: { id: position.id } });

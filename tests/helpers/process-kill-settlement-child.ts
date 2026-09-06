@@ -1,7 +1,21 @@
+import fs from "node:fs";
 import { prisma } from "@/src/server/db/prisma";
-import { applyCanonicalPartialSettlementFill, setSettlementFillTransactionHook } from "@/src/server/execution/canonical-settlement-fill.service";
+import {
+  applyCanonicalPartialSettlementFill,
+  setSettlementFillPostCommitHookForTests,
+  setSettlementFillTransactionHook,
+} from "@/src/server/execution/canonical-settlement-fill.service";
 
 type Mode = "PRE_COMMIT_KILL" | "POST_COMMIT_KILL";
+
+function waitForParentKill(signalFile: string) {
+  fs.writeFileSync(signalFile, "COMMITTED", "utf8");
+  const started = Date.now();
+  while (Date.now() - started < 30_000) {
+    // Parent kills this process after reading the barrier file.
+  }
+  process.abort();
+}
 
 async function main() {
   const mode = String(process.env.CRASH_MODE ?? "") as Mode;
@@ -12,6 +26,7 @@ async function main() {
   const settlementFillId = String(process.env.CRASH_FILL_ID ?? "");
   const exchangeOrderId = String(process.env.CRASH_ORDER_ID ?? "");
   const exchangeTradeId = String(process.env.CRASH_TRADE_ID ?? "");
+  const barrierFile = String(process.env.CRASH_BARRIER_FILE ?? "");
   if (!mode || !positionId || !userId || !exchangeConnectionId || !tradingPairId || !settlementFillId) {
     throw new Error("CRASH_CHILD_MISSING_ENV");
   }
@@ -19,6 +34,12 @@ async function main() {
   if (mode === "PRE_COMMIT_KILL") {
     setSettlementFillTransactionHook("afterPositionUpdate", () => {
       process.abort();
+    });
+  }
+  if (mode === "POST_COMMIT_KILL") {
+    if (!barrierFile) throw new Error("CRASH_BARRIER_FILE_REQUIRED");
+    setSettlementFillPostCommitHookForTests(() => {
+      waitForParentKill(barrierFile);
     });
   }
   const result = await applyCanonicalPartialSettlementFill({
@@ -44,7 +65,7 @@ async function main() {
     fillAtMs: Date.now(),
     metadata: { exchangeTradeId },
   });
-  if (mode === "POST_COMMIT_KILL" && result.status === "APPLIED") {
+  if (mode === "POST_COMMIT_KILL" && result.status === "APPLIED" && !barrierFile) {
     await prisma.position.findUnique({ where: { id: positionId } });
     process.abort();
   }
@@ -59,4 +80,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect().catch(() => null);
   });
-

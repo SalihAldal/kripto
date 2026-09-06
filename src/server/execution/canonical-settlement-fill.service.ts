@@ -3,6 +3,11 @@ import { prisma } from "@/src/server/db/prisma";
 import type { SettlementFillResult } from "@/src/server/execution/settlement-fill-result";
 import { calculateRealizedPnl } from "@/src/server/execution/pnl-calculator";
 import type { ExitDecisionKind, ExitPolicyState } from "@/src/server/profitability/pr04-types";
+import {
+  allocateEntryFeePortion,
+  entryFeeAllocationMetadataPatch,
+  readEntryFeeAllocationState,
+} from "@/src/server/execution/entry-fee-allocation";
 
 type Tx = Prisma.TransactionClient;
 
@@ -450,6 +455,10 @@ export async function applyCanonicalPartialSettlementFill(input: {
       }
 
       const existingMeta = (position.metadata as Record<string, unknown> | null) ?? {};
+      const entryFeeAllocation = allocateEntryFeePortion({
+        state: readEntryFeeAllocationState(position),
+        fillQuantity: input.filledQuantity,
+      });
       const nextQuantityRaw = toRounded(position.quantity - input.filledQuantity);
       if (nextQuantityRaw < -1e-8) {
         throw new Error("SETTLEMENT_POSITION_QUANTITY_UNDERFLOW");
@@ -468,6 +477,7 @@ export async function applyCanonicalPartialSettlementFill(input: {
           closedAt: nextQuantity > 0 ? null : new Date(),
           metadata: {
             ...existingMeta,
+            ...entryFeeAllocationMetadataPatch(entryFeeAllocation.nextState),
             partialCloseFills: [
               ...(Array.isArray(existingMeta.partialCloseFills) ? existingMeta.partialCloseFills : []),
               {

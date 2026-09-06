@@ -69,7 +69,7 @@ async function seedPosition(quantity = 1) {
       entryPrice: 100,
       quantity,
       openedAt: new Date(baseNow),
-      metadata: { mode: "paper", executionId: `exec-${suffix}`, executionVenue: "BINANCE_TR" },
+      metadata: { mode: "paper", executionId: `exec-${suffix}`, executionVenue: "BINANCE_TR", entryFeeTotal: 1, entryQuantityInitial: quantity, entryFeeAllocated: 0, buyFee: 1 },
     },
   });
   return { user, conn, pair, position, suffix };
@@ -680,6 +680,346 @@ describe("Settlement & reconciliation integration", () => {
     const p2 = await prisma.position.findUnique({ where: { id: seeded2.position.id } });
     expect(p2?.status).toBe("OPEN");
     expect(await prisma.profitLossRecord.count({ where: { positionId: seeded2.position.id } })).toBe(0);
+  });
+
+  it("boş metadata fill candidate reddedilir, identity-unresolved kalır", async () => {
+    const { reconcileFix02ExitBundles } = await import("@/src/server/execution/fix02-exit-reconciliation.service");
+    const { user, conn, pair, position } = await seedPosition(1);
+    const intentId = "intent-empty-meta";
+    const order = await prisma.tradeOrder.create({
+      data: {
+        userId: user.id,
+        exchangeConnectionId: conn.id,
+        tradingPairId: pair.id,
+        positionId: position.id,
+        side: "SELL",
+        type: "MARKET",
+        quantity: 1,
+        status: "FILLED",
+        clientOrderId: buildClientOrderIdFromExitIntent(intentId)!,
+        exchangeOrderId: "empty-meta-order",
+        metadata: { exitIntentId: intentId, pr04DecisionKind: "STRUCTURAL_STOP", feeAsset: "QUOTE" },
+      },
+    });
+    await prisma.tradeExecution.create({
+      data: {
+        tradeOrderId: order.id,
+        status: "SUCCESS",
+        executionPrice: 90,
+        executedQty: 1,
+        quoteQty: 90,
+        fee: 0.1,
+        executionRef: "ex-ref-empty",
+        executedAt: new Date(baseNow + 1_000),
+        metadata: {},
+      },
+    });
+    await prisma.positionExitPersistedState.create({
+      data: {
+        positionId: position.id,
+        userId: user.id,
+        schemaVersion: "fix02-exit-persistence-v1",
+        snapshot: { positionId: position.id },
+        state: {
+          positionId: position.id,
+          remainingQuantity: 1,
+          reservedSellQuantity: 1,
+          orderState: "SUBMITTED",
+          activeExitOrder: { intentId, requestedQuantity: 1, executedQuantity: 0, openQuantity: 1, partialLegId: null, terminal: false },
+          exitFills: [],
+          completedPartialLegs: [],
+          terminalStatus: "OPEN",
+          lastDecision: "STRUCTURAL_STOP",
+          version: 1,
+          snapshot: { exitPolicyId: "STRUCTURAL_STOP_TARGET" },
+        } as unknown as Prisma.InputJsonValue,
+        stateVersion: 1,
+        terminalStatus: "OPEN",
+        activeExitIntentId: intentId,
+        reconciliationStatus: "RECONCILE_REQUIRED",
+      },
+    });
+    const beforePos = await prisma.position.findUnique({ where: { id: position.id } });
+    const result = await reconcileFix02ExitBundles();
+    expect(result.unresolvedIdentity).toBeGreaterThan(0);
+    expect(await prisma.positionSettlementFill.count({ where: { positionId: position.id } })).toBe(0);
+    expect(await prisma.tradeExecution.count({ where: { tradeOrderId: order.id } })).toBe(1);
+    expect(await prisma.profitLossRecord.count({ where: { positionId: position.id } })).toBe(0);
+    const afterPos = await prisma.position.findUnique({ where: { id: position.id } });
+    expect(afterPos?.quantity).toBe(beforePos?.quantity);
+    const bundle = await prisma.positionExitPersistedState.findUnique({ where: { positionId: position.id } });
+    expect(bundle?.reconciliationStatus).toBe("RECONCILE_REQUIRED");
+  });
+
+  it("canonical settlement kimliği metadata trade kimliği ile uyuşmazsa fill reddedilir", async () => {
+    const { reconcileFix02ExitBundles } = await import("@/src/server/execution/fix02-exit-reconciliation.service");
+    const { user, conn, pair, position } = await seedPosition(1);
+    const intentId = "intent-mismatch";
+    const order = await prisma.tradeOrder.create({
+      data: {
+        userId: user.id,
+        exchangeConnectionId: conn.id,
+        tradingPairId: pair.id,
+        positionId: position.id,
+        side: "SELL",
+        type: "MARKET",
+        quantity: 1,
+        status: "FILLED",
+        clientOrderId: buildClientOrderIdFromExitIntent(intentId)!,
+        exchangeOrderId: "mismatch-order",
+        metadata: { exitIntentId: intentId, pr04DecisionKind: "STRUCTURAL_STOP" },
+      },
+    });
+    const canonicalForTradeA = buildCanonicalSettlementFillId({
+      venue: "BINANCE_TR",
+      exchangeConnectionId: conn.id,
+      symbol: "BTCTRY",
+      exchangeOrderId: "mismatch-order",
+      exchangeTradeId: "trade-a",
+    });
+    await prisma.tradeExecution.create({
+      data: {
+        tradeOrderId: order.id,
+        status: "SUCCESS",
+        executionPrice: 90,
+        executedQty: 1,
+        quoteQty: 90,
+        fee: 0.1,
+        executionRef: "trade-b",
+        executedAt: new Date(baseNow + 1_000),
+        metadata: { exchangeTradeId: "trade-b", settlementFillId: canonicalForTradeA },
+      },
+    });
+    await prisma.positionExitPersistedState.create({
+      data: {
+        positionId: position.id,
+        userId: user.id,
+        schemaVersion: "fix02-exit-persistence-v1",
+        snapshot: { positionId: position.id },
+        state: {
+          positionId: position.id,
+          remainingQuantity: 1,
+          reservedSellQuantity: 1,
+          orderState: "SUBMITTED",
+          activeExitOrder: { intentId, requestedQuantity: 1, executedQuantity: 0, openQuantity: 1, partialLegId: null, terminal: false },
+          exitFills: [],
+          completedPartialLegs: [],
+          terminalStatus: "OPEN",
+          lastDecision: "STRUCTURAL_STOP",
+          version: 1,
+          snapshot: { exitPolicyId: "STRUCTURAL_STOP_TARGET" },
+        } as unknown as Prisma.InputJsonValue,
+        stateVersion: 1,
+        terminalStatus: "OPEN",
+        activeExitIntentId: intentId,
+        reconciliationStatus: "RECONCILE_REQUIRED",
+      },
+    });
+    const result = await reconcileFix02ExitBundles();
+    expect(result.unresolvedIdentity).toBeGreaterThan(0);
+    expect(await prisma.positionSettlementFill.count({ where: { positionId: position.id } })).toBe(0);
+  });
+
+  it("canceled partial fill sonrası rezervasyon temizlenir ve RECONCILE_REQUIRED kapanır", async () => {
+    const { reconcileFix02ExitBundles } = await import("@/src/server/execution/fix02-exit-reconciliation.service");
+    const { user, conn, pair, position } = await seedPosition(1);
+    const intentId = "intent-canceled-partial";
+    const order = await prisma.tradeOrder.create({
+      data: {
+        userId: user.id,
+        exchangeConnectionId: conn.id,
+        tradingPairId: pair.id,
+        positionId: position.id,
+        side: "SELL",
+        type: "MARKET",
+        quantity: 0.4,
+        status: "CANCELED",
+        clientOrderId: buildClientOrderIdFromExitIntent(intentId)!,
+        exchangeOrderId: "canceled-partial-order",
+        metadata: { exitIntentId: intentId, pr04DecisionKind: "PARTIAL_TAKE_PROFIT", exchangeTradeId: "cp-trade-1", feeAsset: "QUOTE", filledAtMs: baseNow + 1000 },
+      },
+    });
+    await prisma.tradeExecution.create({
+      data: {
+        tradeOrderId: order.id,
+        status: "SUCCESS",
+        executionPrice: 110,
+        executedQty: 0.4,
+        quoteQty: 44,
+        fee: 0.04,
+        executionRef: "cp-trade-1",
+        executedAt: new Date(baseNow + 1_000),
+        metadata: { exchangeTradeId: "cp-trade-1", feeAsset: "QUOTE" },
+      },
+    });
+    await prisma.positionExitPersistedState.create({
+      data: {
+        positionId: position.id,
+        userId: user.id,
+        schemaVersion: "fix02-exit-persistence-v1",
+        snapshot: { positionId: position.id },
+        state: {
+          positionId: position.id,
+          remainingQuantity: 1,
+          reservedSellQuantity: 0.4,
+          orderState: "SUBMITTED",
+          activeExitOrder: { intentId, requestedQuantity: 0.4, executedQuantity: 0, openQuantity: 0.4, partialLegId: "leg-1", terminal: false },
+          exitFills: [],
+          completedPartialLegs: [],
+          terminalStatus: "OPEN",
+          lastDecision: "PARTIAL_TAKE_PROFIT",
+          version: 2,
+          snapshot: { exitPolicyId: "STRUCTURAL_PARTIAL_TRAIL" },
+        } as unknown as Prisma.InputJsonValue,
+        stateVersion: 2,
+        terminalStatus: "OPEN",
+        activeExitIntentId: intentId,
+        reconciliationStatus: "RECONCILE_REQUIRED",
+      },
+    });
+    const result = await reconcileFix02ExitBundles();
+    expect(result.recovered).toBe(1);
+    const bundle = await prisma.positionExitPersistedState.findUnique({ where: { positionId: position.id } });
+    expect(bundle?.reconciliationStatus).toBe("OK");
+    expect(bundle?.activeExitIntentId).toBeNull();
+    const state = bundle?.state as { reservedSellQuantity?: number; orderState?: string };
+    expect(state.reservedSellQuantity).toBe(0);
+    expect(state.orderState).toBe("CANCELED");
+    expect(await prisma.positionSettlementFill.count({ where: { positionId: position.id } })).toBe(1);
+    const pos = await prisma.position.findUnique({ where: { id: position.id } });
+    expect(pos?.quantity).toBeCloseTo(0.6, 8);
+  });
+
+  it("reconcile OK güncellemesi yeni intent race durumunda eski intent'i temizlemez", async () => {
+    const { reconcileFix02ExitBundles } = await import("@/src/server/execution/fix02-exit-reconciliation.service");
+    const { user, conn, pair, position } = await seedPosition(1);
+    const oldIntent = "intent-old";
+    const newIntent = "intent-new-race";
+    const order = await prisma.tradeOrder.create({
+      data: {
+        userId: user.id,
+        exchangeConnectionId: conn.id,
+        tradingPairId: pair.id,
+        positionId: position.id,
+        side: "SELL",
+        type: "MARKET",
+        quantity: 1,
+        status: "FILLED",
+        clientOrderId: buildClientOrderIdFromExitIntent(oldIntent)!,
+        exchangeOrderId: "race-order",
+        metadata: { exitIntentId: oldIntent, pr04DecisionKind: "STRUCTURAL_STOP", exchangeTradeId: "race-trade", feeAsset: "QUOTE", filledAtMs: baseNow + 1000 },
+      },
+    });
+    await prisma.tradeExecution.create({
+      data: {
+        tradeOrderId: order.id,
+        status: "SUCCESS",
+        executionPrice: 90,
+        executedQty: 1,
+        quoteQty: 90,
+        fee: 0.1,
+        executionRef: "race-trade",
+        executedAt: new Date(baseNow + 1_000),
+        metadata: { exchangeTradeId: "race-trade" },
+      },
+    });
+    await prisma.positionExitPersistedState.create({
+      data: {
+        positionId: position.id,
+        userId: user.id,
+        schemaVersion: "fix02-exit-persistence-v1",
+        snapshot: { positionId: position.id },
+        state: {
+          positionId: position.id,
+          remainingQuantity: 1,
+          reservedSellQuantity: 1,
+          orderState: "SUBMITTED",
+          activeExitOrder: { intentId: newIntent, requestedQuantity: 1, executedQuantity: 0, openQuantity: 1, partialLegId: null, terminal: false },
+          exitFills: [],
+          completedPartialLegs: [],
+          terminalStatus: "OPEN",
+          lastDecision: "STRUCTURAL_STOP",
+          version: 5,
+          snapshot: { exitPolicyId: "STRUCTURAL_STOP_TARGET" },
+        } as unknown as Prisma.InputJsonValue,
+        stateVersion: 5,
+        terminalStatus: "OPEN",
+        activeExitIntentId: newIntent,
+        reconciliationStatus: "RECONCILE_REQUIRED",
+      },
+    });
+    const result = await reconcileFix02ExitBundles();
+    expect(result.unresolvedIntent).toBeGreaterThan(0);
+    const bundle = await prisma.positionExitPersistedState.findUnique({ where: { positionId: position.id } });
+    expect(bundle?.activeExitIntentId).toBe(newIntent);
+    expect(bundle?.reconciliationStatus).toBe("RECONCILE_REQUIRED");
+    expect(await prisma.positionSettlementFill.count({ where: { positionId: position.id } })).toBe(0);
+  });
+
+  it("entry fee allocation iki kısmi kapanışta toplam 1 pay üretir", async () => {
+    const { applyCanonicalPartialSettlementFill } = await import("@/src/server/execution/canonical-settlement-fill.service");
+    const { user, conn, pair, position } = await seedPosition(1);
+    const first = await applyCanonicalPartialSettlementFill({
+      positionId: position.id,
+      settlementFillId: "fee-alloc-1",
+      userId: user.id,
+      exchangeConnectionId: conn.id,
+      tradingPairId: pair.id,
+      quoteAsset: "TRY",
+      positionSide: "LONG",
+      closeSide: "SELL",
+      fillPrice: 110,
+      filledQuantity: 0.5,
+      closeFee: 0.05,
+      feeAsset: "QUOTE",
+      openFeePortion: 0.5,
+      clientOrderId: "fee-client-1",
+      exchangeOrderId: "fee-order-1",
+      closeReason: "TAKE_PROFIT",
+      mode: "paper",
+      orderTerminal: false,
+      orderRemainingQuantity: 0.5,
+      fillAtMs: baseNow + 1000,
+      metadata: { exchangeTradeId: "fee-trade-1" },
+    });
+    expect(first.status).toBe("APPLIED");
+    const mid = await prisma.position.findUnique({ where: { id: position.id } });
+    const midMeta = (mid?.metadata as Record<string, unknown>) ?? {};
+    expect(Number(midMeta.entryFeeAllocated ?? 0)).toBeCloseTo(0.5, 8);
+    const second = await applyCanonicalPartialSettlementFill({
+      positionId: position.id,
+      settlementFillId: "fee-alloc-2",
+      userId: user.id,
+      exchangeConnectionId: conn.id,
+      tradingPairId: pair.id,
+      quoteAsset: "TRY",
+      positionSide: "LONG",
+      closeSide: "SELL",
+      fillPrice: 112,
+      filledQuantity: 0.5,
+      closeFee: 0.05,
+      feeAsset: "QUOTE",
+      openFeePortion: 0.5,
+      clientOrderId: "fee-client-2",
+      exchangeOrderId: "fee-order-2",
+      closeReason: "TAKE_PROFIT",
+      mode: "paper",
+      orderTerminal: true,
+      orderRemainingQuantity: 0,
+      fillAtMs: baseNow + 2000,
+      metadata: { exchangeTradeId: "fee-trade-2" },
+    });
+    expect(second.status).toBe("APPLIED");
+    const pnlRows = await prisma.profitLossRecord.findMany({ where: { positionId: position.id } });
+    const allocatedEntryFee = pnlRows.reduce((acc, row) => {
+      const meta = (row.metadata as Record<string, unknown> | null) ?? {};
+      return acc;
+    }, 0);
+    const final = await prisma.position.findUnique({ where: { id: position.id } });
+    const finalMeta = (final?.metadata as Record<string, unknown>) ?? {};
+    expect(Number(finalMeta.entryFeeAllocated ?? 0)).toBeCloseTo(1, 8);
+    const feeFromPnl = pnlRows.reduce((acc, row) => acc + Number(row.feeTotal ?? 0), 0);
+    expect(feeFromPnl).toBeGreaterThan(0.09);
   });
 });
 

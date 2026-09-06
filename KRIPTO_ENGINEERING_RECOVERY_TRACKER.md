@@ -455,3 +455,19 @@
 - QA koşuları: settlement/reconcile, execution-correction, fix02-durable, process-kill, replay/pr05, corrections-final ve post-fix-final paketleri PASS; crash/concurrency grubu 3 tur PASS; typecheck/build PASS.
 - Final verdict bu tur: `FINAL_ENGINEERING_VERDICT=PARTIAL`, `PAPER_ENGINEERING_READINESS=NOT_READY`.
 - Açık HIGH: gerçek IPC post-commit/pre-response kill bariyeri, no-manual-seed tek testte full entry->partial->stop zinciri, tam deterministic counterfactual execution modeli.
+
+## Paper Readiness Completion (Prompt 17 — paper öncesi açıklar)
+
+- Rapor: `KRIPTO_PAPER_READINESS_COMPLETION_REPORT.md`
+- Findings: `KRIPTO_PAPER_READINESS_COMPLETION_FINDINGS.md`
+- JSON: `kripto-paper-readiness-completion.json`
+- Fill identity: `resolveCanonicalFillIdentity` / `resolveExchangeTradeIdFromMetadata` — boş/`"undefined"` literal reddi; ingestion + reconcile ortak resolver.
+- Entry fee: `entry-fee-allocation.ts` — başlangıç qty/fee + `entryFeeAllocated`; kalan-qty bölme hatası giderildi.
+- Reconcile terminal: canceled partial cleanup, koşullu OK (`stateVersion`), intent race testi.
+- IPC post-commit kill: `postCommitHook` + barrier dosyası; 3 tur PASS.
+- Paper adapter metadata: `tradeId`/`fillId`/`simulationId` production settlement path’e bağlandı.
+- Counterfactual: `counterfactual-exit-execution.ts` + unit testler.
+- Production chain: `tests/paper-readiness-production-chain.integration.test.ts` (paper entry → partial → stop).
+- QA: settlement (14), process-kill ×3, production chain, counterfactual, correction/corrections/replay/settlement suites, typecheck, build PASS.
+- Verdict: `FINAL_ENGINEERING_VERDICT=PARTIAL`, `PAPER_ENGINEERING_READINESS=NOT_READY`, `OPEN_HIGH_COUNT=2`.
+- Kalan HIGH: ACK-loss submit timeout + process death e2e; authoritative paper cash/exposure tek test.

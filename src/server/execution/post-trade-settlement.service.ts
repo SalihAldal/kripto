@@ -46,8 +46,12 @@ import { persistOrchestrationEnvelope } from "@/src/server/orchestration";
 import { persistPaperCloseFillForSettlement } from "@/src/server/execution/paper-close-persistence.service";
 import { applyCanonicalPartialSettlementFill } from "@/src/server/execution/canonical-settlement-fill.service";
 import type { SettlementFillResult } from "@/src/server/execution/settlement-fill-result";
-import { buildCanonicalSettlementFillId } from "@/src/server/execution/canonical-fill-identity";
+import { buildCanonicalSettlementFillId, resolveCanonicalFillIdentity } from "@/src/server/execution/canonical-fill-identity";
 import { buildClientOrderIdFromExitIntent } from "@/src/server/execution/exit-intent-identity";
+import {
+  allocateEntryFeePortion,
+  readEntryFeeAllocationState,
+} from "@/src/server/execution/entry-fee-allocation";
 
 function isRateLimitedCloseError(error: unknown) {
   const message = (error as Error)?.message?.toLowerCase?.() ?? "";
@@ -102,25 +106,6 @@ function resolveFeeCurrency(input: {
   return null;
 }
 
-function buildCanonicalFillIdentity(input: {
-  venue: string;
-  exchangeConnectionId: string;
-  symbol: string;
-  exchangeOrderId: string;
-  exchangeTradeId: string;
-}) {
-  const normalizedOrderId = input.exchangeOrderId.trim();
-  const normalizedTradeId = input.exchangeTradeId.trim();
-  if (!normalizedOrderId || !normalizedTradeId) return null;
-  return buildCanonicalSettlementFillId({
-    venue: input.venue,
-    exchangeConnectionId: input.exchangeConnectionId,
-    symbol: input.symbol,
-    exchangeOrderId: normalizedOrderId,
-    exchangeTradeId: normalizedTradeId,
-  });
-}
-
 function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED" {
   const upper = raw.toUpperCase();
   if (upper.includes("PARTIALLY")) return "PARTIALLY_FILLED";
@@ -131,17 +116,12 @@ function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "C
   return "NEW";
 }
 
-function resolveOpenFee(position: NonNullable<Awaited<ReturnType<typeof getPositionById>>>) {
-  const positionFee = Number(position.feeTotal ?? 0);
-  if (Number.isFinite(positionFee) && positionFee > 0) return positionFee;
-  const openSide = position.side === "LONG" ? "BUY" : "SELL";
-  const orderFee = (position.tradeOrders ?? [])
-    .filter((order) => order.side === openSide && order.status === "FILLED")
-    .reduce((acc, order) => acc + Number(order.fee ?? 0), 0);
-  if (Number.isFinite(orderFee) && orderFee > 0) return Number(orderFee.toFixed(8));
-  const metadata = (position.metadata as Record<string, unknown> | null) ?? {};
-  const metadataFee = Number(metadata.buyFee ?? metadata.openFee ?? 0);
-  return Number.isFinite(metadataFee) && metadataFee > 0 ? metadataFee : 0;
+function resolveEntryFeePortion(position: NonNullable<Awaited<ReturnType<typeof getPositionById>>>, fillQuantity: number) {
+  const { portion } = allocateEntryFeePortion({
+    state: readEntryFeeAllocationState(position),
+    fillQuantity,
+  });
+  return portion;
 }
 
 async function recordFeedbackLearning(input: {
@@ -864,7 +844,7 @@ export async function settleOpenPosition(input: {
   const closeFeeFromOrder = Number((closeOrder.metadata as Record<string, unknown> | undefined)?.fee ?? 0);
   const closeFeeEst = await estimateFees(symbol, closeSide, finalCloseQty, closeFillPrice);
   const closeFee = Number.isFinite(closeFeeFromOrder) && closeFeeFromOrder > 0 ? closeFeeFromOrder : closeFeeEst.estimatedTakerFee;
-  const openFee = resolveOpenFee(position);
+  const openFeePortion = resolveEntryFeePortion(position, finalCloseQty);
   const slippageCostAttribution = Number((closeOrder.metadata as Record<string, unknown> | undefined)?.slippagePct ?? 0);
   const spreadCostAttribution = Number((closeOrder.metadata as Record<string, unknown> | undefined)?.spreadCostQuote ?? 0);
   // Fill price already includes spread/slippage effect. Avoid double-counting in net PnL.
@@ -875,7 +855,7 @@ export async function settleOpenPosition(input: {
     entryPrice: position.entryPrice,
     exitPrice: closeFillPrice,
     quantity: finalCloseQty,
-    openFee: isPartialClose ? openFee * (finalCloseQty / Math.max(position.quantity, finalCloseQty)) : openFee,
+    openFee: openFeePortion,
     closeFee,
     slippageCost,
   });
@@ -899,21 +879,16 @@ export async function settleOpenPosition(input: {
     if (raw === "BASE" || raw === "QUOTE") return raw;
     return "UNKNOWN";
   })() as "BASE" | "QUOTE" | "UNKNOWN";
+  const closeMetadata = (closeOrder.metadata as Record<string, unknown> | undefined) ?? {};
   const exchangeOrderId = String(closeOrder.orderId ?? "").trim();
-  const exchangeTradeId = String(
-    (closeOrder.metadata as Record<string, unknown> | undefined)?.tradeId ??
-      (closeOrder.metadata as Record<string, unknown> | undefined)?.fillId ??
-      (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
-      "",
-  ).trim();
-  const canonicalSettlementFillId = buildCanonicalFillIdentity({
+  const canonicalIdentity = resolveCanonicalFillIdentity({
     venue,
     exchangeConnectionId: position.exchangeConnectionId,
     symbol,
     exchangeOrderId,
-    exchangeTradeId,
+    metadata: closeMetadata,
   });
-  if (!canonicalSettlementFillId) {
+  if (!canonicalIdentity) {
     resumeScannerWorker();
     return {
       closed: false,
@@ -921,6 +896,7 @@ export async function settleOpenPosition(input: {
       reason: "Canonical fill identity unavailable",
     };
   }
+  const { exchangeTradeId, settlementFillId: canonicalSettlementFillId } = canonicalIdentity;
   const canonical = await applyCanonicalPartialSettlementFill({
     positionId: position.id,
     settlementFillId: canonicalSettlementFillId,
@@ -940,7 +916,7 @@ export async function settleOpenPosition(input: {
       quoteAsset: position.tradingPair.quoteAsset,
       closeOrderMetadata: (closeOrder.metadata as Record<string, unknown> | undefined) ?? undefined,
     }),
-    openFeePortion: openFee * (finalCloseQty / Math.max(position.quantity, finalCloseQty)),
+    openFeePortion,
     clientOrderId: closeOrder.clientOrderId ?? preferredClientOrderId ?? `client-${input.positionId}`,
     exchangeOrderId: closeOrder.orderId ?? `ex-${input.positionId}`,
     closeReason: input.reason,
@@ -1025,7 +1001,7 @@ export async function settleOpenPosition(input: {
     reason: input.reason,
     closePrice: settledFillPrice,
     quantity: settledQty,
-    openFee,
+    openFee: openFeePortion,
     closeFee: settledFillFee,
     slippageCost: spreadCostAttribution,
     decisionTimestamp,

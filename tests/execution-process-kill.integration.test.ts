@@ -1,5 +1,8 @@
 import crypto from "node:crypto";
-import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { spawn, spawnSync } from "node:child_process";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createFix02DisposablePostgres, type Fix02DisposablePostgres } from "./helpers/fix02-disposable-postgres";
 
@@ -46,6 +49,7 @@ function runCrashChild(input: {
   settlementFillId: string;
   exchangeOrderId: string;
   exchangeTradeId: string;
+  barrierFile?: string;
 }) {
   const env = {
     ...process.env,
@@ -57,12 +61,55 @@ function runCrashChild(input: {
     CRASH_FILL_ID: input.settlementFillId,
     CRASH_ORDER_ID: input.exchangeOrderId,
     CRASH_TRADE_ID: input.exchangeTradeId,
+    ...(input.barrierFile ? { CRASH_BARRIER_FILE: input.barrierFile } : {}),
   };
   return spawnSync("npx", ["tsx", "tests/helpers/process-kill-settlement-child.ts"], {
     cwd: process.cwd(),
     env,
     encoding: "utf8",
+    shell: true,
   });
+}
+
+async function runPostCommitBarrierKill(input: {
+  positionId: string;
+  userId: string;
+  exchangeConnectionId: string;
+  tradingPairId: string;
+  settlementFillId: string;
+  exchangeOrderId: string;
+  exchangeTradeId: string;
+}) {
+  const barrierFile = path.join(os.tmpdir(), `kripto-crash-barrier-${crypto.randomUUID()}.txt`);
+  const env = {
+    ...process.env,
+    CRASH_MODE: "POST_COMMIT_KILL",
+    CRASH_POSITION_ID: input.positionId,
+    CRASH_USER_ID: input.userId,
+    CRASH_CONN_ID: input.exchangeConnectionId,
+    CRASH_PAIR_ID: input.tradingPairId,
+    CRASH_FILL_ID: input.settlementFillId,
+    CRASH_ORDER_ID: input.exchangeOrderId,
+    CRASH_TRADE_ID: input.exchangeTradeId,
+    CRASH_BARRIER_FILE: barrierFile,
+  };
+  const child = spawn("npx", ["tsx", "tests/helpers/process-kill-settlement-child.ts"], {
+    cwd: process.cwd(),
+    env,
+    stdio: "ignore",
+    shell: true,
+  });
+  const started = Date.now();
+  while (!fs.existsSync(barrierFile) && Date.now() - started < 20_000) {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  expect(fs.existsSync(barrierFile)).toBe(true);
+  child.kill("SIGKILL");
+  await new Promise<void>((resolve) => {
+    child.once("exit", () => resolve());
+    setTimeout(resolve, 2_000);
+  });
+  if (fs.existsSync(barrierFile)) fs.unlinkSync(barrierFile);
 }
 
 describe("EXEC crash proof — child process kill", () => {
@@ -112,8 +159,7 @@ describe("EXEC crash proof — child process kill", () => {
     const fillId = "crash-post-commit";
     const orderId = "order-post-commit";
     const tradeId = "trade-post-commit";
-    const res = runCrashChild({
-      mode: "POST_COMMIT_KILL",
+    await runPostCommitBarrierKill({
       positionId: seeded.position.id,
       userId: seeded.user.id,
       exchangeConnectionId: seeded.conn.id,
@@ -122,7 +168,6 @@ describe("EXEC crash proof — child process kill", () => {
       exchangeOrderId: orderId,
       exchangeTradeId: tradeId,
     });
-    expect(res.status).not.toBe(0);
     const { applyCanonicalPartialSettlementFill } = await import("@/src/server/execution/canonical-settlement-fill.service");
     const retry = await applyCanonicalPartialSettlementFill({
       positionId: seeded.position.id,

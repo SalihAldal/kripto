@@ -1,8 +1,12 @@
 import { getOrderStatus, getOrderStatusByClientOrderId } from "@/services/binance.service";
 import { prisma } from "@/src/server/db/prisma";
 import { applyCanonicalPartialSettlementFill } from "@/src/server/execution/canonical-settlement-fill.service";
-import { buildCanonicalSettlementFillId } from "@/src/server/execution/canonical-fill-identity";
+import { buildCanonicalSettlementFillId, resolveCanonicalFillIdentity, resolveExchangeTradeIdFromMetadata } from "@/src/server/execution/canonical-fill-identity";
 import { buildClientOrderIdFromExitIntent } from "@/src/server/execution/exit-intent-identity";
+import {
+  allocateEntryFeePortion,
+  readEntryFeeAllocationState,
+} from "@/src/server/execution/entry-fee-allocation";
 import type { ExitDecisionKind, ExitPolicyState } from "@/src/server/profitability/pr04-types";
 import { updateOrderStatus } from "@/src/server/repositories/execution.repository";
 import { Prisma } from "@prisma/client";
@@ -151,7 +155,7 @@ async function recoverOrderByIntentClientOrderId(input: {
   for (const fill of recoveredFills) {
     if (!fill || typeof fill !== "object") continue;
     const row = fill as Record<string, unknown>;
-    const tradeId = String(row.tradeId ?? row.id ?? row.fillId ?? "").trim();
+    const tradeId = resolveExchangeTradeIdFromMetadata(row as Record<string, unknown>);
     const qty = Number(row.executedQty ?? row.qty ?? row.quantity ?? 0);
     const price = Number(row.price ?? 0);
     const fee = Number(row.fee ?? 0);
@@ -204,19 +208,16 @@ function buildFillCandidateFromExecution(input: {
 }): ReconcileFillCandidate | null {
   const metadata = (input.execution.metadata as Record<string, unknown> | null) ?? {};
   const existingSettlementId = String(metadata.settlementFillId ?? "").trim();
-  const exchangeTradeId = String(
-    metadata.exchangeTradeId ??
-      metadata.fillId ??
-      metadata.tradeId,
-  ).trim();
-  if (!exchangeTradeId) return null;
-  const canonicalSettlementId = buildCanonicalSettlementFillId({
+  const identity = resolveCanonicalFillIdentity({
     venue: input.venue,
     exchangeConnectionId: input.exchangeConnectionId,
     symbol: input.symbol,
     exchangeOrderId: input.exchangeOrderId,
-    exchangeTradeId,
+    metadata,
+    exchangeTradeId: metadata.exchangeTradeId as string | undefined,
   });
+  if (!identity) return null;
+  const { exchangeTradeId, settlementFillId: canonicalSettlementId } = identity;
   if (existingSettlementId && existingSettlementId !== canonicalSettlementId) {
     return null;
   }
@@ -246,17 +247,17 @@ function buildFillCandidateFromOrderCumulative(input: {
 }): ReconcileFillCandidate | null {
   const metadata = (input.order.metadata as Record<string, unknown> | null) ?? {};
   const exchangeOrderId = String(input.order.exchangeOrderId ?? "").trim();
-  const exchangeTradeId = String(metadata.exchangeTradeId ?? metadata.tradeId ?? metadata.fillId ?? "").trim();
-  if (!exchangeOrderId || !exchangeTradeId) {
-    return null;
-  }
-  const settlementFillId = buildCanonicalSettlementFillId({
+  const identity = resolveCanonicalFillIdentity({
     venue: input.venue,
     exchangeConnectionId: input.exchangeConnectionId,
     symbol: input.symbol,
     exchangeOrderId,
-    exchangeTradeId,
+    metadata,
   });
+  if (!identity) {
+    return null;
+  }
+  const { exchangeTradeId, settlementFillId } = identity;
   const feeAssetRaw = String(metadata.feeAsset ?? "UNKNOWN").toUpperCase();
   const feeAsset: "BASE" | "QUOTE" | "UNKNOWN" =
     feeAssetRaw === "BASE" || feeAssetRaw === "QUOTE" ? feeAssetRaw : "UNKNOWN";
@@ -276,10 +277,57 @@ function buildFillCandidateFromOrderCumulative(input: {
   };
 }
 
-function resolveReconcileOpenFee(position: ReconcileOrderRow["position"]) {
-  const metadata = (position?.metadata as Record<string, unknown> | null) ?? {};
-  const openFee = Number(metadata.buyFee ?? metadata.openFee ?? 0);
-  return Number.isFinite(openFee) && openFee > 0 ? openFee : 0;
+function resolveReconcileOpenFeePortion(position: ReconcileOrderRow["position"], fillQuantity: number) {
+  if (!position) return 0;
+  const { portion } = allocateEntryFeePortion({
+    state: readEntryFeeAllocationState(position),
+    fillQuantity,
+  });
+  return portion;
+}
+
+async function markReconcileBundleOk(input: {
+  positionId: string;
+  expectedStateVersion: number;
+}) {
+  const updated = await prisma.positionExitPersistedState.updateMany({
+    where: {
+      positionId: input.positionId,
+      reconciliationStatus: "RECONCILE_REQUIRED",
+      stateVersion: input.expectedStateVersion,
+    },
+    data: { reconciliationStatus: "OK", activeExitIntentId: null },
+  });
+  return updated.count === 1;
+}
+
+async function clearCanceledExitReservation(input: {
+  positionId: string;
+  expectedStateVersion: number;
+}) {
+  const currentBundle = await prisma.positionExitPersistedState.findUnique({
+    where: { positionId: input.positionId },
+  });
+  if (!currentBundle) return false;
+  const currentState = currentBundle.state as ExitPolicyState;
+  const nextState = {
+    ...currentState,
+    reservedSellQuantity: 0,
+    orderState: "CANCELED" as const,
+    activeExitOrder: null,
+    version: currentState.version + 1,
+  };
+  const updated = await prisma.positionExitPersistedState.updateMany({
+    where: { positionId: input.positionId, stateVersion: input.expectedStateVersion },
+    data: {
+      state: nextState as Prisma.InputJsonValue,
+      stateVersion: nextState.version,
+      terminalStatus: nextState.terminalStatus,
+      activeExitIntentId: null,
+      reconciliationStatus: "OK",
+    },
+  });
+  return updated.count === 1;
 }
 
 export async function reconcileFix02ExitBundles(limit = 20) {
@@ -415,13 +463,7 @@ export async function reconcileFix02ExitBundles(limit = 20) {
       const orderQty = Number(latestOrder.quantity);
       const remainingOrderQty = Number.isFinite(orderQty) ? Math.max(0, orderQty - (executedRunning + fill.executedQty)) : 0;
       const result = await applyCanonicalPartialSettlementFill({
-        // Current position is re-read for open-fee apportioning under concurrent reconcile steps.
-        // This avoids unconditional openFeePortion=0 accounting.
-        openFeePortion: (() => {
-          const openFee = resolveReconcileOpenFee(latestOrder.position);
-          const denominator = Math.max(latestOrder.position?.quantity ?? fill.executedQty, fill.executedQty);
-          return denominator > 0 ? openFee * (fill.executedQty / denominator) : 0;
-        })(),
+        openFeePortion: resolveReconcileOpenFeePortion(latestOrder.position, fill.executedQty),
         positionId: position.id,
         settlementFillId: fill.settlementFillId,
         userId: position.userId,
@@ -463,46 +505,37 @@ export async function reconcileFix02ExitBundles(limit = 20) {
       }
     }
 
-    if (appliedAny && allSuccessful && latestOrder.status === "FILLED") {
-      await prisma.positionExitPersistedState.updateMany({
-        where: { positionId: row.positionId },
-        data: { reconciliationStatus: "OK", activeExitIntentId: null },
+    const terminalCanceled =
+      latestOrder.status === "CANCELED" || latestOrder.status === "REJECTED" || latestOrder.status === "EXPIRED";
+    const bundleAfterFills = await prisma.positionExitPersistedState.findUnique({
+      where: { positionId: row.positionId },
+    });
+
+    if (terminalCanceled) {
+      if (bundleAfterFills) {
+        const cleared = await clearCanceledExitReservation({
+          positionId: row.positionId,
+          expectedStateVersion: bundleAfterFills.stateVersion,
+        });
+        if (cleared) recovered += 1;
+        else stillPending += 1;
+      } else {
+        stillPending += 1;
+      }
+      continue;
+    }
+
+    if (appliedAny && allSuccessful && latestOrder.status === "FILLED" && bundleAfterFills) {
+      const marked = await markReconcileBundleOk({
+        positionId: row.positionId,
+        expectedStateVersion: bundleAfterFills.stateVersion,
       });
-      recovered += 1;
+      if (marked) recovered += 1;
+      else stillPending += 1;
       continue;
     }
     if (appliedAny) {
       stillPending += 1;
-      continue;
-    }
-
-    if (latestOrder.status === "CANCELED" || latestOrder.status === "REJECTED" || latestOrder.status === "EXPIRED") {
-      const currentBundle = await prisma.positionExitPersistedState.findUnique({
-        where: { positionId: row.positionId },
-      });
-      if (!currentBundle) {
-        stillPending += 1;
-        continue;
-      }
-      const currentState = currentBundle.state as ExitPolicyState;
-      const nextState = {
-        ...currentState,
-        reservedSellQuantity: 0,
-        orderState: "CANCELED" as const,
-        activeExitOrder: null,
-        version: currentState.version + 1,
-      };
-      await prisma.positionExitPersistedState.updateMany({
-        where: { positionId: row.positionId, stateVersion: currentBundle.stateVersion },
-        data: {
-          state: nextState as Prisma.InputJsonValue,
-          stateVersion: nextState.version,
-          terminalStatus: nextState.terminalStatus,
-          activeExitIntentId: null,
-          reconciliationStatus: "OK",
-        },
-      });
-      recovered += 1;
       continue;
     }
 

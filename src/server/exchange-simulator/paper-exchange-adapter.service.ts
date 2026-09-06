@@ -185,7 +185,9 @@ export async function executePaperOrderViaExchangeSimulator(
     simulationId: simulation.simulationId,
     metadata: {
       simulationId: simulation.simulationId,
-      candidateId: input.candidateId,
+      tradeId: simulation.simulationId,
+      fillId: simulation.simulationId,
+      feeAsset: "QUOTE",
       executionIntentId: input.executionIntentId ?? input.executionId,
       lane: input.lane ?? null,
       executionVenue: input.executionVenue ?? null,
