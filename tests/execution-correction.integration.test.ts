@@ -1,7 +1,6 @@
 import crypto from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createFix02DisposablePostgres, type Fix02DisposablePostgres } from "./helpers/fix02-disposable-postgres";
-import { createFix02DisposablePostgres, type Fix02DisposablePostgres } from "./helpers/fix02-disposable-postgres";
 
 let disposable: Fix02DisposablePostgres | null = null;
 let prisma: typeof import("@/src/server/db/prisma").prisma;
@@ -265,9 +264,15 @@ describe("EXEC correction — PostgreSQL integration", () => {
     expect(routed.closed).toBe(true);
     const exitState = getExitPolicyState(position.id)!;
     const lastFill = exitState.exitFills[exitState.exitFills.length - 1];
+    const settledRows = await prisma.positionSettlementFill.findMany({ where: { positionId: position.id } });
+    const orders = await prisma.tradeOrder.findMany({ where: { positionId: position.id } });
     expect(lastFill?.price).toBe(88.5);
     expect(lastFill?.fee).toBe(0.15);
     expect(lastFill?.quantity).toBe(1);
+    expect(settledRows.length).toBe(1);
+    expect(settledRows[0]?.fillPrice).toBe(88.5);
+    expect(orders.length).toBe(1);
+    expect(orders[0]?.status).toBe("FILLED");
   }, 30_000);
 
   it("D atomic partial settlement rolls back on injected failure", async () => {
@@ -343,6 +348,162 @@ describe("EXEC correction — PostgreSQL integration", () => {
     const pnlCount = await prisma.profitLossRecord.count({ where: { positionId: position.id } });
     expect(pnlCount).toBe(1);
   });
+
+  it("G different fill ids applied concurrently preserve quantity and pnl", async () => {
+    const { applyCanonicalPartialSettlementFill } = await import(
+      "@/src/server/execution/canonical-settlement-fill.service"
+    );
+    const { user, position } = await seedPosition(1);
+    const [a, b] = await Promise.all([
+      applyCanonicalPartialSettlementFill({
+        positionId: position.id,
+        settlementFillId: "fill-concurrent-a",
+        userId: user.id,
+        exchangeConnectionId: position.exchangeConnectionId,
+        tradingPairId: position.tradingPairId,
+        quoteAsset: "TRY",
+        positionSide: "LONG",
+        closeSide: "SELL",
+        fillPrice: 110,
+        filledQuantity: 0.4,
+        closeFee: 0.1,
+        feeAsset: "QUOTE",
+        openFeePortion: 0.04,
+        clientOrderId: "client-concurrent",
+        exchangeOrderId: "ex-concurrent",
+        closeReason: "TAKE_PROFIT",
+        mode: "paper",
+        orderTerminal: false,
+        orderRemainingQuantity: 0.6,
+      }),
+      applyCanonicalPartialSettlementFill({
+        positionId: position.id,
+        settlementFillId: "fill-concurrent-b",
+        userId: user.id,
+        exchangeConnectionId: position.exchangeConnectionId,
+        tradingPairId: position.tradingPairId,
+        quoteAsset: "TRY",
+        positionSide: "LONG",
+        closeSide: "SELL",
+        fillPrice: 111,
+        filledQuantity: 0.5,
+        closeFee: 0.1,
+        feeAsset: "QUOTE",
+        openFeePortion: 0.05,
+        clientOrderId: "client-concurrent",
+        exchangeOrderId: "ex-concurrent",
+        closeReason: "TAKE_PROFIT",
+        mode: "paper",
+        orderTerminal: true,
+        orderRemainingQuantity: 0.1,
+      }),
+    ]);
+    expect(a.status).toBe("APPLIED");
+    expect(b.status).toBe("APPLIED");
+    const after = await prisma.position.findUnique({ where: { id: position.id } });
+    expect(after?.quantity).toBeCloseTo(0.1, 8);
+    expect(await prisma.profitLossRecord.count({ where: { positionId: position.id } })).toBe(2);
+  });
+
+  it("H reconcile-required pending order is consumed by RECONCILE worker", async () => {
+    const { buildExitPolicySnapshotAtEntry, getExitPolicyState } = await import(
+      "@/src/server/profitability/pr04-exit-evaluator"
+    );
+    const { bootstrapExitPersistenceAtEntry, loadPersistedExitBundle } = await import(
+      "@/src/server/execution/fix02-exit-persistence.service"
+    );
+    const { processFix02Pr04ExitTick } = await import("@/src/server/execution/fix02-exit-routing.service");
+    const { runExecutionEngineV2Job } = await import("@/src/server/execution-engine-v2/execution-engine-v2.orchestrator");
+    const { addTradeExecution, updateOrderStatus } = await import("@/src/server/repositories/execution.repository");
+    const { user, position, suffix } = await seedPosition(1);
+    paperCloseMock.mockImplementationOnce(async () => ({
+      orderId: "ack-lost-order",
+      clientOrderId: "ack-lost-client",
+      symbol: "BTCTRY",
+      side: "SELL",
+      type: "MARKET",
+      status: "NEW",
+      executedQty: 0,
+      price: 90,
+      dryRun: true,
+      fee: 0.1,
+      metadata: { fee: 0.1, feeAsset: "QUOTE" },
+    }));
+    const snapshot = buildExitPolicySnapshotAtEntry({
+      positionId: position.id,
+      strategyId: "BREAKOUT_RETEST",
+      entryPolicyVersion: "pr03-v1",
+      entrySignalId: "sig-ack",
+      setupId: "setup-ack",
+      exitPolicyId: "STRUCTURAL_STOP_TARGET",
+      experimentalMode: true,
+      takeProfitPercent: 10,
+      invalidation: null,
+      boundAtMs: baseNow,
+    });
+    await bootstrapExitPersistenceAtEntry({
+      userId: user.id,
+      positionId: position.id,
+      selectedSignal: null,
+      snapshot,
+      side: "LONG",
+      entryFills: [{ price: 100, quantity: 1, fee: 0.1, atMs: baseNow }],
+      entryFee: 0.1,
+      ownerExecutionId: `exec-${suffix}`,
+    });
+    const state = getExitPolicyState(position.id)!;
+    state.activeStopPrice = 99;
+    const routed = await processFix02Pr04ExitTick({
+      executionId: `exec-${suffix}`,
+      positionId: position.id,
+      userId: user.id,
+      side: "LONG",
+      mode: "paper",
+      observation: {
+        eventId: `evt-ack-${suffix}`,
+        eventAtMs: baseNow + 1000,
+        availableAtMs: baseNow + 1000,
+        markPrice: 90,
+        bid: 89.9,
+        ask: 90.1,
+        high: 91,
+        low: 89,
+        closed: true,
+        stale: false,
+        dataGap: false,
+      },
+    });
+    expect(routed.reconciliationRequired).toBe(true);
+    const pending = await prisma.tradeOrder.findFirst({
+      where: { positionId: position.id, exchangeOrderId: "ack-lost-order" },
+      orderBy: { createdAt: "desc" },
+    });
+    expect(pending).not.toBeNull();
+    await updateOrderStatus({
+      orderId: pending!.id,
+      status: "FILLED",
+      executedAt: new Date(),
+      avgExecutionPrice: 90,
+      fee: 0.1,
+    });
+    await addTradeExecution({
+      tradeOrderId: pending!.id,
+      status: "SUCCESS",
+      executionPrice: 90,
+      executedQty: 1,
+      quoteQty: 90,
+      fee: 0.1,
+      executionRef: "ack-lost-order",
+      metadata: { reconciled: true },
+    });
+    await runExecutionEngineV2Job({ type: "RECONCILE" });
+    const after = await prisma.position.findUnique({ where: { id: position.id } });
+    const bundle = await loadPersistedExitBundle(position.id);
+    expect(after?.status).toBe("CLOSED");
+    expect(after?.quantity).toBe(0);
+    expect(bundle?.reconciliationStatus).toBe("OK");
+    expect((bundle?.processedFillIds.length ?? 0) > 0).toBe(true);
+  }, 45_000);
 });
 
 describe("EXEC correction — in-memory evaluator", () => {

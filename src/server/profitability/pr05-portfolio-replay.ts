@@ -23,6 +23,8 @@ type ActivePosition = {
   lifecycleId: string;
   manifest: MatchedEntryManifest;
   entryCost: number;
+  entryQuantity: number;
+  entryPrice: number;
   session: ReturnType<typeof createPr04ExitReplaySession>;
   closed: boolean;
   closedAtMs: number | null;
@@ -93,6 +95,8 @@ export function runPortfolioReplay(input: {
         lifecycleId: row.lifecycleId,
         manifest: row.manifest,
         entryCost,
+        entryQuantity: row.manifest.fills.reduce((acc, fill) => acc + fill.quantity, 0),
+        entryPrice: row.manifest.fills[0]?.price ?? 0,
         session,
         closed: false,
         closedAtMs: null,
@@ -177,24 +181,33 @@ export function runPortfolioReplay(input: {
     });
   }
 
-  let unrealizedMtm = 0;
+  let openPositionMarketValue = 0;
+  let openPositionCostBasis = 0;
+  let missingMarkCount = 0;
   for (const position of active.values()) {
     const ticks = input.ticksByManifestId[position.manifest.manifestId] ?? [];
     const lastMark = ticks.length ? ticks[ticks.length - 1]!.observation.markPrice : null;
-    const qty = position.manifest.fills.reduce((a, f) => a + f.quantity, 0);
-    const entryPrice = position.manifest.fills[0]?.price ?? 0;
-    if (lastMark != null && entryPrice > 0) {
-      unrealizedMtm += qty * (lastMark - entryPrice);
+    const state = getExitPolicyState(position.session.positionId);
+    const remainingQty = state?.remainingQuantity ?? position.entryQuantity;
+    if (lastMark != null && Number.isFinite(lastMark) && remainingQty > 0) {
+      openPositionMarketValue += remainingQty * lastMark;
+      openPositionCostBasis += remainingQty * position.entryPrice;
+    } else if (remainingQty > 0) {
+      missingMarkCount += 1;
     }
   }
+  const unrealizedMtm = openPositionMarketValue - openPositionCostBasis;
 
   return {
     outcomes,
     endingCapital: availableCash,
-    endingEquity: availableCash + unrealizedMtm,
+    endingEquity: availableCash + openPositionMarketValue,
     availableCash,
-    reservedCash: active.values().reduce((acc, p) => acc + p.entryCost, 0),
+    reservedCash: 0,
+    openPositionMarketValue,
+    openPositionCostBasis,
     unrealizedMtm,
+    valuationStatus: missingMarkCount > 0 ? "PARTIAL" : "KNOWN",
     acceptedLifecycles: admitted.size,
     rejectedForCapital: rejections.filter((r) => r.reasonCode === "INSUFFICIENT_CAPITAL").length,
     rejectedForPositionLimit: rejections.filter((r) => r.reasonCode === "POSITION_LIMIT").length,

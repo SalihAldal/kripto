@@ -21,6 +21,7 @@ import {
   runCausalEntryShiftNegativeControl,
 } from "@/src/server/profitability/pr05-negative-control";
 import { runPortfolioReplay } from "@/src/server/profitability/pr05-portfolio-replay";
+import { findMarketQuoteAtMs } from "@/src/server/profitability/pr05-replay-clock";
 
 const baseNow = Date.parse("2026-09-06T10:00:00.000Z");
 
@@ -188,6 +189,26 @@ describe("REPLAY correction — negative control", () => {
     expect(a.controlNetExpectancies).toEqual(b.controlNetExpectancies);
     expect(a.marketTimestampsPreserved).toBe(true);
   });
+
+  it("18 counterfactual does not carry old applyFill payloads", () => {
+    const m = manifest("nc-no-fill-copy", baseNow);
+    const ticks = [
+      { tickIndex: 0, observation: obs(100, 0) },
+      { tickIndex: 1, observation: obs(110, 10_000), applyFill: { price: 99, quantity: 1, fee: 0.1, feeAsset: "QUOTE" as const } },
+    ];
+    const built = buildCounterfactualEntryShift({ manifest: m, marketTicks: ticks, shiftMs: 5_000 });
+    expect(built.status).toBe("OK");
+    if (built.status === "OK") {
+      const originalFilledPrices = ticks
+        .filter((tick) => tick.applyFill)
+        .map((tick) => tick.applyFill!.price);
+      const shiftedFill = built.exitTicks.find((tick) => "applyFill" in tick);
+      expect(shiftedFill).toBeTruthy();
+      if (shiftedFill && "applyFill" in shiftedFill) {
+        expect(originalFilledPrices.includes(shiftedFill.applyFill!.price)).toBe(false);
+      }
+    }
+  });
 });
 
 describe("REPLAY correction — portfolio capital", () => {
@@ -220,5 +241,93 @@ describe("REPLAY correction — portfolio capital", () => {
     expect(result.rejectedForPositionLimit).toBe(1);
     expect(result.rejections.some((r) => r.lifecycleId === "life-b" && r.reasonCode === "POSITION_LIMIT")).toBe(true);
     expect(result.endingCapital).toBeGreaterThan(105);
+  });
+
+  it("24 100 sermaye, acik 1 BTC mark 100 ise equity 100 olur", () => {
+    const m = buildMatchedEntryManifest({
+      entrySignalId: "eq-open",
+      strategyId: "MOMENTUM_CONTINUATION",
+      entryPolicyVersion: "pr03-v1",
+      entryAtMs: baseNow,
+      fills: [{ price: 100, quantity: 1, fee: 0, atMs: baseNow }],
+      riskReference: buildRiskReference({
+        entryPrice: 100,
+        initialStopPrice: 99.2,
+        initialQuantity: 1,
+        entryFee: 0,
+        includesFeesInBreakEven: true,
+        computedAtMs: baseNow,
+      }),
+      invalidation,
+      featureEvidenceIds: [],
+      dataSource: "SYNTHETIC_FIXTURE",
+      replayWindow: { fromMs: baseNow, toMs: baseNow + 120_000 },
+    });
+    const ticks = [{ tickIndex: 0, observation: obs(100, 1000) }];
+    const result = runPortfolioReplay({
+      datasetId: "eq-open",
+      lifecycleRows: [{ lifecycleId: "eq-open", eventAtMs: baseNow, labelEndAtMs: baseNow + 120_000, manifest: m }],
+      policyId: "STRUCTURAL_STOP_TARGET",
+      ticksByManifestId: { [m.manifestId]: ticks },
+      startingCapital: 100,
+      maxConcurrentPositions: 1,
+    });
+    expect(result.availableCash).toBe(0);
+    expect(result.openPositionMarketValue).toBe(100);
+    expect(result.endingEquity).toBe(100);
+  });
+
+  it("25 partial 0.5 @110 ve kalan 0.5 mark 110 ise equity 110 olur", () => {
+    const m = buildMatchedEntryManifest({
+      entrySignalId: "eq-partial",
+      strategyId: "MOMENTUM_CONTINUATION",
+      entryPolicyVersion: "pr03-v1",
+      entryAtMs: baseNow,
+      fills: [{ price: 100, quantity: 1, fee: 0, atMs: baseNow }],
+      riskReference: buildRiskReference({
+        entryPrice: 100,
+        initialStopPrice: 99.2,
+        initialQuantity: 1,
+        entryFee: 0,
+        includesFeesInBreakEven: true,
+        computedAtMs: baseNow,
+      }),
+      invalidation,
+      featureEvidenceIds: [],
+      dataSource: "SYNTHETIC_FIXTURE",
+      replayWindow: { fromMs: baseNow, toMs: baseNow + 120_000 },
+    });
+    const ticks = [
+      { tickIndex: 0, observation: obs(103, 1000) },
+      { tickIndex: 1, observation: obs(110, 2000), applyFill: { price: 110, quantity: 0.5, fee: 0, feeAsset: "QUOTE" as const } },
+      { tickIndex: 2, observation: obs(110, 3000) },
+    ];
+    const result = runPortfolioReplay({
+      datasetId: "eq-partial",
+      lifecycleRows: [{ lifecycleId: "eq-partial", eventAtMs: baseNow, labelEndAtMs: baseNow + 120_000, manifest: m }],
+      policyId: "STRUCTURAL_PARTIAL_TRAIL",
+      ticksByManifestId: { [m.manifestId]: ticks },
+      startingCapital: 100,
+      maxConcurrentPositions: 1,
+    });
+    expect(result.availableCash).toBe(55);
+    expect(result.openPositionMarketValue).toBe(55);
+    expect(result.endingEquity).toBe(110);
+  });
+});
+
+describe("REPLAY correction — quote causality", () => {
+  it("26 gelecekteki fiyat gecmise fallback olamaz", () => {
+    const quote = findMarketQuoteAtMs(
+      [{
+        observation: {
+          eventAtMs: 2000,
+          availableAtMs: 3000,
+          markPrice: 110,
+        },
+      }],
+      1000,
+    );
+    expect(quote).toBeNull();
   });
 });

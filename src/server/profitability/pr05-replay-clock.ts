@@ -20,17 +20,23 @@ export function findMarketQuoteAtMs(
   ticks: Array<{ observation: { eventAtMs: number; availableAtMs: number; markPrice: number | null } }>,
   atMs: number,
 ) {
-  let lastEligible: number | null = null;
-  let firstAfter: number | null = null;
-  for (const tick of ticks) {
-    const obs = tick.observation;
-    if (obs.eventAtMs <= atMs && obs.availableAtMs <= atMs && obs.markPrice != null) {
-      lastEligible = obs.markPrice;
-      continue;
+  let lastEligible: { markPrice: number; eventAtMs: number; availableAtMs: number } | null = null;
+  const sorted = [...ticks].sort((a, b) => {
+    if (a.observation.eventAtMs !== b.observation.eventAtMs) {
+      return a.observation.eventAtMs - b.observation.eventAtMs;
     }
-    if (obs.eventAtMs > atMs && firstAfter == null && obs.markPrice != null) {
-      firstAfter = obs.markPrice;
+    return a.observation.availableAtMs - b.observation.availableAtMs;
+  });
+  for (const tick of sorted) {
+    const obs = tick.observation;
+    if (!Number.isFinite(obs.markPrice)) continue;
+    if (obs.eventAtMs <= atMs && obs.availableAtMs <= atMs) {
+      lastEligible = {
+        markPrice: obs.markPrice as number,
+        eventAtMs: obs.eventAtMs,
+        availableAtMs: obs.availableAtMs,
+      };
     }
   }
-  return lastEligible ?? firstAfter;
+  return lastEligible?.markPrice ?? null;
 }

@@ -2,6 +2,7 @@ import { prisma } from "@/src/server/db/prisma";
 import { getAccountBalances } from "@/services/binance.service";
 import { persistExecutionReconciliation } from "@/src/server/execution-engine-v2/execution-engine-v2.repository";
 import { emitExecutionEngineV2Event, EXECUTION_ENGINE_V2_EVENT } from "@/src/server/execution-engine-v2/execution-engine-v2.events";
+import { reconcileFix02ExitBundles } from "@/src/server/execution/fix02-exit-reconciliation.service";
 
 function parseBaseAsset(symbol: string) {
   const upper = symbol.toUpperCase();
@@ -76,5 +77,6 @@ export async function reconcileOpenPositions(limit = 10) {
   for (const pos of positions) {
     results.push(await reconcileSymbolState(pos.tradingPair.symbol));
   }
-  return { reconciled: results.length, results };
+  const fix02 = await reconcileFix02ExitBundles(limit);
+  return { reconciled: results.length, results, fix02 };
 }

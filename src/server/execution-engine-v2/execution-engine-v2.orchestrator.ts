@@ -3,6 +3,7 @@ import { evaluateExitForOpenPosition } from "@/src/server/execution-engine-v2/ex
 import { executeApprovedSpotOrder } from "@/src/server/execution-engine-v2/execution-flow.service";
 import { verifyExecutionOrder, verifyRecentUnverifiedLogs } from "@/src/server/execution-engine-v2/order-verification.service";
 import { reconcileOpenPositions, reconcileSymbolState } from "@/src/server/execution-engine-v2/reconciliation.service";
+import { reconcileFix02ExitBundles } from "@/src/server/execution/fix02-exit-reconciliation.service";
 import { recoverFailedExecution } from "@/src/server/execution-engine-v2/failure-recovery.service";
 import { listExecutionLogs, listExecutionReconciliations, listExecutionAudits, listExecutionFailures, listOpenPositions } from "@/src/server/execution-engine-v2/execution-engine-v2.repository";
 import { processWaitReevaluations } from "@/src/server/entry-timing/wait-mode.service";
@@ -22,7 +23,12 @@ export async function runExecutionEngineV2Job(payload: ExecutionEngineV2JobPaylo
       if (payload.logKey === "batch") return verifyRecentUnverifiedLogs();
       return verifyExecutionOrder(payload.logKey);
     case "RECONCILE":
-      return payload.symbol ? reconcileSymbolState(payload.symbol) : reconcileOpenPositions();
+      if (payload.symbol) {
+        const symbolResult = await reconcileSymbolState(payload.symbol);
+        const fix02 = await reconcileFix02ExitBundles(10);
+        return { symbolResult, fix02 };
+      }
+      return reconcileOpenPositions();
     case "RECOVERY":
       return payload.executionId ? recoverFailedExecution(payload.executionId) : verifyRecentUnverifiedLogs();
     case "WAIT_REEVALUATE":

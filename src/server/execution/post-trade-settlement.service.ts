@@ -25,7 +25,6 @@ import { collectLearningMarketEvidence } from "@/src/server/trading-core/self-le
 import { buildDynamicLearningWeight } from "@/src/server/trading-core/self-learning/dynamic-learning-weight";
 import {
   addTradeExecution,
-  applyPartialPositionClose,
   closePositionRecord,
   createPnlRecord,
   createTradeOrder,
@@ -49,6 +48,7 @@ import { persistOrchestrationEnvelope } from "@/src/server/orchestration";
 import { persistPaperCloseFillForSettlement } from "@/src/server/execution/paper-close-persistence.service";
 import { applyCanonicalPartialSettlementFill } from "@/src/server/execution/canonical-settlement-fill.service";
 import type { SettlementFillResult } from "@/src/server/execution/settlement-fill-result";
+import { createHash } from "node:crypto";
 
 function isRateLimitedCloseError(error: unknown) {
   const message = (error as Error)?.message?.toLowerCase?.() ?? "";
@@ -88,6 +88,47 @@ function classifyCloseError(errorMessage: string) {
 function optionalNumber(value: unknown) {
   const num = Number(value);
   return Number.isFinite(num) ? num : undefined;
+}
+
+function resolveFeeCurrency(input: {
+  feeAsset: "BASE" | "QUOTE" | "UNKNOWN";
+  baseAsset: string;
+  quoteAsset: string;
+  closeOrderMetadata?: Record<string, unknown>;
+}) {
+  const explicit = String(input.closeOrderMetadata?.feeCurrency ?? "").trim().toUpperCase();
+  if (explicit) return explicit;
+  if (input.feeAsset === "QUOTE") return input.quoteAsset;
+  if (input.feeAsset === "BASE") return input.baseAsset;
+  return null;
+}
+
+function buildCanonicalFillIdentity(input: {
+  exchangeConnectionId: string;
+  symbol: string;
+  exchangeOrderId?: string;
+  clientOrderId?: string;
+  filledQuantity: number;
+  fillPrice: number;
+  fee: number;
+  filledAtMs: number;
+}) {
+  return createHash("sha256")
+    .update(
+      [
+        "fill-v1",
+        input.exchangeConnectionId,
+        input.symbol,
+        input.exchangeOrderId ?? "",
+        input.clientOrderId ?? "",
+        input.filledQuantity.toFixed(8),
+        input.fillPrice.toFixed(8),
+        input.fee.toFixed(8),
+        String(input.filledAtMs),
+      ].join(":"),
+    )
+    .digest("hex")
+    .slice(0, 32);
 }
 
 function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED" {
@@ -388,6 +429,7 @@ export async function settleOpenPosition(input: {
   pr04DecisionKind?: string;
   pr04PartialLegId?: string | null;
   decisionPrice?: number | null;
+  expectedExitStateVersion?: number;
 }) {
   const position = await getPositionById(input.positionId);
   if (!position || position.status !== "OPEN") {
@@ -863,6 +905,9 @@ export async function settleOpenPosition(input: {
       metadata: {
         closeReason: input.reason,
         mode: input.mode,
+        pr04DecisionKind: input.pr04DecisionKind ?? null,
+        pr04PartialLegId: input.pr04PartialLegId ?? null,
+        exitIntentId: input.settlementFillId ?? null,
         linkedPositionId: position.id,
         pendingCloseOrder: true,
         ...variantTelemetryMeta,
@@ -949,62 +994,114 @@ export async function settleOpenPosition(input: {
     partialClose: isPartialClose,
   };
 
-  if (isPartialClose) {
-    const canonical = await applyCanonicalPartialSettlementFill({
-      positionId: position.id,
-      settlementFillId: input.settlementFillId ?? `partial-${Date.now()}`,
-      userId: position.userId,
-      exchangeConnectionId: position.exchangeConnectionId,
-      tradingPairId: position.tradingPairId,
+  const filledAtMs = Number(
+    (closeOrder.metadata as Record<string, unknown> | undefined)?.filledAtMs ??
+      (closeOrder.metadata as Record<string, unknown> | undefined)?.executedAtMs ??
+      Date.now(),
+  );
+  const normalizedFeeAsset = (() => {
+    const raw = String((closeOrder.metadata as Record<string, unknown> | undefined)?.feeAsset ?? "QUOTE")
+      .trim()
+      .toUpperCase();
+    if (raw === "BASE" || raw === "QUOTE") return raw;
+    return "UNKNOWN";
+  })() as "BASE" | "QUOTE" | "UNKNOWN";
+  const canonicalSettlementFillId = buildCanonicalFillIdentity({
+    exchangeConnectionId: position.exchangeConnectionId,
+    symbol,
+    exchangeOrderId: closeOrder.orderId,
+    clientOrderId: closeOrder.clientOrderId,
+    filledQuantity: finalCloseQty,
+    fillPrice: closeFillPrice,
+    fee: closeFee,
+    filledAtMs,
+  });
+  const canonical = await applyCanonicalPartialSettlementFill({
+    positionId: position.id,
+    settlementFillId: canonicalSettlementFillId,
+    userId: position.userId,
+    exchangeConnectionId: position.exchangeConnectionId,
+    tradingPairId: position.tradingPairId,
+    quoteAsset: position.tradingPair.quoteAsset,
+    positionSide: position.side,
+    closeSide,
+    fillPrice: closeFillPrice,
+    filledQuantity: finalCloseQty,
+    closeFee,
+    feeAsset: normalizedFeeAsset,
+    feeCurrency: resolveFeeCurrency({
+      feeAsset: normalizedFeeAsset,
+      baseAsset: position.tradingPair.baseAsset,
       quoteAsset: position.tradingPair.quoteAsset,
-      positionSide: position.side,
-      closeSide,
-      fillPrice: closeFillPrice,
-      filledQuantity: finalCloseQty,
-      closeFee,
-      feeAsset: "QUOTE",
-      openFeePortion: openFee * (finalCloseQty / Math.max(position.quantity, finalCloseQty)),
-      clientOrderId: closeOrder.clientOrderId ?? `client-${input.settlementFillId ?? input.positionId}`,
-      exchangeOrderId: closeOrder.orderId ?? `ex-${input.settlementFillId ?? input.positionId}`,
+      closeOrderMetadata: (closeOrder.metadata as Record<string, unknown> | undefined) ?? undefined,
+    }),
+    openFeePortion: openFee * (finalCloseQty / Math.max(position.quantity, finalCloseQty)),
+    clientOrderId: closeOrder.clientOrderId ?? `client-${input.positionId}`,
+    exchangeOrderId: closeOrder.orderId ?? `ex-${input.positionId}`,
+    closeReason: input.reason,
+    mode: input.mode,
+    orderTerminal: true,
+    orderRemainingQuantity: 0,
+    fillAtMs: filledAtMs,
+    exitStateUpdate:
+      typeof input.expectedExitStateVersion === "number" && input.pr04DecisionKind
+        ? {
+            expectedStateVersion: input.expectedExitStateVersion,
+            decisionKind: input.pr04DecisionKind as
+              | "NONE"
+              | "STRUCTURAL_STOP"
+              | "TAKE_PROFIT"
+              | "PARTIAL_TAKE_PROFIT"
+              | "TRAILING_STOP"
+              | "TIME_EXIT"
+              | "SETUP_INVALIDATION"
+              | "RISK_OVERRIDE"
+              | "MANUAL_CLOSE",
+            partialLegId: input.pr04PartialLegId ?? null,
+          }
+        : undefined,
+    metadata: {
       closeReason: input.reason,
-      mode: input.mode,
-      metadata: {
-        closeReason: input.reason,
-        ...pr04Meta,
-        ...variantTelemetryMeta,
-      },
-    });
-    resumeScannerWorker();
-    if (canonical.status === "ALREADY_APPLIED") {
-      return {
-        ...canonical,
-        closed: false,
-        partial: canonical.partial,
-        filledQuantity: canonical.executedQuantity,
-        fillPrice: canonical.fillPrice,
-        fillFee: canonical.fillFee,
-        feeAsset: canonical.feeAsset,
-        reason: canonical.reason,
-      };
-    }
-    if (canonical.status !== "APPLIED") {
-      return {
-        ...canonical,
-        closed: false,
-        partial: false,
-        reason: canonical.reason ?? "Partial settlement failed",
-      };
-    }
+      exitIntentId: input.settlementFillId ?? null,
+      ...pr04Meta,
+      ...variantTelemetryMeta,
+    },
+  });
+  resumeScannerWorker();
+  if (canonical.status !== "APPLIED" && canonical.status !== "ALREADY_APPLIED") {
+    return {
+      ...canonical,
+      closed: false,
+      partial: false,
+      reason: canonical.reason ?? "Canonical settlement failed",
+    };
+  }
+
+  const settledQty = canonical.executedQuantity ?? finalCloseQty;
+  const settledFillPrice = canonical.fillPrice ?? closeFillPrice;
+  const settledFillFee = canonical.fillFee ?? closeFee;
+  const settledFeeAsset = canonical.feeAsset ?? normalizedFeeAsset;
+  const persistedOrder = canonical.tradeOrderId ? await findTradeOrderById(canonical.tradeOrderId) : null;
+  if (!persistedOrder) {
+    return {
+      ...canonical,
+      closed: false,
+      partial: false,
+      reason: "Canonical settlement order record missing",
+    };
+  }
+
+  if (canonical.partial || !canonical.positionClosed || isPartialClose) {
     return {
       ...canonical,
       closed: false,
       partial: true,
-      filledQuantity: canonical.executedQuantity,
-      fillPrice: canonical.fillPrice,
-      fillFee: canonical.fillFee,
-      feeAsset: canonical.feeAsset,
+      filledQuantity: settledQty,
+      fillPrice: settledFillPrice,
+      fillFee: settledFillFee,
+      feeAsset: settledFeeAsset,
       remainingQuantity: canonical.positionRemainingQuantity,
-      closeOrderId: canonical.tradeOrderId,
+      closeOrderId: persistedOrder.id,
     } satisfies SettlementFillResult & {
       closed: boolean;
       partial: boolean;
@@ -1020,106 +1117,14 @@ export async function settleOpenPosition(input: {
 
   const exitForensicsSnapshot = recordClosedTradeForensics({
     reason: input.reason,
-    closePrice: closeFillPrice,
-    quantity: finalCloseQty,
+    closePrice: settledFillPrice,
+    quantity: settledQty,
     openFee,
-    closeFee,
+    closeFee: settledFillFee,
     slippageCost: spreadCostAttribution,
     decisionTimestamp,
   });
-
-  const createdCloseOrder = await createTradeOrder({
-    userId: position.userId,
-    exchangeConnectionId: position.exchangeConnectionId,
-    tradingPairId: position.tradingPairId,
-    positionId: position.id,
-    side: closeSide,
-    type: "MARKET",
-    quantity: finalCloseQty,
-    price: closeFillPrice,
-    status: "FILLED",
-    clientOrderId: closeOrder.clientOrderId,
-    exchangeOrderId: closeOrder.orderId,
-    submittedAt: new Date(),
-    executedAt: new Date(),
-    avgExecutionPrice: closeFillPrice,
-    fee: closeFee,
-    feeCurrency: position.tradingPair.quoteAsset,
-    slippage: spreadCostAttribution,
-    metadata: {
-      closeReason: input.reason,
-      mode: input.mode,
-      linkedPositionId: position.id,
-      slippagePct: slippageCostAttribution,
-      spreadCostQuote: spreadCostAttribution,
-      ...variantTelemetryMeta,
-    },
-  });
-  await logTradeEvent({
-    positionId: position.id,
-    symbol,
-    eventType: "NEW_SELL_ORDER_CREATED",
-    price: exitPrice,
-    newValue: {
-      orderId: createdCloseOrder.id,
-      status: normalizedCloseStatus,
-      reason: input.reason,
-    },
-    reason: input.reason,
-  });
-
-  await addTradeExecution({
-    tradeOrderId: createdCloseOrder.id,
-    status: "SUCCESS",
-    executionPrice: closeFillPrice,
-    executedQty: finalCloseQty,
-    quoteQty: Number((finalCloseQty * closeFillPrice).toFixed(8)),
-    fee: closeFee,
-    slippage: spreadCostAttribution,
-    executionRef: closeOrder.orderId,
-    metadata: {
-      mode: input.mode,
-      reason: input.reason,
-      slippagePct: slippageCostAttribution,
-      spreadCostQuote: spreadCostAttribution,
-      ...variantTelemetryMeta,
-    },
-  });
-
-  await closePositionRecord({
-    positionId: position.id,
-    closePrice: closeFillPrice,
-    realizedPnl: pnl.realizedPnl,
-    feeTotal: pnl.feeTotal,
-    metadata: {
-      closeReason: input.reason,
-      roePercent: pnl.roePercent,
-      slippagePct: slippageCostAttribution,
-      spreadCostQuote: spreadCostAttribution,
-      ...variantTelemetryMeta,
-    },
-  });
-
-  await createPnlRecord({
-    userId: position.userId,
-    tradingPairId: position.tradingPairId,
-    positionId: position.id,
-    tradeOrderId: createdCloseOrder.id,
-    realizedPnl: pnl.realizedPnl,
-    unrealizedPnl: 0,
-    grossPnl: pnl.grossPnl,
-    netPnl: pnl.netPnl,
-    feeTotal: pnl.feeTotal,
-    slippageCost: pnl.slippageCost,
-    roePercent: pnl.roePercent,
-    notes: `Position closed: ${input.reason}`,
-    metadata: {
-      mode: input.mode,
-      slippagePct: slippageCostAttribution,
-      spreadCostQuote: spreadCostAttribution,
-      ...variantTelemetryMeta,
-    },
-  });
+  const createdCloseOrder = persistedOrder;
   let paperClosePersistence: { persisted: boolean; skipped: boolean; reason?: string } = {
     persisted: false,
     skipped: false,
@@ -1389,13 +1394,13 @@ export async function settleOpenPosition(input: {
   return {
     status: "APPLIED",
     positionId: position.id,
-    settlementFillId: input.settlementFillId ?? createdCloseOrder.id,
+    settlementFillId: canonicalSettlementFillId,
     tradeOrderId: createdCloseOrder.id,
     executionRef: closeOrder.orderId,
-    executedQuantity: finalCloseQty,
-    fillPrice: closeFillPrice,
-    fillFee: closeFee,
-    feeAsset: "QUOTE" as const,
+    executedQuantity: settledQty,
+    fillPrice: settledFillPrice,
+    fillFee: settledFillFee,
+    feeAsset: settledFeeAsset,
     orderTerminal: true,
     orderRemainingQuantity: 0,
     positionRemainingQuantity: 0,

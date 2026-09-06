@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "kripto-pre-paper-final-fix-v1",
+  "generatedAt": "2026-09-07T00:00:00+03:00",
+  "fingerprint": {
+    "startHead": "ac7fddea15659b23bea191a3030a847df5a6b8fb",
+    "finalHead": "ac7fddea15659b23bea191a3030a847df5a6b8fb",
+    "nodeVersion": "v24.13.0",
+    "worktreeFingerprint": "928978a730407c24c4c2333caa277aa7d9799bf2aff2930d669b9c4f38714523"
+  },
+  "verdicts": {
+    "FULL_AND_PARTIAL_SETTLEMENT_VERDICT": "PASS",
+    "EXIT_STATE_ATOMICITY_VERDICT": "PASS",
+    "CONCURRENT_FILL_ACCOUNTING_VERDICT": "PASS",
+    "RECONCILIATION_CONSUMER_VERDICT": "PASS",
+    "POST_PARTIAL_STOP_VERDICT": "PASS",
+    "ACTUAL_FILL_AND_FEES_VERDICT": "PASS",
+    "REPLAY_CAUSALITY_VERDICT": "PASS",
+    "COUNTERFACTUAL_FILL_VERDICT": "PASS",
+    "PORTFOLIO_CASH_EQUITY_VERDICT": "PASS",
+    "PRODUCTION_CHAIN_VERDICT": "PARTIAL",
+    "FINAL_ENGINEERING_VERDICT": "PARTIAL",
+    "REQUIRED_CHECKS_NOT_RUN": [
+      "PROCESS_CRASH_CHILD_PRE_COMMIT_KILL",
+      "PROCESS_CRASH_CHILD_POST_COMMIT_PRE_RESPONSE_KILL",
+      "FULL_ENTRY_TO_PARTIAL_TO_STOP_SINGLE_E2E_CHAIN_NO_MANUAL_SEED"
+    ],
+    "OPEN_CRITICAL_COUNT": 0,
+    "OPEN_HIGH_COUNT": 2,
+    "PAPER_ENGINEERING_READINESS": "NOT_READY",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED"
+  },
+  "tests": [
+    {
+      "command": "npx vitest run tests/corrections-final-qa.integration.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "npx vitest run tests/execution-correction.integration.test.ts --reporter=verbose (x3)",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "npx vitest run tests/replay-correction.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "npx vitest run tests/fix02-durable-exit-and-settlement.integration.test.ts tests/post-fix-final-qa.integration.test.ts tests/fix01-strategy-context-and-invalidation.test.ts tests/pr04-exit-and-position-management.test.ts tests/pr05-offline-comparison.test.ts tests/replay-correction.test.ts --reporter=verbose",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "status": "PASS_AFTER_STALE_NEXT_ARTIFACT_CLEANUP"
+    }
+  ]
+}

@@ -410,3 +410,14 @@
 - Rapor: `KRIPTO_PR02_EARLY_ACCELERATION_IMPLEMENTATION_REPORT.md`
 - JSON: `kripto-pr02-early-acceleration.json`
 - Forensics: `artifacts/forensics/pr02-assessment-20260906T094000+0300/`
+
+## Pre-Paper Final Fix (Prompt 15 sonrası)
+
+- Rapor: `KRIPTO_PRE_PAPER_FINAL_FIX_REPORT.md`
+- Findings: `KRIPTO_PRE_PAPER_FINAL_FIX_FINDINGS.md`
+- JSON: `kripto-pre-paper-final-fix.json`
+- Tam/kısmi kapanış canonical settlement transaction altında birleştirildi.
+- `RECONCILE_REQUIRED` artık worker zincirinde gerçek tüketici ile işleniyor.
+- Replay future quote fallback kaldırıldı; counterfactual fill yolu yeni sentetik üretime taşındı.
+- Portfolio `endingEquity` sözleşmesi nakit + açık varlık piyasa değeri olacak şekilde düzeltildi.
+- Kalan açıklar: child-process crash kill kanıtı, tek testte full entry->partial->stop production zinciri.

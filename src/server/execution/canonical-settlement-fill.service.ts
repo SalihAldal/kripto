@@ -1,7 +1,8 @@
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/src/server/db/prisma";
 import type { SettlementFillResult } from "@/src/server/execution/settlement-fill-result";
 import { calculateRealizedPnl } from "@/src/server/execution/pnl-calculator";
+import type { ExitDecisionKind, ExitPolicyState } from "@/src/server/profitability/pr04-types";
 
 type Tx = Prisma.TransactionClient;
 
@@ -23,9 +24,87 @@ export function resetSettlementFillTransactionHooksForTests() {
   }
 }
 
+function toRounded(value: number) {
+  return Number(value.toFixed(8));
+}
+
+function isRetryableTransactionError(error: unknown) {
+  const code = (error as { code?: string }).code;
+  return code === "P2034";
+}
+
+function deriveOrderStatus(input: { terminal: boolean; remaining: number }) {
+  if (input.terminal && input.remaining <= 0) return "FILLED" as const;
+  if (input.remaining > 0) return "PARTIALLY_FILLED" as const;
+  return "NEW" as const;
+}
+
+function mutateExitStateFromFill(input: {
+  state: ExitPolicyState;
+  settlementFillId: string;
+  fillPrice: number;
+  filledQuantity: number;
+  closeFee: number;
+  feeAsset: "BASE" | "QUOTE" | "UNKNOWN";
+  fillAtMs: number;
+  decisionKind: ExitDecisionKind;
+  partialLegId?: string | null;
+  orderRemainingQuantity: number;
+}) {
+  const next = JSON.parse(JSON.stringify(input.state)) as ExitPolicyState;
+  if (!Number.isFinite(input.filledQuantity) || input.filledQuantity <= 0) {
+    throw new Error("SETTLEMENT_INVALID_FILLED_QUANTITY");
+  }
+  if (input.filledQuantity - next.remainingQuantity > 1e-8) {
+    throw new Error("SETTLEMENT_FILL_EXCEEDS_EXIT_STATE_REMAINING");
+  }
+  next.remainingQuantity = toRounded(next.remainingQuantity - input.filledQuantity);
+  next.exitFills.push({
+    fillId: input.settlementFillId,
+    side: "SELL",
+    price: input.fillPrice,
+    quantity: input.filledQuantity,
+    fee: input.closeFee,
+    feeAsset: input.feeAsset,
+    filledAtMs: input.fillAtMs,
+    decisionKind: input.decisionKind,
+  });
+  if (input.partialLegId && !next.completedPartialLegs.includes(input.partialLegId)) {
+    next.completedPartialLegs.push(input.partialLegId);
+  }
+  if (input.orderRemainingQuantity > 0) {
+    next.reservedSellQuantity = toRounded(input.orderRemainingQuantity);
+    next.orderState = "PARTIALLY_FILLED";
+    if (next.activeExitOrder) {
+      next.activeExitOrder.executedQuantity = toRounded(next.activeExitOrder.executedQuantity + input.filledQuantity);
+      next.activeExitOrder.openQuantity = toRounded(input.orderRemainingQuantity);
+      next.activeExitOrder.terminal = false;
+    }
+  } else {
+    const nextReserved = toRounded(next.reservedSellQuantity - input.filledQuantity);
+    if (nextReserved < -1e-8 && next.activeExitOrder) throw new Error("SETTLEMENT_EXIT_RESERVATION_UNDERFLOW");
+    if (nextReserved < -1e-8) {
+      next.lastReasonCode = "RESERVATION_RECONCILED_FROM_DB";
+      next.reservedSellQuantity = 0;
+    } else {
+      next.reservedSellQuantity = Math.max(0, nextReserved);
+    }
+    next.orderState = next.remainingQuantity <= 0 ? "FILLED" : "NONE";
+    next.activeExitOrder = null;
+  }
+  next.terminalStatus = next.remainingQuantity <= 0 ? "CLOSED" : "REDUCING";
+  next.lastDecision = input.decisionKind;
+  next.version += 1;
+  return next;
+}
+
 function alreadyAppliedResult(input: {
   positionId: string;
   settlementFillId: string;
+  executedQuantity: number;
+  fillPrice: number;
+  fillFee: number;
+  feeAsset: "BASE" | "QUOTE" | "UNKNOWN";
   positionQuantity: number;
   positionStatus: string;
 }): SettlementFillResult {
@@ -33,10 +112,10 @@ function alreadyAppliedResult(input: {
     status: "ALREADY_APPLIED",
     positionId: input.positionId,
     settlementFillId: input.settlementFillId,
-    executedQuantity: null,
-    fillPrice: null,
-    fillFee: null,
-    feeAsset: null,
+    executedQuantity: input.executedQuantity,
+    fillPrice: input.fillPrice,
+    fillFee: input.fillFee,
+    feeAsset: input.feeAsset,
     orderTerminal: true,
     orderRemainingQuantity: 0,
     positionRemainingQuantity: input.positionStatus === "OPEN" ? input.positionQuantity : 0,
@@ -64,10 +143,94 @@ export async function applyCanonicalPartialSettlementFill(input: {
   exchangeOrderId: string;
   closeReason: string;
   mode: string;
+  orderTerminal?: boolean;
+  orderRemainingQuantity?: number;
+  fillAtMs?: number;
+  feeCurrency?: string | null;
+  exitStateUpdate?: {
+    expectedStateVersion: number;
+    decisionKind: ExitDecisionKind;
+    partialLegId?: string | null;
+  };
   metadata?: Record<string, unknown>;
 }): Promise<SettlementFillResult> {
-  try {
-    return await prisma.$transaction(async (tx) => {
+  if (!Number.isFinite(input.filledQuantity) || input.filledQuantity <= 0) {
+    return {
+      status: "FAILED",
+      positionId: input.positionId,
+      settlementFillId: input.settlementFillId,
+      executedQuantity: null,
+      fillPrice: null,
+      fillFee: null,
+      feeAsset: null,
+      orderTerminal: false,
+      orderRemainingQuantity: 0,
+      positionRemainingQuantity: null,
+      positionClosed: false,
+      partial: false,
+      reason: "Invalid fill quantity",
+    };
+  }
+  if (!Number.isFinite(input.fillPrice) || input.fillPrice <= 0) {
+    return {
+      status: "FAILED",
+      positionId: input.positionId,
+      settlementFillId: input.settlementFillId,
+      executedQuantity: null,
+      fillPrice: null,
+      fillFee: null,
+      feeAsset: null,
+      orderTerminal: false,
+      orderRemainingQuantity: 0,
+      positionRemainingQuantity: null,
+      positionClosed: false,
+      partial: false,
+      reason: "Invalid fill price",
+    };
+  }
+  if (!Number.isFinite(input.closeFee) || input.closeFee < 0) {
+    return {
+      status: "FAILED",
+      positionId: input.positionId,
+      settlementFillId: input.settlementFillId,
+      executedQuantity: null,
+      fillPrice: null,
+      fillFee: null,
+      feeAsset: null,
+      orderTerminal: false,
+      orderRemainingQuantity: 0,
+      positionRemainingQuantity: null,
+      positionClosed: false,
+      partial: false,
+      reason: "Invalid close fee",
+    };
+  }
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const dedupExisting = await tx.positionSettlementFill.findUnique({
+          where: {
+            positionId_settlementFillId: {
+              positionId: input.positionId,
+              settlementFillId: input.settlementFillId,
+            },
+          },
+        });
+        if (dedupExisting) {
+          const dedupPosition = await tx.position.findUnique({ where: { id: input.positionId } });
+          return alreadyAppliedResult({
+            positionId: input.positionId,
+            settlementFillId: input.settlementFillId,
+            executedQuantity: dedupExisting.executedQty,
+            fillPrice: dedupExisting.fillPrice,
+            fillFee: dedupExisting.fee,
+            feeAsset: (dedupExisting.feeAsset as "BASE" | "QUOTE" | "UNKNOWN" | null) ?? "UNKNOWN",
+            positionQuantity: dedupPosition?.quantity ?? 0,
+            positionStatus: dedupPosition?.status ?? "CLOSED",
+          });
+        }
+
       const position = await tx.position.findUnique({ where: { id: input.positionId } });
       if (!position || position.status !== "OPEN") {
         return {
@@ -86,30 +249,34 @@ export async function applyCanonicalPartialSettlementFill(input: {
           reason: "Position not open",
         };
       }
-
-      try {
-        await tx.positionSettlementFill.create({
-          data: {
-            positionId: input.positionId,
-            settlementFillId: input.settlementFillId,
-            executedQty: input.filledQuantity,
-            fillPrice: input.fillPrice,
-            fee: input.closeFee,
-            feeAsset: input.feeAsset,
-          },
-        });
-      } catch (error) {
-        const code = (error as { code?: string }).code;
-        if (code === "P2002") {
-          return alreadyAppliedResult({
-            positionId: input.positionId,
-            settlementFillId: input.settlementFillId,
-            positionQuantity: position.quantity,
-            positionStatus: position.status,
-          });
-        }
-        throw error;
+      if (input.filledQuantity - position.quantity > 1e-8) {
+        return {
+          status: "FAILED",
+          positionId: input.positionId,
+          settlementFillId: input.settlementFillId,
+          executedQuantity: null,
+          fillPrice: null,
+          fillFee: null,
+          feeAsset: null,
+          orderTerminal: false,
+          orderRemainingQuantity: 0,
+          positionRemainingQuantity: position.quantity,
+          positionClosed: false,
+          partial: false,
+          reason: "Fill quantity exceeds remaining position quantity",
+        };
       }
+
+      const dedup = await tx.positionSettlementFill.create({
+        data: {
+          positionId: input.positionId,
+          settlementFillId: input.settlementFillId,
+          executedQty: input.filledQuantity,
+          fillPrice: input.fillPrice,
+          fee: input.closeFee,
+          feeAsset: input.feeAsset,
+        },
+      });
 
       transactionHooks.afterDedupClaim?.();
 
@@ -123,31 +290,82 @@ export async function applyCanonicalPartialSettlementFill(input: {
         slippageCost: 0,
       });
 
-      const createdCloseOrder = await tx.tradeOrder.create({
-        data: {
-          userId: input.userId,
-          exchangeConnectionId: input.exchangeConnectionId,
-          tradingPairId: input.tradingPairId,
+      const orderRemainingQuantity = Number.isFinite(input.orderRemainingQuantity)
+        ? Math.max(0, Number(input.orderRemainingQuantity))
+        : 0;
+      const terminal = input.orderTerminal ?? orderRemainingQuantity <= 0;
+      const orderStatus = deriveOrderStatus({ terminal, remaining: orderRemainingQuantity });
+      const existingOrder = await tx.tradeOrder.findFirst({
+        where: {
           positionId: input.positionId,
-          side: input.closeSide,
-          type: "MARKET",
-          quantity: input.filledQuantity,
-          price: input.fillPrice,
-          status: "FILLED",
-          clientOrderId: input.clientOrderId,
-          exchangeOrderId: input.exchangeOrderId,
-          submittedAt: new Date(),
-          executedAt: new Date(),
-          avgExecutionPrice: input.fillPrice,
-          fee: input.closeFee,
-          feeCurrency: input.quoteAsset,
-          metadata: {
-            closeReason: input.closeReason,
-            mode: input.mode,
-            settlementFillId: input.settlementFillId,
-            ...(input.metadata ?? {}),
-          } as Prisma.InputJsonValue,
+          OR: [
+            { exchangeOrderId: input.exchangeOrderId },
+            { clientOrderId: input.clientOrderId },
+          ],
         },
+        orderBy: { createdAt: "desc" },
+      });
+      const priorExecAgg = existingOrder
+        ? await tx.tradeExecution.aggregate({
+            where: { tradeOrderId: existingOrder.id, status: "SUCCESS" },
+            _sum: { executedQty: true, quoteQty: true, fee: true },
+          })
+        : null;
+      const prevQty = Number(priorExecAgg?._sum.executedQty ?? 0);
+      const prevQuote = Number(priorExecAgg?._sum.quoteQty ?? 0);
+      const totalExecutedQty = toRounded(prevQty + input.filledQuantity);
+      const totalQuote = toRounded(prevQuote + input.filledQuantity * input.fillPrice);
+      const nextAvg = totalExecutedQty > 0 ? toRounded(totalQuote / totalExecutedQty) : input.fillPrice;
+      const totalRequestedQty = toRounded(Math.max(existingOrder?.quantity ?? 0, totalExecutedQty + orderRemainingQuantity));
+      const totalFee = toRounded(Number(existingOrder?.fee ?? 0) + input.closeFee);
+      const createdCloseOrder = existingOrder
+        ? await tx.tradeOrder.update({
+            where: { id: existingOrder.id },
+            data: {
+              status: orderStatus,
+              quantity: totalRequestedQty,
+              avgExecutionPrice: nextAvg,
+              fee: totalFee,
+              feeCurrency: input.feeCurrency ?? input.quoteAsset,
+              executedAt: terminal ? new Date(input.fillAtMs ?? Date.now()) : null,
+              metadata: {
+                ...(((existingOrder.metadata as Record<string, unknown> | null) ?? {}) as Prisma.InputJsonObject),
+                closeReason: input.closeReason,
+                mode: input.mode,
+                settlementFillId: input.settlementFillId,
+                ...(input.metadata ?? {}),
+              } as Prisma.InputJsonValue,
+            },
+          })
+        : await tx.tradeOrder.create({
+            data: {
+              userId: input.userId,
+              exchangeConnectionId: input.exchangeConnectionId,
+              tradingPairId: input.tradingPairId,
+              positionId: input.positionId,
+              side: input.closeSide,
+              type: "MARKET",
+              quantity: totalRequestedQty,
+              price: input.fillPrice,
+              status: orderStatus,
+              clientOrderId: input.clientOrderId,
+              exchangeOrderId: input.exchangeOrderId,
+              submittedAt: new Date(input.fillAtMs ?? Date.now()),
+              executedAt: terminal ? new Date(input.fillAtMs ?? Date.now()) : null,
+              avgExecutionPrice: nextAvg,
+              fee: totalFee,
+              feeCurrency: input.feeCurrency ?? input.quoteAsset,
+              metadata: {
+                closeReason: input.closeReason,
+                mode: input.mode,
+                settlementFillId: input.settlementFillId,
+                ...(input.metadata ?? {}),
+              } as Prisma.InputJsonValue,
+            },
+          });
+      await tx.positionSettlementFill.update({
+        where: { id: dedup.id },
+        data: { tradeOrderId: createdCloseOrder.id },
       });
 
       await tx.tradeExecution.create({
@@ -159,6 +377,7 @@ export async function applyCanonicalPartialSettlementFill(input: {
           quoteQty: Number((input.filledQuantity * input.fillPrice).toFixed(8)),
           fee: input.closeFee,
           executionRef: input.exchangeOrderId,
+          executedAt: new Date(input.fillAtMs ?? Date.now()),
           metadata: {
             mode: input.mode,
             reason: input.closeReason,
@@ -169,7 +388,11 @@ export async function applyCanonicalPartialSettlementFill(input: {
       });
 
       const existingMeta = (position.metadata as Record<string, unknown> | null) ?? {};
-      const nextQuantity = Math.max(0, Number((position.quantity - input.filledQuantity).toFixed(8)));
+      const nextQuantityRaw = toRounded(position.quantity - input.filledQuantity);
+      if (nextQuantityRaw < -1e-8) {
+        throw new Error("SETTLEMENT_POSITION_QUANTITY_UNDERFLOW");
+      }
+      const nextQuantity = Math.max(0, nextQuantityRaw);
       const nextRealized = Number((position.realizedPnl + pnl.realizedPnl).toFixed(8));
       const nextFeeTotal = Number(((position.feeTotal ?? 0) + input.closeFee).toFixed(8));
       const updatedPosition = await tx.position.update({
@@ -199,6 +422,47 @@ export async function applyCanonicalPartialSettlementFill(input: {
       });
 
       transactionHooks.afterPositionUpdate?.();
+
+      if (input.exitStateUpdate) {
+        const exitRow = await tx.positionExitPersistedState.findUnique({
+          where: { positionId: input.positionId },
+        });
+        if (!exitRow) {
+          throw new Error(`EXIT_STATE_MISSING:${input.positionId}`);
+        }
+        const nextState = mutateExitStateFromFill({
+          state: exitRow.state as ExitPolicyState,
+          settlementFillId: input.settlementFillId,
+          fillPrice: input.fillPrice,
+          filledQuantity: input.filledQuantity,
+          closeFee: input.closeFee,
+          feeAsset: input.feeAsset,
+          fillAtMs: input.fillAtMs ?? Date.now(),
+          decisionKind: input.exitStateUpdate.decisionKind,
+          partialLegId: input.exitStateUpdate.partialLegId ?? null,
+          orderRemainingQuantity,
+        });
+        const nextProcessed = Array.isArray(exitRow.processedFillIds)
+          ? [...new Set([...(exitRow.processedFillIds as string[]), input.settlementFillId])]
+          : [input.settlementFillId];
+        const updated = await tx.positionExitPersistedState.updateMany({
+          where: {
+            positionId: input.positionId,
+            stateVersion: input.exitStateUpdate.expectedStateVersion,
+          },
+          data: {
+            state: nextState as Prisma.InputJsonValue,
+            stateVersion: nextState.version,
+            terminalStatus: nextState.terminalStatus,
+            processedFillIds: nextProcessed as Prisma.InputJsonValue,
+            activeExitIntentId: null,
+            reconciliationStatus: "OK",
+          },
+        });
+        if (updated.count !== 1) {
+          throw new Error(`EXIT_STATE_VERSION_CONFLICT:${input.positionId}`);
+        }
+      }
 
       await tx.profitLossRecord.create({
         data: {
@@ -234,28 +498,45 @@ export async function applyCanonicalPartialSettlementFill(input: {
         fillPrice: input.fillPrice,
         fillFee: input.closeFee,
         feeAsset: input.feeAsset,
-        orderTerminal: true,
-        orderRemainingQuantity: 0,
+        orderTerminal: terminal,
+        orderRemainingQuantity,
         positionRemainingQuantity: updatedPosition.quantity,
         positionClosed: updatedPosition.status === "CLOSED",
         partial: updatedPosition.status === "OPEN",
       };
-    });
-  } catch (error) {
-    return {
-      status: "FAILED",
-      positionId: input.positionId,
-      settlementFillId: input.settlementFillId,
-      executedQuantity: null,
-      fillPrice: null,
-      fillFee: null,
-      feeAsset: null,
-      orderTerminal: false,
-      orderRemainingQuantity: 0,
-      positionRemainingQuantity: null,
-      positionClosed: false,
-      partial: false,
-      reason: (error as Error).message,
-    };
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    } catch (error) {
+      if (isRetryableTransactionError(error) && attempt < 2) continue;
+      return {
+        status: "FAILED",
+        positionId: input.positionId,
+        settlementFillId: input.settlementFillId,
+        executedQuantity: null,
+        fillPrice: null,
+        fillFee: null,
+        feeAsset: null,
+        orderTerminal: false,
+        orderRemainingQuantity: 0,
+        positionRemainingQuantity: null,
+        positionClosed: false,
+        partial: false,
+        reason: (error as Error).message,
+      };
+    }
   }
+  return {
+    status: "FAILED",
+    positionId: input.positionId,
+    settlementFillId: input.settlementFillId,
+    executedQuantity: null,
+    fillPrice: null,
+    fillFee: null,
+    feeAsset: null,
+    orderTerminal: false,
+    orderRemainingQuantity: 0,
+    positionRemainingQuantity: null,
+    positionClosed: false,
+    partial: false,
+    reason: "SETTLEMENT_RETRY_EXHAUSTED",
+  };
 }

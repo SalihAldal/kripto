@@ -15,14 +15,8 @@ function computeMaxEntryShiftMs(input: {
   maxShiftMs: number;
 }) {
   const windowSpan = input.manifest.replayWindow.toMs - input.manifest.entryAtMs;
-  const futureTicks = input.marketTicks.filter((tick) => tick.observation.eventAtMs > input.manifest.entryAtMs);
-  const earliestFutureAt =
-    futureTicks.length > 0
-      ? Math.min(...futureTicks.map((tick) => tick.observation.eventAtMs))
-      : input.manifest.replayWindow.toMs;
-  const tickBound = Math.max(0, earliestFutureAt - input.manifest.entryAtMs - 1);
-  const windowBound = Math.max(0, windowSpan - 15_000);
-  const effectiveMax = Math.min(input.maxShiftMs, tickBound, windowBound);
+  const windowBound = Math.max(0, windowSpan - 1_000);
+  const effectiveMax = Math.min(input.maxShiftMs, windowBound);
   return effectiveMax >= input.minShiftMs ? effectiveMax : null;
 }
 
@@ -157,10 +151,26 @@ export function buildCounterfactualEntryShift(input: {
   if (!exitTicks.length) {
     return { status: "UNSUPPORTED" as const, reason: "NO_EXIT_TICKS_AFTER_SHIFT" };
   }
+  const sanitizedTicks = exitTicks.map((tick) => ({
+    tickIndex: tick.tickIndex,
+    observation: tick.observation,
+  }));
+  const lastTick = sanitizedTicks[sanitizedTicks.length - 1];
+  if (lastTick && Number.isFinite(lastTick.observation.markPrice)) {
+    const syntheticFee = Number((totalQty * Number(lastTick.observation.markPrice) * feeRate).toFixed(8));
+    (lastTick as typeof lastTick & {
+      applyFill?: { price: number; quantity: number; fee: number; feeAsset: "QUOTE" };
+    }).applyFill = {
+      price: Number(lastTick.observation.markPrice),
+      quantity: totalQty,
+      fee: syntheticFee,
+      feeAsset: "QUOTE",
+    };
+  }
   return {
     status: "OK" as const,
     manifest: shiftedManifest,
-    exitTicks,
+    exitTicks: sanitizedTicks,
     marketTicksUnchanged: true,
     entryPrice,
   };
@@ -222,8 +232,8 @@ export function runCausalEntryShiftNegativeControl(input: {
   const controlNetExpectancies: number[] = [];
   let matchedIterations = 0;
   let unmatchedIterations = 0;
-  const minShift = input.minShiftMs ?? 30_000;
-  const maxShift = input.maxShiftMs ?? 120_000;
+  const minShift = input.minShiftMs ?? 1_000;
+  const maxShift = input.maxShiftMs ?? 30_000;
   for (let i = 0; i < input.iterations; i += 1) {
     const shiftedManifests: MatchedEntryManifest[] = [];
     const shiftedTicks: Record<string, Pr04ExitReplayTick[]> = {};
@@ -240,9 +250,18 @@ export function runCausalEntryShiftNegativeControl(input: {
         iterationOk = false;
         break;
       }
-      const shiftMs = minShift + Math.floor(rng() * Math.max(1, effectiveMax - minShift));
-      const built = buildCounterfactualEntryShift({ manifest, marketTicks, shiftMs });
-      if (built.status !== "OK") {
+      let built:
+        | ReturnType<typeof buildCounterfactualEntryShift>
+        | null = null;
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const shiftMs = minShift + Math.floor(rng() * Math.max(1, effectiveMax - minShift + 1));
+        const candidate = buildCounterfactualEntryShift({ manifest, marketTicks, shiftMs });
+        if (candidate.status === "OK") {
+          built = candidate;
+          break;
+        }
+      }
+      if (!built || built.status !== "OK") {
         iterationOk = false;
         break;
       }

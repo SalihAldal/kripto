@@ -2,13 +2,11 @@ import type { PositionCloseReason, TradingMode } from "@/src/server/execution/ty
 import { settleOpenPosition } from "@/src/server/execution/post-trade-settlement.service";
 import {
   loadPersistedExitBundle,
-  markProcessedFillId,
   savePersistedExitState,
   syncExitStateToDb,
 } from "@/src/server/execution/fix02-exit-persistence.service";
 import { claimExitQuantity, registerOpenExitOrder } from "@/src/server/profitability/pr04-exit-coordinator";
 import {
-  applyExitFill,
   evaluateExitPolicyTick,
   getExitPolicyState,
   hydrateExitPolicyState,
@@ -78,7 +76,7 @@ function isActionableDecision(kind: ExitDecisionKind) {
   return kind !== "NONE";
 }
 
-function buildSettlementFillId(input: {
+function buildExitIntentId(input: {
   positionId: string;
   decisionKind: ExitDecisionKind;
   quantity: number;
@@ -188,7 +186,7 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
       reconciliationRequired: true,
     };
   }
-  const fillId = buildSettlementFillId({
+  const intentId = buildExitIntentId({
     positionId: input.positionId,
     decisionKind: decision.kind,
     quantity: decision.closeQuantity,
@@ -197,24 +195,22 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
   });
   registerOpenExitOrder({
     state: evaluation.state,
-    intentId: fillId,
+    intentId,
     requestedQuantity: decision.closeQuantity,
     partialLegId: decision.partialLegId,
   });
-  await syncExitStateToDb(input.positionId);
-
-  const refreshedBundle = await loadPersistedExitBundle(input.positionId);
-  if (refreshedBundle && refreshedBundle.processedFillIds.includes(fillId)) {
-    return {
-      handled: true,
-      authorityActive: true,
-      decisionKind: decision.kind,
-      closed: evaluation.state.remainingQuantity <= 0,
-      partial: evaluation.state.remainingQuantity > 0,
-      reasonCode: "DUPLICATE_FILL_SUPPRESSED",
-      remainingQuantity: evaluation.state.remainingQuantity,
-      reconciliationRequired: false,
-    };
+  const postIntentBundle = await loadPersistedExitBundle(input.positionId);
+  if (postIntentBundle) {
+    await savePersistedExitState({
+      positionId: input.positionId,
+      expectedVersion: postIntentBundle.stateVersion,
+      state: evaluation.state,
+      processedFillIds: postIntentBundle.processedFillIds,
+      activeExitIntentId: intentId,
+      reconciliationStatus: postIntentBundle.reconciliationStatus,
+    });
+  } else {
+    await syncExitStateToDb(input.positionId);
   }
 
   const closeReason = mapDecisionToCloseReason(decision.kind);
@@ -228,19 +224,15 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
     reason: closeReason,
     mode: input.mode,
     requestedCloseQuantity: decision.closeQuantity,
-    settlementFillId: fillId,
+    settlementFillId: intentId,
     pr04DecisionKind: decision.kind,
     pr04PartialLegId: decision.partialLegId,
     decisionPrice: decision.decisionPrice,
+    expectedExitStateVersion: evaluation.state.version,
   })) as SettlementFillResult & { closed?: boolean; partial?: boolean; reason?: string };
 
   if (!isSuccessfulSettlementFill(settlement)) {
-    evaluation.state.reservedSellQuantity = Math.max(
-      0,
-      evaluation.state.reservedSellQuantity - decision.closeQuantity,
-    );
-    evaluation.state.orderState = "CANCELED";
-    evaluation.state.activeExitOrder = null;
+    evaluation.state.orderState = "SUBMITTED";
     await savePersistedExitState({
       positionId: input.positionId,
       expectedVersion: evaluation.state.version,
@@ -261,8 +253,7 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
 
   const fillEvidence = requireSettlementFillEvidence(settlement);
   if (!fillEvidence) {
-    evaluation.state.orderState = "CANCELED";
-    evaluation.state.activeExitOrder = null;
+    evaluation.state.orderState = "SUBMITTED";
     await savePersistedExitState({
       positionId: input.positionId,
       expectedVersion: evaluation.state.version,
@@ -281,22 +272,10 @@ export async function processFix02Pr04ExitTick(input: Fix02ExitTickInput): Promi
     };
   }
 
-  applyExitFill({
-    positionId: input.positionId,
-    fill: {
-      price: fillEvidence.fillPrice,
-      quantity: fillEvidence.executedQuantity,
-      fee: fillEvidence.fillFee,
-      feeAsset: fillEvidence.feeAsset,
-      atMs: input.observation.eventAtMs,
-    },
-    decisionKind: decision.kind,
-    partialLegId: decision.partialLegId,
-    openOrderRemainingQuantity: settlement.orderRemainingQuantity,
-  });
-  await markProcessedFillId(input.positionId, fillId);
-  await syncExitStateToDb(input.positionId);
-
+  const finalBundle = await loadPersistedExitBundle(input.positionId);
+  if (finalBundle) {
+    hydrateExitPolicyState(finalBundle.state);
+  }
   const finalState = getExitPolicyState(input.positionId);
   const closed = Boolean(settlement.positionClosed) || (finalState?.remainingQuantity ?? 0) <= 0;
   return {
