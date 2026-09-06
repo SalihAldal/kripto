@@ -421,3 +421,17 @@
 - Replay future quote fallback kaldırıldı; counterfactual fill yolu yeni sentetik üretime taşındı.
 - Portfolio `endingEquity` sözleşmesi nakit + açık varlık piyasa değeri olacak şekilde düzeltildi.
 - Kalan açıklar: child-process crash kill kanıtı, tek testte full entry->partial->stop production zinciri.
+
+## Settlement/Reconciliation Final Fix (Prompt 16)
+
+- Rapor: `KRIPTO_SETTLEMENT_RECONCILIATION_FINAL_REPORT.md`
+- Findings: `KRIPTO_SETTLEMENT_RECONCILIATION_FINAL_FINDINGS.md`
+- JSON: `kripto-settlement-reconciliation-final.json`
+- Canonical fill identity normal/reconcile yolunda `fill-v2` helper ile birleştirildi.
+- Reconcile multi-fill loop güncel `stateVersion` ile yeniden okunur hale getirildi.
+- `ALREADY_APPLIED` çıktısı `tradeOrderId` taşıyacak şekilde genişletildi.
+- `BALANCE_MISMATCH_AUTO_CLOSE` ve `DUST_AUTO_CLOSE` sahte close/PnL üretmeyecek şekilde düzeltildi.
+- Counterfactual replay’de son tick’e koşulsuz fill ekleme kaldırıldı.
+- Child-process crash testleri eklendi (`pre-commit kill rollback`, `restart exactly-once`).
+- Verdict: `FINAL_ENGINEERING_VERDICT=PARTIAL`, `PAPER_ENGINEERING_READINESS=NOT_READY`.
+- Açık kalan HIGH: ACK-loss no-orderId discovery e2e, full production chain no-manual-seed, crash post-commit barrier.

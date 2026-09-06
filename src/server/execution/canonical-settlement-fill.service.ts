@@ -9,6 +9,7 @@ type Tx = Prisma.TransactionClient;
 export type SettlementFillTransactionHook = "afterDedupClaim" | "afterPositionUpdate" | "afterPnlRecord";
 
 const transactionHooks: Partial<Record<SettlementFillTransactionHook, () => void>> = {};
+let postCommitHook: (() => void) | undefined;
 
 export function setSettlementFillTransactionHook(
   hook: SettlementFillTransactionHook,
@@ -22,6 +23,11 @@ export function resetSettlementFillTransactionHooksForTests() {
   for (const key of Object.keys(transactionHooks) as SettlementFillTransactionHook[]) {
     delete transactionHooks[key];
   }
+  postCommitHook = undefined;
+}
+
+export function setSettlementFillPostCommitHookForTests(fn: (() => void) | undefined) {
+  postCommitHook = fn;
 }
 
 function toRounded(value: number) {
@@ -31,6 +37,10 @@ function toRounded(value: number) {
 function isRetryableTransactionError(error: unknown) {
   const code = (error as { code?: string }).code;
   return code === "P2034";
+}
+
+async function sleep(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function deriveOrderStatus(input: { terminal: boolean; remaining: number }) {
@@ -101,6 +111,7 @@ function mutateExitStateFromFill(input: {
 function alreadyAppliedResult(input: {
   positionId: string;
   settlementFillId: string;
+  tradeOrderId?: string | null;
   executedQuantity: number;
   fillPrice: number;
   fillFee: number;
@@ -112,6 +123,7 @@ function alreadyAppliedResult(input: {
     status: "ALREADY_APPLIED",
     positionId: input.positionId,
     settlementFillId: input.settlementFillId,
+    tradeOrderId: input.tradeOrderId ?? undefined,
     executedQuantity: input.executedQuantity,
     fillPrice: input.fillPrice,
     fillFee: input.fillFee,
@@ -206,9 +218,9 @@ export async function applyCanonicalPartialSettlementFill(input: {
     };
   }
 
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
     try {
-      return await prisma.$transaction(async (tx) => {
+      const txResult = await prisma.$transaction<SettlementFillResult>(async (tx) => {
         const dedupExisting = await tx.positionSettlementFill.findUnique({
           where: {
             positionId_settlementFillId: {
@@ -222,6 +234,7 @@ export async function applyCanonicalPartialSettlementFill(input: {
           return alreadyAppliedResult({
             positionId: input.positionId,
             settlementFillId: input.settlementFillId,
+            tradeOrderId: dedupExisting.tradeOrderId,
             executedQuantity: dedupExisting.executedQty,
             fillPrice: dedupExisting.fillPrice,
             fillFee: dedupExisting.fee,
@@ -505,8 +518,13 @@ export async function applyCanonicalPartialSettlementFill(input: {
         partial: updatedPosition.status === "OPEN",
       };
       }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      postCommitHook?.();
+      return txResult;
     } catch (error) {
-      if (isRetryableTransactionError(error) && attempt < 2) continue;
+      if (isRetryableTransactionError(error) && attempt < 5) {
+        await sleep(15 * (attempt + 1));
+        continue;
+      }
       return {
         status: "FAILED",
         positionId: input.positionId,

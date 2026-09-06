@@ -25,8 +25,6 @@ import { collectLearningMarketEvidence } from "@/src/server/trading-core/self-le
 import { buildDynamicLearningWeight } from "@/src/server/trading-core/self-learning/dynamic-learning-weight";
 import {
   addTradeExecution,
-  closePositionRecord,
-  createPnlRecord,
   createTradeOrder,
   findTradeOrderById,
   getPositionById,
@@ -48,7 +46,7 @@ import { persistOrchestrationEnvelope } from "@/src/server/orchestration";
 import { persistPaperCloseFillForSettlement } from "@/src/server/execution/paper-close-persistence.service";
 import { applyCanonicalPartialSettlementFill } from "@/src/server/execution/canonical-settlement-fill.service";
 import type { SettlementFillResult } from "@/src/server/execution/settlement-fill-result";
-import { createHash } from "node:crypto";
+import { buildCanonicalSettlementFillId } from "@/src/server/execution/canonical-fill-identity";
 
 function isRateLimitedCloseError(error: unknown) {
   const message = (error as Error)?.message?.toLowerCase?.() ?? "";
@@ -104,31 +102,23 @@ function resolveFeeCurrency(input: {
 }
 
 function buildCanonicalFillIdentity(input: {
+  venue: string;
   exchangeConnectionId: string;
   symbol: string;
   exchangeOrderId?: string;
   clientOrderId?: string;
-  filledQuantity: number;
-  fillPrice: number;
-  fee: number;
-  filledAtMs: number;
+  exchangeTradeId?: string;
 }) {
-  return createHash("sha256")
-    .update(
-      [
-        "fill-v1",
-        input.exchangeConnectionId,
-        input.symbol,
-        input.exchangeOrderId ?? "",
-        input.clientOrderId ?? "",
-        input.filledQuantity.toFixed(8),
-        input.fillPrice.toFixed(8),
-        input.fee.toFixed(8),
-        String(input.filledAtMs),
-      ].join(":"),
-    )
-    .digest("hex")
-    .slice(0, 32);
+  const normalizedOrderId = (input.exchangeOrderId ?? input.clientOrderId ?? "").trim();
+  const normalizedTradeId = (input.exchangeTradeId ?? "").trim();
+  if (!normalizedOrderId || !normalizedTradeId) return null;
+  return buildCanonicalSettlementFillId({
+    venue: input.venue,
+    exchangeConnectionId: input.exchangeConnectionId,
+    symbol: input.symbol,
+    exchangeOrderId: normalizedOrderId,
+    exchangeTradeId: normalizedTradeId,
+  });
 }
 
 function mapOrderStatus(raw: string): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED" {
@@ -535,77 +525,28 @@ export async function settleOpenPosition(input: {
   };
 
   const finalizeBalanceMismatchClose = async (errorMessage: string) => {
-    const openFee = resolveOpenFee(position);
-    const settledQty = Number.isFinite(effectiveCloseQty) && effectiveCloseQty > 0 ? effectiveCloseQty : position.quantity;
-    recordClosedTradeForensics({
-      reason: input.reason,
-      closePrice: exitPrice,
-      quantity: settledQty,
-      openFee,
-      closeFee: 0,
-      slippageCost: 0,
-    });
-    await closePositionRecord({
-      positionId: position.id,
-      closePrice: exitPrice,
-      realizedPnl: 0,
-      feeTotal: openFee,
-      metadata: {
-        closeReason: input.reason,
-        closeMode: "BALANCE_MISMATCH_AUTO_CLOSE",
-        closeError: errorMessage,
-        ...variantTelemetryMeta,
-      },
-    });
-    await createPnlRecord({
-      userId: position.userId,
-      tradingPairId: position.tradingPairId,
-      positionId: position.id,
-      realizedPnl: 0,
-      unrealizedPnl: 0,
-      grossPnl: 0,
-      netPnl: 0,
-      feeTotal: openFee,
-      slippageCost: 0,
-      roePercent: 0,
-      notes: `Balance mismatch auto-close: ${input.reason}`,
-      metadata: {
-        mode: input.mode,
-        symbol,
-        closeError: errorMessage,
-        skipExchangeCloseOrder: true,
-        ...variantTelemetryMeta,
-      },
-    });
     await addSystemLog({
       level: "WARN",
       source: "execution-settlement",
-      message: `${symbol} balance mismatch auto-close applied`,
+      message: `${symbol} balance mismatch detected; canonical close deferred`,
       context: { positionId: position.id, reason: input.reason, error: errorMessage },
     }).catch(() => null);
     publishExecutionEvent({
       executionId: input.executionId,
       symbol,
       stage: "settlement",
-      status: "SUCCESS",
-      message: `${symbol} bakiye uyumsuzlugu nedeniyle sistemsel olarak kapatildi`,
+      status: "RUNNING",
+      message: `${symbol} bakiye uyumsuzlugu: reconcile gerekli, otomatik kapanis uygulanmadi`,
       level: "WARN",
-      context: { positionId: position.id, reason: input.reason, closeError: errorMessage, balanceMismatchAutoClose: true },
+      context: { positionId: position.id, reason: input.reason, closeError: errorMessage, reconciliationRequired: true },
     });
     resumeScannerWorker();
     return {
-      closed: true,
+      closed: false,
+      partial: false,
       positionId: position.id,
       closeOrderId: undefined,
-      pnl: {
-        realizedPnl: 0,
-        grossPnl: 0,
-        netPnl: 0,
-        feeTotal: openFee,
-        slippageCost: 0,
-        roePercent: 0,
-      },
-      closeReason: input.reason,
+      reason: "BALANCE_RECONCILIATION_REQUIRED",
     };
   };
 
@@ -746,84 +687,34 @@ export async function settleOpenPosition(input: {
           return finalizeBalanceMismatchClose((lastError as Error)?.message ?? "Insufficient balance on close");
         }
         if (isMinNotionalCloseError(lastError)) {
-          // Exchange rejects tiny remainder (dust) closes. Do not block the engine with a forever-open position.
-          const fallbackPnl = calculateRealizedPnl({
-            side: position.side,
-            entryPrice: position.entryPrice,
-            exitPrice,
-            quantity: effectiveCloseQty,
-            openFee: resolveOpenFee(position),
-            closeFee: 0,
-            slippageCost: 0,
-          });
-          recordClosedTradeForensics({
-            reason: input.reason,
-            closePrice: exitPrice,
-            quantity: effectiveCloseQty,
-            openFee: resolveOpenFee(position),
-            closeFee: 0,
-            slippageCost: 0,
-          });
-          await closePositionRecord({
-            positionId: position.id,
-            closePrice: exitPrice,
-            realizedPnl: fallbackPnl.realizedPnl,
-            feeTotal: fallbackPnl.feeTotal,
-            metadata: {
-              closeReason: input.reason,
-              roePercent: fallbackPnl.roePercent,
-              closeMode: "DUST_AUTO_CLOSE",
-              closeError: (lastError as Error)?.message ?? "Notional below min",
-              ...variantTelemetryMeta,
-            },
-          });
-          await createPnlRecord({
-            userId: position.userId,
-            tradingPairId: position.tradingPairId,
-            positionId: position.id,
-            realizedPnl: fallbackPnl.realizedPnl,
-            unrealizedPnl: 0,
-            grossPnl: fallbackPnl.grossPnl,
-            netPnl: fallbackPnl.netPnl,
-            feeTotal: fallbackPnl.feeTotal,
-            slippageCost: fallbackPnl.slippageCost,
-            roePercent: fallbackPnl.roePercent,
-            notes: `Dust auto-close: ${input.reason}`,
-            metadata: {
-              mode: input.mode,
-              symbol,
-              skipExchangeCloseOrder: true,
-              closeError: (lastError as Error)?.message ?? "Notional below min",
-              ...variantTelemetryMeta,
-            },
-          });
           await addSystemLog({
             level: "WARN",
             source: "execution-settlement",
-            message: `${symbol} dust auto-close applied (min notional)`,
+            message: `${symbol} min-notional reject; dust remains open for reconciliation`,
             context: { positionId: position.id, reason: input.reason, error: (lastError as Error)?.message ?? "unknown" },
           }).catch(() => null);
           publishExecutionEvent({
             executionId: input.executionId,
             symbol,
             stage: "settlement",
-            status: "SUCCESS",
-            message: `${symbol} dust pozisyon min notional nedeniyle sistemsel olarak kapatildi`,
+            status: "RUNNING",
+            message: `${symbol} dust/min-notional reddi: otomatik kapanis yok, reconcile gerekli`,
             level: "WARN",
             context: {
               positionId: position.id,
               reason: input.reason,
               closeError: (lastError as Error)?.message ?? "Notional below min",
-              dustAutoClose: true,
+              dustUnsettled: true,
+              reconciliationRequired: true,
             },
           });
           resumeScannerWorker();
           return {
-            closed: true,
+            closed: false,
+            partial: false,
             positionId: position.id,
             closeOrderId: undefined,
-            pnl: fallbackPnl,
-            closeReason: input.reason,
+            reason: "DUST_RECONCILIATION_REQUIRED",
           };
         }
         if (!isRateLimitedCloseError(error) || attempt >= 2) {
@@ -1007,15 +898,36 @@ export async function settleOpenPosition(input: {
     return "UNKNOWN";
   })() as "BASE" | "QUOTE" | "UNKNOWN";
   const canonicalSettlementFillId = buildCanonicalFillIdentity({
+    venue,
     exchangeConnectionId: position.exchangeConnectionId,
     symbol,
     exchangeOrderId: closeOrder.orderId,
     clientOrderId: closeOrder.clientOrderId,
-    filledQuantity: finalCloseQty,
-    fillPrice: closeFillPrice,
-    fee: closeFee,
-    filledAtMs,
+    exchangeTradeId: String(
+      (closeOrder.metadata as Record<string, unknown> | undefined)?.tradeId ??
+        (closeOrder.metadata as Record<string, unknown> | undefined)?.fillId ??
+        (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
+        closeOrder.orderId ??
+        closeOrder.clientOrderId ??
+        "",
+    ),
   });
+  if (!canonicalSettlementFillId) {
+    resumeScannerWorker();
+    return {
+      closed: false,
+      partial: false,
+      reason: "Canonical fill identity unavailable",
+    };
+  }
+  const exchangeTradeId = String(
+    (closeOrder.metadata as Record<string, unknown> | undefined)?.tradeId ??
+      (closeOrder.metadata as Record<string, unknown> | undefined)?.fillId ??
+      (closeOrder.metadata as Record<string, unknown> | undefined)?.simulationId ??
+      closeOrder.orderId ??
+      closeOrder.clientOrderId ??
+      "",
+  ).trim();
   const canonical = await applyCanonicalPartialSettlementFill({
     positionId: position.id,
     settlementFillId: canonicalSettlementFillId,
@@ -1063,6 +975,7 @@ export async function settleOpenPosition(input: {
     metadata: {
       closeReason: input.reason,
       exitIntentId: input.settlementFillId ?? null,
+      exchangeTradeId,
       ...pr04Meta,
       ...variantTelemetryMeta,
     },

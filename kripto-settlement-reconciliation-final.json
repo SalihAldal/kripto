@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "kripto-settlement-reconciliation-final-v1",
+  "generatedAt": "2026-09-07T01:45:00+03:00",
+  "fingerprint": {
+    "startHead": "a123c3fffc83eb018f7755d7a3954c38bedcacc5",
+    "finalHead": "a123c3fffc83eb018f7755d7a3954c38bedcacc5",
+    "nodeVersion": "v24.13.0",
+    "npmVersion": "11.6.2",
+    "worktreeFingerprint": "68b0b530f738b499e0681271291bca45cb16d7aa8b9c233f4ce62b83bb4fa794"
+  },
+  "environment": {
+    "db": "disposable-postgresql-kripto_fix02_*",
+    "paperCampaignStarted": false,
+    "liveAuthorization": "DISABLED"
+  },
+  "verdicts": {
+    "CANONICAL_FILL_IDENTITY_VERDICT": "PASS",
+    "EXACTLY_ONCE_ACCOUNTING_VERDICT": "PASS",
+    "MULTI_FILL_RECONCILIATION_VERDICT": "PASS",
+    "ACK_LOSS_RECOVERY_VERDICT": "PARTIAL",
+    "RESERVATION_CONCURRENCY_VERDICT": "PASS",
+    "SETTLEMENT_EXIT_STATE_ATOMICITY_VERDICT": "PASS",
+    "DUST_AND_BALANCE_ACCOUNTING_VERDICT": "PASS",
+    "COUNTERFACTUAL_EXECUTION_VERDICT": "PASS",
+    "PORTFOLIO_REGRESSION_VERDICT": "PASS",
+    "PROCESS_CRASH_VERDICT": "PARTIAL",
+    "PRODUCTION_CHAIN_VERDICT": "PARTIAL",
+    "FINAL_ENGINEERING_VERDICT": "PARTIAL",
+    "REQUIRED_CHECKS_NOT_RUN": [
+      "ACK_LOSS_ACCEPTED_TIMEOUT_NO_LOCAL_ORDERID_DISCOVERY_E2E",
+      "FULL_ENTRY_TO_PARTIAL_TO_STOP_SINGLE_CHAIN_NO_MANUAL_SEED",
+      "CRASH_POST_COMMIT_PRE_RESPONSE_BARRIER_PROOF_WITH_ACK_LOSS"
+    ],
+    "OPEN_CRITICAL_COUNT": 0,
+    "OPEN_HIGH_COUNT": 3,
+    "PAPER_ENGINEERING_READINESS": "NOT_READY",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED"
+  },
+  "tests": [
+    {
+      "command": "npx vitest run tests/settlement-reconciliation.integration.test.ts tests/execution-process-kill.integration.test.ts --reporter=verbose",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run tests/execution-correction.integration.test.ts tests/replay-correction.test.ts --reporter=verbose",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run tests/execution-correction.integration.test.ts tests/settlement-reconciliation.integration.test.ts tests/execution-process-kill.integration.test.ts --reporter=verbose (x3)",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run tests/corrections-final-qa.integration.test.ts tests/fix02-durable-exit-and-settlement.integration.test.ts tests/post-fix-final-qa.integration.test.ts tests/replay-correction.test.ts tests/pr05-offline-comparison.test.ts --reporter=verbose",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "exitCode": 0,
+      "elapsedMs": 476131
+    }
+  ]
+}
+

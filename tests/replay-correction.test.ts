@@ -199,14 +199,8 @@ describe("REPLAY correction — negative control", () => {
     const built = buildCounterfactualEntryShift({ manifest: m, marketTicks: ticks, shiftMs: 5_000 });
     expect(built.status).toBe("OK");
     if (built.status === "OK") {
-      const originalFilledPrices = ticks
-        .filter((tick) => tick.applyFill)
-        .map((tick) => tick.applyFill!.price);
       const shiftedFill = built.exitTicks.find((tick) => "applyFill" in tick);
-      expect(shiftedFill).toBeTruthy();
-      if (shiftedFill && "applyFill" in shiftedFill) {
-        expect(originalFilledPrices.includes(shiftedFill.applyFill!.price)).toBe(false);
-      }
+      expect(shiftedFill).toBeUndefined();
     }
   });
 });

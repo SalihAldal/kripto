@@ -155,18 +155,6 @@ export function buildCounterfactualEntryShift(input: {
     tickIndex: tick.tickIndex,
     observation: tick.observation,
   }));
-  const lastTick = sanitizedTicks[sanitizedTicks.length - 1];
-  if (lastTick && Number.isFinite(lastTick.observation.markPrice)) {
-    const syntheticFee = Number((totalQty * Number(lastTick.observation.markPrice) * feeRate).toFixed(8));
-    (lastTick as typeof lastTick & {
-      applyFill?: { price: number; quantity: number; fee: number; feeAsset: "QUOTE" };
-    }).applyFill = {
-      price: Number(lastTick.observation.markPrice),
-      quantity: totalQty,
-      fee: syntheticFee,
-      feeAsset: "QUOTE",
-    };
-  }
   return {
     status: "OK" as const,
     manifest: shiftedManifest,
