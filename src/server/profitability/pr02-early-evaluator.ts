@@ -19,6 +19,7 @@ import {
   type EarlyFeatureSet,
   type EarlyTriggerResult,
 } from "@/src/server/profitability/pr02-types";
+import type { InvalidationContract } from "@/src/server/profitability/pr03-types";
 
 const POLICY = {
   minPriceReturnShortPct: 0.04,
@@ -48,6 +49,97 @@ function buildSignalId(candidateId: string, lifecycleId: string, triggerGenerati
     .update(`${candidateId}:${lifecycleId}:${triggerGeneration}:${eventAtMs}`)
     .digest("hex")
     .slice(0, 24);
+}
+
+export function buildEarlyStructuralInvalidation(input: {
+  baselinePrice: number;
+  firstDetectionPrice: number;
+  latestPrice: number;
+  asOfMs: number;
+}): InvalidationContract | null {
+  const reference = Math.min(input.baselinePrice, input.firstDetectionPrice);
+  if (!Number.isFinite(reference) || reference <= 0) return null;
+  if (!Number.isFinite(input.latestPrice) || input.latestPrice <= reference) return null;
+  const invalidationThreshold = Number((reference * 0.995).toFixed(8));
+  if (invalidationThreshold >= input.latestPrice) return null;
+  return {
+    referenceLevel: reference,
+    invalidationThreshold,
+    reasonCode: "EARLY_BASELINE_STRUCTURE_BREACH",
+    computedAtMs: input.asOfMs,
+    availableAtMs: input.asOfMs,
+    validUntilMs: input.asOfMs + EARLY_SETUP_EXPIRE_MS,
+    sourceObservations: ["BASELINE_PRICE", "FIRST_DETECTION_PRICE"],
+  };
+}
+
+function buildProducerContextMissingResult(
+  input: StrategyInput,
+  regime: RegimeSnapshot,
+  ctx: EarlyContextExtension | undefined,
+  nowMs: number,
+  lifecycleId: string,
+): EarlyEvaluationResult {
+  const trigger: EarlyTriggerResult = {
+    triggered: false,
+    signalId: null,
+    triggerAt: null,
+    validUntil: null,
+    reasonCodes: ["PRODUCER_CONTEXT_MISSING"],
+    setupQualified: false,
+    entryTriggerMet: false,
+    rankingScore: 0,
+  };
+  const features = computeEarlyFeatures({
+    symbol: input.candidateId.split(":")[0] ?? input.candidateId,
+    candidateId: input.candidateId,
+    lifecycleId,
+    marketEventAt: input.marketEventAt,
+    observedAt: input.evaluatedAt,
+    nowMs,
+    trades: [],
+    book: ctx?.book ?? null,
+    baselinePrice: ctx?.baselinePrice ?? 0,
+    firstDetectionPrice: ctx?.firstDetectionPrice ?? 0,
+    intendedNotional: ctx?.intendedNotional ?? 500,
+  });
+  const strategyEvaluation = mapToStrategyEvaluation(input, regime, features, trigger, "WARMUP", "UNKNOWN");
+  return {
+    schemaVersion: PR02_SCHEMA_VERSION,
+    policyVersion: PR02_POLICY_VERSION,
+    candidateId: input.candidateId,
+    lifecycleId,
+    strategyId: "EARLY_ACCELERATION",
+    featureSnapshotId: ctx?.featureSnapshotId ?? null,
+    sourceType: input.sourceType,
+    marketEventAt: input.marketEventAt,
+    evaluatedAt: input.evaluatedAt,
+    setupState: "WARMUP",
+    dataValidity: "INSUFFICIENT_DATA",
+    universeEligible: true,
+    setupQualified: false,
+    trigger,
+    exhaustion: {
+      exhausted: false,
+      reasonCodes: [],
+      extensionFromBaselinePct: null,
+      flowWeakening: false,
+      spreadDepthDeteriorating: false,
+      spikeReversal: false,
+    },
+    features,
+    transition: null,
+    economics: buildTradeEconomicsRecord({
+      candidateId: input.candidateId,
+      strategyId: "EARLY_ACCELERATION",
+      featureSnapshotId: ctx?.featureSnapshotId ?? null,
+      costSource: "UNKNOWN",
+    }),
+    economicsStatus: "UNKNOWN",
+    invalidation: null,
+    setupId: `${input.candidateId}:early:${lifecycleId}`,
+    strategyEvaluation,
+  };
 }
 
 export function assessEarlyExhaustion(features: EarlyFeatureSet, trades: { price: number }[]): EarlyExhaustionAssessment {
@@ -200,12 +292,7 @@ function mapToStrategyEvaluation(
   const legacySetupScore = clamp01(
     (input.velocity + input.acceleration + input.volumeAcceleration + input.relativeStrength) / 4,
   );
-  const routerFixtureMode = features.coverage.tradeCount === 0;
-  const setupQuality = trigger.setupQualified
-    ? Math.max(trigger.rankingScore, legacySetupScore)
-    : routerFixtureMode
-      ? legacySetupScore
-      : trigger.rankingScore;
+  const setupQuality = trigger.setupQualified ? Math.max(trigger.rankingScore, legacySetupScore) : trigger.rankingScore;
   const entryTimingQuality = trigger.entryTriggerMet ? clamp01(1 - Math.max(0, (features.features.extensionFromBaselinePct?.value ?? 0) / POLICY.maxExtensionFromBaselinePct)) : 0.2;
   const spreadBps = featureValue(features, "spreadBps") ?? input.spreadBps;
   const depthCoverage = featureValue(features, "depthCoverage") ?? input.liquidityScore;
@@ -267,7 +354,10 @@ export function evaluateEarlyAccelerationStrategy(
   const nowMs = ctx?.nowMs ?? Date.parse(input.evaluatedAt);
   const lifecycleId = ctx?.lifecycleId ?? input.candidateId;
   const trades = ctx?.trades ?? [];
-  const persistLifecycle = Boolean((ctx?.trades?.length ?? 0) > 0);
+  if (!trades.length) {
+    return buildProducerContextMissingResult(input, regime, ctx, nowMs, lifecycleId);
+  }
+  const persistLifecycle = true;
   const terminalState = persistLifecycle ? getEarlySetupState(input.candidateId, lifecycleId) : "OBSERVING";
   const features = computeEarlyFeatures({
     symbol: input.candidateId.split(":")[0] ?? input.candidateId,
@@ -281,21 +371,6 @@ export function evaluateEarlyAccelerationStrategy(
     baselinePrice: ctx?.baselinePrice ?? ctx?.firstDetectionPrice ?? trades[0]?.price ?? 0,
     firstDetectionPrice: ctx?.firstDetectionPrice ?? trades[0]?.price ?? 0,
     intendedNotional: ctx?.intendedNotional ?? 500,
-    fallback: {
-      velocity: input.velocity,
-      acceleration: input.acceleration,
-      volumeAcceleration: input.volumeAcceleration,
-      relativeStrength: input.relativeStrength,
-      flowImbalance:
-        input.flowImbalance ??
-        (Number.isFinite(input.flowRecovery) ? Math.max(-1, Math.min(1, input.flowRecovery * 2 - 1)) : null),
-      tradeRateAcceleration: input.tradeRateAcceleration ?? input.velocity,
-      spreadBps: input.spreadBps,
-      liquidityScore: input.liquidityScore,
-      staleFeatures: input.staleFeatures,
-      missingFeatures: input.missingFeatures,
-      invalidFeatures: input.invalidFeatures,
-    },
   });
 
   const setupCheck = evaluateEarlySetupQualification(features);
@@ -353,6 +428,28 @@ export function evaluateEarlyAccelerationStrategy(
       validUntil: new Date(nowMs + EARLY_TRIGGER_VALID_MS).toISOString(),
     };
   }
+
+  const latestPrice = trades.at(-1)?.price ?? ctx?.baselinePrice ?? 0;
+  let invalidation = trigger.triggered
+    ? buildEarlyStructuralInvalidation({
+        baselinePrice: ctx?.baselinePrice ?? latestPrice,
+        firstDetectionPrice: ctx?.firstDetectionPrice ?? latestPrice,
+        latestPrice,
+        asOfMs: nowMs,
+      })
+    : null;
+  if (trigger.triggered && !invalidation) {
+    trigger = {
+      ...trigger,
+      triggered: false,
+      signalId: null,
+      triggerAt: null,
+      validUntil: null,
+      reasonCodes: [...trigger.reasonCodes, "INVALIDATION_STRUCTURE_MISSING"],
+    };
+  }
+
+  const setupId = `${input.candidateId}:early:${lifecycleId}`;
 
   const economicsStatus: EarlyEvaluationResult["economicsStatus"] =
     input.expectedMovePercent > 0 && input.entryFee > 0 && input.expectedMovePercent > computeMinimumViableMove(input)
@@ -420,6 +517,8 @@ export function evaluateEarlyAccelerationStrategy(
     transition,
     economics,
     economicsStatus,
+    invalidation,
+    setupId,
     strategyEvaluation,
   };
 }

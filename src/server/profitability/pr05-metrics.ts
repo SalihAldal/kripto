@@ -6,9 +6,14 @@ export function aggregateTradeOutcomes(input: {
   strategyId: Pr05TradeOutcome["strategyId"] | "PORTFOLIO";
   exitPolicyId: Pr05TradeOutcome["exitPolicyId"] | null;
   comparisonType: "MATCHED_EXIT" | "PORTFOLIO_REPLAY";
+  split?: Pr05TradeOutcome["split"] | "ALL";
 }) {
-  const closed = input.outcomes.filter((o) => o.closed && !o.censored && o.netPnl != null);
-  const censoredCount = input.outcomes.filter((o) => o.censored).length;
+  const scoped =
+    input.split && input.split !== "ALL"
+      ? input.outcomes.filter((o) => o.split === input.split)
+      : input.outcomes.filter((o) => o.split !== "UNASSIGNED" || input.split === "ALL");
+  const closed = scoped.filter((o) => o.closed && !o.censored && o.netPnl != null);
+  const censoredCount = scoped.filter((o) => o.censored).length;
   const nets = closed.map((o) => o.netPnl!);
   const wins = closed.filter((o) => (o.netPnl ?? 0) > 0);
   const losses = closed.filter((o) => (o.netPnl ?? 0) < 0);
@@ -51,7 +56,7 @@ export function aggregateTradeOutcomes(input: {
     strategyId: input.strategyId,
     exitPolicyId: input.exitPolicyId,
     comparisonType: input.comparisonType,
-    observedCount: input.outcomes.length,
+    observedCount: scoped.length,
     closedTradeCount: closed.length,
     censoredCount,
     netExpectancy,

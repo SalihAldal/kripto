@@ -113,7 +113,6 @@ function mapToStrategyEvaluation(
   trigger: StrategyTriggerResult,
   setupState: BreakoutSetupState,
   legacySetupScore: number,
-  routerFixtureMode: boolean,
 ): StrategyEvaluation {
   const reasons: string[] = [];
   const missingAll = new Set(input.missingFeatures ?? []);
@@ -127,9 +126,7 @@ function mapToStrategyEvaluation(
   const minimumViableMovePercent = computeMinimumViableMove(input);
   const regimeCompatibility =
     regime.regime === "BULL_TREND" || regime.regime === "TRANSITION" ? 0.75 : 0.2;
-  const setupQuality = trigger.setupQualified
-    ? Math.max(trigger.rankingScore, legacySetupScore)
-    : routerFixtureMode ? legacySetupScore : trigger.rankingScore;
+  const setupQuality = trigger.setupQualified ? Math.max(trigger.rankingScore, legacySetupScore) : trigger.rankingScore;
   const entryTimingQuality = trigger.entryTriggerMet ? 0.85 : 0.2;
   const executionQuality = clamp01((input.liquidityScore + (1 - input.spreadBps / 100)) / 2);
   if (missingFeatures.length > 0) reasons.push("MISSING_FEATURES");
@@ -180,64 +177,61 @@ function mapToStrategyEvaluation(
   };
 }
 
+function buildBreakoutProducerContextMissingResult(
+  input: StrategyInput,
+  regime: RegimeSnapshot,
+  ctx: ReturnType<typeof resolveStrategyContext>,
+): BreakoutEvaluationResult {
+  const trigger: StrategyTriggerResult = {
+    triggered: false,
+    signalId: null,
+    triggerAt: null,
+    validUntil: null,
+    reasonCodes: ["PRODUCER_CONTEXT_MISSING"],
+    setupQualified: false,
+    entryTriggerMet: false,
+    rankingScore: 0,
+  };
+  const strategyEvaluation = mapToStrategyEvaluation(input, regime, trigger, "WARMUP", 0);
+  return {
+    schemaVersion: PR03_SCHEMA_VERSION,
+    policyVersion: PR03_POLICY_VERSION,
+    candidateId: input.candidateId,
+    lifecycleId: ctx.lifecycleId,
+    setupId: `${input.candidateId}:breakout-pending`,
+    strategyId: "BREAKOUT_RETEST",
+    featureSnapshotId: ctx.featureSnapshotId,
+    sourceType: input.sourceType,
+    marketEventAt: input.marketEventAt,
+    evaluatedAt: input.evaluatedAt,
+    setupState: "WARMUP",
+    referenceLevel: null,
+    invalidation: null,
+    trigger,
+    transition: null,
+    economics: buildTradeEconomicsRecord({
+      candidateId: input.candidateId,
+      strategyId: "BREAKOUT_RETEST",
+      featureSnapshotId: ctx.featureSnapshotId,
+      costSource: "UNKNOWN",
+    }),
+    economicsStatus: "UNKNOWN",
+    strategyEvaluation,
+  };
+}
+
 export function evaluateBreakoutRetestStrategy(
   input: StrategyInput,
   regime: RegimeSnapshot,
   strategyContext?: StrategyContextExtension,
 ): BreakoutEvaluationResult {
   const ctx = resolveStrategyContext(strategyContext ?? input.strategyContext, input);
+  if (!ctx.candles.length && !ctx.trades.length) {
+    return buildBreakoutProducerContextMissingResult(input, regime, ctx);
+  }
   const persistLifecycle = Boolean(ctx.candles.length > 0 || ctx.trades.length > 0);
   const terminalState = persistLifecycle ? getBreakoutSetupState(input.candidateId, ctx.lifecycleId) : "WARMUP";
   const frozen = persistLifecycle ? getFrozenBreakoutLevel(input.candidateId, ctx.lifecycleId) : null;
-
-  const routerFixtureMode = ctx.candles.length === 0 && ctx.trades.length === 0;
-
-  if (routerFixtureMode) {
-    const legacyQualified = input.breakoutHeld && input.flowRecovery >= 0.45 && input.acceleration >= 0.45;
-    const legacyTrigger = legacyQualified && input.flowRecovery >= 0.5 && input.acceleration >= 0.5;
-    const trigger: StrategyTriggerResult = {
-      triggered: legacyTrigger,
-      signalId: null,
-      triggerAt: null,
-      validUntil: null,
-      reasonCodes: legacyTrigger ? [] : ["ROUTER_FIXTURE_SETUP_NOT_MET"],
-      setupQualified: legacyQualified,
-      entryTriggerMet: legacyTrigger,
-      rankingScore: clamp01((input.breakoutHeld ? 1 : 0) * 0.5 + input.flowRecovery * 0.25 + input.acceleration * 0.25),
-    };
-    const legacySetupScore = trigger.rankingScore;
-    const strategyEvaluation = mapToStrategyEvaluation(input, regime, trigger, legacyTrigger ? "TRIGGERED" : "LEVEL_READY", legacySetupScore, true);
-    const economicsStatus =
-      input.expectedMovePercent > 0 && input.entryFee > 0 && input.expectedMovePercent > computeMinimumViableMove(input)
-        ? "KNOWN"
-        : "UNKNOWN";
-    return {
-      schemaVersion: PR03_SCHEMA_VERSION,
-      policyVersion: PR03_POLICY_VERSION,
-      candidateId: input.candidateId,
-      lifecycleId: ctx.lifecycleId,
-      setupId: `${input.candidateId}:breakout-router-fixture`,
-      strategyId: "BREAKOUT_RETEST",
-      featureSnapshotId: ctx.featureSnapshotId,
-      sourceType: input.sourceType,
-      marketEventAt: input.marketEventAt,
-      evaluatedAt: input.evaluatedAt,
-      setupState: legacyTrigger ? "TRIGGERED" : legacyQualified ? "HOLD_CONFIRMED" : "WARMUP",
-      referenceLevel: null,
-      invalidation: null,
-      trigger,
-      transition: null,
-      economics: buildTradeEconomicsRecord({
-        candidateId: input.candidateId,
-        strategyId: "BREAKOUT_RETEST",
-        featureSnapshotId: ctx.featureSnapshotId,
-        costSource: economicsStatus === "KNOWN" ? "CONFIGURED_ASSUMPTION" : "UNKNOWN",
-        expectedMovePercent: economicsStatus === "KNOWN" ? input.expectedMovePercent : undefined,
-      }),
-      economicsStatus,
-      strategyEvaluation,
-    };
-  }
 
   const closedCount = ctx.candles.filter((c) => c.closed && c.availableAt <= ctx.nowMs).length;
   const warmupComplete = closedCount >= MIN_CLOSED_CANDLES;
@@ -391,7 +385,6 @@ export function evaluateBreakoutRetestStrategy(
     trigger,
     setupState,
     legacySetupScore,
-    false,
   );
 
   const setupId = transition?.setupId ?? `${input.candidateId}:breakout-pending`;

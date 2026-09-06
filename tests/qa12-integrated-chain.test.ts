@@ -1,8 +1,26 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it, beforeEach, vi } from "vitest";
+
+const claimMocks = vi.hoisted(() => ({
+  create: vi.fn(),
+  findUnique: vi.fn(),
+  deleteMany: vi.fn(),
+}));
+
+vi.mock("@/src/server/db/prisma", () => ({
+  prisma: {
+    appSetting: {
+      create: claimMocks.create,
+      findUnique: claimMocks.findUnique,
+      deleteMany: claimMocks.deleteMany,
+      update: vi.fn(),
+    },
+  },
+}));
 import { resolveTerminalEvidence } from "@/src/server/forensics/er01-telemetry-verdict";
 import { resolveExecutionAuthorization } from "@/src/server/execution/er03-canonical-policy";
 import { buildFeatureContractSnapshot } from "@/src/server/execution/er02-feature-contract";
 import { evaluateCanonicalRegime, routeStrategies } from "@/src/server/forensics/p4-regime-strategy-shadow";
+import { freezeSelectedStrategySignal, resolveInvalidationFromSelectedSignal } from "@/src/server/execution/fix01-selected-signal";
 import { buildOutcomeHorizonRows } from "@/src/server/shadow-outcome/canonical-dataset";
 import { evaluateBreakoutRetestStrategy } from "@/src/server/profitability/pr03-breakout-evaluator";
 import { evaluateMomentumContinuationStrategy } from "@/src/server/profitability/pr03-momentum-evaluator";
@@ -16,7 +34,6 @@ import {
 import { buildExitPolicySnapshotAtEntry } from "@/src/server/profitability/pr04-exit-evaluator";
 import { buildRiskReference } from "@/src/server/profitability/pr04-structural-stop";
 import {
-  resolveInvalidationForSelectedStrategy,
   isPr04ExitEvaluationEnabled,
 } from "@/src/server/profitability/pr04-exit-bridge";
 import { runPr04ExitReplayWithOutcome } from "@/src/server/profitability/pr04-replay";
@@ -61,6 +78,10 @@ function baseStrategyInput(overrides?: Partial<StrategyInput>): StrategyInput {
 
 beforeEach(() => {
   resetExitPolicyStoreForTests();
+  vi.clearAllMocks();
+  claimMocks.create.mockResolvedValue({ id: "setting-1" });
+  claimMocks.findUnique.mockResolvedValue(null);
+  claimMocks.deleteMany.mockResolvedValue({ count: 1 });
 });
 
 describe("QA12 integrated chain", () => {
@@ -87,7 +108,8 @@ describe("QA12 integrated chain", () => {
       replayTickIndex: 0,
     });
     expect(early.strategyEvaluation.strategyId).toBe("EARLY_ACCELERATION");
-    expect(early.trigger.triggered).toBeDefined();
+    expect(early.trigger.triggered).toBe(false);
+    expect(early.trigger.reasonCodes).toContain("PRODUCER_CONTEXT_MISSING");
   });
 
   it("B momentum partial exit preserves remaining quantity", () => {
@@ -203,8 +225,21 @@ describe("QA12 integrated chain", () => {
     expect(router.eligibleStrategies.length).toBeLessThanOrEqual(router.evaluations.length);
   });
 
-  it("F durable claim idempotency covered by er04 suite reference", () => {
-    expect(true).toBe(true);
+  it("F durable claim rejects wrong owner release", async () => {
+    const { claimDurableCanonicalExecutionAttempt, releaseDurableCanonicalExecutionAttempt } = await import(
+      "@/src/server/hot-path/execution-attempt-lock.service"
+    );
+    claimMocks.findUnique.mockResolvedValueOnce({
+      value: { executionId: "exec-qa12", ownerFenceToken: "fence-1" },
+    });
+    const release = await releaseDurableCanonicalExecutionAttempt({
+      userId: "qa12-user",
+      candidateId: "BTC:QA12",
+      executionId: "exec-other",
+      executionMode: "paper",
+      venue: "BINANCE_TR",
+    });
+    expect(release.ok).toBe(false);
   });
 
   it("G exit coordinator prevents duplicate sell on in-flight order", () => {
@@ -376,7 +411,7 @@ describe("QA12 integrated chain", () => {
     expect(detectFutureDataLeakFixture({ decisionAtMs: baseNow, observationAvailableAtMs: baseNow + 5000 })).toBe(true);
   });
 
-  it("M invalidation bridge resolves PR03 contract for selected strategy", () => {
+  it("M invalidation bridge uses frozen selected signal without re-evaluation", () => {
     const input = baseStrategyInput({ breakoutHeld: true, flowRecovery: 0.8, acceleration: 0.8 });
     const regime = evaluateCanonicalRegime({
       marketEventAt: input.marketEventAt,
@@ -388,18 +423,52 @@ describe("QA12 integrated chain", () => {
       chaosProbability: 0.05,
       pumpScore: 0.2,
     });
-    const breakoutInv = resolveInvalidationForSelectedStrategy({
-      strategyId: "BREAKOUT_RETEST",
-      strategyInput: input,
-      regime,
+    const candle = (index: number, o: number, h: number, l: number, c: number) => {
+      const openTime = baseNow - (10 - index) * 30_000;
+      const closeTime = openTime + 30_000;
+      return { openTime, closeTime, open: o, high: h, low: l, close: c, volume: 1000, closed: true, availableAt: closeTime };
+    };
+    const candles = [
+      candle(0, 98, 99, 97.5, 98.5),
+      candle(1, 98.5, 99.2, 98.2, 99),
+      candle(2, 99, 99.6, 98.8, 99.4),
+      candle(3, 99.2, 100, 99, 99.8),
+      candle(4, 99.5, 99.7, 99.1, 99.3),
+      candle(5, 99.2, 99.5, 99, 99.2),
+      candle(6, 99.5, 101.5, 99.4, 101.3),
+      candle(7, 101.2, 101.4, 99.9, 100.8),
+      candle(8, 100.7, 101.8, 100.5, 101.5),
+      candle(9, 101.4, 102, 101.2, 101.9),
+    ];
+    const trades = Array.from({ length: 20 }, (_, index) => {
+      const t = baseNow - (20 - index) * 1_000;
+      return {
+        type: "trade" as const,
+        symbol: "BTCTRY",
+        price: 101 + index * 0.01,
+        quantity: 1,
+        quoteNotional: 150,
+        eventTime: t,
+        tradeTime: t,
+        receiveTime: t,
+        buyerMaker: false,
+        takerSide: "BUY" as const,
+        source: "memory" as const,
+      };
     });
-    expect(breakoutInv === null || breakoutInv.invalidationThreshold != null).toBe(true);
-    const momentumInv = resolveInvalidationForSelectedStrategy({
-      strategyId: "MOMENTUM_CONTINUATION",
-      strategyInput: input,
-      regime,
+    const breakoutDetail = evaluateBreakoutRetestStrategy(input, regime, {
+      candles,
+      trades,
+      lifecycleId: "lc-qa12-inv",
+      nowMs: baseNow,
     });
-    expect(momentumInv === null || typeof momentumInv === "object").toBe(true);
+    expect(breakoutDetail.trigger.triggered).toBe(true);
+    const selected = freezeSelectedStrategySignal("BREAKOUT_RETEST", breakoutDetail);
+    expect(selected.invalidation?.reasonCode).toBe("LEVEL_HOLD_BREACH");
+    expect(resolveInvalidationFromSelectedSignal(selected)?.invalidationThreshold).toBe(
+      breakoutDetail.invalidation?.invalidationThreshold,
+    );
+    expect(selected.signalId).toBe(breakoutDetail.trigger.signalId);
   });
 
   it("N horizon rows do not include prices after horizon end", () => {
@@ -460,6 +529,7 @@ describe("QA12 integrated chain", () => {
     });
     expect(assessment.verdicts.FINAL_ENGINEERING_VERDICT).toBe("PARTIAL");
     expect(assessment.verdicts.PROFITABILITY_EVIDENCE).toBe("INSUFFICIENT_DATA");
+    expect(assessment.verdicts.OVERALL_QA_STATUS).toBe("QA_PENDING");
     expect(assessment.verdicts.PAPER_CAMPAIGN_STARTED).toBe(false);
   });
 });

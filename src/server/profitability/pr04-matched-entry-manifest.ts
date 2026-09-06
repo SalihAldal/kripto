@@ -15,6 +15,9 @@ export function buildMatchedEntryManifest(input: {
   featureEvidenceIds: string[];
   dataSource: string;
   replayWindow: { fromMs: number; toMs: number };
+  symbol?: string | null;
+  regime?: string | null;
+  closedAtMs?: number | null;
 }): MatchedEntryManifest {
   const initialQuantity = input.fills.reduce((acc, row) => acc + row.quantity, 0);
   const body = JSON.stringify({
@@ -29,6 +32,9 @@ export function buildMatchedEntryManifest(input: {
     featureEvidenceIds: input.featureEvidenceIds,
     dataSource: input.dataSource,
     replayWindow: input.replayWindow,
+    symbol: input.symbol ?? null,
+    regime: input.regime ?? null,
+    closedAtMs: input.closedAtMs ?? null,
   });
   const manifestHash = createHash("sha256").update(body).digest("hex");
   return {
@@ -45,6 +51,9 @@ export function buildMatchedEntryManifest(input: {
     featureEvidenceIds: input.featureEvidenceIds,
     dataSource: input.dataSource,
     replayWindow: input.replayWindow,
+    symbol: input.symbol ?? null,
+    regime: input.regime ?? null,
+    closedAtMs: input.closedAtMs ?? null,
   };
 }
 

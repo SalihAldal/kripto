@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "fix02-durable-exit-and-settlement-v1",
+  "generatedAt": "2026-09-06T12:25:00.000Z",
+  "fingerprints": {
+    "startHead": "695c9f07ee475d5b4a338cfade769e8825e4ac98",
+    "finalHead": "695c9f07ee475d5b4a338cfade769e8825e4ac98",
+    "worktree": "DIRTY_FIX02"
+  },
+  "verdicts": {
+    "FIX02_ENGINEERING_VERDICT": "COMPLETED_PARTIAL",
+    "DISPOSABLE_POSTGRES_VERDICT": "PASS",
+    "EXIT_DECISION_ROUTING_VERDICT": "PASS",
+    "DURABLE_EXIT_STATE_VERDICT": "PASS",
+    "PARTIAL_SETTLEMENT_VERDICT": "PASS",
+    "CLAIM_OWNERSHIP_VERDICT": "PASS",
+    "CRASH_RECONCILIATION_VERDICT": "PARTIAL",
+    "ACCOUNTING_INVARIANTS_VERDICT": "PARTIAL",
+    "REQUIRED_CHECKS_NOT_RUN": [
+      "npm run build blocked by Next build lock guard",
+      "36-scenario matrix not fully enumerated as individual tests (8 integration tests cover critical subset)",
+      "Live/paper campaign",
+      "Production DB migration"
+    ],
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "OVERALL_QA_STATUS": "QA_PENDING"
+  },
+  "disposablePostgres": {
+    "container": "kripto-main-postgres-1",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dbPrefix": "kripto_fix02_",
+    "failClosed": true,
+    "forbiddenTargets": ["kinetic", "postgres"]
+  },
+  "migration": "prisma/migrations/20260906151500_fix02_position_exit_persisted_state/migration.sql",
+  "activationFlags": {
+    "EXECUTION_PR04_EXIT_EVAL_ENABLED": "false (default shadow telemetry)",
+    "EXECUTION_PR04_EXIT_ROUTING_ENABLED": "false (default execution routing)"
+  },
+  "testResults": {
+    "fix02Integration": "8/8 PASS x3 consecutive",
+    "regressionBundle": "87/87 PASS (ER04+PR04+FIX01+execution-settlement)",
+    "typecheck": "exit 0",
+    "build": "exit 1 Next build lock guard"
+  },
+  "exitChain": [
+    "position-monitor tick",
+    "processFix02Pr04ExitTick / evaluateExitPolicyTick",
+    "claimExitQuantity",
+    "settleOpenPosition(requestedCloseQuantity, settlementFillId)",
+    "applyPartialPositionClose | closePositionRecord",
+    "applyExitFill + savePersistedExitState"
+  ]
+}

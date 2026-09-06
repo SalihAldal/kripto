@@ -25,6 +25,7 @@ import { collectLearningMarketEvidence } from "@/src/server/trading-core/self-le
 import { buildDynamicLearningWeight } from "@/src/server/trading-core/self-learning/dynamic-learning-weight";
 import {
   addTradeExecution,
+  applyPartialPositionClose,
   closePositionRecord,
   createPnlRecord,
   createTradeOrder,
@@ -380,10 +381,27 @@ export async function settleOpenPosition(input: {
   variantDEnabled?: boolean;
   baselineComparableExitReason?: string | null;
   actualVariantDExitReason?: string | null;
+  requestedCloseQuantity?: number;
+  settlementFillId?: string;
+  pr04DecisionKind?: string;
+  pr04PartialLegId?: string | null;
+  decisionPrice?: number | null;
 }) {
   const position = await getPositionById(input.positionId);
   if (!position || position.status !== "OPEN") {
     return { closed: false, reason: "Position not found or already closed." };
+  }
+  const positionMeta = (position.metadata as Record<string, unknown> | null) ?? {};
+  const partialFills = Array.isArray(positionMeta.partialCloseFills)
+    ? (positionMeta.partialCloseFills as Array<Record<string, unknown>>)
+    : [];
+  if (input.settlementFillId && partialFills.some((row) => row.fillId === input.settlementFillId)) {
+    return {
+      closed: false,
+      partial: false,
+      reason: "Duplicate settlement fill suppressed",
+      duplicate: true,
+    };
   }
   const decisionTimestamp = new Date().toISOString();
   const variantTelemetryMeta = {
@@ -393,14 +411,23 @@ export async function settleOpenPosition(input: {
   };
 
   const symbol = position.tradingPair.symbol;
-  const positionMeta = (position.metadata as Record<string, unknown> | null) ?? {};
   const venue = String(
     (positionMeta.executionVenue as string | undefined) ?? "BINANCE_TR",
   );
   const isGlobalVenue = venue === "BINANCE_GLOBAL";
   const closeSide = position.side === "LONG" ? "SELL" : "BUY";
-  const closeQty = await resolveCloseQuantity(position, closeSide, input.mode);
-  const effectiveCloseQty = Number.isFinite(closeQty) && closeQty > 0 ? closeQty : position.quantity;
+  const resolvedCloseQty = await resolveCloseQuantity(position, closeSide, input.mode);
+  const requestedQty =
+    input.requestedCloseQuantity != null && Number.isFinite(input.requestedCloseQuantity)
+      ? Number(input.requestedCloseQuantity)
+      : null;
+  const effectiveCloseQty = requestedQty != null && requestedQty > 0
+    ? Math.min(requestedQty, position.quantity, resolvedCloseQty > 0 ? resolvedCloseQty : position.quantity)
+    : Number.isFinite(resolvedCloseQty) && resolvedCloseQty > 0
+      ? resolvedCloseQty
+      : position.quantity;
+  const isPartialClose =
+    requestedQty != null && requestedQty > 0 && effectiveCloseQty < Number(position.quantity);
   const ticker = isGlobalVenue ? await getGlobalTicker(symbol) : await getTicker(symbol);
   const exitPrice = ticker.price;
   const targetPrice = Number(
@@ -538,7 +565,7 @@ export async function settleOpenPosition(input: {
     };
   };
 
-  if (input.mode !== "paper" && closeSide === "SELL" && (!Number.isFinite(closeQty) || closeQty <= 0)) {
+  if (input.mode !== "paper" && closeSide === "SELL" && (!Number.isFinite(resolvedCloseQty) || resolvedCloseQty <= 0)) {
     return finalizeBalanceMismatchClose("No base asset available for SELL close");
   }
 
@@ -556,7 +583,7 @@ export async function settleOpenPosition(input: {
       buyEntryPrice: position.entryPrice,
       targetSellPrice: targetPrice > 0 ? targetPrice : undefined,
       requestedSellQty: Number(effectiveCloseQty.toFixed(8)),
-      maxQtyFromBalance: Number(closeQty.toFixed(8)),
+      maxQtyFromBalance: Number(resolvedCloseQty.toFixed(8)),
       venue,
       reason: input.reason,
     },
@@ -908,10 +935,105 @@ export async function settleOpenPosition(input: {
     entryPrice: position.entryPrice,
     exitPrice: closeFillPrice,
     quantity: finalCloseQty,
-    openFee,
+    openFee: isPartialClose ? openFee * (finalCloseQty / Math.max(position.quantity, finalCloseQty)) : openFee,
     closeFee,
     slippageCost,
   });
+
+  const pr04Meta = {
+    pr04DecisionKind: input.pr04DecisionKind ?? null,
+    pr04PartialLegId: input.pr04PartialLegId ?? null,
+    settlementFillId: input.settlementFillId ?? null,
+    partialClose: isPartialClose,
+  };
+
+  if (isPartialClose) {
+    const createdCloseOrder = await createTradeOrder({
+      userId: position.userId,
+      exchangeConnectionId: position.exchangeConnectionId,
+      tradingPairId: position.tradingPairId,
+      positionId: position.id,
+      side: closeSide,
+      type: "MARKET",
+      quantity: finalCloseQty,
+      price: closeFillPrice,
+      status: "FILLED",
+      clientOrderId: closeOrder.clientOrderId,
+      exchangeOrderId: closeOrder.orderId,
+      submittedAt: new Date(),
+      executedAt: new Date(),
+      avgExecutionPrice: closeFillPrice,
+      fee: closeFee,
+      feeCurrency: position.tradingPair.quoteAsset,
+      slippage: spreadCostAttribution,
+      metadata: {
+        closeReason: input.reason,
+        mode: input.mode,
+        linkedPositionId: position.id,
+        ...pr04Meta,
+        ...variantTelemetryMeta,
+      },
+    });
+    await addTradeExecution({
+      tradeOrderId: createdCloseOrder.id,
+      status: "SUCCESS",
+      executionPrice: closeFillPrice,
+      executedQty: finalCloseQty,
+      quoteQty: Number((finalCloseQty * closeFillPrice).toFixed(8)),
+      fee: closeFee,
+      slippage: spreadCostAttribution,
+      executionRef: closeOrder.orderId,
+      metadata: {
+        mode: input.mode,
+        reason: input.reason,
+        ...pr04Meta,
+        ...variantTelemetryMeta,
+      },
+    });
+    await applyPartialPositionClose({
+      positionId: position.id,
+      fillPrice: closeFillPrice,
+      filledQuantity: finalCloseQty,
+      realizedPnlDelta: pnl.realizedPnl,
+      feeDelta: closeFee,
+      settlementFillId: input.settlementFillId,
+      metadata: {
+        closeReason: input.reason,
+        ...pr04Meta,
+        ...variantTelemetryMeta,
+      },
+    });
+    await createPnlRecord({
+      userId: position.userId,
+      tradingPairId: position.tradingPairId,
+      positionId: position.id,
+      tradeOrderId: createdCloseOrder.id,
+      realizedPnl: pnl.realizedPnl,
+      unrealizedPnl: 0,
+      grossPnl: pnl.grossPnl,
+      netPnl: pnl.netPnl,
+      feeTotal: pnl.feeTotal,
+      slippageCost: pnl.slippageCost,
+      roePercent: pnl.roePercent,
+      notes: `Partial position close: ${input.reason}`,
+      metadata: {
+        mode: input.mode,
+        ...pr04Meta,
+        ...variantTelemetryMeta,
+      },
+    });
+    resumeScannerWorker();
+    return {
+      closed: false,
+      partial: true,
+      filledQuantity: finalCloseQty,
+      fillPrice: closeFillPrice,
+      fillFee: closeFee,
+      feeAsset: "QUOTE" as const,
+      remainingQuantity: Math.max(0, Number((position.quantity - finalCloseQty).toFixed(8))),
+      closeOrderId: createdCloseOrder.id,
+    };
+  }
 
   const exitForensicsSnapshot = recordClosedTradeForensics({
     reason: input.reason,

@@ -1,6 +1,8 @@
 import { evaluateEarlyAccelerationStrategy } from "@/src/server/profitability/pr02-early-evaluator";
+import type { EarlyEvaluationResult } from "@/src/server/profitability/pr02-types";
 import { evaluateBreakoutRetestStrategy } from "@/src/server/profitability/pr03-breakout-evaluator";
 import { evaluateMomentumContinuationStrategy } from "@/src/server/profitability/pr03-momentum-evaluator";
+import type { BreakoutEvaluationResult, MomentumEvaluationResult } from "@/src/server/profitability/pr03-types";
 
 export type MarketRegime =
   | "BULL_TREND"
@@ -67,6 +69,15 @@ export type StrategyRouterResult = {
   preferredStrategy: StrategyId | null;
   conflictStatus: "NO_CONFLICT" | "MULTIPLE_COMPATIBLE" | "CONTRADICTORY" | "INSUFFICIENT_DATA";
   shadowOnly: true;
+};
+
+export type StrategyDetailedEvaluation =
+  | EarlyEvaluationResult
+  | MomentumEvaluationResult
+  | BreakoutEvaluationResult;
+
+export type StrategyRouterDetailedResult = StrategyRouterResult & {
+  strategyDetails: Partial<Record<StrategyId, StrategyDetailedEvaluation>>;
 };
 
 export type StrategyInput = {
@@ -165,17 +176,47 @@ export function evaluateCanonicalRegime(input: {
 }
 
 export function evaluateStrategies(input: StrategyInput, regime: RegimeSnapshot): StrategyEvaluation[] {
-  return STRATEGIES.map((strategyId) => evaluateOneStrategy(strategyId, input, regime));
+  return evaluateStrategiesWithDetails(input, regime).evaluations;
+}
+
+export function evaluateStrategiesWithDetails(
+  input: StrategyInput,
+  regime: RegimeSnapshot,
+): { evaluations: StrategyEvaluation[]; strategyDetails: Partial<Record<StrategyId, StrategyDetailedEvaluation>> } {
+  const evaluations: StrategyEvaluation[] = [];
+  const strategyDetails: Partial<Record<StrategyId, StrategyDetailedEvaluation>> = {};
+  for (const strategyId of STRATEGIES) {
+    const row = evaluateOneStrategyWithDetail(strategyId, input, regime);
+    evaluations.push(row.evaluation);
+    if (row.detail) strategyDetails[strategyId] = row.detail;
+  }
+  return { evaluations, strategyDetails };
 }
 
 export function routeStrategies(input: StrategyInput, regime: RegimeSnapshot): StrategyRouterResult {
-  const evaluations = evaluateStrategies(input, regime);
+  const detailed = routeStrategiesWithDetails(input, regime);
+  return {
+    candidateId: detailed.candidateId,
+    evaluations: detailed.evaluations,
+    eligibleStrategies: detailed.eligibleStrategies,
+    preferredStrategy: detailed.preferredStrategy,
+    conflictStatus: detailed.conflictStatus,
+    shadowOnly: detailed.shadowOnly,
+  };
+}
+
+export function routeStrategiesWithDetails(
+  input: StrategyInput,
+  regime: RegimeSnapshot,
+): StrategyRouterDetailedResult {
+  const { evaluations, strategyDetails } = evaluateStrategiesWithDetails(input, regime);
   const eligible = evaluations.filter((row) => row.verdict === "ELIGIBLE");
   const missingOrStale = evaluations.some((row) => row.missingFeatures.length > 0 || row.staleFeatures.length > 0);
   if (!eligible.length) {
     return {
       candidateId: input.candidateId,
       evaluations,
+      strategyDetails,
       eligibleStrategies: [],
       preferredStrategy: null,
       conflictStatus: missingOrStale ? "INSUFFICIENT_DATA" : "NO_CONFLICT",
@@ -194,6 +235,7 @@ export function routeStrategies(input: StrategyInput, regime: RegimeSnapshot): S
   return {
     candidateId: input.candidateId,
     evaluations,
+    strategyDetails,
     eligibleStrategies: eligible.map((row) => row.strategyId),
     preferredStrategy: preferred?.strategyId ?? null,
     conflictStatus,
@@ -272,16 +314,27 @@ export function evaluateMultipleTesting(input: { experimentCount: number; parame
   };
 }
 
-function evaluateOneStrategy(strategyId: StrategyId, input: StrategyInput, regime: RegimeSnapshot): StrategyEvaluation {
+function evaluateOneStrategyWithDetail(
+  strategyId: StrategyId,
+  input: StrategyInput,
+  regime: RegimeSnapshot,
+): { evaluation: StrategyEvaluation; detail?: StrategyDetailedEvaluation } {
   if (strategyId === "EARLY_ACCELERATION") {
-    return evaluateEarlyAccelerationStrategy(input, regime, input.earlyContext).strategyEvaluation;
+    const detail = evaluateEarlyAccelerationStrategy(input, regime, input.earlyContext);
+    return { evaluation: detail.strategyEvaluation, detail };
   }
   if (strategyId === "MOMENTUM_CONTINUATION") {
-    return evaluateMomentumContinuationStrategy(input, regime, input.strategyContext).strategyEvaluation;
+    const detail = evaluateMomentumContinuationStrategy(input, regime, input.strategyContext);
+    return { evaluation: detail.strategyEvaluation, detail };
   }
   if (strategyId === "BREAKOUT_RETEST") {
-    return evaluateBreakoutRetestStrategy(input, regime, input.strategyContext).strategyEvaluation;
+    const detail = evaluateBreakoutRetestStrategy(input, regime, input.strategyContext);
+    return { evaluation: detail.strategyEvaluation, detail };
   }
+  return { evaluation: evaluateScalarStrategy(strategyId, input, regime) };
+}
+
+function evaluateScalarStrategy(strategyId: StrategyId, input: StrategyInput, regime: RegimeSnapshot): StrategyEvaluation {
   const reasons: string[] = [];
   const missingAll = new Set(input.missingFeatures ?? []);
   const staleAll = new Set(input.staleFeatures ?? []);

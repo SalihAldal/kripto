@@ -19,7 +19,67 @@
 
 **Plan revizyonu:** Eski Phase 7 “bağımsız ağır QA” Prompt 12’ye taşındı. Prompt 7 artık kârlılık geliştirme serisinin 1/5’i (işlem yapılabilir fırsat evreni).
 
-**QA durumu:** `OVERALL_QA_STATUS=QA_COMPLETED_WITH_GAPS` (Prompt 12 tamamlandı; piyasa/DB kanıtı eksik).
+## FIX03 — Offline Veri Kabulü, Negatif Kontrol & QA Kanıt (Düzeltme 3/4)
+
+| Alan | Durum |
+|---|---|
+| Replay paket loader (`pr05-replay-package-v1`) | `PASS` |
+| Veri envanteri (gerçek loader, fitness ayrımı) | `PASS` |
+| Nedensel negatif kontrol (`CAUSAL_ENTRY_TIME_SHIFT`) | `PASS` |
+| Split-bazlı aggregation | `PASS` |
+| Portföy replay (sermaye kısıtı) | `PASS` |
+| QA12 evidence-driven assessment | `PASS` |
+| Kayıtlı market dataset | `NOT_RUN` |
+| Piyasa kârlılık deneyi | `NOT_RUN` |
+| Rapor | `KRIPTO_FIX03_OFFLINE_PIPELINE_AND_EVIDENCE_REPORT.md` |
+| JSON | `kripto-fix03-offline-pipeline-and-evidence.json` |
+
+**QA durumu:** `OVERALL_QA_STATUS=QA_PENDING` (FIX03 tamamlandı; genel post-fix QA tamamlandı).
+
+## POST-FIX FINAL QA — Düzeltme 1–3 Entegrasyon Denetimi
+
+| Alan | Durum |
+|---|---|
+| FIX01 context → signal → entry | `PASS` |
+| FIX02 PostgreSQL exit/settlement | `PASS` |
+| FIX03 loader + causal NC + assessment | `PASS` |
+| Full chain DB (EARLY → persist → partial) | `PASS` |
+| Recorded market profitability | `NOT_RUN` |
+| Process crash injection A–F | `PARTIAL` |
+| Rapor | `KRIPTO_POST_FIX_FINAL_QA_REPORT.md` |
+| JSON | `kripto-post-fix-final-qa.json` |
+| Requirement matrix | `KRIPTO_POST_FIX_QA_REQUIREMENT_MATRIX.md` |
+| Findings | `KRIPTO_POST_FIX_QA_FINDINGS.md` |
+
+**Final verdict:** `FINAL_ENGINEERING_VERDICT=PARTIAL` — mühendislik zinciri doğrulandı; piyasa verisi ve tam crash injection eksik.
+
+## FIX02 — Durable Exit State & Partial Settlement (Düzeltme 2/4)
+
+| Alan | Durum |
+|---|---|
+| PR04 → settleOpenPosition routing | `PASS` (flag-gated) |
+| Exit state PostgreSQL persistence | `PASS` |
+| Partial settlement | `PASS` |
+| Shadow dry-run (no state mutation) | `PASS` |
+| Claim owner/fence | `PASS` |
+| Disposable PostgreSQL harness | `PASS` |
+| 36-scenario full matrix | `PARTIAL` (8 kritik DB testi) |
+| Rapor | `KRIPTO_FIX02_DURABLE_EXIT_AND_SETTLEMENT_REPORT.md` |
+| JSON | `kripto-fix02-durable-exit-and-settlement.json` |
+
+**QA durumu:** `OVERALL_QA_STATUS=QA_PENDING` (FIX02 tamamlandı; FIX03 tamamlandı; Düzeltme 4 + genel QA bekliyor).
+
+## FIX01 — Strategy Context & Invalidation (Düzeltme 1/4)
+
+| Alan | Durum |
+|---|---|
+| Producer → context → router → entry | `PASS` |
+| Fixture fallback kaldırıldı | `PASS` |
+| Seçili sinyal immutable taşıma | `PASS` |
+| EARLY yapısal invalidation | `PASS` |
+| DB/restart kalıcılığı | `BLOCKED` → FIX02 |
+| Rapor | `KRIPTO_FIX01_STRATEGY_CONTEXT_AND_INVALIDATION_REPORT.md` |
+| JSON | `kripto-fix01-strategy-context-and-invalidation.json` |
 
 ## İncelenen Sürüm ve Çalışma Kopyası
 

@@ -6,14 +6,14 @@ import { buildMatchedEntryManifest, verifyManifestImmutable } from "@/src/server
 import { runPr04ExitReplayWithOutcome } from "@/src/server/profitability/pr04-replay";
 import { buildRiskReference } from "@/src/server/profitability/pr04-structural-stop";
 import type { ExitTickObservation } from "@/src/server/profitability/pr04-types";
-import { buildPr05DataInventory } from "@/src/server/profitability/pr05-data-inventory";
+import { buildPr05DataInventory, loadEngineeringReplayPackageInput } from "@/src/server/profitability/pr05-data-inventory";
 import {
   createLockedPr05ExperimentManifest,
   verifyExperimentManifestUnchanged,
 } from "@/src/server/profitability/pr05-experiment-manifest";
 import { buildPr05SplitManifest, resolveManifestSplit } from "@/src/server/profitability/pr05-split-manifest";
 import { aggregateTradeOutcomes, computeNetExpectancyFromPnls } from "@/src/server/profitability/pr05-metrics";
-import { detectFutureDataLeakFixture, shiftSignalBlocksWithSeed } from "@/src/server/profitability/pr05-negative-control";
+import { detectFutureDataLeakFixture, runCausalEntryShiftNegativeControl, shuffleClosedPnlPermutation } from "@/src/server/profitability/pr05-negative-control";
 import { applyCostStressToNetPnls, runCostStressEvaluation } from "@/src/server/profitability/pr05-cost-stress";
 import { evaluateOfflineCandidate } from "@/src/server/profitability/pr05-candidate-evaluation";
 import {
@@ -165,11 +165,12 @@ describe("PR05 offline comparison", () => {
     expect(first.report.tickCount).toBe(1);
   });
 
-  it("9 missing historical universe is explicitly marked", () => {
+  it("9 replay package inventory is discovered by loader", () => {
     const inv = buildPr05DataInventory();
-    const recorded = inv.entries.find((e) => e.sourceId === "recorded-market-replay-package");
-    expect(recorded?.historicalUniverse).toBe(false);
-    expect(recorded?.sourceClass).toBe("MISSING");
+    const recorded = inv.entries.find((e) => e.sourceId.startsWith("replay-package:"));
+    expect(recorded).toBeTruthy();
+    expect(recorded?.entryFillData).toBe(true);
+    expect(recorded?.sourceClass).toBe("SYNTHETIC_FIXTURE");
   });
 
   it("10 synthetic fixture is not fit for market experiment", () => {
@@ -184,13 +185,19 @@ describe("PR05 offline comparison", () => {
     expect(verifyExperimentManifestUnchanged(a, b)).toBe(false);
   });
 
-  it("12 same seed data config yields deterministic negative control", () => {
-    const outcomes = [
-      { lifecycleId: "a", closed: true, netPnl: 1, censored: false },
-      { lifecycleId: "b", closed: true, netPnl: -0.5, censored: false },
-    ] as Parameters<typeof shiftSignalBlocksWithSeed>[0]["outcomes"];
-    const r1 = shiftSignalBlocksWithSeed({ outcomes, seed: 42, iterations: 5, shiftBlocks: 1 });
-    const r2 = shiftSignalBlocksWithSeed({ outcomes, seed: 42, iterations: 5, shiftBlocks: 1 });
+  it("12 same seed data config yields deterministic causal negative control", () => {
+    const pkg = loadEngineeringReplayPackageInput();
+    expect(pkg).not.toBeNull();
+    const args = {
+      datasetId: pkg!.datasetId,
+      manifests: pkg!.manifests,
+      ticksByManifestId: pkg!.ticksByManifestId,
+      policyIds: ["STRUCTURAL_STOP_TARGET"] as const,
+      seed: 42,
+      iterations: 5,
+    };
+    const r1 = runCausalEntryShiftNegativeControl(args);
+    const r2 = runCausalEntryShiftNegativeControl(args);
     expect(r1.controlNetExpectancies).toEqual(r2.controlNetExpectancies);
   });
 
@@ -221,14 +228,17 @@ describe("PR05 offline comparison", () => {
     expect(outcomes[0]!.exitPolicyId).not.toBe(outcomes[1]!.exitPolicyId);
   });
 
-  it("15 portfolio capital double-use is not modeled in matched-exit comparison", () => {
-    const report = runPr05OfflineComparison({
-      datasetId: "ds",
-      manifests: [],
-      ticksByManifestId: {},
+  it("15 portfolio replay produces capital-constrained outcomes", () => {
+    const pkg = loadEngineeringReplayPackageInput();
+    expect(pkg).not.toBeNull();
+    const report = runPr05EngineeringFixtureComparison({
+      datasetId: pkg!.datasetId,
+      manifests: pkg!.manifests,
+      ticksByManifestId: pkg!.ticksByManifestId,
       recordedMarketData: false,
+      policyIds: ["STRUCTURAL_STOP_TARGET"],
     });
-    expect(report.portfolioOutcomes).toEqual([]);
+    expect(report.portfolioOutcomes.length).toBeGreaterThan(0);
   });
 
   it("16 router competition is not bypassed in market blocked path", () => {
@@ -389,158 +399,61 @@ describe("PR05 offline comparison", () => {
     expect(agg.largestWinnerShare).toBeGreaterThan(0.8);
   });
 
-  it("23 dependent lifecycle blocks are not treated as independent in negative control", () => {
-    const nc = shiftSignalBlocksWithSeed({
-      outcomes: [
-        {
-          manifestId: "m1",
-          lifecycleId: "block-a",
-          strategyId: "MOMENTUM_CONTINUATION",
-          exitPolicyId: "BASELINE_FIXED_TP_SL",
-          split: "TRAIN",
-          entryAtMs: baseNow,
-          closed: true,
-          censored: false,
-          grossPnl: 2,
-          netPnl: 2,
-          fees: 0,
-          rMultiple: 1,
-          holdingMs: 1000,
-          symbol: null,
-          regime: null,
-          pnlStatus: "KNOWN",
-          equalRiskComparable: true,
-        },
-      ],
+  it("23 causal negative control reports implementation separately from significance", () => {
+    const pkg = loadEngineeringReplayPackageInput();
+    const nc = runCausalEntryShiftNegativeControl({
+      datasetId: pkg!.datasetId,
+      manifests: pkg!.manifests,
+      ticksByManifestId: pkg!.ticksByManifestId,
+      policyIds: ["STRUCTURAL_STOP_TARGET"],
       seed: 99,
       iterations: 3,
-      shiftBlocks: 1,
     });
-    expect(nc.method).toBe("SIGNAL_BLOCK_SHIFT");
+    expect(nc.method).toBe("CAUSAL_ENTRY_TIME_SHIFT");
+    expect(nc.implementationVerdict).toBe("PASS");
+    expect(nc.significanceVerdict).not.toBeUndefined();
   });
 
-  it("24 negative control changes entry timing dependency", () => {
-    const nc = shiftSignalBlocksWithSeed({
-      outcomes: [
-        {
-          manifestId: "m1",
-          lifecycleId: "a",
-          strategyId: "MOMENTUM_CONTINUATION",
-          exitPolicyId: "BASELINE_FIXED_TP_SL",
-          split: "TRAIN",
-          entryAtMs: baseNow,
-          closed: true,
-          censored: false,
-          grossPnl: 3,
-          netPnl: 3,
-          fees: 0,
-          rMultiple: 1,
-          holdingMs: 1000,
-          symbol: null,
-          regime: null,
-          pnlStatus: "KNOWN",
-          equalRiskComparable: true,
-        },
-        {
-          manifestId: "m2",
-          lifecycleId: "b",
-          strategyId: "MOMENTUM_CONTINUATION",
-          exitPolicyId: "BASELINE_FIXED_TP_SL",
-          split: "TRAIN",
-          entryAtMs: baseNow + 1000,
-          closed: true,
-          censored: false,
-          grossPnl: -1,
-          netPnl: -1,
-          fees: 0,
-          rMultiple: -0.3,
-          holdingMs: 1000,
-          symbol: null,
-          regime: null,
-          pnlStatus: "KNOWN",
-          equalRiskComparable: true,
-        },
-      ],
+  it("24 negative control changes entry timing dependency via replay", () => {
+    const pkg = loadEngineeringReplayPackageInput();
+    const nc = runCausalEntryShiftNegativeControl({
+      datasetId: pkg!.datasetId,
+      manifests: pkg!.manifests,
+      ticksByManifestId: pkg!.ticksByManifestId,
+      policyIds: ["STRUCTURAL_STOP_TARGET"],
       seed: 7,
-      iterations: 20,
-      shiftBlocks: 1,
+      iterations: 5,
     });
+    expect(nc.procedureApplied).toBe(true);
     expect(nc.controlNetExpectancies.length).toBeGreaterThan(0);
   });
 
   it("25 negative control uses same exit engine outcomes", () => {
-    const nc = shiftSignalBlocksWithSeed({
-      outcomes: [
-        {
-          manifestId: "m1",
-          lifecycleId: "a",
-          strategyId: "BREAKOUT_RETEST",
-          exitPolicyId: "STRUCTURAL_STOP_TARGET",
-          split: "TRAIN",
-          entryAtMs: baseNow,
-          closed: true,
-          censored: false,
-          grossPnl: 1,
-          netPnl: 1,
-          fees: 0,
-          rMultiple: 0.5,
-          holdingMs: 1000,
-          symbol: null,
-          regime: null,
-          pnlStatus: "KNOWN",
-          equalRiskComparable: true,
-        },
-      ],
-      seed: 1,
-      iterations: 1,
-      shiftBlocks: 1,
+    const pkg = loadEngineeringReplayPackageInput();
+    const nc = runCausalEntryShiftNegativeControl({
+      datasetId: pkg!.datasetId,
+      manifests: pkg!.manifests,
+      ticksByManifestId: pkg!.ticksByManifestId,
+      policyIds: ["STRUCTURAL_STOP_TARGET"],
+      seed: 11,
+      iterations: 4,
     });
-    expect(nc.realNetExpectancy).toBe(1);
+    expect(nc.method).toBe("CAUSAL_ENTRY_TIME_SHIFT");
+    expect(nc.matchedIterations).toBeGreaterThan(0);
   });
 
   it("26 fixed seed is stable across runs", () => {
-    const outcomes = [
-      {
-        manifestId: "m1",
-        lifecycleId: "a",
-        strategyId: "EARLY_ACCELERATION",
-        exitPolicyId: "BASELINE_FIXED_TP_SL",
-        split: "TRAIN",
-        entryAtMs: baseNow,
-        closed: true,
-        censored: false,
-        grossPnl: 2,
-        netPnl: 2,
-        fees: 0,
-        rMultiple: 1,
-        holdingMs: 1000,
-        symbol: null,
-        regime: null,
-        pnlStatus: "KNOWN",
-        equalRiskComparable: true,
-      },
-      {
-        manifestId: "m2",
-        lifecycleId: "b",
-        strategyId: "EARLY_ACCELERATION",
-        exitPolicyId: "BASELINE_FIXED_TP_SL",
-        split: "TRAIN",
-        entryAtMs: baseNow + 1000,
-        closed: true,
-        censored: false,
-        grossPnl: -1,
-        netPnl: -1,
-        fees: 0,
-        rMultiple: -0.5,
-        holdingMs: 1000,
-        symbol: null,
-        regime: null,
-        pnlStatus: "KNOWN",
-        equalRiskComparable: true,
-      },
-    ];
-    const a = shiftSignalBlocksWithSeed({ outcomes, seed: 20260906, iterations: 5, shiftBlocks: 1 });
-    const b = shiftSignalBlocksWithSeed({ outcomes, seed: 20260906, iterations: 5, shiftBlocks: 1 });
+    const pkg = loadEngineeringReplayPackageInput();
+    const args = {
+      datasetId: pkg!.datasetId,
+      manifests: pkg!.manifests,
+      ticksByManifestId: pkg!.ticksByManifestId,
+      policyIds: ["STRUCTURAL_STOP_TARGET"] as const,
+      seed: 20260906,
+      iterations: 5,
+    };
+    const a = runCausalEntryShiftNegativeControl(args);
+    const b = runCausalEntryShiftNegativeControl(args);
     expect(a.controlNetExpectancies).toEqual(b.controlNetExpectancies);
   });
 
@@ -557,9 +470,9 @@ describe("PR05 offline comparison", () => {
     expect(stressed.netPnls[0]).toBeLessThan(2);
   });
 
-  it("29 stress assumptions are not labeled measured", () => {
+  it("29 stress uses real notional when entry price is known", () => {
     const stress = runCostStressEvaluation({ baseNetPnls: [1, -0.5], entryPrices: [100, 100] });
-    expect(stress.every((s) => s.measured === false)).toBe(true);
+    expect(stress.some((s) => s.measured === true)).toBe(true);
   });
 
   it("30 failed variants remain in experiment variant count", () => {

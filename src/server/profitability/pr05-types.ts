@@ -29,6 +29,7 @@ export type DataInventoryEntry = {
   historicalUniverse: boolean;
   priorUsage: string;
   fitnessForMarketExperiment: "FIT" | "NOT_FIT" | "UNKNOWN";
+  fitnessForEngineeringReplay?: "FIT" | "NOT_FIT" | "UNKNOWN";
   reason: string;
 };
 
@@ -73,7 +74,7 @@ export type Pr05ExperimentManifest = {
   minClosedTradesPerSplit: number;
   minIndependentLifecycleGroups: number;
   negativeControl: {
-    method: "SIGNAL_BLOCK_SHIFT";
+    method: "CAUSAL_ENTRY_TIME_SHIFT" | "SIGNAL_BLOCK_SHIFT" | "PNL_PERMUTATION_NON_CAUSAL";
     seed: number;
     iterations: number;
     breaks: string[];
@@ -149,6 +150,12 @@ export type Pr05NegativeControlResult = {
   breaksDependency: boolean;
   verdict: "PASS" | "FAIL" | "NOT_RUN" | "INSUFFICIENT_DATA";
   reason: string;
+  procedureApplied?: boolean;
+  matchedIterations?: number;
+  unmatchedIterations?: number;
+  distributionDiffers?: boolean | null;
+  implementationVerdict?: "PASS" | "FAIL" | "INSUFFICIENT_DATA";
+  significanceVerdict?: "DIFFERS" | "NOT_DIFFERENT" | "INSUFFICIENT_DATA" | "NOT_EVALUATED";
 };
 
 export type Pr05CostStressResult = {

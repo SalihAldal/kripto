@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "fix03-offline-pipeline-and-evidence-v1",
+  "generatedAt": "2026-09-06T12:47:00.000Z",
+  "fingerprints": {
+    "startHead": "695c9f07ee475d5b4a338cfade769e8825e4ac98",
+    "finalHead": "695c9f07ee475d5b4a338cfade769e8825e4ac98",
+    "worktree": "DIRTY_FIX03"
+  },
+  "verdicts": {
+    "FIX03_ENGINEERING_VERDICT": "COMPLETED_PARTIAL",
+    "DATA_PACKAGE_INGESTION_VERDICT": "PASS",
+    "CAUSAL_REPLAY_WIRING_VERDICT": "PASS",
+    "NEGATIVE_CONTROL_IMPLEMENTATION_VERDICT": "PASS",
+    "SPLIT_ISOLATION_VERDICT": "PASS",
+    "PORTFOLIO_REPLAY_INTEGRATION_VERDICT": "PASS",
+    "ASSESSMENT_EVIDENCE_VERDICT": "PASS",
+    "REQUIRED_CHECKS_NOT_RUN": [
+      "Recorded market replay package (sourceType=recorded) ingestion",
+      "Holdout market profitability experiment",
+      "Full-scale portfolio replay on recorded multi-lifecycle dataset",
+      "Paper campaign",
+      "Live authorization"
+    ],
+    "MARKET_EXPERIMENT_STATUS": "NOT_RUN",
+    "PROFITABILITY_EVIDENCE": "INSUFFICIENT_DATA",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "OVERALL_QA_STATUS": "QA_PENDING"
+  },
+  "replayPackage": {
+    "schema": "pr05-replay-package-v1",
+    "loader": "src/server/profitability/pr05-replay-package-loader.ts",
+    "engineeringPackage": "data/replay-packages/engineering-synthetic-v1",
+    "sourceType": "synthetic",
+    "fitnessForEngineeringReplay": "FIT",
+    "fitnessForMarketExperiment": "NOT_FIT",
+    "recordedMarketDatasetAvailable": false
+  },
+  "negativeControl": {
+    "causalMethod": "CAUSAL_ENTRY_TIME_SHIFT",
+    "module": "src/server/profitability/pr05-negative-control.ts",
+    "whatChanges": "entryAtMs shifted within replayWindow; invalidation rebuilt when applicable",
+    "reexecutes": [
+      "buildMatchedEntryManifest",
+      "runMatchedExitComparison",
+      "runPr04ExitReplayWithOutcome"
+    ],
+    "deprecatedNonCausal": "PNL_PERMUTATION_NON_CAUSAL (shuffleClosedPnlPermutation)"
+  },
+  "splitAndPortfolio": {
+    "splitAggregation": "pr05-metrics aggregateTradeOutcomes(split=...)",
+    "portfolioModule": "src/server/profitability/pr05-portfolio-replay.ts",
+    "capitalConstraint": "maxConcurrentPositions=1, entryNotional reserve",
+    "engineeringFixturePortfolioOutcomes": ">0"
+  },
+  "assessment": {
+    "module": "src/server/forensics/qa12-final-assessment.ts",
+    "evidenceDriven": true,
+    "openHighBlocksPass": true,
+    "requiredNotRunBlocksQaPending": true
+  },
+  "invalidatedClaims": [
+    "PR05 shuffle-only negative control as causal evidence",
+    "QA12 scenario F expect(true) durable claim placeholder",
+    "buildQa12FinalAssessment hardcoded phase PASS/BLOCKED map",
+    "buildPr05DataInventory fixed NOT_PRESENT replay package",
+    "runPr05OfflineComparison hardcoded entryPrices=100 and strategyId",
+    "portfolioOutcomes=[] reported as portfolio support",
+    "recordedMarketData=true without sourceType=recorded as market evidence"
+  ],
+  "testResults": {
+    "fix03Focused": "14/14 PASS x3 consecutive (42/42)",
+    "pr05OfflineComparison": "36/36 PASS",
+    "qa12IntegratedChain": "17/17 PASS",
+    "fix01StrategyContext": "32/32 PASS",
+    "fix02DurableExit": "8/8 PASS",
+    "er04DurableLock": "3/3 PASS",
+    "er05CanonicalDataset": "2/2 PASS",
+    "regressionTotal": "112/112 PASS",
+    "typecheck": "exit 0",
+    "build": "exit 0"
+  },
+  "safeOfflineCommand": "npm run test:run -- tests/fix03-offline-pipeline-and-evidence.test.ts tests/pr05-offline-comparison.test.ts"
+}

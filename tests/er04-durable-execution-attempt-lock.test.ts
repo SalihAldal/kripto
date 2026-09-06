@@ -12,6 +12,7 @@ vi.mock("@/src/server/db/prisma", () => ({
       create: mocks.create,
       findUnique: mocks.findUnique,
       deleteMany: mocks.deleteMany,
+      update: vi.fn(),
     },
   },
 }));
@@ -43,12 +44,13 @@ describe("ER04 durable execution attempt lock", () => {
     const { claimDurableCanonicalExecutionAttempt } = await import(
       "@/src/server/hot-path/execution-attempt-lock.service"
     );
-    mocks.create.mockRejectedValueOnce(new Error("unique violation"));
+    mocks.create.mockRejectedValueOnce({ code: "P2002" });
     mocks.findUnique.mockResolvedValueOnce({
       value: {
         candidateId: "BTC:1",
         executionId: "exec-existing",
         executionState: "IN_PROGRESS",
+        leaseExpiresAt: new Date(Date.now() + 60_000).toISOString(),
       },
     });
     const second = await claimDurableCanonicalExecutionAttempt({
@@ -68,9 +70,16 @@ describe("ER04 durable execution attempt lock", () => {
     const { releaseDurableCanonicalExecutionAttempt } = await import(
       "@/src/server/hot-path/execution-attempt-lock.service"
     );
+    mocks.findUnique.mockResolvedValueOnce({
+      value: {
+        executionId: "exec-1",
+        ownerFenceToken: "fence-1",
+      },
+    });
     await releaseDurableCanonicalExecutionAttempt({
       userId: "u-1",
       candidateId: "btc:1",
+      executionId: "exec-1",
       executionMode: "paper",
       venue: "BINANCE_TR",
     });

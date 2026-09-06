@@ -10,24 +10,25 @@ export const PR05_COST_STRESS_SCENARIOS = [
 
 export function applyCostStressToNetPnls(input: {
   baseNetPnls: number[];
-  entryPrices: number[];
+  entryPrices: Array<number | null>;
   scenarioId: string;
 }) {
   const scenario = PR05_COST_STRESS_SCENARIOS.find((s) => s.scenarioId === input.scenarioId);
   if (!scenario) return { netPnls: input.baseNetPnls, measured: false };
   const netPnls = input.baseNetPnls.map((net, idx) => {
-    const entry = input.entryPrices[idx] ?? 100;
+    const entry = input.entryPrices[idx];
+    if (entry == null || !Number.isFinite(entry)) return Number.NaN;
     const extraFee = scenario.feeMultiplier > 1 ? Math.abs(net) * (scenario.feeMultiplier - 1) * 0.01 : 0;
     const slippageCost = (entry * scenario.slippageBps) / 10_000;
     const latencyPenalty = scenario.latencyTicks > 0 ? entry * 0.0001 * scenario.latencyTicks : 0;
     return Number((net - extraFee - slippageCost - latencyPenalty).toFixed(8));
   });
-  return { netPnls, measured: false };
+  return { netPnls, measured: true };
 }
 
 export function runCostStressEvaluation(input: {
   baseNetPnls: number[];
-  entryPrices: number[];
+  entryPrices: Array<number | null>;
 }) {
   const baseExp = computeNetExpectancyFromPnls(input.baseNetPnls);
   const results: Pr05CostStressResult[] = [];
@@ -37,13 +38,13 @@ export function runCostStressEvaluation(input: {
       entryPrices: input.entryPrices,
       scenarioId: scenario.scenarioId,
     });
-    const exp = computeNetExpectancyFromPnls(stressed.netPnls);
+    const exp = computeNetExpectancyFromPnls(stressed.netPnls.filter((n) => Number.isFinite(n)));
     const flipsSign =
       baseExp != null && exp != null ? (baseExp > 0 && exp < 0) || (baseExp < 0 && exp > 0) : false;
     results.push({
       scenarioId: scenario.scenarioId,
       label: scenario.label,
-      measured: false,
+      measured: stressed.measured && stressed.netPnls.every((n) => Number.isFinite(n)),
       netExpectancy: exp,
       flipsSign,
     });

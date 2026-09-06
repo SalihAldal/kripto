@@ -1,0 +1,40 @@
+[
+  {
+    "tickIndex": 0,
+    "observation": {
+      "eventId": "evt:0:101.2",
+      "eventAtMs": 1788692400000,
+      "availableAtMs": 1788692400000,
+      "markPrice": 101.2,
+      "bid": 101.15,
+      "ask": 101.25,
+      "high": 101.3,
+      "low": 101.1,
+      "closed": true,
+      "stale": false,
+      "dataGap": false
+    }
+  },
+  {
+    "tickIndex": 1,
+    "observation": {
+      "eventId": "evt:1:103.5",
+      "eventAtMs": 1788692460000,
+      "availableAtMs": 1788692460000,
+      "markPrice": 103.5,
+      "bid": 103.45,
+      "ask": 103.55,
+      "high": 103.6,
+      "low": 103.4,
+      "closed": true,
+      "stale": false,
+      "dataGap": false
+    },
+    "applyFill": {
+      "price": 103.5,
+      "quantity": 1,
+      "fee": 0.05,
+      "feeAsset": "QUOTE"
+    }
+  }
+]

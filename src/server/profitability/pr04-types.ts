@@ -152,6 +152,9 @@ export type MatchedEntryManifest = {
   featureEvidenceIds: string[];
   dataSource: string;
   replayWindow: { fromMs: number; toMs: number };
+  symbol?: string | null;
+  regime?: string | null;
+  closedAtMs?: number | null;
 };
 
 export type Pr04ReplayReport = {

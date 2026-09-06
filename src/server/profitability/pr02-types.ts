@@ -104,6 +104,8 @@ export type EarlyEvaluationResult = {
   transition: EarlySetupTransition | null;
   economics: TradeEconomicsRecord | null;
   economicsStatus: "KNOWN" | "UNKNOWN" | "INSUFFICIENT_EVIDENCE";
+  invalidation: import("@/src/server/profitability/pr03-types").InvalidationContract | null;
+  setupId: string;
   strategyEvaluation: StrategyEvaluation;
 };
 

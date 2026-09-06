@@ -392,6 +392,59 @@ export async function closePositionRecord(input: {
   });
 }
 
+export async function applyPartialPositionClose(input: {
+  positionId: string;
+  fillPrice: number;
+  filledQuantity: number;
+  realizedPnlDelta: number;
+  feeDelta?: number;
+  settlementFillId?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  const current = await prisma.position.findUnique({ where: { id: input.positionId } });
+  if (!current || current.status !== "OPEN") {
+    throw new Error(`PARTIAL_CLOSE_POSITION_NOT_OPEN:${input.positionId}`);
+  }
+  const existing = (current.metadata as Record<string, unknown> | null) ?? {};
+  const preservedSnapshot = existing.decisionFeatureSnapshot;
+  const partialFills = Array.isArray(existing.partialCloseFills)
+    ? (existing.partialCloseFills as Array<Record<string, unknown>>)
+    : [];
+  if (input.settlementFillId && partialFills.some((row) => row.fillId === input.settlementFillId)) {
+    return current;
+  }
+  const nextQuantity = Math.max(0, Number((current.quantity - input.filledQuantity).toFixed(8)));
+  const nextRealized = Number((current.realizedPnl + input.realizedPnlDelta).toFixed(8));
+  const nextFeeTotal = Number(((current.feeTotal ?? 0) + (input.feeDelta ?? 0)).toFixed(8));
+  const mergedMetadata = {
+    ...existing,
+    ...(input.metadata ?? {}),
+    partialCloseFills: [
+      ...partialFills,
+      {
+        fillId: input.settlementFillId ?? null,
+        quantity: input.filledQuantity,
+        price: input.fillPrice,
+        realizedPnlDelta: input.realizedPnlDelta,
+        at: new Date().toISOString(),
+      },
+    ],
+    ...(preservedSnapshot !== undefined ? { decisionFeatureSnapshot: preservedSnapshot } : {}),
+  } as Prisma.InputJsonObject;
+  return prisma.position.update({
+    where: { id: input.positionId },
+    data: {
+      status: nextQuantity > 0 ? "OPEN" : "CLOSED",
+      quantity: nextQuantity,
+      closePrice: nextQuantity > 0 ? current.closePrice : input.fillPrice,
+      realizedPnl: nextRealized,
+      feeTotal: nextFeeTotal,
+      closedAt: nextQuantity > 0 ? null : new Date(),
+      metadata: mergedMetadata,
+    },
+  });
+}
+
 export async function updateOrderStatus(input: {
   orderId: string;
   status: "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" | "EXPIRED";

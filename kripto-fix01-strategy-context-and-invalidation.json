@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "kripto-fix01-strategy-context-and-invalidation-v1",
+  "baselineCommit": "695c9f07ee475d5b4a338cfade769e8825e4ac98",
+  "generatedAt": "2026-09-06T12:10:00.000Z",
+  "verdicts": {
+    "FIX01_ENGINEERING_VERDICT": "PARTIAL",
+    "PRODUCTION_CONTEXT_WIRING_VERDICT": "PASS",
+    "FIXTURE_ISOLATION_VERDICT": "PASS",
+    "STRATEGY_LIFECYCLE_VERDICT": "PARTIAL",
+    "SELECTED_SIGNAL_IDENTITY_VERDICT": "PASS",
+    "INVALIDATION_ENTRY_BRIDGE_VERDICT": "PASS",
+    "PROFITABILITY_EVIDENCE": "NOT_EVALUATED",
+    "PAPER_CAMPAIGN_STARTED": false,
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "OVERALL_QA_STATUS": "QA_PENDING"
+  },
+  "requiredChecksNotRun": [
+    "DB_SETTLEMENT_INTEGRATION",
+    "RECORDED_MARKET_REPLAY",
+    "EXIT_STATE_DB_PERSISTENCE"
+  ],
+  "producerChain": [
+    "MarketDataDaemon.getDeepState",
+    "buildStrategyEvaluationContexts",
+    "routeStrategiesWithDetails",
+    "buildSelectedStrategySignal",
+    "buildPr04ExitMetadataFromSelectedSignal"
+  ],
+  "tests": {
+    "fix01Focused": { "command": "vitest run tests/fix01-strategy-context-and-invalidation.test.ts", "runs": 3, "passed": 32, "failed": 0, "exitCode": 0 },
+    "regressionBundle": { "command": "vitest run ER02+ER03+PR02-04+QA12+FIX01", "passed": 211, "failed": 0, "exitCode": 0 },
+    "typecheck": { "command": "npm run typecheck", "exitCode": 0 },
+    "build": { "command": "npm run build", "exitCode": 0, "durationMs": 828698 }
+  },
+  "fix02Handoff": {
+    "persistSelectedSignal": true,
+    "persistExitPolicyState": true,
+    "reconcileOnRestart": true,
+    "partialCloseSettlement": "PENDING"
+  }
+}

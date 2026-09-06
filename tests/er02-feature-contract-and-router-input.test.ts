@@ -333,11 +333,13 @@ describe("ER02 feature contract and router adapter", () => {
     expect(m.evaluations[0]?.reasons).toContain("MISSING_FEATURES");
   });
 
-  it("21 adapter preserves known threshold behavior", () => {
+  it("21 adapter blocks scalar-only early setup without producer context", () => {
     const context = produceContext();
     const out = buildFeatureContractSnapshot({ context, ai: buildAi() });
     const routed = routeStrategies(out.strategyInput, evaluateCanonicalRegime(out.regimeInput));
-    expect(routed.evaluations.find((x) => x.strategyId === "EARLY_ACCELERATION")?.setupQuality).toBeGreaterThan(0.45);
+    const early = routed.evaluations.find((x) => x.strategyId === "EARLY_ACCELERATION");
+    expect(early?.setupQuality).toBe(0);
+    expect(early?.verdict).not.toBe("ELIGIBLE");
   });
 
   it("22 missing range no longer creates fake range eligibility", () => {

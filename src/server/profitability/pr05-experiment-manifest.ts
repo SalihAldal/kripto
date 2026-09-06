@@ -45,7 +45,7 @@ export function createLockedPr05ExperimentManifest(input: {
     minClosedTradesPerSplit: 30,
     minIndependentLifecycleGroups: 20,
     negativeControl: {
-      method: "SIGNAL_BLOCK_SHIFT" as const,
+      method: "CAUSAL_ENTRY_TIME_SHIFT" as const,
       seed: 42_026_0906,
       iterations: 200,
       breaks: ["entry-signal-timing-dependency"],

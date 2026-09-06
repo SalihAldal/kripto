@@ -97,7 +97,6 @@ function mapToStrategyEvaluation(
   trigger: StrategyTriggerResult,
   setupState: MomentumSetupState,
   legacySetupScore: number,
-  routerFixtureMode: boolean,
 ): StrategyEvaluation {
   const reasons: string[] = [];
   const missingAll = new Set(input.missingFeatures ?? []);
@@ -111,9 +110,7 @@ function mapToStrategyEvaluation(
   const minimumViableMovePercent = computeMinimumViableMove(input);
   const regimeCompatibility =
     regime.regime === "BULL_TREND" || regime.regime === "HIGH_VOLATILITY" || regime.regime === "ROCKET_PUMP" ? 0.8 : 0.2;
-  const setupQuality = trigger.setupQualified
-    ? Math.max(trigger.rankingScore, legacySetupScore)
-    : routerFixtureMode ? legacySetupScore : trigger.rankingScore;
+  const setupQuality = trigger.setupQualified ? Math.max(trigger.rankingScore, legacySetupScore) : trigger.rankingScore;
   const entryTimingQuality = trigger.entryTriggerMet ? 0.82 : 0.2;
   const executionQuality = clamp01((input.liquidityScore + (1 - input.spreadBps / 100)) / 2);
   if (missingFeatures.length > 0) reasons.push("MISSING_FEATURES");
@@ -164,58 +161,57 @@ function mapToStrategyEvaluation(
   };
 }
 
+function buildMomentumProducerContextMissingResult(
+  input: StrategyInput,
+  regime: RegimeSnapshot,
+  ctx: ReturnType<typeof resolveStrategyContext>,
+): MomentumEvaluationResult {
+  const trigger: StrategyTriggerResult = {
+    triggered: false,
+    signalId: null,
+    triggerAt: null,
+    validUntil: null,
+    reasonCodes: ["PRODUCER_CONTEXT_MISSING"],
+    setupQualified: false,
+    entryTriggerMet: false,
+    rankingScore: 0,
+  };
+  const strategyEvaluation = mapToStrategyEvaluation(input, regime, trigger, "WARMUP", 0);
+  return {
+    schemaVersion: PR03_SCHEMA_VERSION,
+    policyVersion: PR03_POLICY_VERSION,
+    candidateId: input.candidateId,
+    lifecycleId: ctx.lifecycleId,
+    setupId: `${input.candidateId}:momentum-pending`,
+    strategyId: "MOMENTUM_CONTINUATION",
+    featureSnapshotId: ctx.featureSnapshotId,
+    sourceType: input.sourceType,
+    marketEventAt: input.marketEventAt,
+    evaluatedAt: input.evaluatedAt,
+    setupState: "WARMUP",
+    impulseReferencePrice: null,
+    invalidation: null,
+    trigger,
+    transition: null,
+    economics: buildTradeEconomicsRecord({
+      candidateId: input.candidateId,
+      strategyId: "MOMENTUM_CONTINUATION",
+      featureSnapshotId: ctx.featureSnapshotId,
+      costSource: "UNKNOWN",
+    }),
+    economicsStatus: "UNKNOWN",
+    strategyEvaluation,
+  };
+}
+
 export function evaluateMomentumContinuationStrategy(
   input: StrategyInput,
   regime: RegimeSnapshot,
   strategyContext?: StrategyContextExtension,
 ): MomentumEvaluationResult {
   const ctx = resolveStrategyContext(strategyContext ?? input.strategyContext, input);
-  const routerFixtureMode = ctx.candles.length === 0 && ctx.trades.length === 0;
-
-  if (routerFixtureMode) {
-    const legacyQualified = input.momentum >= 0.45 && input.acceleration >= 0.45 && input.flowRecovery >= 0.45;
-    const legacyTrigger = legacyQualified && input.momentum >= 0.5 && input.acceleration >= 0.5;
-    const trigger: StrategyTriggerResult = {
-      triggered: legacyTrigger,
-      signalId: null,
-      triggerAt: null,
-      validUntil: null,
-      reasonCodes: legacyTrigger ? [] : ["ROUTER_FIXTURE_SETUP_NOT_MET"],
-      setupQualified: legacyQualified,
-      entryTriggerMet: legacyTrigger,
-      rankingScore: clamp01((input.momentum + input.acceleration + input.flowRecovery) / 3),
-    };
-    const strategyEvaluation = mapToStrategyEvaluation(input, regime, trigger, legacyTrigger ? "TRIGGERED" : "RESUMPTION_ARMED", trigger.rankingScore, true);
-    const economicsStatus =
-      input.expectedMovePercent > 0 && input.entryFee > 0 && input.expectedMovePercent > computeMinimumViableMove(input)
-        ? "KNOWN"
-        : "UNKNOWN";
-    return {
-      schemaVersion: PR03_SCHEMA_VERSION,
-      policyVersion: PR03_POLICY_VERSION,
-      candidateId: input.candidateId,
-      lifecycleId: ctx.lifecycleId,
-      setupId: `${input.candidateId}:momentum-router-fixture`,
-      strategyId: "MOMENTUM_CONTINUATION",
-      featureSnapshotId: ctx.featureSnapshotId,
-      sourceType: input.sourceType,
-      marketEventAt: input.marketEventAt,
-      evaluatedAt: input.evaluatedAt,
-      setupState: legacyTrigger ? "TRIGGERED" : legacyQualified ? "RESUMPTION_ARMED" : "WARMUP",
-      impulseReferencePrice: null,
-      invalidation: null,
-      trigger,
-      transition: null,
-      economics: buildTradeEconomicsRecord({
-        candidateId: input.candidateId,
-        strategyId: "MOMENTUM_CONTINUATION",
-        featureSnapshotId: ctx.featureSnapshotId,
-        costSource: economicsStatus === "KNOWN" ? "CONFIGURED_ASSUMPTION" : "UNKNOWN",
-        expectedMovePercent: economicsStatus === "KNOWN" ? input.expectedMovePercent : undefined,
-      }),
-      economicsStatus,
-      strategyEvaluation,
-    };
+  if (!ctx.candles.length && !ctx.trades.length) {
+    return buildMomentumProducerContextMissingResult(input, regime, ctx);
   }
 
   const persistLifecycle = Boolean(ctx.candles.length > 0 || ctx.trades.length > 0);
@@ -368,7 +364,6 @@ export function evaluateMomentumContinuationStrategy(
     trigger,
     setupState,
     legacySetupScore,
-    false,
   );
 
   return {

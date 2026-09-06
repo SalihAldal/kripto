@@ -25,6 +25,14 @@ export function resetExitPolicyStoreForTests() {
   stateStore.clear();
 }
 
+export function hydrateExitPolicyState(state: ExitPolicyState) {
+  stateStore.set(state.positionId, JSON.parse(JSON.stringify(state)) as ExitPolicyState);
+}
+
+function cloneState(state: ExitPolicyState): ExitPolicyState {
+  return JSON.parse(JSON.stringify(state)) as ExitPolicyState;
+}
+
 export function getExitPolicyState(positionId: string) {
   return stateStore.get(positionId) ?? null;
 }
@@ -132,11 +140,13 @@ export function evaluateExitPolicyTick(input: {
   side: "LONG" | "SHORT";
   observation: ExitTickObservation;
   riskOverride?: boolean;
+  dryRun?: boolean;
 }): ExitEvaluationResult {
-  const state = stateStore.get(input.positionId);
-  if (!state) {
+  const persisted = stateStore.get(input.positionId);
+  if (!persisted) {
     throw new Error(`EXIT_STATE_NOT_FOUND:${input.positionId}`);
   }
+  const state = input.dryRun ? cloneState(persisted) : persisted;
   if (state.terminalStatus === "CLOSED" || state.terminalStatus === "CENSORED") {
     return buildResult(state, input.side, {
       kind: "NONE",
@@ -257,8 +267,10 @@ export function evaluateExitPolicyTick(input: {
   state.lastDataAtMs = input.observation.availableAtMs;
   state.lastDecision = decision.kind;
   state.lastReasonCode = decision.reasonCode;
-  state.version += 1;
-  stateStore.set(input.positionId, state);
+  if (!input.dryRun) {
+    state.version += 1;
+    stateStore.set(input.positionId, state);
+  }
   return buildResult(state, input.side, decision, input.observation);
 }
 

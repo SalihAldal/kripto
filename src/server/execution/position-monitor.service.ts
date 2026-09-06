@@ -8,6 +8,10 @@ import { isExecutionTimedOut } from "@/src/server/execution/timeout-closer";
 import type { PositionCloseReason, TradingMode } from "@/src/server/execution/types";
 import { evaluateSmartExitEngine, type SmartExitEngineState } from "@/src/server/execution/smart-exit-engine.service";
 import { evaluatePr04ExitShadowTick } from "@/src/server/profitability/pr04-exit-bridge";
+import {
+  isFix02Pr04ExitAuthority,
+  processFix02Pr04ExitTick,
+} from "@/src/server/execution/fix02-exit-routing.service";
 import { observeVariantDShadowNonBlocking } from "@/src/server/forensics/variant-d-shadow-observer.service";
 import {
   evaluateExitForOpenPosition,
@@ -447,15 +451,52 @@ export function startPositionMonitor(payload: MonitorPayload) {
         return;
       }
       await payload.onTick?.({ positionId: payload.positionId, markPrice: ticker.price });
+      const pr04Authority = await isFix02Pr04ExitAuthority(payload.positionId);
       try {
         evaluatePr04ExitShadowTick({
           positionId: payload.positionId,
           side: payload.side,
           markPrice: ticker.price,
           eventAtMs: Date.now(),
+          stale: false,
+          dataGap: false,
         });
       } catch {
         // PR04 shadow evaluation is optional and must not block canonical monitor.
+      }
+      if (pr04Authority) {
+        const routed = await processFix02Pr04ExitTick({
+          executionId: payload.executionId,
+          positionId: payload.positionId,
+          userId: payload.userId ?? "unknown",
+          side: payload.side,
+          mode: payload.mode ?? "paper",
+          observation: {
+            eventId: `${payload.positionId}:${Date.now()}`,
+            eventAtMs: Date.now(),
+            availableAtMs: Date.now(),
+            markPrice: ticker.price,
+            bid: null,
+            ask: null,
+            high: ticker.price,
+            low: ticker.price,
+            closed: false,
+            stale: false,
+            dataGap: false,
+          },
+        });
+        if (routed.closed) {
+          stopPositionMonitor(payload.positionId);
+          return;
+        }
+        if (routed.handled) {
+          emitVariantDShadow({
+            baselineExitEligible: false,
+            baselineReason: "NONE",
+            currentExitPrecedenceState: "PR04_AUTHORITY",
+          });
+          return;
+        }
       }
       emitVariantDShadow({
         baselineExitEligible: false,

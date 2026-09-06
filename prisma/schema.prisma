@@ -691,9 +691,34 @@ model Position {
   tradeOrders          TradeOrder[]
   profitLossRecords    ProfitLossRecord[]
   learningTrades       LearningTrade[]
+  exitPersistedState   PositionExitPersistedState?
 
   @@index([userId, status, openedAt])
   @@index([tradingPairId, status])
+}
+
+model PositionExitPersistedState {
+  id                   String   @id @default(cuid())
+  positionId           String   @unique
+  userId               String
+  schemaVersion        String
+  selectedSignal       Json?
+  snapshot             Json
+  state                Json
+  stateVersion         Int      @default(1)
+  terminalStatus       String
+  processedFillIds     Json     @default("[]")
+  activeExitIntentId   String?
+  reconciliationStatus String   @default("OK")
+  ownerExecutionId     String?
+  ownerFenceToken      String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  position Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, terminalStatus])
+  @@index([ownerExecutionId])
 }
 
 model ProfitLossRecord {

@@ -183,8 +183,11 @@ import {
 } from "@/src/server/execution/execution-failure-contract";
 import { recordPaperFillEvent } from "@/src/server/paper-validation/paper-trade-recorder.service";
 import { markPaperPersistenceReconciliation } from "@/src/server/execution/paper-persistence-reconciliation.service";
-import { evaluateCanonicalRegime, routeStrategies, type StrategyId } from "@/src/server/forensics/p4-regime-strategy-shadow";
-import { bootstrapPr04ExitStateFromEntry, buildPr04ExitMetadataAtEntry, resolveInvalidationForSelectedStrategy } from "@/src/server/profitability/pr04-exit-bridge";
+import { evaluateCanonicalRegime, routeStrategiesWithDetails, type StrategyId } from "@/src/server/forensics/p4-regime-strategy-shadow";
+import { buildSelectedStrategySignal } from "@/src/server/execution/fix01-selected-signal";
+import { buildStrategyEvaluationContexts } from "@/src/server/execution/fix01-strategy-context-builder";
+import { bootstrapPr04ExitStateFromEntry, buildPr04ExitMetadataAtEntry, buildPr04ExitMetadataFromSelectedSignal } from "@/src/server/profitability/pr04-exit-bridge";
+import { bootstrapExitPersistenceAtEntry, restoreExitPolicyStateFromDb } from "@/src/server/execution/fix02-exit-persistence.service";
 import { resolveStrategyActivationMode, type StrategyStatus } from "@/src/server/execution/p7-paper-strategy-contract";
 import { buildFeatureContractSnapshot } from "@/src/server/execution/er02-feature-contract";
 import {
@@ -1137,6 +1140,7 @@ export async function ensureOpenPositionMonitors(userId?: string) {
         typeof metadata.smartExitState === "object" && metadata.smartExitState
           ? (metadata.smartExitState as Record<string, unknown>)
           : undefined;
+      await restoreExitPolicyStateFromDb(position.id).catch(() => null);
       await attachPositionMonitor({
         executionId,
         userId: user.id,
@@ -1834,10 +1838,11 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       strategyStatus,
       liveTradingEnabled: env.LIVE_TRADING_ENABLED,
     });
+    const decisionAtMs = Date.now();
     const featureContract = buildFeatureContractSnapshot({
       context: selected.context,
       ai,
-      now: Date.now(),
+      now: decisionAtMs,
       staleAfterMs: Math.max(60_000, env.SCANNER_SHORT_HORIZON_SEC * 2_000),
     });
     selected.context.metadata = {
@@ -1853,9 +1858,33 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       expectedMoveHorizonMinutes: featureContract.snapshot.expectedMove.horizonMinutes,
       costSource: featureContract.snapshot.costs.source,
     };
+    const lifecycleId =
+      typeof selected.context.metadata.opportunityLifecycleId === "string"
+        ? selected.context.metadata.opportunityLifecycleId
+        : featureContract.strategyInput.candidateId;
+    const evalContexts = buildStrategyEvaluationContexts({
+      symbol: selected.context.symbol,
+      venue: featureContract.snapshot.venue,
+      candidateId: featureContract.strategyInput.candidateId,
+      lifecycleId,
+      featureSnapshotId: featureContract.snapshot.snapshotId,
+      decisionAtMs,
+      baselinePrice: Number(selected.context.metadata.firstDetectionPrice ?? selected.context.lastPrice ?? 0) || null,
+      firstDetectionPrice: Number(selected.context.metadata.firstDetectionPrice ?? selected.context.lastPrice ?? 0) || null,
+    });
+    selected.context.metadata.strategyContextCoverage = evalContexts.dataCoverage;
+    const routerInput = {
+      ...featureContract.strategyInput,
+      earlyContext: evalContexts.earlyContext,
+      strategyContext: evalContexts.strategyContext,
+    };
     const p4Regime = evaluateCanonicalRegime(featureContract.regimeInput);
-    const strategyRouter = routeStrategies(featureContract.strategyInput, p4Regime);
-    const selectedStrategyId = strategyRouter.preferredStrategy ?? marketRegime.strategy;
+    const strategyRouter = routeStrategiesWithDetails(routerInput, p4Regime);
+    const selectedStrategyId = (strategyRouter.preferredStrategy ?? marketRegime.strategy) as StrategyId;
+    const selectedStrategySignal = buildSelectedStrategySignal(selectedStrategyId, strategyRouter);
+    if (selectedStrategySignal) {
+      selected.context.metadata.selectedStrategySignal = selectedStrategySignal;
+    }
     if (!marketRegime.openAllowed) {
       return finishExecution({
         executionId,
@@ -4407,19 +4436,21 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
 
-    const pr04ExitSnapshot = buildPr04ExitMetadataAtEntry({
-      positionId: position.id,
-      strategyId: selectedStrategyId as StrategyId,
-      entryPolicyVersion: STRATEGY_POLICY_VERSION,
-      entrySignalId: executionId,
-      setupId: forensicCandidateId,
-      takeProfitPercent,
-      invalidation: resolveInvalidationForSelectedStrategy({
-        strategyId: selectedStrategyId as StrategyId,
-        strategyInput: featureContract.strategyInput,
-        regime: p4Regime,
-      }),
-    });
+    const pr04ExitSnapshot = selectedStrategySignal
+      ? buildPr04ExitMetadataFromSelectedSignal({
+          positionId: position.id,
+          selectedSignal: selectedStrategySignal,
+          takeProfitPercent,
+        })
+      : buildPr04ExitMetadataAtEntry({
+          positionId: position.id,
+          strategyId: selectedStrategyId as StrategyId,
+          entryPolicyVersion: STRATEGY_POLICY_VERSION,
+          entrySignalId: executionId,
+          setupId: forensicCandidateId,
+          takeProfitPercent,
+          invalidation: null,
+        });
     bootstrapPr04ExitStateFromEntry({
       snapshot: pr04ExitSnapshot,
       side: position.side,
@@ -4428,6 +4459,23 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       entryFee: fee.estimatedTakerFee,
       openedAtMs: position.openedAt.getTime(),
     });
+    await bootstrapExitPersistenceAtEntry({
+      userId: user.id,
+      positionId: position.id,
+      selectedSignal: selectedStrategySignal,
+      snapshot: pr04ExitSnapshot,
+      side: position.side,
+      entryFills: [
+        {
+          price: entryPrice,
+          quantity: submittedQty,
+          fee: fee.estimatedTakerFee,
+          atMs: position.openedAt.getTime(),
+        },
+      ],
+      entryFee: fee.estimatedTakerFee,
+      ownerExecutionId: executionId,
+    }).catch(() => null);
 
     await attachPositionMonitor({
       executionId,
@@ -4760,6 +4808,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       await releaseDurableCanonicalExecutionAttempt({
         userId: runtimeUserId,
         candidateId: claimedExecutionAttemptCandidateId,
+        executionId,
         executionMode: mode,
         venue: executionIdentity.venue,
       }).catch(() => null);

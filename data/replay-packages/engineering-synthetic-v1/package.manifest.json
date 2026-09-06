@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "pr05-replay-package-v1",
+  "datasetId": "engineering-synthetic-v1",
+  "sourceType": "synthetic",
+  "venue": "SYNTHETIC",
+  "instrument": "BTCTRY",
+  "quote": "TRY",
+  "timeRange": {
+    "fromMs": 1788688800000,
+    "toMs": 1788693600000
+  },
+  "hasEventAt": true,
+  "hasAvailableAt": true,
+  "resolution": "synthetic-tick",
+  "knownGaps": ["engineering-fixture-only"],
+  "feeMetadata": true,
+  "historicalUniverse": false,
+  "priorUsage": "FIX03 engineering replay validation only",
+  "contentHashes": {
+    "entries/sig-001.ticks.json": "50dfe9aa7b15478bcc4466ef6feaec2890d6bd25763817a092334c3699900156",
+    "entries/sig-002.ticks.json": "4f2d882689cb9d14cec7f832b270136bf3a33d531ac0378316de9f49546420fc"
+  },
+  "entries": [
+    {
+      "entrySignalId": "sig-001",
+      "strategyId": "MOMENTUM_CONTINUATION",
+      "entryPolicyVersion": "pr03-momentum-and-retest-v1",
+      "entryAtMs": 1788688800000,
+      "symbol": "BTCTRY",
+      "regime": "TREND_UP",
+      "fills": [{ "price": 100, "quantity": 1, "fee": 0.1, "atMs": 1788688800000 }],
+      "invalidation": {
+        "referenceLevel": 100,
+        "invalidationThreshold": 99.2,
+        "reasonCode": "LEVEL_HOLD_BREACH",
+        "computedAtMs": 1788688800000,
+        "availableAtMs": 1788688800000,
+        "validUntilMs": 1788689400000,
+        "sourceObservations": ["CONFIRMED_PIVOT_HIGH"]
+      },
+      "featureEvidenceIds": ["feat-001"],
+      "replayWindow": { "fromMs": 1788688800000, "toMs": 1788689400000 },
+      "ticksFile": "entries/sig-001.ticks.json"
+    },
+    {
+      "entrySignalId": "sig-002",
+      "strategyId": "BREAKOUT_RETEST",
+      "entryPolicyVersion": "pr03-momentum-and-retest-v1",
+      "entryAtMs": 1788692400000,
+      "symbol": "BTCTRY",
+      "regime": "RANGE_SIDEWAYS",
+      "fills": [{ "price": 101, "quantity": 1, "fee": 0.1, "atMs": 1788692400000 }],
+      "invalidation": null,
+      "featureEvidenceIds": ["feat-002"],
+      "replayWindow": { "fromMs": 1788692400000, "toMs": 1788693000000 },
+      "ticksFile": "entries/sig-002.ticks.json"
+    }
+  ]
+}

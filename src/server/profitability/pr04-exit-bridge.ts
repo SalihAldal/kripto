@@ -1,7 +1,7 @@
 import type { RegimeSnapshot, StrategyId, StrategyInput } from "@/src/server/forensics/p4-regime-strategy-shadow";
+import type { SelectedStrategySignal } from "@/src/server/execution/fix01-selected-signal";
+import { resolveInvalidationFromSelectedSignal } from "@/src/server/execution/fix01-selected-signal";
 import type { InvalidationContract } from "@/src/server/profitability/pr03-types";
-import { evaluateBreakoutRetestStrategy } from "@/src/server/profitability/pr03-breakout-evaluator";
-import { evaluateMomentumContinuationStrategy } from "@/src/server/profitability/pr03-momentum-evaluator";
 import {
   buildExitPolicySnapshotAtEntry,
   evaluateExitPolicyTick,
@@ -11,30 +11,22 @@ import {
 import type { ExitPolicyId, ExitTickObservation } from "@/src/server/profitability/pr04-types";
 import { defaultExitPolicyId } from "@/src/server/profitability/pr04-policy-registry";
 
+/** @deprecated Re-evaluation removed — pass selectedSignal from router instead. */
 export function resolveInvalidationForSelectedStrategy(input: {
   strategyId: StrategyId;
   strategyInput: StrategyInput;
   regime: RegimeSnapshot;
+  selectedSignal?: SelectedStrategySignal | null;
 }): InvalidationContract | null {
-  if (input.strategyId === "MOMENTUM_CONTINUATION") {
-    return evaluateMomentumContinuationStrategy(
-      input.strategyInput,
-      input.regime,
-      input.strategyInput.strategyContext,
-    ).invalidation;
-  }
-  if (input.strategyId === "BREAKOUT_RETEST") {
-    return evaluateBreakoutRetestStrategy(
-      input.strategyInput,
-      input.regime,
-      input.strategyInput.strategyContext,
-    ).invalidation;
-  }
-  return null;
+  return resolveInvalidationFromSelectedSignal(input.selectedSignal);
 }
 
 export function isPr04ExitEvaluationEnabled() {
   return process.env.EXECUTION_PR04_EXIT_EVAL_ENABLED === "true";
+}
+
+export function isPr04ExitRoutingEnabled() {
+  return process.env.EXECUTION_PR04_EXIT_ROUTING_ENABLED === "true";
 }
 
 export function buildPr04ExitMetadataAtEntry(input: {
@@ -61,6 +53,24 @@ export function buildPr04ExitMetadataAtEntry(input: {
   return snapshot;
 }
 
+export function buildPr04ExitMetadataFromSelectedSignal(input: {
+  positionId: string;
+  selectedSignal: SelectedStrategySignal;
+  takeProfitPercent?: number | null;
+  exitPolicyId?: ExitPolicyId;
+}) {
+  return buildPr04ExitMetadataAtEntry({
+    positionId: input.positionId,
+    strategyId: input.selectedSignal.strategyId,
+    entryPolicyVersion: input.selectedSignal.policyVersion,
+    entrySignalId: input.selectedSignal.signalId,
+    setupId: input.selectedSignal.setupId,
+    takeProfitPercent: input.takeProfitPercent ?? null,
+    invalidation: input.selectedSignal.invalidation,
+    exitPolicyId: input.exitPolicyId,
+  });
+}
+
 export function bootstrapPr04ExitStateFromEntry(input: {
   snapshot: ReturnType<typeof buildExitPolicySnapshotAtEntry>;
   side: "LONG" | "SHORT";
@@ -82,27 +92,39 @@ export function evaluatePr04ExitShadowTick(input: {
   positionId: string;
   side: "LONG" | "SHORT";
   markPrice: number;
+  bid?: number | null;
+  ask?: number | null;
   high?: number | null;
   low?: number | null;
   eventAtMs: number;
+  availableAtMs?: number;
+  stale?: boolean;
+  dataGap?: boolean;
 }) {
   if (!isPr04ExitEvaluationEnabled()) return null;
   const state = getExitPolicyState(input.positionId);
   if (!state) return null;
+  const bid = input.bid ?? null;
+  const ask = input.ask ?? null;
   const observation: ExitTickObservation = {
     eventId: `${input.positionId}:${input.eventAtMs}`,
     eventAtMs: input.eventAtMs,
-    availableAtMs: input.eventAtMs,
+    availableAtMs: input.availableAtMs ?? input.eventAtMs,
     markPrice: input.markPrice,
-    bid: input.markPrice,
-    ask: input.markPrice,
+    bid,
+    ask,
     high: input.high ?? null,
     low: input.low ?? null,
-    closed: true,
-    stale: false,
-    dataGap: false,
+    closed: bid != null && ask != null,
+    stale: input.stale ?? false,
+    dataGap: input.dataGap ?? (input.markPrice == null),
   };
-  return evaluateExitPolicyTick({ positionId: input.positionId, side: input.side, observation });
+  return evaluateExitPolicyTick({
+    positionId: input.positionId,
+    side: input.side,
+    observation,
+    dryRun: true,
+  });
 }
 
 export function resolvePr04CloseQuantity(positionId: string, fallbackQuantity: number) {
