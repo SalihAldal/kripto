@@ -1,0 +1,73 @@
+{
+  "verdict": "PARTIAL",
+  "readyForLongPaper": false,
+  "liveTradingEnabled": false,
+  "profitability": "INSUFFICIENT_DATA",
+  "startingHead": "8048bf34f7ef1a6fdbf8ff999a1e4128a80a4993",
+  "finalHead": "8048bf3 + uncommitted post-handoff validation changes",
+  "integration": {
+    "canonicalToPaper": true,
+    "realDb": true,
+    "manualAiInjection": false,
+    "paperOrder": true,
+    "paperFill": true,
+    "positionPersistence": true,
+    "exit": false,
+    "casesPassed": 6,
+    "casesTotal": 6
+  },
+  "accounting": {
+    "initialized": true,
+    "cashBeforeKnown": true,
+    "cashAfterKnown": true,
+    "feesReconciled": true,
+    "realizedPnlReconciled": true,
+    "campaignIsolation": true,
+    "authoritativeSource": "AppSetting paper.account.<userId>"
+  },
+  "scoreAudit": {
+    "completed": true,
+    "scaleMismatchFound": true,
+    "scaleMismatchFixed": true,
+    "finding": "Entry quality gate used ai.finalConfidence (0) instead of resolveExecutionConfidenceScore (scanner fallback 78+) — caused false 0% in smoke reject messages"
+  },
+  "tests": {
+    "typecheck": "PASS",
+    "build": "PASS",
+    "unit": "11/11 PASS (handoff + terminal + score-scale)",
+    "integration": "10/10 PASS (canonical-paper-full-chain + paper-accounting)",
+    "regression": "2/2 PASS (final-engineering-production-chain)"
+  },
+  "smoke": {
+    "status": "IN_PROGRESS",
+    "campaignId": "paper-post-handoff-2026-09-07T14-45Z",
+    "rounds": null,
+    "selected": null,
+    "executionReached": null,
+    "orders": null,
+    "fills": null,
+    "trades": null,
+    "realizedPnl": null,
+    "fees": null,
+    "paperCashBefore": null,
+    "paperCashAfter": null
+  },
+  "priorSmokeReference": {
+    "campaignId": "paper-30m-2026-09-07T11-15-57-378Z",
+    "rounds": 8,
+    "selected": 7,
+    "executionReached": 7,
+    "trades": 0,
+    "paperCashBefore": null,
+    "paperCashAfter": null,
+    "note": "paperCash null due to readPaperCashSnapshot JSON.parse bug — fixed in this phase"
+  },
+  "zeroTradeForensic": {
+    "dominantBlockers": {
+      "execution_rejected": 4,
+      "ai_rejected": 3,
+      "no_eligible_candidate": 1
+    },
+    "entryQualityFalseZeroPercent": "CONFIRMED_BUG_FIXED — orchestrator entry quality now uses scorecardConfidence"
+  }
+}

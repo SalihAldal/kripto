@@ -49,15 +49,9 @@ function sleep(ms: number) {
 }
 
 async function readPaperCashSnapshot(userId: string) {
-  const { prisma } = await import("@/src/server/db/prisma");
-  const row = await prisma.appSetting.findUnique({ where: { key: `paper.account.${userId}` } });
-  if (!row?.value) return null;
-  try {
-    const parsed = JSON.parse(row.value) as { balances?: Record<string, number> };
-    return parsed.balances ?? null;
-  } catch {
-    return null;
-  }
+  const { ensurePaperAccountInitialized } = await import("@/src/server/simulation/paper-trading.service");
+  const account = await ensurePaperAccountInitialized(userId);
+  return account.balances;
 }
 
 async function waitForJobTerminal(jobId: string, userId: string, timeoutMs: number) {
@@ -120,6 +114,8 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     return blocked;
   }
 
+  const { ensurePaperAccountInitialized } = await import("@/src/server/simulation/paper-trading.service");
+  await ensurePaperAccountInitialized(user.id);
   const paperCashBefore = await readPaperCashSnapshot(user.id);
   const openPositionsBefore = await prisma.position.count({ where: { userId: user.id, status: "OPEN" } });
 
@@ -287,6 +283,25 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
 
   writeJson(path.join(config.artifactRoot, "final-snapshot.json"), result);
   writeJson(path.join(process.cwd(), config.resultFile), result);
+
+  try {
+    const { buildPaperCampaignSummary } = await import("@/src/server/forensics/paper-campaign-summary.service");
+    const summary = await buildPaperCampaignSummary({
+      campaignId: config.campaignId,
+      jobId,
+      userId: user.id,
+      startedAt: result.jobStartedAt,
+      endedAt: result.endedAt,
+      paperCashBefore: result.paperCashBefore,
+    });
+    writeJson(path.join(config.artifactRoot, "paper-campaign-summary.json"), summary);
+  } catch (summaryError) {
+    appendCheckpoint(config.artifactRoot, {
+      type: "SUMMARY_ERROR",
+      message: summaryError instanceof Error ? summaryError.message : String(summaryError),
+    });
+  }
+
   await prisma.$disconnect();
   return result;
 }

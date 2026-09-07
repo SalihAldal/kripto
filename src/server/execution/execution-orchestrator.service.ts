@@ -1796,7 +1796,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
     const entryQuality = shouldRejectHighRiskLowConfidenceEntry({
-      confidencePercent: ai.finalConfidence,
+      confidencePercent: scorecardConfidence,
       aiRiskScore: ai.finalRiskScore,
     });
     if (entryQuality.reject) {
@@ -1816,7 +1816,10 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
         details: {
           aiRiskScore: ai.finalRiskScore,
-          confidence: ai.finalConfidence,
+          confidence: scorecardConfidence,
+          aiFinalConfidence: ai.finalConfidence,
+          scorecardConfidence: Number(ai.analysisScorecard?.confidenceScore ?? 0),
+          scannerConfidence: Number(selected.score.confidence ?? 0),
         },
       });
     }

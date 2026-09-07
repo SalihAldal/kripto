@@ -118,6 +118,16 @@ async function writePaperAccount(userId: string, balances: PaperBalances) {
   return updatedAt;
 }
 
+/** Idempotent paper account bootstrap — authoritative source is AppSetting `paper.account.<userId>`. */
+export async function ensurePaperAccountInitialized(userId: string): Promise<PaperAccountSnapshot> {
+  return readPaperAccount(userId);
+}
+
+export async function readPaperCashBalances(userId: string): Promise<PaperBalances> {
+  const account = await readPaperAccount(userId);
+  return account.balances;
+}
+
 export async function getPaperAccount(userId: string) {
   const account = await readPaperAccount(userId);
   const orders = await prisma.tradeOrder.findMany({
