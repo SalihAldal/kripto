@@ -62,7 +62,7 @@ function obs(mark: number, offsetMs: number): ExitTickObservation {
   };
 }
 
-describe("Paper readiness production chain", () => {
+describe("Paper readiness settlement slice (mocked adapter — not full production chain)", () => {
   beforeAll(async () => {
     disposable = await createFix02DisposablePostgres();
     vi.resetModules();

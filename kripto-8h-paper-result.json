@@ -1,0 +1,61 @@
+{
+  "campaignId": "paper-8h-2026-09-07T0012Z",
+  "phase": "COMPLETED",
+  "jobId": "cmtqhz77p000fun84lgcyuckv",
+  "startedAt": "2026-09-07T00:23:34.888Z",
+  "endedAt": "2026-09-07T08:23:20.724Z",
+  "plannedDurationHours": 8,
+  "actualDurationMs": 28807318,
+  "completedFullDuration": true,
+  "gracefulStopRequested": false,
+  "configHash": "a19044544c7dccbb0b253ccb3c23beb7af1f8af86947b730574a6a4b2527d0c6",
+  "frozenConfig": {
+    "EXECUTION_MODE": "paper",
+    "LIVE_TRADING_ENABLED": "false",
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "PAPER_INITIAL_BALANCE_TRY": "100000",
+    "DURATION_HOURS": 8,
+    "CAMPAIGN_ID": "paper-8h-2026-09-07T0012Z",
+    "BUDGET_PER_TRADE": 1000,
+    "MAX_WAIT_SEC": 600,
+    "configHash": "a19044544c7dccbb0b253ccb3c23beb7af1f8af86947b730574a6a4b2527d0c6"
+  },
+  "preflightVerdict": "READY",
+  "roundsRecorded": 47,
+  "roundsCompleted": 46,
+  "roundsFailed": 0,
+  "tradeCount": 0,
+  "openPositionCount": 0,
+  "maxOpenPositionsObserved": 0,
+  "realizedPnl": 0,
+  "unrealizedPnl": 0,
+  "netEquityDelta": 0,
+  "initialBalanceTry": 100000,
+  "profitabilityConclusion": "inconclusive",
+  "funnel": {
+    "coinSelected": 8,
+    "reachedBuy": 0,
+    "reachedSell": 0,
+    "completed": 46
+  },
+  "rejectCategories": {
+    "Bilinmeyen / kayıt yok": 47
+  },
+  "rejectByState": {
+    "tur_tamamlandi": 46,
+    "tariyor": 1
+  },
+  "topSymbols": {
+    "ARBTRY": 2,
+    "XPLTRY": 1,
+    "AVAXTRY": 1,
+    "SUIUSDT": 1,
+    "ADAUSDT": 1,
+    "VETUSDT": 1,
+    "PUMPTRY": 1
+  },
+  "finalJobStatus": "RUNNING",
+  "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\paper-campaigns\\paper-8h-2026-09-07T0012Z",
+  "reportPath": "C:\\Users\\salih\\Desktop\\kripto-main\\KRIPTO_8H_PAPER_REPORT.md",
+  "generatedAt": "2026-09-07T08:24:09.434Z"
+}

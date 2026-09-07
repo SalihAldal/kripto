@@ -28,6 +28,8 @@ export * from "@/src/server/profitability/pr04-pnl-accounting";
 export * from "@/src/server/profitability/pr04-exit-evaluator";
 export * from "@/src/server/profitability/pr04-matched-entry-manifest";
 export * from "@/src/server/profitability/pr04-replay";
+export * from "@/src/server/profitability/pr04-counterfactual-replay";
+export * from "@/src/server/profitability/counterfactual-exit-execution";
 export * from "@/src/server/profitability/pr04-exit-bridge";
 export * from "@/src/server/profitability/pr05-types";
 export * from "@/src/server/profitability/pr05-data-inventory";

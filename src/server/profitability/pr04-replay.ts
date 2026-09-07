@@ -20,6 +20,13 @@ import {
   type Pr04ReplayReport,
 } from "@/src/server/profitability/pr04-types";
 
+export {
+  runPr04CounterfactualExitReplayWithOutcome,
+  stepPr04CounterfactualExitReplayTick,
+  type Pr04CounterfactualReplayConfig,
+  type Pr04CounterfactualReplayTick,
+} from "@/src/server/profitability/pr04-counterfactual-replay";
+
 export type Pr04ExitReplayTick = {
   tickIndex: number;
   observation: ExitTickObservation;

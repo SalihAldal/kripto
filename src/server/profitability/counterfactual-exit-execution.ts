@@ -9,8 +9,10 @@ import type { ExitDecisionKind, ExitTickObservation } from "@/src/server/profita
  * - Partial fills are quantity-capped to the open order request.
  * - Stop fills route through the active open order, not a fresh decision tick.
  * - Open positions at window end are censored (no synthetic terminal fill).
+ * - Repeated actionable ticks preserve order identity and openedAtMs (latency is not reset).
  */
 export type CounterfactualExitOrderIntent = {
+  orderId: string;
   decisionKind: ExitDecisionKind;
   partialLegId: string | null;
   requestedQuantity: number;
@@ -36,22 +38,45 @@ export type CounterfactualExitTickInput = {
   latencyMs: number;
   feeRate: number;
   feeAsset: "BASE" | "QUOTE" | "UNKNOWN";
+  decisionAtMs?: number | null;
 };
 
 export function isActionableExitDecision(kind: ExitDecisionKind, closeQuantity: number | null) {
   return kind !== "NONE" && closeQuantity != null && closeQuantity > 0;
 }
 
-export function planCounterfactualExitTick(input: CounterfactualExitTickInput & { openOrder: CounterfactualExitOrderIntent | null }) {
+function buildOrderId(decisionKind: ExitDecisionKind, partialLegId: string | null) {
+  return `cf:${decisionKind}:${partialLegId ?? "full"}`;
+}
+
+function isSameOpenOrder(
+  left: CounterfactualExitOrderIntent,
+  right: { decisionKind: ExitDecisionKind; partialLegId: string | null },
+) {
+  return left.decisionKind === right.decisionKind && left.partialLegId === right.partialLegId;
+}
+
+export function planCounterfactualExitTick(
+  input: CounterfactualExitTickInput & { openOrder: CounterfactualExitOrderIntent | null },
+) {
   const actionable = isActionableExitDecision(input.decisionKind, input.closeQuantity);
   let openOrder = input.openOrder;
   if (actionable) {
-    openOrder = {
-      decisionKind: input.decisionKind,
-      partialLegId: input.partialLegId,
-      requestedQuantity: input.closeQuantity!,
-      openedAtMs: input.observation.eventAtMs,
-    };
+    const decisionAtMs = input.decisionAtMs ?? input.observation.eventAtMs;
+    if (openOrder && isSameOpenOrder(openOrder, input)) {
+      openOrder = {
+        ...openOrder,
+        requestedQuantity: input.closeQuantity!,
+      };
+    } else {
+      openOrder = {
+        orderId: buildOrderId(input.decisionKind, input.partialLegId),
+        decisionKind: input.decisionKind,
+        partialLegId: input.partialLegId,
+        requestedQuantity: input.closeQuantity!,
+        openedAtMs: decisionAtMs,
+      };
+    }
   }
   if (!openOrder) {
     return { openOrder: null, fill: null as CounterfactualExitFillPlan | null, censored: false };
@@ -80,7 +105,7 @@ export function planCounterfactualExitTick(input: CounterfactualExitTickInput & 
   const remaining = openOrder.requestedQuantity - quantity;
   const nextOpenOrder =
     remaining > 1e-8
-      ? { ...openOrder, requestedQuantity: remaining, openedAtMs: fill.fillAtMs }
+      ? { ...openOrder, requestedQuantity: remaining, openedAtMs: openOrder.openedAtMs }
       : null;
   return { openOrder: nextOpenOrder, fill, censored: false };
 }

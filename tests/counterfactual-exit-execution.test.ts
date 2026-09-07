@@ -125,6 +125,48 @@ describe("Counterfactual exit execution model", () => {
     expect(rejected.rejectedReason).toBe("QUOTE_NOT_YET_AVAILABLE");
   });
 
+  it("tekrarlanan stop sinyali openedAtMs sıfırlamaz, latency sonrası tek fill olur", () => {
+    const opened = planCounterfactualExitTick({
+      observation: obs(100, 0),
+      decisionKind: "STRUCTURAL_STOP",
+      closeQuantity: 1,
+      partialLegId: null,
+      quotePrice: 99,
+      latencyMs: 2_000,
+      feeRate: 0.001,
+      feeAsset: "QUOTE",
+      openOrder: null,
+      decisionAtMs: baseNow,
+    });
+    expect(opened.openOrder?.openedAtMs).toBe(baseNow);
+    const repeated = planCounterfactualExitTick({
+      observation: obs(99, 500),
+      decisionKind: "STRUCTURAL_STOP",
+      closeQuantity: 1,
+      partialLegId: null,
+      quotePrice: 99,
+      latencyMs: 2_000,
+      feeRate: 0.001,
+      feeAsset: "QUOTE",
+      openOrder: opened.openOrder,
+      decisionAtMs: baseNow + 500,
+    });
+    expect(repeated.openOrder?.openedAtMs).toBe(baseNow);
+    expect(repeated.fill).toBeNull();
+    const filled = planCounterfactualExitTick({
+      observation: obs(99, 2_500),
+      decisionKind: "NONE",
+      closeQuantity: null,
+      partialLegId: null,
+      quotePrice: 99,
+      latencyMs: 2_000,
+      feeRate: 0.001,
+      feeAsset: "QUOTE",
+      openOrder: repeated.openOrder,
+    });
+    expect(filled.fill?.quantity).toBe(1);
+  });
+
   it("pencere sonunda açık pozisyon censored olur", () => {
     const openOrder = {
       decisionKind: "STRUCTURAL_STOP" as const,
