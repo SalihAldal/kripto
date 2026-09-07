@@ -2,10 +2,12 @@ import type { AIAnalysisInput } from "@/src/types/ai";
 import type { MarketContext } from "@/src/types/scanner";
 import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
 import { isMarketDataUnavailableError } from "@/src/server/market-data/market-data-unavailable.error";
+import { ensureFreshKlineContext } from "@/src/server/market-data/ensure-fresh-kline-context.service";
 import { getMarketSnapshot } from "@/src/server/scanner/market-snapshot-cache";
 import { buildMultiTimeframeAnalysis } from "@/src/server/ai/multi-timeframe.service";
 import { getAIAnalysisMemoryContext } from "@/src/server/ai/ai-analysis-memory.service";
 import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
+import { logTradeEvent } from "@/src/server/observability/trade-event-log";
 
 async function fromRamOrEmpty<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
@@ -31,28 +33,49 @@ export async function formatAIRequest(
         cached.recentTrades.some((row) => row.qty > 0)),
   );
   const allowCached = cachedUsable && !(context.metadata as { liteSnapshot?: boolean } | undefined)?.liteSnapshot;
-  const [baseSnapshot, klines5m, klines15m, klines1h, klines4h, klines1d] = await Promise.all([
+  const klineContext = await ensureFreshKlineContext({
+    symbol: context.symbol,
+    interval: "1m",
+    limit: 80,
+    existingKlines: allowCached ? cached?.klines : undefined,
+  });
+  await logTradeEvent({
+    symbol: context.symbol,
+    eventType: "AI_KLINE_INPUT",
+    price: context.lastPrice,
+    newValue: {
+      symbol: context.symbol,
+      venue: String(context.metadata?.venue ?? context.metadata?.exchangeVenue ?? "UNKNOWN"),
+      interval: klineContext.interval,
+      count: klineContext.count,
+      source: klineContext.source,
+      lastOpenTime: klineContext.lastOpenTime,
+      lastCloseTime: klineContext.lastCloseTime,
+      ageSec: klineContext.ageSec,
+      fresh: klineContext.fresh,
+      refreshed: klineContext.refreshed,
+      refreshAttempted: klineContext.refreshAttempted,
+      refreshSucceeded: klineContext.refreshSucceeded,
+      reasonCode: klineContext.reasonCode,
+    },
+  });
+  const [orderBook, recentTrades, klines5m, klines15m, klines1h, klines4h, klines1d] = await Promise.all([
     allowCached
-      ? Promise.resolve({
-          klines: cached!.klines,
-          orderBook: cached!.orderBook,
-          recentTrades: cached!.recentTrades,
-        })
-      : Promise.all([
-          fromRamOrEmpty(() => marketDataGateway.getKlines(context.symbol, "1m", 80), []),
-          fromRamOrEmpty(
-            () => marketDataGateway.getOrderBook(context.symbol, 30),
-            { lastUpdateId: 0, bids: [], asks: [] },
-          ),
-          fromRamOrEmpty(() => marketDataGateway.getRecentTrades(context.symbol, 150), []),
-        ]).then(([klines, orderBook, recentTrades]) => ({ klines, orderBook, recentTrades })),
+      ? Promise.resolve(cached!.orderBook)
+      : fromRamOrEmpty(
+          () => marketDataGateway.getOrderBook(context.symbol, 30),
+          { lastUpdateId: 0, bids: [], asks: [] },
+        ),
+    allowCached
+      ? Promise.resolve(cached!.recentTrades)
+      : fromRamOrEmpty(() => marketDataGateway.getRecentTrades(context.symbol, 150), []),
     Promise.resolve([]),
     Promise.resolve([]),
     Promise.resolve([]),
     Promise.resolve([]),
     Promise.resolve([]),
   ]);
-  const { klines, orderBook, recentTrades } = baseSnapshot;
+  const klines = klineContext.klines;
   const mtf = buildMultiTimeframeAnalysis({
     m1: klines,
     m5: klines5m,

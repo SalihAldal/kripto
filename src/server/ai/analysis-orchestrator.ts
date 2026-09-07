@@ -62,6 +62,10 @@ import { bridgeAiProviderResult, bridgeConsensusResult } from "@/src/server/fore
 import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
 import { recordConsensusAudit } from "@/src/server/forensics/ai-runtime.service";
 import { STALL_ERROR_CODES } from "@/src/server/forensics/stall-error-taxonomy";
+import {
+  assessKlineInput,
+  buildKlineStaleMessage,
+} from "@/src/server/market-data/kline-input-contract.service";
 import type { AIAnalysisInput, AIConsensusResult, AIModelOutput, AIProviderResult } from "@/src/types/ai";
 
 function aggregateModelOutputs(parts: AIModelOutput[], input: AIAnalysisInput): AIModelOutput {
@@ -886,18 +890,44 @@ async function runAIConsensusFromInputImpl(
   };
   throwIfAborted(signal, "AI consensus aborted");
   const now = Date.now();
-  const lastKlineClose = input.klines[input.klines.length - 1]?.closeTime ?? 0;
-  const klineAgeSec = lastKlineClose ? Math.floor((now - lastKlineClose) / 1000) : null;
-  if (input.klines.length < 20 || (klineAgeSec !== null && klineAgeSec > 180)) {
-    const reason = "Kline data missing or stale";
+  const klineAssessment = assessKlineInput({ klines: input.klines, nowMs: now });
+  if (!klineAssessment.fresh) {
+    const reason = buildKlineStaleMessage(klineAssessment);
     pushLog("SIGNAL", `${input.symbol.toUpperCase()} AI consensus: NO_TRADE (kline missing)`);
+    await logTradeEvent({
+      symbol: input.symbol,
+      eventType: "AI_KLINE_STALE",
+      reason: klineAssessment.reasonCode,
+      aiConfidence: 0,
+      price: input.lastPrice,
+      newValue: {
+        symbol: input.symbol,
+        interval: "1m",
+        count: klineAssessment.count,
+        lastOpenTime: klineAssessment.lastOpenTime,
+        lastCloseTime: klineAssessment.lastCloseTime,
+        ageSec: klineAssessment.ageSec,
+        fresh: false,
+        refreshed: false,
+        reasonCode: klineAssessment.reasonCode,
+      },
+    });
     await logTradeEvent({
       symbol: input.symbol,
       eventType: "AI_ANALYSIS_RESULT",
       reason,
       aiConfidence: 0,
       price: input.lastPrice,
-      newValue: { decision: "NO_TRADE" },
+      newValue: {
+        decision: "NO_TRADE",
+        providerAttemptCount: 0,
+        providerSuccessCount: 0,
+        providerFailureCount: 0,
+        outputsCount: 0,
+        consensusDecision: "NO_TRADE",
+        consensusConfidence: 0,
+        consensusRisk: 100,
+      },
     });
     return {
       finalDecision: "NO_TRADE",
@@ -1130,6 +1160,9 @@ async function runAIConsensusFromInputImpl(
     });
     throw new Error(`${STALL_ERROR_CODES.CONSENSUS_FAILED}: ${(error as Error).message}`);
   }
+  const providerAttemptCount = [technicalSingle, momentumSingle, riskSingle].length;
+  const providerSuccessCount = [technicalSingle, momentumSingle, riskSingle].filter((row) => row.ok).length;
+  const providerFailureCount = providerAttemptCount - providerSuccessCount;
   const technical = [technicalSingle];
   const momentum = [momentumSingle];
   const risk = [riskSingle];
@@ -1372,6 +1405,13 @@ async function runAIConsensusFromInputImpl(
       decision: finalConsensus.finalDecision,
       confidence: finalConsensus.finalConfidence,
       riskScore: finalConsensus.finalRiskScore,
+      providerAttemptCount,
+      providerSuccessCount,
+      providerFailureCount,
+      outputsCount: weightedAggregated.length,
+      consensusDecision: finalConsensus.finalDecision,
+      consensusConfidence: finalConsensus.finalConfidence,
+      consensusRisk: finalConsensus.finalRiskScore,
     },
   });
 

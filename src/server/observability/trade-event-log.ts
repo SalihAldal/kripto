@@ -2,6 +2,8 @@ import { logger } from "@/lib/logger";
 import { addTradeEventLog } from "@/src/server/repositories/trade-event-log.repository";
 
 export type TradeEventType =
+  | "AI_KLINE_INPUT"
+  | "AI_KLINE_STALE"
   | "AI_ANALYSIS_STARTED"
   | "AI_ANALYSIS_RESULT"
   | "AI_PROVIDER_RESULT"

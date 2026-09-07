@@ -1,0 +1,43 @@
+{
+  "verdict": "PASS",
+  "rootCauseFound": true,
+  "rootCause": "formatAIRequest read daemon RAM klines without recovery; subscribeDeep bootstrap is async; selected symbols often had empty kline arrays at AI call time",
+  "klineCountContractVerified": true,
+  "freshnessContractVerified": true,
+  "timestampContractVerified": true,
+  "timeframeContractVerified": true,
+  "tryRoutingVerified": true,
+  "usdtRoutingVerified": true,
+  "staleRefreshImplemented": true,
+  "refreshFailureSafe": true,
+  "integration": {
+    "freshKlineToProvider": true,
+    "staleRefreshToProvider": true,
+    "providerOutputsObserved": true,
+    "consensusObserved": true
+  },
+  "runtimeSmoke": {
+    "campaignId": "paper-kline-ai-30m-2026-09-07T19-02-47-786Z",
+    "runtimeMinutes": 30,
+    "selected": 7,
+    "freshKlineInputs": 7,
+    "refreshAttempts": 4,
+    "refreshSuccess": 4,
+    "providerAttempts": 21,
+    "providerSuccess": 21,
+    "providerOutputs": 15,
+    "realConsensusCount": 7,
+    "realRuntimeProviderConsensus": "OBSERVED"
+  },
+  "tests": {
+    "typecheck": "PASS",
+    "build": "PASS",
+    "unit": "PASS",
+    "integration": "PASS",
+    "regression": "PASS"
+  },
+  "liveTradingEnabled": false,
+  "readyForExtendedPaper": true,
+  "startingHead": "7677da80f564f525ad2a0539f0da5764d680d760",
+  "finalHead": "7677da80f564f525ad2a0539f0da5764d680d760"
+}
