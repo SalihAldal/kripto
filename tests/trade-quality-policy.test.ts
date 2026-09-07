@@ -13,7 +13,7 @@ describe("trade-quality-policy", () => {
       aiRiskScore: 78.28,
     });
     expect(result.reject).toBe(true);
-    expect(result.reason).toContain("Entry quality");
+    expect(result.reason).toContain("ENTRY_QUALITY:AI_RISK_ELEVATED_LOW_CONFIDENCE");
   });
 
   it("allows high AI risk when confidence is elite", () => {

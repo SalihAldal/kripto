@@ -110,6 +110,19 @@ export function classifyRoundTerminalOutcome(input: {
     };
   }
 
+  if (upper.includes("ENTRY_QUALITY") || upper.includes("ELITE CONFIDENCE") || upper.includes("AI_RISK_ELEVATED")) {
+    return {
+      stage: "admission",
+      reasonCode: extractReasonCode(reason, "ENTRY_QUALITY_REJECT"),
+      description: reason,
+      symbol,
+      candidateId,
+      outcome: "admission_rejected",
+      closeReason: "ENTRY_QUALITY_REJECT",
+      runtimeStep: "ENTRY_QUALITY_REJECTED",
+    };
+  }
+
   if (upper.includes("AI_GATE") || upper.includes("LOW_CONFIDENCE") || upper.includes("NO_TRADE")) {
     return {
       stage: "ai_evaluation",

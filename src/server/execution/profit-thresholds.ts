@@ -28,7 +28,7 @@ export function shouldRejectHighRiskLowConfidenceEntry(input: {
   if (input.aiRiskScore > thresholds.maxAiRiskScore && input.confidencePercent < thresholds.minConfidence) {
     return {
       reject: true,
-      reason: `Entry quality: elevated AI risk (${input.aiRiskScore.toFixed(0)}) without elite confidence (${input.confidencePercent.toFixed(0)}% < ${thresholds.minConfidence.toFixed(0)}%)`,
+      reason: `ENTRY_QUALITY:AI_RISK_ELEVATED_LOW_CONFIDENCE elevated AI risk (${input.aiRiskScore.toFixed(0)}) without elite confidence (${input.confidencePercent.toFixed(0)}% < ${thresholds.minConfidence.toFixed(0)}%)`,
     };
   }
   return { reject: false };

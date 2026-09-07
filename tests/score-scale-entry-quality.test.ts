@@ -100,7 +100,7 @@ describe("score scale / entry-quality contract", () => {
       aiRiskScore: 100,
     });
     expect(gate.reject).toBe(true);
-    expect(gate.reason).toContain("78%");
+    expect(gate.reason).toContain("ENTRY_QUALITY:AI_RISK_ELEVATED_LOW_CONFIDENCE");
     expect(gate.reason).not.toContain("0%");
   });
 

@@ -160,6 +160,7 @@ import {
   isLegacyScannerConsensusCandidate,
   parseCanonicalHandoff,
   resolveExecutionConfidenceScore,
+  resolveEntryQualityConfidenceScore,
   validateCanonicalHandoffRecord,
 } from "@/src/server/execution/canonical-handoff.service";
 import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
@@ -1795,34 +1796,6 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         },
       });
     }
-    const entryQuality = shouldRejectHighRiskLowConfidenceEntry({
-      confidencePercent: scorecardConfidence,
-      aiRiskScore: ai.finalRiskScore,
-    });
-    if (entryQuality.reject) {
-      await logTradeEvent({
-        symbol: selected.context.symbol,
-        eventType: "RISK_GATE_BLOCKED",
-        reason: entryQuality.reason ?? "Entry quality gate",
-        aiConfidence: scorecardConfidence,
-      });
-      return finishExecution({
-        executionId,
-        mode,
-        opened: false,
-        rejected: true,
-        rejectReason: entryQuality.reason ?? "ENTRY_QUALITY: elevated AI risk without elite confidence",
-        symbol: selected.context.symbol,
-        decision: ai.finalDecision,
-        details: {
-          aiRiskScore: ai.finalRiskScore,
-          confidence: scorecardConfidence,
-          aiFinalConfidence: ai.finalConfidence,
-          scorecardConfidence: Number(ai.analysisScorecard?.confidenceScore ?? 0),
-          scannerConfidence: Number(selected.score.confidence ?? 0),
-        },
-      });
-    }
     const noTradeReasons = resolveNoTradeReasons({
       candidate: selected,
       confidence: ai.finalConfidence,
@@ -1881,7 +1854,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         mode,
         opened: false,
         rejected: true,
-        rejectReason: `NO_TRADE: ${noTradeReasons.join(" | ")}`,
+        rejectReason: `AI_NO_TRADE: ${noTradeReasons.join(" | ")}`,
         symbol: selected.context.symbol,
         decision: ai.finalDecision,
         details: {
@@ -1891,6 +1864,35 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           volatilityPercent: selected.context.volatilityPercent,
           volume24h: selected.context.volume24h,
           orchestration,
+        },
+      });
+    }
+    const entryQualityConfidence = resolveEntryQualityConfidenceScore({ ai, learningLane });
+    const entryQuality = shouldRejectHighRiskLowConfidenceEntry({
+      confidencePercent: entryQualityConfidence,
+      aiRiskScore: ai.finalRiskScore,
+    });
+    if (entryQuality.reject) {
+      await logTradeEvent({
+        symbol: selected.context.symbol,
+        eventType: "RISK_GATE_BLOCKED",
+        reason: entryQuality.reason ?? "Entry quality gate",
+        aiConfidence: entryQualityConfidence,
+      });
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: entryQuality.reason ?? "ENTRY_QUALITY:AI_RISK_ELEVATED_LOW_CONFIDENCE",
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+        details: {
+          aiRiskScore: ai.finalRiskScore,
+          confidence: entryQualityConfidence,
+          aiFinalConfidence: ai.finalConfidence,
+          scorecardConfidence: Number(ai.analysisScorecard?.confidenceScore ?? 0),
+          scannerConfidence: Number(selected.score.confidence ?? 0),
         },
       });
     }

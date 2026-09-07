@@ -254,6 +254,17 @@ export function resolveExecutionConfidenceScore(input: {
   return scorecardConfidence;
 }
 
+/** Entry-quality admission uses AI/scorecard confidence only — never scanner fallback. */
+export function resolveEntryQualityConfidenceScore(input: {
+  ai: AIConsensusResult;
+  learningLane: boolean;
+}): number {
+  const scorecardConfidenceRaw = Number(input.ai.analysisScorecard?.confidenceScore ?? input.ai.finalConfidence ?? 0);
+  return input.learningLane
+    ? Math.max(scorecardConfidenceRaw, Number(input.ai.finalConfidence ?? 0))
+    : scorecardConfidenceRaw;
+}
+
 export function isLegacyScannerConsensusCandidate(candidate: ScannerCandidate): boolean {
   if (parseCanonicalHandoff(candidate)) return false;
   return Boolean(candidate.ai);

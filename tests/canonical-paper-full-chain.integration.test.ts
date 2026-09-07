@@ -483,7 +483,7 @@ describe.sequential("canonical paper full chain (disposable PostgreSQL)", () => 
       campaignId: "cmp-case-3",
     });
     expect(result.opened).toBe(false);
-    expect(String(result.rejectReason ?? "")).toContain("Entry quality");
+    expect(String(result.rejectReason ?? "")).toContain("ENTRY_QUALITY:AI_RISK_ELEVATED_LOW_CONFIDENCE");
     expect(String(result.rejectReason ?? "")).not.toContain("UNCLASSIFIED_TERMINAL_REASON");
     const orders = await prisma.tradeOrder.count({ where: { userId: user.id } });
     expect(orders).toBe(0);

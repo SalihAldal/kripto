@@ -1,0 +1,97 @@
+{
+  "verdict": "PASS",
+  "campaignId": "paper-1h-2026-09-07T15-47-43-241Z",
+  "jobId": "cmtrezwvc000bunbk5fgm1kvl",
+  "startingHead": "ec1bc2b51f7f8bb0b7758dc556befbd1dc715513",
+  "liveTradingEnabled": false,
+  "executionMode": "paper",
+  "runtime": {
+    "plannedMinutes": 60,
+    "actualMinutes": 62,
+    "actualJobDurationMs": 3714820,
+    "reachedTerminal": true,
+    "completedFullDuration": true,
+    "finalJobStatus": "STOPPED",
+    "stopReason": "deadline"
+  },
+  "funnel": {
+    "rounds": 8,
+    "discovered": 8,
+    "selected": 5,
+    "handoffValid": 5,
+    "aiBuy": 0,
+    "aiNoTrade": 5,
+    "executionReached": 5,
+    "entryQualityPass": 0,
+    "entryQualityRejected": 5,
+    "riskPass": 0,
+    "riskRejected": 0,
+    "sizingRejected": 0,
+    "noEligibleCandidate": 3,
+    "orders": 0,
+    "fills": 0,
+    "positionsOpened": 0,
+    "positionsClosed": 0
+  },
+  "accounting": {
+    "cashBefore": { "BTC": 0.02, "TRY": 99997.997, "USDT": 2500 },
+    "cashAfter": { "BTC": 0.02, "TRY": 99997.997, "USDT": 2500 },
+    "realizedPnl": 0,
+    "unrealizedPnl": 0,
+    "fees": 0,
+    "reconciled": true,
+    "expectedCashAfterTry": 99997.997,
+    "actualCashAfterTry": 99997.997,
+    "tolerance": 0.05
+  },
+  "performance": {
+    "closedTrades": 0,
+    "wins": 0,
+    "losses": 0,
+    "winRate": null,
+    "averageWin": null,
+    "averageLoss": null,
+    "profitFactor": null,
+    "expectancy": null,
+    "maxDrawdown": null,
+    "profitabilityVerdict": "INSUFFICIENT_DATA"
+  },
+  "health": {
+    "http429": 0,
+    "http418": 0,
+    "wsReconnects": 0,
+    "wsStale": 0,
+    "restFallback": 0,
+    "aiTimeouts": 0,
+    "aiParseErrors": 0,
+    "dbErrors": 0,
+    "redisErrors": 0,
+    "workerErrors": 0,
+    "candidateStale": 0,
+    "priceStale": 0,
+    "orderErrors": 0,
+    "fillErrors": 0
+  },
+  "dominantRejections": [
+    {
+      "gate": "ENTRY_QUALITY_ELEVATED_AI_RISK_LOW_CONFIDENCE",
+      "rejected": 5,
+      "pctSelected": "100.00",
+      "threshold": "elite confidence >= 82%, AI risk elevated at 100",
+      "medianObserved": "confidence 74%, AI risk 100"
+    },
+    {
+      "gate": "NO_ELIGIBLE_CANDIDATE",
+      "rejected": 3,
+      "pctSelected": "N/A (unselected rounds)",
+      "threshold": "selection deadline",
+      "medianObserved": "~600s observe window"
+    }
+  ],
+  "dominantGate": "ENTRY_QUALITY_ELEVATED_AI_RISK_LOW_CONFIDENCE",
+  "pipelineVerdict": "HEALTHY",
+  "accountingVerdict": "PASS",
+  "profitability": "INSUFFICIENT_DATA",
+  "readyForLongPaper": true,
+  "artifactRoot": "artifacts/paper-campaigns/paper-1h-2026-09-07T15-47-43-241Z"
+}
