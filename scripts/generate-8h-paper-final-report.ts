@@ -34,18 +34,42 @@ function readCheckpoints() {
     .map((line) => JSON.parse(line) as Record<string, unknown>);
 }
 
-function categorizeFail(reason: string | null): string {
-  if (!reason) return "Bilinmeyen / kayıt yok";
+function categorizeFail(reason: string | null, state?: string | null): string {
+  if (state === "tariyor") return "Yarım kalan round";
+  if (!reason || reason === "UNKNOWN") return "Bilinmeyen / kayıt yok";
+  if (reason.includes("HANDOFF_")) return "Handoff geçersiz";
+  if (reason.includes("NO_ELIGIBLE") || reason.includes("NO_ELIGIBLE_CANDIDATE")) return "Uygun aday yok";
+  if (reason.includes("AI_EVALUATION") || reason.includes("AI_HYDRATION") || reason.includes("HANDOFF_AI")) return "AI değerlendirme eksik";
   if (reason.includes("NO_TRADE") || reason.includes("No-trade")) return "AI NO_TRADE";
   if (reason.startsWith("AI_GATE")) return "AI gate veto";
   if (reason.startsWith("SIM_TIGHT_FILTER")) return "SIM tight filter";
   if (reason.startsWith("LEARNING_LANE")) return "Learning lane hard reject";
   if (reason.startsWith("Paper NO_TRADE")) return "Paper aday yok";
-  if (reason.includes("NO_ELIGIBLE")) return "Strateji / admission";
+  if (reason.includes("STRATEGY")) return "Strateji tetiklenmedi";
+  if (reason.includes("ADMISSION") || reason.includes("RISK_")) return "Admission/risk reddi";
+  if (reason.includes("EXECUTION")) return "Execution reddi";
   if (reason.includes("WAIT:")) return "Canonical WAIT";
+  if (reason.includes("ROUND_INCOMPLETE")) return "Yarım kalan round";
   if (reason.includes("Tur zaman asimi") || reason.includes("heartbeat")) return "Zaman aşımı";
   if (reason.includes("25P02")) return "DB transaction";
   return "Diğer";
+}
+
+function resolveRoundFailReason(r: {
+  failReason: string | null;
+  metadata: unknown;
+  state: string;
+}): string {
+  const meta = (r.metadata ?? {}) as Record<string, unknown>;
+  const terminalReason = typeof meta.terminalReason === "string" ? meta.terminalReason : null;
+  const closeReason = typeof meta.closeReason === "string" ? meta.closeReason : null;
+  const runtime = meta.runtime as { step?: string } | undefined;
+  if (r.failReason && r.failReason.trim()) return r.failReason.trim();
+  if (terminalReason) return terminalReason;
+  if (closeReason) return closeReason;
+  if (r.state === "tariyor") return "ROUND_INCOMPLETE";
+  if (runtime?.step) return runtime.step;
+  return "UNKNOWN";
 }
 
 function fmtTry(n: number) {
@@ -98,8 +122,11 @@ async function main() {
   let reachedSell = 0;
 
   const roundRows = rounds.map((r) => {
-    const cat = categorizeFail(r.failReason);
-    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
+    const resolvedFail = resolveRoundFailReason(r);
+    const cat = r.state === "tariyor" ? "Yarım kalan round" : categorizeFail(resolvedFail, r.state);
+    if (r.state !== "tariyor") {
+      byCategory[cat] = (byCategory[cat] ?? 0) + 1;
+    }
     byState[r.state] = (byState[r.state] ?? 0) + 1;
     if (r.symbol) {
       coinSelected++;
@@ -115,7 +142,7 @@ async function main() {
       roundNo: r.roundNo,
       state: r.state,
       symbol: r.symbol,
-      failReason: r.failReason,
+      failReason: resolvedFail,
       category: cat,
       selectedReason: r.selectedReason,
       runtimeStep: runtime?.step,
@@ -135,9 +162,23 @@ async function main() {
     where: { userId: user.id, status: "CLOSED" },
     orderBy: { closedAt: "desc" },
   });
+  const campaignCmpId = `cmp:${jobId}`;
   const campaignClosedPaper = closedPaper.filter((t) => {
-    const opened = t.openedAt?.getTime() ?? 0;
-    return opened >= campaignStartMs - 60_000;
+    if (t.campaignId === CAMPAIGN_ID || t.campaignId === campaignCmpId) return true;
+    const meta = (t.metadata ?? {}) as Record<string, unknown>;
+    if (meta.campaignId === CAMPAIGN_ID || meta.campaignId === campaignCmpId) return true;
+    return false;
+  });
+  const campaignOpenPositions = openPositions.filter((p) => {
+    const meta = (p.metadata ?? {}) as Record<string, unknown>;
+    const opened = p.openedAt?.getTime() ?? 0;
+    const inWindow = opened >= campaignStartMs && opened <= campaignEndMs + 60_000;
+    return (
+      meta.campaignId === CAMPAIGN_ID ||
+      meta.campaignId === campaignCmpId ||
+      meta.sessionId === jobId ||
+      (inWindow && (meta.mode === "paper" || String(meta.executionMode ?? "") === "paper"))
+    );
   });
 
   const realizedPnl = snapshot?.realizedPnl != null
@@ -145,7 +186,7 @@ async function main() {
     : campaignClosedPaper.reduce((s, r) => s + Number(r.realizedPnl ?? 0), 0);
   const unrealizedPnl = snapshot?.unrealizedPnl != null
     ? Number(snapshot.unrealizedPnl)
-    : openPositions.reduce((s, r) => s + Number(r.unrealizedPnl ?? 0), 0);
+    : campaignOpenPositions.reduce((s, r) => s + Number(r.unrealizedPnl ?? 0), 0);
   const initialBalance = Number(frozen?.PAPER_INITIAL_BALANCE_TRY ?? process.env.PAPER_INITIAL_BALANCE_TRY ?? 10_000);
   const netEquityDelta = realizedPnl + unrealizedPnl;
 

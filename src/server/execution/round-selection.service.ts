@@ -28,6 +28,14 @@ import { getMicrostructureEngine } from "@/src/server/microstructure/microstruct
 import { getOpportunityEngine } from "@/src/server/opportunity/opportunity-engine";
 import { getCanonicalInstanceOwnership } from "@/src/server/candidate/instance-ownership.service";
 import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
+import {
+  attachCanonicalHandoff,
+  buildCanonicalHandoffMetadata,
+  hydrateCanonicalHandoffCandidate,
+  validateCanonicalHandoffRecord,
+} from "@/src/server/execution/canonical-handoff.service";
+import { resolveAiExecutionGatePolicy } from "@/src/server/execution/ai-execution-gate.service";
+import { recordRoundPipelineTelemetry } from "@/src/server/execution/round-pipeline-telemetry.service";
 import { observeCanonicalShadowTick } from "@/src/server/shadow-outcome/shadow-outcome-engine";
 import { persistShadowOutcomes } from "@/src/server/shadow-outcome/persist";
 import { setLegacyScannerCounters } from "@/src/server/execution/authority-counters.service";
@@ -509,17 +517,66 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
       };
     }
     if (selectionResult.kind === "selected") {
-      await controller.transition("SYMBOL_SELECTED", `${selectionResult.selected.context.symbol} canonical opportunity secimi`, {
-        currentSymbol: selectionResult.selected.context.symbol.toUpperCase(),
+      const handoffMeta = buildCanonicalHandoffMetadata({
+        candidateId: selectionResult.selectedRecord.candidateId,
+        symbol: selectionResult.selected.context.symbol,
+        record: selectionResult.selectedRecord,
+        aiAdvisory: selectionResult.selected.context.metadata.aiAdvisory as
+          | import("@/src/server/microstructure/types").AiAdvisory
+          | undefined,
+      });
+      const validation = validateCanonicalHandoffRecord(handoffMeta, selectionResult.selected.context.symbol);
+      if (!validation.ok) {
+        return {
+          selected: null,
+          source: null,
+          reason: `${validation.reasonCode}:${validation.reasonDetail}`,
+        };
+      }
+      const aiPolicy = resolveAiExecutionGatePolicy({ mode: "paper", learningLane: true });
+      const hydrated = await hydrateCanonicalHandoffCandidate({
+        candidate: selectionResult.selected,
+        handoff: handoffMeta,
+        allowAdvisoryShell: aiPolicy === "ADVISORY",
+      });
+      const selected = attachCanonicalHandoff(hydrated.candidate, hydrated.handoff);
+      await controller.transition("SYMBOL_SELECTED", `${selected.context.symbol} canonical opportunity secimi`, {
+        currentSymbol: selected.context.symbol.toUpperCase(),
         currentPipeline: "opportunity-engine",
       });
+      recordRoundPipelineTelemetry({
+        jobId: input.jobId,
+        runId: input.runId,
+        roundNo: input.roundNo,
+        stage: "handoff",
+        payload: {
+          candidateId: handoffMeta.candidateId,
+          symbol: selected.context.symbol,
+          aiSource: hydrated.aiSource,
+          aiConsensusStatus: hydrated.handoff.aiConsensusStatus,
+          storeTelemetry: getCanonicalCandidateStore().getTelemetry(),
+        },
+      });
       return {
-        selected: selectionResult.selected,
+        selected,
         source: "opportunity",
         reason: `CANDIDATE_STORE_EXECUTION_READY:${selectionResult.selectedRecord.candidateId}`,
       };
     }
     const telemetry = getCanonicalCandidateStore().getTelemetry();
+    recordRoundPipelineTelemetry({
+      jobId: input.jobId,
+      runId: input.runId,
+      roundNo: input.roundNo,
+      stage: "selection",
+      payload: {
+        outcome: "NO_ELIGIBLE_CANDIDATE",
+        observedMs: observationMs,
+        storeByState: telemetry.byState,
+        executionReady: telemetry.executionReady,
+        handoffErrorCounts: telemetry.handoffErrorCounts,
+      },
+    });
     const reason = `VALID_NO_CANDIDATE observedMs=${observationMs} discovered=${telemetry.byState.DISCOVERED ?? 0} hot=${telemetry.byState.HOT ?? 0} microConfirmed=${telemetry.byState.MICRO_CONFIRMED ?? 0} ready=${telemetry.executionReady}`;
     traceCandidateWait({
       symbol: "NO_CANDIDATE",

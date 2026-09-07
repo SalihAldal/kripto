@@ -55,6 +55,12 @@ import {
   isTerminalNonExecutableReason,
   recordCandidateFunnelStage,
 } from "@/src/server/forensics/candidate-funnel-trace.service";
+import {
+  classifyRoundTerminalOutcome,
+  formatTerminalReason,
+  toRoundRuntimeStep,
+  type RoundTerminalOutcome,
+} from "@/src/server/execution/round-terminal-outcome.service";
 import { classifyTerminalReason } from "@/src/server/execution/p7-paper-strategy-contract";
 import { shouldBindSymbolOnTerminalFail } from "@/src/server/execution/auto-round-terminal-policy";
 import { getPositionById, getRuntimeExecutionContext, getEmergencyStopState, listOpenPositionsByUser } from "@/src/server/repositories/execution.repository";
@@ -1500,11 +1506,22 @@ async function completeNoTradeRound(input: {
   runId: string;
   reason: string;
   roundOwnerId?: string;
+  symbol?: string | null;
+  candidateId?: string | null;
+  terminalOutcome?: RoundTerminalOutcome;
 }) {
   const job = await getAutoRoundJobById(input.jobId);
   const run = await getAutoRoundRunById(input.runId).catch(() => null);
   if (!job || !run) return;
   const campaignId = resolveCampaignIdFromJob(job);
+  const outcome =
+    input.terminalOutcome ??
+    classifyRoundTerminalOutcome({
+      reason: input.reason,
+      symbol: input.symbol ?? run.symbol,
+      candidateId: input.candidateId ?? null,
+    });
+  const terminalReason = formatTerminalReason(outcome);
   const ownership =
     getActiveRoundOwnershipForJob(input.jobId).find((row) => row.runId === input.runId)?.roundOwner ??
     input.roundOwnerId;
@@ -1529,15 +1546,20 @@ async function completeNoTradeRound(input: {
       feeTotal: 0,
       result: "no_trade",
       metadata: {
-        closeReason: "VALID_NO_CANDIDATE",
-        terminalReason: input.reason,
+        closeReason: outcome.closeReason,
+        terminalReason,
+        terminalOutcome: outcome,
       },
     },
   });
-  await setJobState(input.jobId, "tur_tamamlandi", `Tur tamamlandi (trade yok): ${input.reason}`, {
+  await updateAutoRoundRun({
+    runId: input.runId,
+    failReason: terminalReason,
+  }).catch(() => null);
+  await setJobState(input.jobId, "tur_tamamlandi", `Tur tamamlandi (trade yok): ${terminalReason}`, {
     runId: input.runId,
     roundNo: run.roundNo,
-    reason: input.reason,
+    reason: terminalReason,
   });
   const forensicSession =
     getForensicSession() ??
@@ -1551,12 +1573,12 @@ async function completeNoTradeRound(input: {
     roundNo: run.roundNo,
     startedAt: run.startedAt,
     endedAt: new Date(),
-    symbol: null,
-    failReason: input.reason,
+    symbol: input.symbol ?? run.symbol ?? null,
+    failReason: terminalReason,
     result: "no_trade",
     userId: job.userId,
     terminalState: "tur_tamamlandi",
-    currentStage: "NO_CANDIDATE",
+    currentStage: outcome.runtimeStep,
     lastProgressAt: new Date().toISOString(),
     heartbeatAt: new Date().toISOString(),
     elapsedMs: null,
@@ -2182,9 +2204,14 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
       if (!selected || !execution?.opened || !execution.positionId) {
         const reason = !selected ? "NO_ELIGIBLE_CANDIDATE" : (lastRejectReason || "Alim acilisi basarisiz");
         const terminal = classifyRoundTerminal(reason);
+        const terminalOutcome = classifyRoundTerminalOutcome({
+          reason,
+          symbol: selected?.context.symbol ?? run.symbol,
+          candidateId: String(selected?.context.metadata.opportunityCandidateId ?? "") || null,
+        });
         const noCandidateLike =
           !selected ||
-          reason.includes("NO_CANDIDATE") ||
+          terminalOutcome.outcome === "no_eligible_candidate" ||
           reason.includes("Microstructure engine produced no confirmed candidate") ||
           terminal.decision === "WAIT";
         if (noCandidateLike) {
@@ -2204,8 +2231,8 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
               totalRounds: job.totalRounds,
               maxSelectionAttempts,
               patch: {
-                step: "NO_CANDIDATE",
-                message: `Tur ${roundNo}: VALID_NO_CANDIDATE observe (${Math.floor((Date.now() - observeStart) / 1000)}s)`,
+                step: toRoundRuntimeStep(terminalOutcome),
+                message: `Tur ${roundNo}: ${terminalOutcome.closeReason} observe (${Math.floor((Date.now() - observeStart) / 1000)}s)`,
                 currentPipeline: "opportunity-engine",
               },
             }).catch(() => null);
@@ -2214,8 +2241,11 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           await completeNoTradeRound({
             jobId,
             runId: run.id,
-            reason: `${terminal.reasonCode}:${reason || "VALID_NO_CANDIDATE"}`,
+            reason: formatTerminalReason(terminalOutcome),
             roundOwnerId,
+            symbol: selected?.context.symbol ?? run.symbol,
+            candidateId: String(selected?.context.metadata.opportunityCandidateId ?? "") || null,
+            terminalOutcome,
           });
           continue;
         }

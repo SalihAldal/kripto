@@ -155,6 +155,13 @@ import {
   resolveAiExecutionGatePolicy,
   type AiExecutionGateEvaluation,
 } from "@/src/server/execution/ai-execution-gate.service";
+import {
+  hydrateCanonicalHandoffCandidate,
+  isLegacyScannerConsensusCandidate,
+  parseCanonicalHandoff,
+  resolveExecutionConfidenceScore,
+  validateCanonicalHandoffRecord,
+} from "@/src/server/execution/canonical-handoff.service";
 import { createCandidateId } from "@/src/server/forensics/forensic-collector.service";
 import {
   bridgeAiExecutionGate,
@@ -1534,7 +1541,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       }
     }
 
-    if (!selected || !selected.ai) {
+    if (!selected) {
       publishExecutionEvent({
         executionId,
         stage: "selection",
@@ -1547,7 +1554,58 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         mode,
         opened: false,
         rejected: true,
-        rejectReason: "No tradeable candidate after scanner+AI",
+        rejectReason: "NO_ELIGIBLE_CANDIDATE",
+      });
+    }
+
+    const canonicalHandoff = parseCanonicalHandoff(selected);
+    if (!selected.ai) {
+      if (canonicalHandoff) {
+        const validation = validateCanonicalHandoffRecord(canonicalHandoff, selected.context.symbol);
+        if (!validation.ok) {
+          return finishExecution({
+            executionId,
+            mode,
+            opened: false,
+            rejected: true,
+            rejectReason: `${validation.reasonCode}:${validation.reasonDetail}`,
+            symbol: selected.context.symbol,
+          });
+        }
+        const aiPolicy = resolveAiExecutionGatePolicy({ mode, learningLane });
+        const hydrated = await hydrateCanonicalHandoffCandidate({
+          candidate: selected,
+          handoff: canonicalHandoff,
+          allowAdvisoryShell: aiPolicy === "ADVISORY",
+        });
+        selected = hydrated.candidate;
+      } else if (!isLegacyScannerConsensusCandidate(selected)) {
+        return finishExecution({
+          executionId,
+          mode,
+          opened: false,
+          rejected: true,
+          rejectReason: "HANDOFF_AI_CONSENSUS_MISSING: legacy scanner path requires AI consensus",
+          symbol: selected.context.symbol,
+        });
+      }
+    }
+
+    if (!selected.ai) {
+      publishExecutionEvent({
+        executionId,
+        stage: "selection",
+        status: "SKIPPED",
+        message: "Canonical handoff without AI consensus under active policy",
+        level: "SIGNAL",
+      });
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: "HANDOFF_AI_CONSENSUS_MISSING",
+        symbol: selected.context.symbol,
       });
     }
 
@@ -1665,10 +1723,12 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         decision: ai.finalDecision,
       });
     }
-    const scorecardConfidenceRaw = Number(ai.analysisScorecard?.confidenceScore ?? ai.finalConfidence ?? 0);
-    const scorecardConfidence = learningLane
-      ? Math.max(scorecardConfidenceRaw, Number(ai.finalConfidence ?? 0))
-      : scorecardConfidenceRaw;
+    const scorecardConfidence = resolveExecutionConfidenceScore({
+      selected,
+      ai,
+      learningLane,
+      requestedDurationSec: Number(input.maxDurationSec ?? 0),
+    });
     const requestedDurationForConfidence = Number(input.maxDurationSec ?? 0);
     const minConfidenceForLane = learningLane ? 25 : requestedDurationForConfidence > 0 && requestedDurationForConfidence <= 3600 ? 55 : 60;
     if (scorecardConfidence < minConfidenceForLane) {
