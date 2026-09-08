@@ -1,0 +1,111 @@
+{
+  "verdict": "FAIL",
+  "dataset": {
+    "start": "2026-08-04T00:00:00.000Z",
+    "end": "2026-08-18T00:00:00.000Z",
+    "trainEnd": "2026-08-11T16:48:00.000Z",
+    "valEnd": "2026-08-15T04:48:00.000Z",
+    "windows": 1049,
+    "symbols": 11
+  },
+  "setups": [
+    {
+      "name": "BREAKOUT_CONTINUATION",
+      "trainSamples": 116,
+      "validationSamples": 77,
+      "finalTestSamples": 44,
+      "validationExpectancy": -5.9605,
+      "validationProfitFactor": 0.1882,
+      "finalExpectancy": -2.2712,
+      "finalProfitFactor": 0.5985,
+      "finalNetPnl": -99.93
+    },
+    {
+      "name": "TREND_PULLBACK",
+      "trainSamples": 18,
+      "validationSamples": 13,
+      "finalTestSamples": 9,
+      "validationExpectancy": -5.3677,
+      "validationProfitFactor": 0,
+      "finalExpectancy": -6.42,
+      "finalProfitFactor": 0,
+      "finalNetPnl": -57.78
+    },
+    {
+      "name": "VOLUME_CONFIRMED_MOMENTUM",
+      "trainSamples": 16,
+      "validationSamples": 15,
+      "finalTestSamples": 19,
+      "validationExpectancy": -3.3801,
+      "validationProfitFactor": 0.5197,
+      "finalExpectancy": -3.8052,
+      "finalProfitFactor": 0.5584,
+      "finalNetPnl": -72.3
+    },
+    {
+      "name": "MEAN_REVERSION",
+      "trainSamples": 647,
+      "validationSamples": 443,
+      "finalTestSamples": 330,
+      "validationExpectancy": -3.676,
+      "validationProfitFactor": 0.1882,
+      "finalExpectancy": -4.2612,
+      "finalProfitFactor": 0.1707,
+      "finalNetPnl": -1406.19
+    },
+    {
+      "name": "VOLATILITY_EXPANSION",
+      "trainSamples": 1,
+      "validationSamples": 0,
+      "finalTestSamples": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalExpectancy": null,
+      "finalProfitFactor": null,
+      "finalNetPnl": null
+    },
+    {
+      "name": "RANGE_BREAK",
+      "trainSamples": 209,
+      "validationSamples": 163,
+      "finalTestSamples": 117,
+      "validationExpectancy": -4.4519,
+      "validationProfitFactor": 0.1187,
+      "finalExpectancy": -3.6835,
+      "finalProfitFactor": 0.312,
+      "finalNetPnl": -430.97
+    },
+    {
+      "name": "POST_SPIKE_CONSOLIDATION",
+      "trainSamples": 1,
+      "validationSamples": 2,
+      "finalTestSamples": 0,
+      "validationExpectancy": -7.3472,
+      "validationProfitFactor": 0,
+      "finalExpectancy": null,
+      "finalProfitFactor": null,
+      "finalNetPnl": null
+    }
+  ],
+  "portfolio": {
+    "trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "netPnl": 0,
+    "expectancy": 0,
+    "profitFactor": 0,
+    "maxDrawdown": 0
+  },
+  "ai": {
+    "analysed": 0,
+    "providerBuy": 0,
+    "hybridBuy": 0,
+    "finalBuy": 0,
+    "preAiExpectancy": 0,
+    "postAiExpectancy": null
+  },
+  "productionWired": false,
+  "strategyArchitectureVerdict": "NO_EDGE_ACROSS_TESTED_SETUPS",
+  "run15hPaper": "NO",
+  "nextPhase": "ALTERNATIVE_MARKET_PARADIGM"
+}

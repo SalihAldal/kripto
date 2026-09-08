@@ -1,0 +1,93 @@
+{
+  "verdict": "FAIL",
+  "unseenDataset": {
+    "start": "2026-08-28T00:00:00.000Z",
+    "end": "2026-09-04T00:00:00.000Z",
+    "trainEnd": "2026-09-01T00:00:00.000Z",
+    "valEnd": "2026-09-03T00:00:00.000Z",
+    "windows": 657,
+    "symbols": 11,
+    "candidates": 2888
+  },
+  "baseline": {
+    "winnerRate": 22.41,
+    "rankingMissRate": 57.19,
+    "selected": 657,
+    "tpFirst": 134,
+    "slFirst": 464,
+    "top1WinnerRate": 42.81
+  },
+  "rankingV2": {
+    "implemented": true,
+    "validationWinnerRate": 20,
+    "finalTestWinnerRate": 25.33,
+    "baselineFinalTestWinnerRate": 28.24,
+    "rankingMissRate": 69.84,
+    "baselineRankingMissRate": 61.9
+  },
+  "cost": {
+    "slippageCapPerSide": 0.35,
+    "slippageCapSemantics": "MAXIMUM_ALLOWED_SLIPPAGE_CAP",
+    "paperSimulatorUses": "CONSERVATIVE_STRESS_CASE_FIXED_BPS_PER_SIDE",
+    "realisticSlippagePerSide": 0.0689,
+    "realisticSlippageBps": 7,
+    "roundTripFee": 0.3,
+    "scenarios": {
+      "conservative": {
+        "label": "CONSERVATIVE",
+        "slippageBps": 35
+      },
+      "realistic": {
+        "label": "BASELINE_REALISTIC",
+        "slippageBps": 7
+      },
+      "zeroSlippage": {
+        "label": "ZERO_SLIPPAGE_LOWER_BOUND",
+        "slippageBps": 0
+      }
+    }
+  },
+  "exit": {
+    "profile": "C_MFE_P75_SL_P50",
+    "breakEvenWinRate": 25.95
+  },
+  "finalTest": {
+    "rankingModel": "MODEL_A",
+    "exitProfile": "C_MFE_P75_SL_P50",
+    "trades": 95,
+    "wins": 35,
+    "losses": 60,
+    "netPnl": -177.50740657205085,
+    "expectancy": -1.8684990165479036,
+    "profitFactor": 0.6865001200295576,
+    "maxDrawdown": 2.5676510492820124,
+    "conservative": {
+      "trades": 95,
+      "wins": 18,
+      "losses": 77,
+      "netPnl": -696.3737933750804,
+      "expectancy": -7.330250456579793,
+      "profitFactor": 0.2568388661924377,
+      "maxDrawdown": 6.963737933751181
+    },
+    "zeroSlippage": {
+      "trades": 95,
+      "wins": 47,
+      "losses": 48,
+      "netPnl": 5.288616940981471,
+      "expectancy": 0.05566965201033127,
+      "profitFactor": 1.0116051290748367,
+      "maxDrawdown": 1.5401482628865883
+    }
+  },
+  "ai": {
+    "analysed": 0,
+    "providerBuy": 0,
+    "hybridBuy": 0,
+    "finalBuy": 0
+  },
+  "strategyVerdict": "NO_EDGE",
+  "productionRankingWired": false,
+  "run15hPaper": "NO",
+  "nextPhase": "SCANNER_DISCOVERY_REDESIGN"
+}

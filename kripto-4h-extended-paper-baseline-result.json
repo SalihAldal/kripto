@@ -1,0 +1,49 @@
+{
+  "campaignId": "paper-4h-2026-09-07T19-59-48-598Z",
+  "jobId": "cmtrnzzb7000bunh8fv6ok9me",
+  "wallClockStartedAt": "2026-09-07T19:59:49.200Z",
+  "jobStartedAt": "2026-09-07T19:59:54.327Z",
+  "endedAt": "2026-09-07T21:24:04.638Z",
+  "preflightDurationMs": 911,
+  "plannedDurationMs": 14400000,
+  "actualJobDurationMs": 5050311,
+  "completedFullDuration": false,
+  "gracefulStopRequested": false,
+  "stopReason": "job_stopped",
+  "stopError": null,
+  "reachedTerminal": true,
+  "configHash": "ba7682b7871109a09e467800c9d751a7c36c81228b1c9fb7f1f03804160419a1",
+  "frozenConfig": {
+    "EXECUTION_MODE": "paper",
+    "LIVE_TRADING_ENABLED": "false",
+    "LIVE_AUTHORIZATION": "DISABLED",
+    "PAPER_INITIAL_BALANCE_TRY": "100000",
+    "DURATION_MS": 14400000,
+    "CAMPAIGN_ID": "paper-4h-2026-09-07T19-59-48-598Z",
+    "BUDGET_PER_TRADE": 1000,
+    "MAX_WAIT_SEC": 600
+  },
+  "roundsCompleted": 10,
+  "roundsRecorded": 10,
+  "tradeCount": 0,
+  "openPositionCount": 0,
+  "realizedPnl": 0,
+  "unrealizedPnl": 0,
+  "netEquityDelta": 0,
+  "paperCashBefore": {
+    "BTC": 0.02,
+    "TRY": 99997.997,
+    "USDT": 2500
+  },
+  "paperCashAfter": {
+    "BTC": 0.02,
+    "TRY": 99997.997,
+    "USDT": 2500
+  },
+  "openPositionsBefore": 0,
+  "openPositions": [],
+  "finalJobStatus": "STOPPED",
+  "artifactRoot": "C:\\Users\\salih\\Desktop\\kripto-main\\artifacts\\paper-campaigns\\paper-4h-2026-09-07T19-59-48-598Z",
+  "liveTradingEnabled": "false",
+  "executionMode": "paper"
+}

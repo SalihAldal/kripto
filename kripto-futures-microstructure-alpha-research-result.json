@@ -1,0 +1,162 @@
+{
+  "verdict": "PARTIAL",
+  "data": {
+    "funding": true,
+    "openInterest": false,
+    "liquidations": false,
+    "orderBook": false,
+    "aggTrades": true,
+    "basis": true
+  },
+  "alphas": [
+    {
+      "name": "FUNDING_EXTREME_NEGATIVE_LONG",
+      "validationTrades": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalTrades": 0,
+      "finalExpectancy": 0,
+      "finalProfitFactor": 0,
+      "finalNetPnl": 0,
+      "finalMaxDrawdown": 0
+    },
+    {
+      "name": "FUNDING_EXTREME_POSITIVE_SHORT",
+      "validationTrades": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalTrades": 0,
+      "finalExpectancy": 0,
+      "finalProfitFactor": 0,
+      "finalNetPnl": 0,
+      "finalMaxDrawdown": 0
+    },
+    {
+      "name": "FUNDING_MEAN_REVERSION",
+      "validationTrades": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalTrades": 0,
+      "finalExpectancy": 0,
+      "finalProfitFactor": 0,
+      "finalNetPnl": 0,
+      "finalMaxDrawdown": 0
+    },
+    {
+      "name": "FUNDING_ACCELERATION_FADE",
+      "validationTrades": 6,
+      "validationExpectancy": 4.0511,
+      "validationProfitFactor": 4.9476,
+      "finalTrades": 18,
+      "finalExpectancy": -0.0125,
+      "finalProfitFactor": 0.9977,
+      "finalNetPnl": -0.22,
+      "finalMaxDrawdown": 0.7888
+    },
+    {
+      "name": "BASIS_EXTREME_DISCOUNT_LONG",
+      "validationTrades": 2,
+      "validationExpectancy": 27.1265,
+      "validationProfitFactor": 999,
+      "finalTrades": 4,
+      "finalExpectancy": -2.1478,
+      "finalProfitFactor": 0.4108,
+      "finalNetPnl": -8.59,
+      "finalMaxDrawdown": 0.1458
+    },
+    {
+      "name": "BASIS_EXTREME_PREMIUM_SHORT",
+      "validationTrades": 1,
+      "validationExpectancy": 6.3169,
+      "validationProfitFactor": 999,
+      "finalTrades": 0,
+      "finalExpectancy": 0,
+      "finalProfitFactor": 0,
+      "finalNetPnl": 0,
+      "finalMaxDrawdown": 0
+    },
+    {
+      "name": "BASIS_NORMALIZATION_FADE",
+      "validationTrades": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalTrades": 0,
+      "finalExpectancy": 0,
+      "finalProfitFactor": 0,
+      "finalNetPnl": 0,
+      "finalMaxDrawdown": 0
+    },
+    {
+      "name": "TAKER_IMBALANCE_LONG",
+      "validationTrades": 67,
+      "validationExpectancy": -2.2483,
+      "validationProfitFactor": 0.6165,
+      "finalTrades": 68,
+      "finalExpectancy": -2.2082,
+      "finalProfitFactor": 0.5311,
+      "finalNetPnl": -150.16,
+      "finalMaxDrawdown": 1.9309
+    },
+    {
+      "name": "TAKER_IMBALANCE_SHORT",
+      "validationTrades": 89,
+      "validationExpectancy": -3.7598,
+      "validationProfitFactor": 0.4337,
+      "finalTrades": 100,
+      "finalExpectancy": -3.4483,
+      "finalProfitFactor": 0.3681,
+      "finalNetPnl": -344.83,
+      "finalMaxDrawdown": 4.3698
+    },
+    {
+      "name": "CVD_DIVERGENCE_SHORT",
+      "validationTrades": 16,
+      "validationExpectancy": -8.4712,
+      "validationProfitFactor": 0.1517,
+      "finalTrades": 21,
+      "finalExpectancy": 5.4419,
+      "finalProfitFactor": 3.4336,
+      "finalNetPnl": 114.28,
+      "finalMaxDrawdown": 0.3206
+    },
+    {
+      "name": "CVD_DIVERGENCE_LONG",
+      "validationTrades": 22,
+      "validationExpectancy": 6.9898,
+      "validationProfitFactor": 3.1606,
+      "finalTrades": 12,
+      "finalExpectancy": -3.3262,
+      "finalProfitFactor": 0.3671,
+      "finalNetPnl": -39.91,
+      "finalMaxDrawdown": 0.3991
+    },
+    {
+      "name": "FUNDING_BASIS_CONFLUENCE_LONG",
+      "validationTrades": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalTrades": 1,
+      "finalExpectancy": 2.6739,
+      "finalProfitFactor": 999,
+      "finalNetPnl": 2.67,
+      "finalMaxDrawdown": 0
+    },
+    {
+      "name": "FUNDING_BASIS_CONFLUENCE_SHORT",
+      "validationTrades": 0,
+      "validationExpectancy": 0,
+      "validationProfitFactor": 0,
+      "finalTrades": 0,
+      "finalExpectancy": 0,
+      "finalProfitFactor": 0,
+      "finalNetPnl": 0,
+      "finalMaxDrawdown": 0
+    }
+  ],
+  "bestAlpha": "BASIS_EXTREME_DISCOUNT_LONG",
+  "alphaFound": false,
+  "requiresFutures": true,
+  "productionReady": false,
+  "recommendedPaperDuration": "N/A",
+  "nextPhase": "EXTERNAL_ALPHA_OR_DIFFERENT_BUSINESS_MODEL"
+}

@@ -1,0 +1,76 @@
+{
+  "verdict": "FAIL",
+  "dataset": {
+    "start": "2026-08-18T00:00:00.000Z",
+    "end": "2026-08-28T00:00:00.000Z",
+    "trainEnd": "2026-08-24T00:00:00.000Z",
+    "valEnd": "2026-08-26T12:00:00.000Z",
+    "windows": 917,
+    "symbols": 11
+  },
+  "baseline": {
+    "candidates": 4566,
+    "selected": 911,
+    "positiveEdgeRate": 56.97,
+    "tpFirstRate": 34.91,
+    "slFirstRate": 54.23
+  },
+  "discoveryV2": {
+    "setupFamilies": [
+      "VOLUME_CONFIRMED_MOMENTUM",
+      "BREAKOUT_CONTINUATION",
+      "TREND_PULLBACK",
+      "VOLATILITY_EXPANSION"
+    ],
+    "candidates": 707,
+    "shortlisted": 671,
+    "validationPositiveEdgeRate": 45.45,
+    "finalPositiveEdgeRate": 53.42,
+    "confidenceMonotonic": true
+  },
+  "economics": {
+    "realisticRoundTripCost": 0.44,
+    "realisticSlippageBps": 7,
+    "trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "netPnl": 0,
+    "expectancy": 0,
+    "profitFactor": 0,
+    "maxDrawdown": 0,
+    "exitByFamily": {
+      "VOLUME_CONFIRMED_MOMENTUM": {
+        "tp": 2.2,
+        "sl": 0.8,
+        "hold": 75
+      },
+      "BREAKOUT_CONTINUATION": {
+        "tp": 2.8,
+        "sl": 0.85,
+        "hold": 90
+      },
+      "TREND_PULLBACK": {
+        "tp": 1.6,
+        "sl": 0.7,
+        "hold": 60
+      },
+      "VOLATILITY_EXPANSION": {
+        "tp": 2.5,
+        "sl": 0.9,
+        "hold": 75
+      }
+    }
+  },
+  "ai": {
+    "analysed": 0,
+    "providerBuy": 0,
+    "hybridBuy": 0,
+    "finalBuy": 0,
+    "preAiExpectancy": 0,
+    "postAiExpectancy": null
+  },
+  "productionDiscoveryV2Wired": false,
+  "strategyVerdict": "NO_DISCOVERABLE_EDGE",
+  "run15hPaper": "NO",
+  "nextPhase": "STRATEGY_ARCHITECTURE_REDESIGN"
+}

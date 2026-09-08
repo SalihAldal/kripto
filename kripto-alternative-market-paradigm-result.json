@@ -1,0 +1,111 @@
+{
+  "verdict": "FAIL",
+  "dataset": {
+    "start": "2026-07-15T00:00:00.000Z",
+    "end": "2026-08-04T00:00:00.000Z",
+    "symbols": 11
+  },
+  "paradigms": [
+    {
+      "name": "CROSS_SECTIONAL_RELATIVE_STRENGTH",
+      "validationTrades": 15,
+      "validationNetPnl": -177.83,
+      "validationExpectancy": -11.8555,
+      "validationProfitFactor": 0.0947,
+      "finalTrades": 9,
+      "finalNetPnl": -0.97,
+      "finalExpectancy": -0.1081,
+      "finalProfitFactor": 0.9769,
+      "finalMaxDrawdown": 0.29
+    },
+    {
+      "name": "BTC_REGIME_CONDITIONED_ROTATION",
+      "validationTrades": 15,
+      "validationNetPnl": -77.62,
+      "validationExpectancy": -5.1744,
+      "validationProfitFactor": 0.1188,
+      "finalTrades": 9,
+      "finalNetPnl": 1.94,
+      "finalExpectancy": 0.2152,
+      "finalProfitFactor": 1.0612,
+      "finalMaxDrawdown": 0.185
+    },
+    {
+      "name": "MULTI_DAY_SWING_MOMENTUM",
+      "validationTrades": 5,
+      "validationNetPnl": -405.89,
+      "validationExpectancy": -81.1779,
+      "validationProfitFactor": 0.0734,
+      "finalTrades": 3,
+      "finalNetPnl": 36.34,
+      "finalExpectancy": 12.1133,
+      "finalProfitFactor": 2.6876,
+      "finalMaxDrawdown": 0.2141
+    },
+    {
+      "name": "CROSS_SECTIONAL_MEAN_REVERSION",
+      "validationTrades": 15,
+      "validationNetPnl": -159.43,
+      "validationExpectancy": -10.6289,
+      "validationProfitFactor": 0.0953,
+      "finalTrades": 9,
+      "finalNetPnl": -34.33,
+      "finalExpectancy": -3.814,
+      "finalProfitFactor": 0.3666,
+      "finalMaxDrawdown": 0.4704
+    },
+    {
+      "name": "VOLATILITY_BREAKOUT_SWING",
+      "validationTrades": 2,
+      "validationNetPnl": -52.66,
+      "validationExpectancy": -26.3293,
+      "validationProfitFactor": 0,
+      "finalTrades": 1,
+      "finalNetPnl": -5.78,
+      "finalExpectancy": -5.7774,
+      "finalProfitFactor": 0,
+      "finalMaxDrawdown": 0.0578
+    },
+    {
+      "name": "RELATIVE_STRENGTH_ROTATION_BASKET",
+      "validationTrades": 10,
+      "validationNetPnl": -129.48,
+      "validationExpectancy": -12.9481,
+      "validationProfitFactor": 0.1454,
+      "finalTrades": 6,
+      "finalNetPnl": 13.93,
+      "finalExpectancy": 2.3221,
+      "finalProfitFactor": 1.6323,
+      "finalMaxDrawdown": 0.1861
+    },
+    {
+      "name": "PAIR_RELATIVE_VALUE",
+      "validationTrades": 15,
+      "validationNetPnl": -347.41,
+      "validationExpectancy": -23.1603,
+      "validationProfitFactor": 0.0907,
+      "finalTrades": 9,
+      "finalNetPnl": 47.92,
+      "finalExpectancy": 5.325,
+      "finalProfitFactor": 2.3826,
+      "finalMaxDrawdown": 0.2492
+    }
+  ],
+  "bestParadigm": "BTC_REGIME_CONDITIONED_ROTATION",
+  "robustness": {
+    "periodsTested": 0,
+    "positivePeriods": 0,
+    "negativePeriods": 0,
+    "details": []
+  },
+  "ai": {
+    "tested": false,
+    "preAiExpectancy": null,
+    "postAiExpectancy": null,
+    "roleMismatch": false
+  },
+  "strategyVerdict": "NO_ALTERNATIVE_EDGE",
+  "productionReady": false,
+  "recommendedPaperDuration": "N/A",
+  "nextPhase": "BETTER_DATA_UNIVERSE_OR_BUSINESS_MODEL"
+}

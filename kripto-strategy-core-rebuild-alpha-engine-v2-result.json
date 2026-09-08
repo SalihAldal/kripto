@@ -1,0 +1,51 @@
+{
+  "verdict": "FAIL",
+  "engineering": {
+    "alphaEngineV2": true,
+    "featureLayer": true,
+    "costModel": true,
+    "validationFramework": true,
+    "portfolioLayer": true,
+    "aiOverlay": true
+  },
+  "bestAlpha": {
+    "id": "",
+    "validationTrades": 0,
+    "validationExpectancy": null,
+    "validationProfitFactor": null,
+    "finalTrades": 0,
+    "finalExpectancy": null,
+    "finalProfitFactor": null,
+    "robustnessPassed": false
+  },
+  "paperReadiness": {
+    "passed": false,
+    "smokePassed": false,
+    "checklist": {
+      "alphaEngineV2": true,
+      "featureLayer": true,
+      "lookaheadGuard": true,
+      "costModel": true,
+      "validationFramework": true,
+      "portfolioLayer": true,
+      "aiOverlay": true,
+      "bestAlphaValidationPass": false,
+      "bestAlphaFinalPass": false,
+      "bestAlphaRobustnessPass": false,
+      "realisticCostExpectancyPositive": false,
+      "realisticCostPfAboveOne": false,
+      "netPnlPositive": false,
+      "smokePassed": false,
+      "accountingPass": true,
+      "liveFalse": true
+    }
+  },
+  "paper10h": {
+    "started": false,
+    "completed": false,
+    "campaignId": "",
+    "runtimeMinutes": 0,
+    "reason": "NO_ALPHA_CAN_PASS_OUT_OF_SAMPLE"
+  },
+  "liveTradingEnabled": false
+}

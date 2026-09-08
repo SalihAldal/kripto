@@ -1,0 +1,39 @@
+{
+  "verdict": "FAIL",
+  "baseline": {
+    "selected": 284,
+    "tpFirst": 64,
+    "slFirst": 211,
+    "winnerRate": 22.54
+  },
+  "scannerForensic": {
+    "scorePredictive": false,
+    "rankingProblem": true,
+    "discoveryProblem": false,
+    "pumpChasing": false,
+    "costProblem": true
+  },
+  "development": {
+    "winnerRateBefore": 27.62,
+    "winnerRateAfter": 27.53,
+    "netPnlBefore": null,
+    "netPnlAfter": null
+  },
+  "holdout": {
+    "winnerRateBefore": 24.72,
+    "winnerRateAfter": 23.33,
+    "trades": 0,
+    "netPnl": 0,
+    "expectancy": null,
+    "profitFactor": null,
+    "maxDrawdown": null
+  },
+  "aiAfter": {
+    "analysed": 0,
+    "providerBuy": 0,
+    "hybridBuy": 0,
+    "finalBuy": 0
+  },
+  "strategyVerdict": "NO_EDGE",
+  "run15hPaper": "NO"
+}

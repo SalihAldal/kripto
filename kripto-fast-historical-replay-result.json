@@ -1,0 +1,50 @@
+{
+  "verdict": "FAIL",
+  "replayWindow": {
+    "start": "2026-09-04T22:38:00.000Z",
+    "end": "2026-09-07T21:37:59.999Z",
+    "hours": 72,
+    "symbols": 12,
+    "marketWindows": 284
+  },
+  "funnel": {
+    "scannerCandidates": 1632,
+    "selected": 284,
+    "aiBuy": 0,
+    "aiSell": 0,
+    "aiNoTrade": 50,
+    "entryPass": 0,
+    "riskPass": 0,
+    "sizingPass": 0,
+    "tradesOpened": 0,
+    "tradesClosed": 0
+  },
+  "performance": {
+    "wins": 0,
+    "losses": 0,
+    "winRate": null,
+    "grossPnl": 0,
+    "fees": 0,
+    "netPnl": 0,
+    "profitFactor": null,
+    "expectancy": null,
+    "maxDrawdown": 0
+  },
+  "proxyBacktestSupplement": {
+    "note": "Scanner+proxy-AI lane on same 72h dataset (not production real-AI path)",
+    "tradesClosed": 27,
+    "netPnl": -245.988,
+    "gatePasses": 32,
+    "candidateScans": 46512
+  },
+  "aiCalls": 50,
+  "aiRemoteHealthy": 50,
+  "replayCandidateCap": 50,
+  "dominantGate": "AI_NO_BUY",
+  "whyZeroTrades": "AI_NO_BUY",
+  "sampleVerdict": "NO_TRADE_SAMPLE",
+  "strategyVerdict": "TOO_SELECTIVE",
+  "run15hPaper": "NO",
+  "timeBudgetReached": false,
+  "liveTradingEnabled": false
+}

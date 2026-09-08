@@ -1,0 +1,75 @@
+{
+  "verdict": "PARTIAL",
+  "baseline": {
+    "selected": 284,
+    "aiAnalysed": 50,
+    "aiBuy": 0,
+    "trades": 0
+  },
+  "forensic": {
+    "providerBuyVotes": 19,
+    "twoProviderBuyVotes": 0,
+    "threeProviderBuyVotes": 0,
+    "hybridBuyCount": 13,
+    "finalBuyCount": 0,
+    "killedByMaster": 13,
+    "killedByPreserveThreshold": 13,
+    "chaosRate": 10,
+    "futureWinnerCount": 10,
+    "futureLoserCount": 36,
+    "missedWinnerCount": 10,
+    "hybridBuyWinners": 4,
+    "hybridBuyLosers": 8,
+    "noTradeWinners": 10,
+    "noTradeLosers": 36,
+    "scannerWinnerRate": 22.54,
+    "scannerTp": 64,
+    "scannerSl": 211,
+    "voteMatrix": {
+      "NO_TRADE / BUY / HOLD": 6,
+      "BUY / NO_TRADE": 4,
+      "NO_TRADE / NO_TRADE": 11,
+      "NO_TRADE / NO_TRADE / NO_TRADE": 4,
+      "BUY / HOLD": 6,
+      "NO_TRADE / HOLD": 14,
+      "SELL / NO_TRADE": 1,
+      "NO_TRADE / BUY / NO_TRADE": 2,
+      "NO_TRADE / BUY": 1,
+      "NO_TRADE": 1
+    },
+    "regimeDistribution": {
+      "TREND_UP": 14,
+      "RANGE_SIDEWAYS": 29,
+      "LOW_VOLATILITY_CALM": 2,
+      "HIGH_VOLATILITY_CHAOS": 5
+    },
+    "regimeNoTradeRates": {
+      "TREND_UP": 100,
+      "RANGE_SIDEWAYS": 100,
+      "LOW_VOLATILITY_CALM": 100,
+      "HIGH_VOLATILITY_CHAOS": 100
+    }
+  },
+  "rootCause": [
+    "MASTER_ADJUDICATION_DOWNGRADES_HYBRID_BUY",
+    "HYBRID_PRESERVE_THRESHOLD_65",
+    "CONSENSUS_POST_PROCESSING_NOT_RAW_PROVIDER",
+    "SCANNER_CANDIDATE_QUALITY_WEAK",
+    "PROXY_SIGNAL_NEGATIVE"
+  ],
+  "calibrationApplied": false,
+  "after": {
+    "selected": 284,
+    "aiAnalysed": 50,
+    "aiBuy": 0,
+    "trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "netPnl": 0,
+    "profitFactor": null,
+    "expectancy": null,
+    "maxDrawdown": null
+  },
+  "strategyVerdict": "NEGATIVE_FAST_EVIDENCE",
+  "run15hPaper": "NO"
+}
