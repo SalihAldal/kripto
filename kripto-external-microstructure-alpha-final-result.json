@@ -1,0 +1,31 @@
+{
+  "verdict": "FAIL",
+  "externalAlphaFound": false,
+  "tradingResearchProgram": "CLOSED",
+  "bestAlpha": null,
+  "coverage": {
+    "oi": 11.3,
+    "liquidation": "UNAVAILABLE",
+    "aggTrades": "PARTIAL",
+    "cvd": 3,
+    "orderBook": "UNAVAILABLE",
+    "longShort": 11.3,
+    "fundingEvents": 5520,
+    "oiPoints": 5000,
+    "liquidationEvents": 0,
+    "aggTradeBuckets": 6
+  },
+  "smoke": {
+    "started": false,
+    "passed": false,
+    "reason": "GATES_NOT_PASS"
+  },
+  "paper3h": {
+    "started": false,
+    "completed": false,
+    "campaignId": "",
+    "runtimeMinutes": 0,
+    "reason": "GATES_NOT_PASS"
+  },
+  "liveTradingEnabled": false
+}
