@@ -19,4 +19,8 @@ export * from "./external-market-data-provider.service";
 export * from "./external-data-qa.service";
 export * from "./external-microstructure-alpha.service";
 export * from "./external-microstructure-walk-forward.service";
+export * from "./deep-historical-providers.service";
+export * from "./oi-features.service";
+export * from "./oi-impulse-alpha-v2.service";
+export * from "./oi-alpha-walk-forward.service";
 export * from "./experiment-runner.service";
