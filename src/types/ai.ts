@@ -78,6 +78,8 @@ export type TechnicalSnapshot = {
 export type AIAnalysisRuntimeControl = {
   abortSignal?: AbortSignal;
   executionMode?: string;
+  /** Historical replay: assess kline freshness relative to this clock instead of Date.now(). */
+  replayClockMs?: number;
 };
 
 export type AIConsensusTelemetry = {

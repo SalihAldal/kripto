@@ -889,7 +889,7 @@ async function runAIConsensusFromInputImpl(
     }
   };
   throwIfAborted(signal, "AI consensus aborted");
-  const now = Date.now();
+  const now = input.runtimeControl?.replayClockMs ?? Date.now();
   const klineAssessment = assessKlineInput({ klines: input.klines, nowMs: now });
   if (!klineAssessment.fresh) {
     const reason = buildKlineStaleMessage(klineAssessment);

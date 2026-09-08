@@ -184,6 +184,7 @@ export async function adjudicateWithMasterDecisionEngine(input: AdjudicateInput)
       openTrade: legacyDecision === "BUY",
       masterDecisionEngine: {
         decision,
+        hybridDecision: legacy.finalDecision,
         effectiveLegacyDecision: legacyDecision,
         preservedHybridBuy: effective.preservedHybridBuy,
         tradingDecisionPolicy: TRADING_DECISION_POLICY,
