@@ -50,3 +50,5 @@ __pycache__/
 *.pyc
 .venv/
 artifacts/
+KRIPTO_DEEP_DATASET/
+KRIPTO_DEEP_OI_DATASET.zip

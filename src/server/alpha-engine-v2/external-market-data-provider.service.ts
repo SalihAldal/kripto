@@ -336,7 +336,13 @@ export function buildCvdSeries(aggTrades: AggTradeBucket[]) {
 }
 
 export function importExternalPanelFromJson(filePath: string): ExternalSymbolPanel {
-  const raw = JSON.parse(fs.readFileSync(filePath, "utf8")) as ExternalSymbolPanel;
+  const raw = JSON.parse(fs.readFileSync(filePath, "utf8")) as ExternalSymbolPanel & {
+    external?: { symbol?: string };
+    execution?: { symbol?: string; venue?: string };
+    executionBarsTRY?: ExternalSymbolPanel["bars"];
+    metadata?: Record<string, unknown>;
+  };
+  if (!raw.symbol && raw.external?.symbol) raw.symbol = raw.external.symbol;
   if (!raw.symbol || !Array.isArray(raw.bars)) {
     throw new Error(`Invalid external panel schema: ${filePath}`);
   }
