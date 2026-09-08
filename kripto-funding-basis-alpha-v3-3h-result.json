@@ -1,0 +1,40 @@
+{
+  "verdict": "FAIL",
+  "alpha": {
+    "id": "FUNDING_BASIS_ALPHA_V3",
+    "walkForwardFolds": 5,
+    "positiveFolds": 3,
+    "negativeFolds": 2,
+    "walkForwardExpectancy": 0.0136,
+    "walkForwardPF": 1.0022,
+    "walkForwardPass": false,
+    "freshTrades": 117,
+    "freshExpectancy": -0.0652,
+    "freshPF": 0.993,
+    "robustnessPassed": false
+  },
+  "smoke": {
+    "started": false,
+    "passed": false,
+    "reason": "GATES_NOT_PASS"
+  },
+  "paper3h": {
+    "started": false,
+    "completed": false,
+    "campaignId": "",
+    "runtimeMinutes": 0,
+    "reason": "GATES_NOT_PASS",
+    "long": 0,
+    "short": 0,
+    "cash": 0,
+    "trades": 0,
+    "pricePnl": 0,
+    "fundingPnl": 0,
+    "fees": 0,
+    "slippage": 0,
+    "netPnl": 0,
+    "expectancy": null,
+    "profitFactor": null
+  },
+  "liveTradingEnabled": false
+}
