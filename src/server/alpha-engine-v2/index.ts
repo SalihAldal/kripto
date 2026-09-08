@@ -8,4 +8,7 @@ export * from "./portfolio-layer.service";
 export * from "./ai-overlay.service";
 export * from "./historical-alpha-simulator.service";
 export * from "./alpha-forensic.service";
+export * from "./regime-engine-v2.service";
+export * from "./regime-alpha-router.service";
+export * from "./walk-forward-validation.service";
 export * from "./experiment-runner.service";
