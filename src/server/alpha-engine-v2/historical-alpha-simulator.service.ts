@@ -41,9 +41,14 @@ export type AlphaSimulatorId =
   | "CVD_REGIME_CONDITIONAL"
   | "LOW_TURNOVER_SWING"
   | "CASH_FILTER_REGIME"
-  | "RESIDUAL_MOMENTUM_SHORT";
+  | "RESIDUAL_MOMENTUM_SHORT"
+  | "BTC_REGIME_RESIDUAL_SHORT"
+  | "RESIDUAL_MEAN_REVERSION"
+  | "FUNDING_RESIDUAL_DIVERGENCE"
+  | "LOW_TURNOVER_RESIDUAL_SWING"
+  | "RESIDUAL_STRENGTH_LONG";
 
-export const ALPHA_SIMULATOR_VERSION = "v2.0.0";
+export const ALPHA_SIMULATOR_VERSION = "v2.1.0";
 
 function nearestFunding(funding: SymbolHistoricalPanel["funding"], time: number) {
   let best: { fundingTime: number; fundingRate: number } | null = null;
@@ -125,9 +130,13 @@ export function simulateAlphaAtBar(input: {
   idx: number;
   split: AlphaTradeRecord["split"];
   costPct: number;
+  allowedRegimes?: string[];
 }): AlphaTradeRecord[] {
-  const { alphaId, panels, btc, idx, split, costPct } = input;
+  const { alphaId, panels, btc, idx, split, costPct, allowedRegimes } = input;
   const regime = btcRegime(btc, Math.min(idx, btc.length - 1));
+  if (allowedRegimes?.length && !allowedRegimes.includes(regime)) {
+    return [];
+  }
   const closesBySymbol = panels.map((p) => ({
     symbol: p.symbol,
     closes: p.bars.map((b) => b.close),
@@ -142,7 +151,8 @@ export function simulateAlphaAtBar(input: {
       }
       break;
     case "RESIDUAL_MOMENTUM":
-    case "RESIDUAL_MOMENTUM_SHORT": {
+    case "RESIDUAL_MOMENTUM_SHORT":
+    case "BTC_REGIME_RESIDUAL_SHORT": {
       const residuals = closesBySymbol.map((row) => {
         const beta = estimateBeta(row.closes, btcCloses, idx, 24);
         const symRet = returnPct(row.closes, idx, 24);
@@ -157,12 +167,95 @@ export function simulateAlphaAtBar(input: {
           const t = buildTrade({ panel: row.panel, idx, holdHours: 8, side: "LONG", split, alphaId, costPct });
           if (t) trades.push(t);
         }
-        if (alphaId === "RESIDUAL_MOMENTUM_SHORT" && pct <= 0.2) {
-          const t = buildTrade({ panel: row.panel, idx, holdHours: 8, side: "SHORT", split, alphaId, costPct });
+        if (
+          (alphaId === "RESIDUAL_MOMENTUM_SHORT" || alphaId === "BTC_REGIME_RESIDUAL_SHORT") &&
+          pct <= 0.2
+        ) {
+          const t = buildTrade({
+            panel: row.panel,
+            idx,
+            holdHours: 8,
+            side: "SHORT",
+            split,
+            alphaId: alphaId === "BTC_REGIME_RESIDUAL_SHORT" ? "BTC_REGIME_RESIDUAL_SHORT" : "RESIDUAL_MOMENTUM_SHORT",
+            costPct,
+          });
           if (t) trades.push(t);
         }
       }
       return trades;
+    }
+    case "RESIDUAL_STRENGTH_LONG": {
+      const residuals = closesBySymbol.map((row) => {
+        const beta = estimateBeta(row.closes, btcCloses, idx, 24);
+        const symRet = returnPct(row.closes, idx, 24);
+        const btcRet = returnPct(btcCloses, idx, 24);
+        const vol = atrPct(row.panel.bars, idx, 14);
+        return { panel: row.panel, score: (symRet - beta * btcRet) / Math.max(vol, 0.5) };
+      });
+      const values = residuals.map((r) => r.score);
+      return residuals
+        .filter((r) => percentileRank(values, r.score) >= 0.85 && r.score > 0.3)
+        .map((r) => buildTrade({ panel: r.panel, idx, holdHours: 8, side: "LONG", split, alphaId, costPct }))
+        .filter(Boolean) as AlphaTradeRecord[];
+    }
+    case "RESIDUAL_MEAN_REVERSION": {
+      const trades: AlphaTradeRecord[] = [];
+      for (const row of closesBySymbol) {
+        const beta = estimateBeta(row.closes, btcCloses, idx, 24);
+        const residual = returnPct(row.closes, idx, 12) - beta * returnPct(btcCloses, idx, 12);
+        if (residual > 2.5) {
+          const t = buildTrade({ panel: row.panel, idx, holdHours: 4, side: "SHORT", split, alphaId, costPct });
+          if (t) trades.push(t);
+        } else if (residual < -2.5) {
+          const t = buildTrade({ panel: row.panel, idx, holdHours: 4, side: "LONG", split, alphaId, costPct });
+          if (t) trades.push(t);
+        }
+      }
+      return trades;
+    }
+    case "FUNDING_RESIDUAL_DIVERGENCE": {
+      const trades: AlphaTradeRecord[] = [];
+      for (const row of closesBySymbol) {
+        const bar = row.panel.bars[idx];
+        if (!bar) continue;
+        const fund = nearestFunding(row.panel.funding, bar.closeTime)?.fundingRate ?? 0;
+        const beta = estimateBeta(row.closes, btcCloses, idx, 24);
+        const residual = returnPct(row.closes, idx, 12) - beta * returnPct(btcCloses, idx, 12);
+        if (fund > 0.0003 && residual > 1.2) {
+          const t = buildTrade({ panel: row.panel, idx, holdHours: 8, side: "SHORT", split, alphaId, costPct });
+          if (t) trades.push(t);
+        } else if (fund < -0.0003 && residual < -1.2) {
+          const t = buildTrade({ panel: row.panel, idx, holdHours: 8, side: "LONG", split, alphaId, costPct });
+          if (t) trades.push(t);
+        }
+      }
+      return trades;
+    }
+    case "LOW_TURNOVER_RESIDUAL_SWING": {
+      const ranked = closesBySymbol
+        .map((row) => {
+          const beta = estimateBeta(row.closes, btcCloses, idx, 24);
+          const residual = returnPct(row.closes, idx, 48) - beta * returnPct(btcCloses, idx, 48);
+          const vol = atrPct(row.panel.bars, idx, 24);
+          return { panel: row.panel, residual, vol };
+        })
+        .filter((r) => Math.abs(r.residual) > 1.5 && r.vol < 3.5)
+        .sort((a, b) => Math.abs(b.residual) - Math.abs(a.residual))
+        .slice(0, 2);
+      return ranked
+        .map((r) =>
+          buildTrade({
+            panel: r.panel,
+            idx,
+            holdHours: 12,
+            side: r.residual > 0 ? "LONG" : "SHORT",
+            split,
+            alphaId,
+            costPct,
+          }),
+        )
+        .filter(Boolean) as AlphaTradeRecord[];
     }
     case "CROSS_SECTIONAL_RESIDUAL_STRENGTH": {
       const ranked = closesBySymbol
@@ -268,6 +361,7 @@ export function runHistoricalAlphaSimulation(input: {
   splitOf: (time: number) => AlphaTradeRecord["split"];
   venue: "SPOT" | "FUTURES";
   costScenario?: "REALISTIC" | "STRESS";
+  allowedRegimes?: string[];
 }) {
   const costPct = resolveRoundTripCostPct(input.venue, input.costScenario ?? "REALISTIC");
   const trades: AlphaTradeRecord[] = [];
@@ -282,6 +376,7 @@ export function runHistoricalAlphaSimulation(input: {
         idx,
         split,
         costPct,
+        allowedRegimes: input.allowedRegimes,
       }),
     );
   }
@@ -291,10 +386,15 @@ export function runHistoricalAlphaSimulation(input: {
 export const ALPHA_SIMULATOR_IDS: AlphaSimulatorId[] = [
   "RESIDUAL_MOMENTUM",
   "RESIDUAL_MOMENTUM_SHORT",
+  "BTC_REGIME_RESIDUAL_SHORT",
+  "RESIDUAL_STRENGTH_LONG",
   "CROSS_SECTIONAL_RESIDUAL_STRENGTH",
   "VOLUME_PERSISTENCE_RESIDUAL",
   "FUNDING_BASIS_DISLOCATION",
+  "FUNDING_RESIDUAL_DIVERGENCE",
+  "RESIDUAL_MEAN_REVERSION",
   "CVD_REGIME_CONDITIONAL",
   "LOW_TURNOVER_SWING",
+  "LOW_TURNOVER_RESIDUAL_SWING",
   "CASH_FILTER_REGIME",
 ];

@@ -9,6 +9,7 @@ import {
   passesValidationGate,
 } from "@/src/server/alpha-engine-v2/validation-framework.service";
 import type { AlphaSignal, AlphaTradeRecord } from "@/src/server/alpha-engine-v2/types";
+import { simulateAlphaAtBar } from "@/src/server/alpha-engine-v2/historical-alpha-simulator.service";
 
 describe("alpha-engine-v2", () => {
   it("applies realistic futures cost", () => {
@@ -64,5 +65,47 @@ describe("alpha-engine-v2", () => {
     const stats = computeAlphaStats(trades);
     expect(stats.trades).toBe(1);
     expect(stats.cashSkips).toBe(1);
+  });
+
+  it("uses same simulator path for validation and final splits", () => {
+    const costPct = 0.22;
+    const panels = [{
+      symbol: "ETHUSDT",
+      bars: Array.from({ length: 120 }, (_, i) => ({
+        openTime: i * 3_600_000,
+        closeTime: (i + 1) * 3_600_000,
+        open: 100 + i * 0.1,
+        high: 101 + i * 0.1,
+        low: 99 + i * 0.1,
+        close: 100 + i * 0.1,
+        volume: 1000,
+        quoteVolume: 100_000,
+        takerBuyQuote: 50_000,
+      })),
+      funding: [],
+      basis: [],
+    }];
+    const btc = panels[0].bars;
+    const valTrade = simulateAlphaAtBar({
+      alphaId: "RESIDUAL_MOMENTUM_SHORT",
+      panels,
+      btc,
+      idx: 60,
+      split: "VALIDATION",
+      costPct,
+    });
+    const testTrade = simulateAlphaAtBar({
+      alphaId: "RESIDUAL_MOMENTUM_SHORT",
+      panels,
+      btc,
+      idx: 60,
+      split: "TEST",
+      costPct,
+    });
+    expect(valTrade.length).toBe(testTrade.length);
+    if (valTrade.length) {
+      expect(valTrade[0].feeCostPct).toBe(testTrade[0].feeCostPct);
+      expect(valTrade[0].side).toBe(testTrade[0].side);
+    }
   });
 });

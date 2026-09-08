@@ -1,0 +1,26 @@
+{
+  "verdict": "FAIL",
+  "bestAlpha": {
+    "id": "",
+    "validationTrades": 0,
+    "validationExpectancy": null,
+    "validationPF": null,
+    "finalTrades": 0,
+    "finalExpectancy": null,
+    "finalPF": null,
+    "robustnessPassed": false
+  },
+  "smoke": {
+    "started": false,
+    "passed": false,
+    "reason": "NO_PAPER_READY_ALPHA"
+  },
+  "paper3h": {
+    "started": false,
+    "completed": false,
+    "campaignId": "",
+    "runtimeMinutes": 0,
+    "reason": "NO_ALPHA_CAN_PASS_OUT_OF_SAMPLE"
+  },
+  "liveTradingEnabled": false
+}

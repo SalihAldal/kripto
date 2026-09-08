@@ -17,6 +17,7 @@ import {
   passesFinalGate,
   passesValidationGate,
 } from "./validation-framework.service";
+import { analyzeResidualMomentumShort } from "./alpha-forensic.service";
 import type { AlphaScoreboardEntry, AlphaTradeRecord } from "./types";
 
 export const DEFAULT_FUTURES_UNIVERSE = [
@@ -234,5 +235,68 @@ export async function runAlphaExperimentBatch(input: {
     paperReady: Boolean(best),
     panelsLoaded: panels.length,
     barsPerSymbol: panels[0]?.bars.length ?? 0,
+  };
+}
+
+export function learnRegimeFilterFromTrain(input: {
+  panels: SymbolHistoricalPanel[];
+  btc: HistoricalBar[];
+  dataset: ExperimentDataset;
+  startIdx: number;
+  endIdx: number;
+  stepHours: number;
+}): string[] {
+  const forensic = analyzeResidualMomentumShort({
+    panels: input.panels,
+    btc: input.btc,
+    dataset: input.dataset,
+    startIdx: input.startIdx,
+    endIdx: input.endIdx,
+    stepHours: input.stepHours,
+  });
+  return forensic.trainAllowedRegimes;
+}
+
+export async function runRegimeConditionedExperiment(input: {
+  dataset: ExperimentDataset;
+  symbols?: string[];
+}) {
+  const symbols = input.symbols ?? DEFAULT_FUTURES_UNIVERSE;
+  const panels: SymbolHistoricalPanel[] = [];
+  for (const symbol of symbols) {
+    panels.push(await fetchFuturesPanel(symbol, input.dataset.start, input.dataset.end));
+  }
+  const btc = panels.find((p) => p.symbol === "BTCUSDT")?.bars ?? panels[0]?.bars ?? [];
+  const startIdx = 48;
+  const endIdx = Math.min(...panels.map((p) => p.bars.length - 24));
+  const allowedRegimes = learnRegimeFilterFromTrain({
+    panels,
+    btc,
+    dataset: input.dataset,
+    startIdx,
+    endIdx,
+    stepHours: 4,
+  });
+  const all = runHistoricalAlphaSimulation({
+    alphaId: "BTC_REGIME_RESIDUAL_SHORT",
+    panels,
+    btc,
+    startIdx,
+    endIdx,
+    stepHours: 4,
+    splitOf: (t) => splitOf(input.dataset, t),
+    venue: "FUTURES",
+    allowedRegimes: allowedRegimes.length ? allowedRegimes : undefined,
+  });
+  const val = all.filter((t) => t.split === "VALIDATION");
+  const test = all.filter((t) => t.split === "TEST");
+  const valStats = computeAlphaStats(val);
+  const testStats = computeAlphaStats(test);
+  return {
+    allowedRegimes,
+    valStats,
+    testStats,
+    validationPass: passesValidationGate(valStats),
+    finalPass: passesFinalGate(testStats),
   };
 }
