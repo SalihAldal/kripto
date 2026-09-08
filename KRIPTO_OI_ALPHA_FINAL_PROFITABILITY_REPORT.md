@@ -185,9 +185,9 @@ OI_IMPULSE_LONG treated as **PROMISING_BUT_UNPROVEN**. Deep historical OI gate: 
 
 ```text
 Starting HEAD: 4c38c29
-Final HEAD: (see git log after commit)
-Commits: deep OI provider + OI impulse v2 + profitability run
-Push: pending
+Final HEAD: 6fd9779
+Commits: cc8a6a5, 6fd9779
+Push: origin/main synced
 
 Historical provider: binance-futures (fallback; no TARDIS/COINALYZE/COINAPI credentials)
 Dataset: Binance public futures API (30d window diagnostic replay)
