@@ -11,4 +11,7 @@ export * from "./alpha-forensic.service";
 export * from "./regime-engine-v2.service";
 export * from "./regime-alpha-router.service";
 export * from "./walk-forward-validation.service";
+export * from "./funding-basis-data.service";
+export * from "./funding-basis-alpha-v3.service";
+export * from "./funding-basis-walk-forward.service";
 export * from "./experiment-runner.service";
