@@ -1,0 +1,132 @@
+{
+  "verdict": "FAIL",
+  "regimeEngine": {
+    "implemented": true,
+    "transitionSupported": true
+  },
+  "walkForward": {
+    "folds": 6,
+    "positiveFolds": 4,
+    "negativeFolds": 2,
+    "expectancy": 1.7482,
+    "profitFactor": 1.1827,
+    "concentration": {
+      "topSymbolContributionPct": 137.73,
+      "topDayContributionPct": 132.35,
+      "topSymbol": "SUIUSDT",
+      "topDay": "2026-05-10"
+    },
+    "failReason": "PNL_CONCENTRATION",
+    "pass": false
+  },
+  "freshUnseen": {
+    "dataset": "2026-03-15→2026-04-15",
+    "trades": 207,
+    "netPnl": -660.21,
+    "expectancy": -3.1894,
+    "profitFactor": 0.5814,
+    "concentration": {
+      "topSymbolContributionPct": -7.26,
+      "topDayContributionPct": -19.31,
+      "topSymbol": "SOLUSDT",
+      "topDay": "2026-03-26"
+    },
+    "pass": false
+  },
+  "robustness": {
+    "periods": 4,
+    "positive": 1,
+    "negative": 3,
+    "details": [
+      {
+        "period": "Apr-May",
+        "trades": 259,
+        "wins": 78,
+        "losses": 181,
+        "grossPnl": -588.65,
+        "netPnl": -1157.26,
+        "expectancy": -4.4682,
+        "profitFactor": 0.3372,
+        "maxDrawdown": 11.965,
+        "longTrades": 9,
+        "shortTrades": 250,
+        "cashSkips": 0,
+        "concentration": {
+          "topSymbolContributionPct": -0.62,
+          "topDayContributionPct": -6.96,
+          "topSymbol": "BNBUSDT",
+          "topDay": "2026-04-29"
+        }
+      },
+      {
+        "period": "May-Jun",
+        "trades": 269,
+        "wins": 124,
+        "losses": 145,
+        "grossPnl": 233.53,
+        "netPnl": -355.13,
+        "expectancy": -1.3202,
+        "profitFactor": 0.8066,
+        "maxDrawdown": 7.6005,
+        "longTrades": 48,
+        "shortTrades": 221,
+        "cashSkips": 0,
+        "concentration": {
+          "topSymbolContributionPct": -17.91,
+          "topDayContributionPct": -118.19,
+          "topSymbol": "BNBUSDT",
+          "topDay": "2026-06-06"
+        }
+      },
+      {
+        "period": "Jun-Jul",
+        "trades": 238,
+        "wins": 121,
+        "losses": 117,
+        "grossPnl": 1112.09,
+        "netPnl": 588.14,
+        "expectancy": 2.4712,
+        "profitFactor": 1.4538,
+        "maxDrawdown": 2.6058,
+        "longTrades": 12,
+        "shortTrades": 226,
+        "cashSkips": 0,
+        "concentration": {
+          "topSymbolContributionPct": 46.09,
+          "topDayContributionPct": 34.59,
+          "topSymbol": "ADAUSDT",
+          "topDay": "2026-06-24"
+        }
+      },
+      {
+        "period": "Jul-Aug",
+        "trades": 137,
+        "wins": 52,
+        "losses": 85,
+        "grossPnl": -187.29,
+        "netPnl": -486.26,
+        "expectancy": -3.5494,
+        "profitFactor": 0.4568,
+        "maxDrawdown": 5.7454,
+        "longTrades": 6,
+        "shortTrades": 131,
+        "cashSkips": 0,
+        "concentration": {
+          "topSymbolContributionPct": -3.07,
+          "topDayContributionPct": -15.22,
+          "topSymbol": "DOGEUSDT",
+          "topDay": "2026-07-16"
+        }
+      }
+    ],
+    "pass": false
+  },
+  "paper3h": {
+    "started": false,
+    "completed": false,
+    "campaignId": "",
+    "runtimeMinutes": 0,
+    "reason": "GATES_NOT_PASS"
+  },
+  "liveTradingEnabled": false
+}
