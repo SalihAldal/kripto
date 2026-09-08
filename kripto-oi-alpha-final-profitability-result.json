@@ -1,0 +1,54 @@
+{
+  "verdict": "FAIL",
+  "blocker": "DEEP_HISTORICAL_OI_DATA_REQUIRED",
+  "deepDataGatePass": false,
+  "provider": "binance-futures",
+  "oiCoverageDays": {
+    "avgDays": 20.79,
+    "minDays": 20.79,
+    "perSymbol": [
+      20.791666666666668
+    ]
+  },
+  "bestAlpha": {
+    "id": "OI_IMPULSE_LONG",
+    "walkForwardPass": false,
+    "trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "grossPnl": 0,
+    "netPnl": 0,
+    "expectancy": 0,
+    "profitFactor": 0,
+    "maxDrawdown": 0,
+    "longTrades": 0,
+    "shortTrades": 0,
+    "cashSkips": 0,
+    "concentration": {
+      "topSymbolContributionPct": 0,
+      "topDayContributionPct": 0,
+      "topFoldContributionPct": 0,
+      "topSymbol": "",
+      "topDay": ""
+    }
+  },
+  "smoke": {
+    "started": false,
+    "passed": false,
+    "reason": "GATES_NOT_PASS"
+  },
+  "paper3h": {
+    "started": false,
+    "completed": false,
+    "campaignId": "",
+    "runtimeMinutes": 0,
+    "reason": "GATES_NOT_PASS"
+  },
+  "liveTradingEnabled": false,
+  "oiImpulseAlphaProgram": "BLOCKED_NO_DEEP_DATA",
+  "tradingAlphaProgram": "CLOSED",
+  "nextPhase": "PROVIDE_DEEP_OI_DATA",
+  "historicalEdgeVerdict": "FAIL",
+  "paperForwardVerdict": "NOT_STARTED",
+  "profitabilityVerdict": "BLOCKED"
+}
