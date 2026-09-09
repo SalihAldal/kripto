@@ -35,8 +35,8 @@ async function main() {
     if (!variants.length)
         throw new Error("UNKNOWN_VARIANT");
     const days = value("--days") == null ? undefined : Number(value("--days"));
-    if (days != null && (!Number.isInteger(days) || days < 1 || days > 365))
-        throw new Error("INVALID_DAYS");
+    if (days != null && (!Number.isInteger(days) || days < 1 || days > 270))
+        throw new Error("INVALID_DAYS_EXPECT_1_TO_270_USE_STRATEGY_WINDOWS_FOR_RECENT_DATA");
     const diagnostic = days != null || symbols.length !== allSymbols.length || variants.length !== (research ? RESEARCH_VARIANTS : STRATEGY_VARIANTS).length;
     const validationStart = start + 45 * DAY, validationEnd = days ? Math.min(end, validationStart + days * DAY - 1) : start + 315 * DAY - 1;
     const options = { periodStart: validationStart, periodEnd: validationEnd, freshPartialStart: fresh };

@@ -43,6 +43,7 @@
     "pm2:restart": "pm2 restart ecosystem.config.cjs",
     "pm2:logs": "pm2 logs",
     "strategy:research": "node --import tsx scripts/run-strategy-validation.ts --research",
+    "strategy:windows": "node --max-old-space-size=4096 --import tsx scripts/run-strategy-window-matrix.ts",
     "strategy:replay-test": "vitest run tests/try-replay-correctness.test.ts tests/trade-decision-core-parity.test.ts tests/trade-decision-core-production-bridge.test.ts"
   },
   "dependencies": {

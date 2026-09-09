@@ -1,0 +1,15 @@
+{
+  "baseCommit": "abaf38997fdf0afcac40d71038e304fa72186195",
+  "sourceHash": "63627cb4f339b15016fc24ac5f31d69c0a26b61a916795af9e133ea94ef16549",
+  "datasetHash": "815e2a29061f628b31c6afb3b760f2653244d41f00d7afbd9103e514a270fa5c",
+  "completedRuns": 64,
+  "testsPassed": 78,
+  "suitesPassed": 8,
+  "applicationTypecheck": "PASS",
+  "scriptTestTypecheck": "PASS",
+  "changedFileLint": "PASS",
+  "postgresIntegration": "NOT_RERUN_DOCKER_UNAVAILABLE",
+  "productionBuild": "NOT_RUN",
+  "ordersSent": false,
+  "validationSplitBoundaryGuard": "PASS"
+}

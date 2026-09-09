@@ -112,7 +112,8 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
     const slip = (input.slippageBpsPerSide ?? 7) / 10000;
     const participation = input.participationRate ?? .01;
     const maxPositions = input.maxPositions ?? (input.variant.researchOnly ? 3 : 10);
-    if (!(initialCash > 0 && budget > 0 && fee >= 0 && fee < 1 && slip >= 0 && slip < 1 && participation > 0 && participation <= 1 && maxPositions > 0))
+    if (![initialCash, budget, fee, slip, participation, maxPositions].every(Number.isFinite) ||
+        !(initialCash > 0 && budget > 0 && fee >= 0 && fee < 1 && slip >= 0 && slip < 1 && participation > 0 && participation <= 1 && Number.isInteger(maxPositions) && maxPositions > 0))
         throw new Error("INVALID_REPLAY_CONFIG");
     if (!(Number.isFinite(input.periodStart) && Number.isFinite(input.periodEnd) && input.periodEnd >= input.periodStart))
         throw new Error("INVALID_REPLAY_PERIOD");

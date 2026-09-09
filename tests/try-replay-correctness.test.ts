@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { runTrySpotReplayUniverse } from "@/src/server/alpha-engine-v2/try-spot-replay.service";
 import { STRATEGY_VARIANTS } from "@/src/server/trade-decision-core/entry-signal.service";
+import { summarizeWindow } from "@/src/server/trade-decision-core/window-diagnostics.service";
 import { buildOiFeatures, prepareOiFeatureCache } from "@/src/server/alpha-engine-v2/oi-features.service";
 import { evaluateUnifiedEntryDecision } from "@/src/server/trade-decision-core/trade-decision-core.service";
 import { applyTradeDecisionCoreProductionBridge } from "@/src/server/trade-decision-core/production-bridge.service";
@@ -18,6 +19,24 @@ function run(p = panel(), extra: Partial<Parameters<typeof runTrySpotReplayUnive
     return runTrySpotReplayUniverse({ panels: [p], btcPanel: p, variant: STRATEGY_VARIANTS[0], periodStart: 0, periodEnd: 80 * H - 1, freshPartialStart: 75 * H, ...extra });
 }
 describe("causal TRY portfolio replay", () => {
+    it("rejects infinite cash, infinite budgets and fractional position limits", () => {
+        for (const config of [{ initialCashTry: Infinity }, { notionalTry: Infinity }, { maxPositions: 1.5 }])
+            expect(() => run(panel(), config)).toThrow("INVALID_REPLAY_CONFIG");
+    });
+    it("attributes identical closed fills exactly and reports open PnL separately", () => {
+        const p = panel();
+        for (const b of p.executionBarsTRY) if (b.openTime >= 51 * H) b.open = b.high = b.low = b.close = 105;
+        const r = run(p), s = summarizeWindow(r, 0, 80 * H - 1), t = r.trades[0];
+        expect(s.closedTradeCosts.rawGrossPnlTry).toBeCloseTo(t.quantity * 5, 8);
+        expect(s.closedTradeCosts.rawGrossPnlTry - s.closedTradeCosts.modeledSlippageTry - s.closedTradeCosts.feesTry).toBeCloseTo(t.netPnlTry, 8);
+        expect(s.profitFactor).toBeNull();
+        expect(s.profitFactorStatus).toBe("NO_LOSING_TRADES");
+        expect(s.paperEligible).toBeNull();
+        const openRun = run(p, { periodEnd: 52 * H - 1 });
+        const open = summarizeWindow(openRun, 0, 52 * H - 1);
+        expect(open.closedTradeCosts.netPnlTry).toBe(0);
+        expect(open.unfinishedPositionPnlTry).toBeCloseTo(openRun.portfolio.netPnlTry, 8);
+    });
     it("charges slippage once, accounts entry and exit fees, conserves cash", () => {
         const r = run();
         expect(r.trades).toHaveLength(1);
