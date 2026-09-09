@@ -23,4 +23,5 @@ export * from "./deep-historical-providers.service";
 export * from "./oi-features.service";
 export * from "./oi-impulse-alpha-v2.service";
 export * from "./oi-alpha-walk-forward.service";
+export * from "./try-spot-replay.service";
 export * from "./experiment-runner.service";

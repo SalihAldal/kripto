@@ -25,31 +25,48 @@ function zScore(values: number[], value: number) {
   return std > 0 ? (value - mean) / std : 0;
 }
 
+function oiAtOrBefore(panel: ExternalSymbolPanel, time: number) {
+  const oi = panel.openInterest;
+  if (!oi.length) return null;
+  let lo = 0;
+  let hi = oi.length - 1;
+  let best = -1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (oi[mid].timestamp <= time) {
+      best = mid;
+      lo = mid + 1;
+    } else hi = mid - 1;
+  }
+  return best >= 0 ? oi[best] : null;
+}
+
 export function buildOiFeatures(panel: ExternalSymbolPanel, idx: number, lookbackHours = 4): OiFeatureSnapshot | null {
   const bar = panel.bars[idx];
   if (!bar || idx < lookbackHours + 24) return null;
-  const oiSeries = panel.openInterest.filter((o) => o.timestamp <= bar.closeTime).map((o) => o.openInterest);
-  if (oiSeries.length < 10) return null;
-  const nowOi = panel.openInterest.filter((o) => o.timestamp <= bar.closeTime).at(-1);
+  const nowOi = oiAtOrBefore(panel, bar.closeTime);
   const prevBar = panel.bars[idx - lookbackHours];
-  const prevOi = panel.openInterest.filter((o) => o.timestamp <= (prevBar?.closeTime ?? 0)).at(-1);
+  const prevOi = prevBar ? oiAtOrBefore(panel, prevBar.closeTime) : null;
   if (!nowOi || !prevOi || prevOi.openInterest <= 0) return null;
   const oiDelta = nowOi.openInterest - prevOi.openInterest;
   const oiDeltaPct = (oiDelta / prevOi.openInterest) * 100;
-  const prior = panel.openInterest.filter((o) => o.timestamp <= (panel.bars[idx - lookbackHours * 2]?.closeTime ?? 0)).at(-1);
-  const oiAcceleration = prior ? oiDeltaPct - ((prevOi.openInterest - prior.openInterest) / prior.openInterest) * 100 : 0;
-  const deltas = [];
+  const priorBar = panel.bars[idx - lookbackHours * 2];
+  const prior = priorBar ? oiAtOrBefore(panel, priorBar.closeTime) : null;
+  const oiAcceleration = prior && prior.openInterest > 0
+    ? oiDeltaPct - ((prevOi.openInterest - prior.openInterest) / prior.openInterest) * 100
+    : 0;
+  const deltas: number[] = [];
   for (let i = 24; i < idx; i += 4) {
     const b = panel.bars[i];
     const p = panel.bars[i - lookbackHours];
     if (!b || !p) continue;
-    const oNow = panel.openInterest.filter((o) => o.timestamp <= b.closeTime).at(-1);
-    const oPrev = panel.openInterest.filter((o) => o.timestamp <= p.closeTime).at(-1);
+    const oNow = oiAtOrBefore(panel, b.closeTime);
+    const oPrev = oiAtOrBefore(panel, p.closeTime);
     if (oNow && oPrev && oPrev.openInterest > 0) deltas.push(((oNow.openInterest - oPrev.openInterest) / oPrev.openInterest) * 100);
   }
-  const closes = panel.bars.map((b) => b.close);
-  const priceReturn1h = closes[idx - 1] > 0 ? ((closes[idx] - closes[idx - 1]) / closes[idx - 1]) * 100 : 0;
-  const priceReturn4h = closes[idx - 4] > 0 ? ((closes[idx] - closes[idx - 4]) / closes[idx - 4]) * 100 : 0;
+  const closes = panel.bars;
+  const priceReturn1h = closes[idx - 1]?.close > 0 ? ((closes[idx].close - closes[idx - 1].close) / closes[idx - 1].close) * 100 : 0;
+  const priceReturn4h = closes[idx - 4]?.close > 0 ? ((closes[idx].close - closes[idx - 4].close) / closes[idx - 4].close) * 100 : 0;
   return {
     timestamp: bar.closeTime,
     oiLevel: nowOi.openInterest,
