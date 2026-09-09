@@ -1,0 +1,56 @@
+{
+  "sampleCount": 2097,
+  "projectHotspots": [
+    {
+      "function": "parseCsvGz",
+      "file": "try-dataset-loader.service.ts",
+      "samples": 622
+    },
+    {
+      "function": "parseCsvGz",
+      "file": "try-dataset-loader.service.ts",
+      "samples": 551
+    },
+    {
+      "function": "",
+      "file": "try-dataset-loader.service.ts",
+      "samples": 46
+    },
+    {
+      "function": "",
+      "file": "try-dataset-loader.service.ts",
+      "samples": 34
+    },
+    {
+      "function": "importExternalPanelFromJson",
+      "file": "external-market-data-provider.service.ts",
+      "samples": 29
+    },
+    {
+      "function": "runTrySpotReplayUniverse",
+      "file": "try-spot-replay.service.ts",
+      "samples": 7
+    },
+    {
+      "function": "loadTrySpotPanel",
+      "file": "try-dataset-loader.service.ts",
+      "samples": 5
+    },
+    {
+      "function": "prepareOiFeatureCache",
+      "file": "oi-features.service.ts",
+      "samples": 4
+    },
+    {
+      "function": "",
+      "file": "try-spot-replay.service.ts",
+      "samples": 3
+    },
+    {
+      "function": "loadUsdtTryBars",
+      "file": "try-dataset-loader.service.ts",
+      "samples": 2
+    }
+  ],
+  "scope": "BTC, 7-day diagnostic; CPU sampled, loader included"
+}

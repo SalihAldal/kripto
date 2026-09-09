@@ -142,14 +142,14 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     allowRepeatCoin: true,
     mode: "auto",
   });
-  if (!started.started || !started.jobId) {
+  const jobId = "jobId" in started ? started.jobId : null;
+  if (!started.started || !jobId) {
     const fail = { campaignId: config.campaignId, phase: "START_FAILED", started };
     writeJson(path.join(process.cwd(), config.resultFile), fail);
     await prisma.$disconnect();
     return fail;
   }
 
-  const jobId = started.jobId;
   await prisma.autoRoundJob.update({
     where: { id: jobId },
     data: {
@@ -180,7 +180,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
         type: "HEARTBEAT",
         elapsedMs: now - jobStartedAtMs,
         remainingMs: deadlineMs - now,
-        jobStatus: status?.status ?? null,
+        jobStatus: status?.active?.id === jobId ? status.active.status : null,
         openPositions,
       });
       lastHeartbeat = now;

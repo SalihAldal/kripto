@@ -41,7 +41,7 @@ function oiAtOrBefore(panel: ExternalSymbolPanel, time: number) {
   return best >= 0 ? oi[best] : null;
 }
 
-export function buildOiFeatures(panel: ExternalSymbolPanel, idx: number, lookbackHours = 4): OiFeatureSnapshot | null {
+function buildOiFeaturesUncached(panel: ExternalSymbolPanel, idx: number, lookbackHours = 4): OiFeatureSnapshot | null {
   const bar = panel.bars[idx];
   if (!bar || idx < lookbackHours + 24) return null;
   const nowOi = oiAtOrBefore(panel, bar.closeTime);
@@ -118,4 +118,44 @@ export function buildOiStateMatrix(panel: ExternalSymbolPanel, holdHours = 8) {
     avgMfe: v.mfe.reduce((s, x) => s + x, 0) / v.mfe.length,
     avgMae: v.mae.reduce((s, x) => s + x, 0) / v.mae.length,
   }));
+}
+
+
+// Explicit replay cache only: live, mutable panels continue to use as-of computation.
+const replayCache = new WeakMap<ExternalSymbolPanel, OiFeatureSnapshot[]>();
+export function prepareOiFeatureCache(panel: ExternalSymbolPanel) {
+  if (replayCache.has(panel)) return;
+  const aligned = panel.bars.map(b => oiAtOrBefore(panel, b.closeTime));
+  const series: OiFeatureSnapshot[] = [];
+  const sorted: number[] = [];
+  let mean = 0, m2 = 0, count = 0;
+  for (let i = 0; i < panel.bars.length; i++) {
+    // Original reference distribution: i=24,28,... strictly BEFORE current index.
+    const j = i - 1;
+    if (j >= 24 && j % 4 === 0 && aligned[j] && aligned[j - 4] && aligned[j - 4]!.openInterest > 0) {
+      const v = (aligned[j]!.openInterest - aligned[j - 4]!.openInterest) / aligned[j - 4]!.openInterest * 100;
+      count++; const d = v - mean; mean += d / count; m2 += d * (v - mean);
+      let lo = 0, hi = sorted.length;
+      while (lo < hi) { const mid = (lo + hi) >>> 1; if (sorted[mid] < v) lo = mid + 1; else hi = mid; }
+      sorted.splice(lo, 0, v);
+    }
+    const now = aligned[i], prev = aligned[i - 4], prior = aligned[i - 8];
+    if (i < 28 || !now || !prev || prev.openInterest <= 0) continue;
+    const delta = now.openInterest - prev.openInterest;
+    const pct = delta / prev.openInterest * 100;
+    let lo = 0, hi = sorted.length;
+    while (lo < hi) { const mid = (lo + hi) >>> 1; if (sorted[mid] < pct) lo = mid + 1; else hi = mid; }
+    const std = count >= 3 ? Math.sqrt(m2 / (count - 1)) : 0;
+    const bars = panel.bars;
+    series[i] = {timestamp: bars[i].closeTime, oiLevel: now.openInterest, oiDelta: delta, oiDeltaPct: pct,
+      oiAcceleration: prior && prior.openInterest > 0 ? pct - (prev.openInterest - prior.openInterest) / prior.openInterest * 100 : 0,
+      oiPercentile: count ? lo / count : .5, oiZScore: std > 0 ? (pct - mean) / std : 0,
+      priceReturn1h: bars[i - 1].close > 0 ? (bars[i].close - bars[i - 1].close) / bars[i - 1].close * 100 : 0,
+      priceReturn4h: bars[i - 4].close > 0 ? (bars[i].close - bars[i - 4].close) / bars[i - 4].close * 100 : 0};
+  }
+  replayCache.set(panel, series);
+}
+export function buildOiFeatures(panel: ExternalSymbolPanel, idx: number, lookbackHours = 4): OiFeatureSnapshot | null {
+  const cached = lookbackHours === 4 ? replayCache.get(panel) : undefined;
+  return cached ? cached[idx] ?? null : buildOiFeaturesUncached(panel, idx, lookbackHours);
 }

@@ -1,0 +1,17 @@
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+ RUN  v2.1.9 /workspace/scratch/5a4badcbd8d1/kripto
+
+ ✓ tests/pr04-exit-and-position-management.test.ts (47 tests) 16ms
+ ✓ tests/try-replay-correctness.test.ts (10 tests) 66ms
+ ✓ tests/trade-decision-core-production-bridge.test.ts (3 tests) 3ms
+ ✓ tests/strategy-validation-evidence.test.ts (4 tests) 10ms
+ ✓ tests/oi-impulse-alpha-v2.test.ts (7 tests) 943ms
+   ✓ oi-impulse-alpha-v2 > resolves provider without exposing secrets 937ms
+ ✓ tests/trade-decision-core-parity.test.ts (2 tests) 3ms
+ ✓ tests/oi-try-spot-audited.test.ts (1 test) 2ms
+
+ Test Files  7 passed (7)
+      Tests  74 passed (74)
+   Start at  16:47:17
+   Duration  2.51s (transform 304ms, setup 0ms, collect 422ms, tests 1.04s, environment 1ms, prepare 321ms)

@@ -31,7 +31,11 @@ function parseCsvGz(filePath: string): TryBar[] {
   const raw = zlib.gunzipSync(fs.readFileSync(filePath)).toString("utf8");
   const lines = raw.trim().split(/\r?\n/);
   const header = lines[0]?.split(",") ?? [];
-  const idx = (name: string) => header.indexOf(name);
+  const columns = new Map(header.map((name,i) => [name,i]));
+  for(const name of ["openTime","closeTime","open","high","low","close","volume","quoteVolume"]) {
+    if(!columns.has(name)) throw new Error(`DATASET_COLUMN_MISSING:${name}:${filePath}`);
+  }
+  const idx = (name: string) => columns.get(name) ?? -1;
   const bars: TryBar[] = [];
   for (const line of lines.slice(1)) {
     if (!line) continue;
@@ -48,7 +52,11 @@ function parseCsvGz(filePath: string): TryBar[] {
       takerBuyQuote: Number(cols[idx("takerBuyQuote")] ?? 0),
     });
   }
-  return bars.filter((b) => Number.isFinite(b.openTime) && b.open > 0);
+  for(let i=0;i<bars.length;i++) {
+    const b=bars[i];
+    if(!Object.values(b).every(Number.isFinite) || b.open<=0 || b.close<=0 || b.low<=0 || b.high<Math.max(b.open,b.close) || b.low>Math.min(b.open,b.close) || b.volume<0 || b.quoteVolume<0 || b.closeTime<b.openTime || (i>0 && b.openTime<=bars[i-1].openTime)) throw new Error(`INVALID_TRY_BAR:${filePath}:${i}`);
+  }
+  return bars;
 }
 
 const panelCache = new Map<string, TrySpotPanel>();
@@ -58,11 +66,11 @@ export function loadTrySpotPanel(symbol: string, root = resolveDatasetRoot()): T
   const cached = panelCache.get(key);
   if (cached) return cached;
   const jsonPath = path.join(root, "deep-oi-data", `${symbol}.json`);
-  const raw = JSON.parse(fs.readFileSync(jsonPath, "utf8")) as TrySpotPanel & {
+  const raw = importExternalPanelFromJson(jsonPath) as TrySpotPanel & {
     files?: { executionBarsTRY?: string };
     execution?: { symbol?: string };
   };
-  const panel = importExternalPanelFromJson(jsonPath) as TrySpotPanel;
+  const panel = raw;
   panel.baseAsset = raw.baseAsset ?? symbol.replace("USDT", "");
   panel.executionSymbol = raw.execution?.symbol ?? `${panel.baseAsset}TRY`;
   if (Array.isArray(raw.executionBarsTRY) && raw.executionBarsTRY.length > 0) {

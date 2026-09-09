@@ -21,6 +21,12 @@ import {
 
 const stateStore = new Map<string, ExitPolicyState>();
 
+/** Remove only an isolated completed replay state; never clear production positions. */
+export function releasePr04ReplayState(positionId: string) {
+  if (!positionId.startsWith("replay:")) throw new Error("NOT_A_REPLAY_POSITION");
+  stateStore.delete(positionId);
+}
+
 export function resetExitPolicyStoreForTests() {
   stateStore.clear();
 }

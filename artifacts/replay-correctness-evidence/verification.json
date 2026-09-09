@@ -1,0 +1,19 @@
+{
+  "baseCommit": "96002e55d684a5c77ef209b3dbc3c5ba7b9b6a8e",
+  "sourceHash": "c674bbdbffc82e48395680f8db1d9f9085da2e87c7d8d7532d9307bd5746d112",
+  "datasetHash": "815e2a29061f628b31c6afb3b760f2653244d41f00d7afbd9103e514a270fa5c",
+  "datasetChecksumFiles": 57,
+  "tests": {
+    "passed": 74,
+    "suites": 7
+  },
+  "applicationTypecheck": "PASS",
+  "scriptAndTestTypecheck": "PASS",
+  "changedFileLint": "PASS",
+  "postgresIntegrationTests": "NOT_RUN_DOCKER_UNAVAILABLE",
+  "nextProductionBuild": "NOT_RUN",
+  "validationDurationMs": 80961,
+  "researchDurationMs": 42304,
+  "liveOrdersSent": false,
+  "paperCampaignStarted": false
+}

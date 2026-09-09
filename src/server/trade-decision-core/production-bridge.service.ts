@@ -48,41 +48,24 @@ function buildMarketSnapshot(input: {
   decisionAtMs: number;
   panel: ExternalSymbolPanel;
 }): MarketSnapshot | null {
-  const barIdxRaw = input.metadata.tradeDecisionCoreBarIdx ?? input.metadata.externalBarIdx;
-  const barIdx = Number(barIdxRaw);
-  if (!Number.isFinite(barIdx) || barIdx < 0 || barIdx >= input.panel.bars.length) {
-    const lastIdx = input.panel.bars.length - 1;
-    if (lastIdx < 0) return null;
-    const bar = input.panel.bars[lastIdx];
-    return {
-      nowMs: input.decisionAtMs,
-      baseAsset: String(input.metadata.baseAsset ?? input.symbol.replace(/TRY$|USDT$/, "")),
-      externalSymbol: input.panel.symbol,
-      executionSymbol: String(input.metadata.executionSymbol ?? input.symbol),
-      externalBarIdx: lastIdx,
-      externalClose: bar.close,
-      tryBarIdx: Number(input.metadata.tryBarIdx ?? lastIdx),
-      tryPrice: Number(input.metadata.tryPrice ?? input.metadata.lastPrice ?? bar.close),
-      tryVolume: Number(input.metadata.tryVolume ?? bar.volume ?? 0),
-      btcExternalReturn4hPct:
-        input.metadata.btcExternalReturn4hPct == null
-          ? null
-          : Number(input.metadata.btcExternalReturn4hPct),
-    };
-  }
+  const raw = input.metadata.tradeDecisionCoreBarIdx ?? input.metadata.externalBarIdx;
+  let barIdx = raw == null ? input.panel.bars.length - 1 : Number(raw);
+  if (!Number.isInteger(barIdx) || barIdx < 0 || barIdx >= input.panel.bars.length) return null;
+  while (barIdx >= 0 && input.panel.bars[barIdx].closeTime > input.decisionAtMs) barIdx--;
+  if (barIdx < 0) return null;
+  // Never substitute an external USDT price/volume for local TRY observations.
+  const tryPrice = Number(input.metadata.tryPrice);
+  const tryVolume = Number(input.metadata.tryVolume);
+  const tryAvailableAtMs = Number(input.metadata.tryAvailableAtMs);
+  if (!(tryPrice > 0) || !Number.isFinite(tryVolume) || !Number.isFinite(tryAvailableAtMs)) return null;
   const bar = input.panel.bars[barIdx];
   return {
     nowMs: input.decisionAtMs,
     baseAsset: String(input.metadata.baseAsset ?? input.symbol.replace(/TRY$|USDT$/, "")),
-    externalSymbol: input.panel.symbol,
-    executionSymbol: String(input.metadata.executionSymbol ?? input.symbol),
-    externalBarIdx: barIdx,
-    externalClose: bar.close,
-    tryBarIdx: Number(input.metadata.tryBarIdx ?? barIdx),
-    tryPrice: Number(input.metadata.tryPrice ?? input.metadata.lastPrice ?? bar.close),
-    tryVolume: Number(input.metadata.tryVolume ?? bar.volume ?? 0),
-    btcExternalReturn4hPct:
-      input.metadata.btcExternalReturn4hPct == null ? null : Number(input.metadata.btcExternalReturn4hPct),
+    externalSymbol: input.panel.symbol, executionSymbol: String(input.metadata.executionSymbol ?? input.symbol),
+    externalBarIdx: barIdx, externalClose: bar.close,
+    tryBarIdx: Number(input.metadata.tryBarIdx ?? -1), tryPrice, tryVolume, tryAvailableAtMs,
+    btcExternalReturn4hPct: input.metadata.btcExternalReturn4hPct == null ? null : Number(input.metadata.btcExternalReturn4hPct),
   };
 }
 

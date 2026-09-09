@@ -20,7 +20,7 @@
     "dataset:build": "tsx scripts/dataset/build-kripto-deep-dataset.ts",
     "dataset:validate": "tsx scripts/dataset/validate-dataset.ts",
     "dataset:audit": "tsx scripts/dataset/audit-deep-dataset.ts",
-    "strategy:validate": "tsx scripts/run-strategy-validation.ts",
+    "strategy:validate": "node --import tsx scripts/run-strategy-validation.ts",
     "strategy:audit-try": "tsx scripts/run-oi-try-spot-audited.ts",
     "strategy:paper-smoke": "tsx scripts/run-strategy-paper-smoke.ts",
     "production:chain-verify": "tsx scripts/run-production-chain-verify.ts",
@@ -41,7 +41,9 @@
     "release:staging": "npm run prisma:migrate:deploy && npm run prisma:seed && npm run qa:gate",
     "pm2:start": "pm2 start ecosystem.config.cjs --env production",
     "pm2:restart": "pm2 restart ecosystem.config.cjs",
-    "pm2:logs": "pm2 logs"
+    "pm2:logs": "pm2 logs",
+    "strategy:research": "node --import tsx scripts/run-strategy-validation.ts --research",
+    "strategy:replay-test": "vitest run tests/try-replay-correctness.test.ts tests/trade-decision-core-parity.test.ts tests/trade-decision-core-production-bridge.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",

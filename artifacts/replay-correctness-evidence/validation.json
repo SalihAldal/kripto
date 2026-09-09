@@ -1,0 +1,973 @@
+{
+  "generatedAt": "2026-09-09T14:48:58.273Z",
+  "status": "COMPLETED",
+  "STRATEGY_VALIDATION_STATUS": "FAIL",
+  "paperEligible": null,
+  "LIVE_STATUS": "DISABLED",
+  "liveTradingEnabled": false,
+  "repositoryHead": "96002e55d684a5c77ef209b3dbc3c5ba7b9b6a8e",
+  "sourceHash": "c674bbdbffc82e48395680f8db1d9f9085da2e87c7d8d7532d9307bd5746d112",
+  "datasetHash": "815e2a29061f628b31c6afb3b760f2653244d41f00d7afbd9103e514a270fa5c",
+  "replayVersion": "causal-portfolio-v2",
+  "diagnostic": false,
+  "researchOnly": false,
+  "acceptanceCriteria": {
+    "minTrades": 40,
+    "minExpectancy": 0,
+    "minProfitFactor": 1.05,
+    "maxDrawdownPct": 20,
+    "minPositiveFoldRatio": 0.55,
+    "maxTopSymbolContributionPct": 45
+  },
+  "period": {
+    "validationStart": 1760572800000,
+    "validationEnd": 1783900799999
+  },
+  "dataSplit": {
+    "development": {
+      "start": 1756684800000,
+      "end": 1760572799999
+    },
+    "validation": {
+      "start": 1760572800000,
+      "end": 1783900799999
+    },
+    "buffer": {
+      "start": 1783900800000,
+      "end": 1784332799999
+    },
+    "freshPartial": {
+      "start": 1784332800000,
+      "end": 1788220799999,
+      "status": "PARTIAL_SEEN_IN_PRIOR_RESEARCH_NOT_USED_FOR_SELECTION"
+    }
+  },
+  "variants": [
+    {
+      "variantId": "baseline_fixed_8h_v1",
+      "researchOnly": false,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -36.99995676161709
+        }
+      },
+      "stats": {
+        "trades": 503,
+        "wins": 173,
+        "losses": 330,
+        "grossPnl": -745.7988280216562,
+        "netPnl": -2955.2859181483987,
+        "expectancy": -5.8753199167960215,
+        "profitFactor": 0.49617779799298695,
+        "maxDrawdown": 29.774359725157208,
+        "longTrades": 503,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 7044.714081851587,
+        "equityTry": 7044.714081851587,
+        "netPnlTry": -2955.2859181484127,
+        "maxDrawdownPct": 29.774359725157208,
+        "rejectedCash": 1,
+        "expiredOrders": 115
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -493.6012805078317
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": -250.0293947992559
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -104.64350452755389
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": -448.95117547166956
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": -493.43050333806605
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 109.05873821961904
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -132.048727492328
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": -108.08857861037995
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": 81.20932454650574
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": -131.4980439149722
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": 65.28155043301285
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -47.5379722686248
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -23.57800797789514
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -62.77983194671833
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": -56.44631636598206
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -155.46091656663248
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": -486.6722365605874
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": -216.06904099905296
+          }
+        ],
+        "positiveRatio": 0.16666666666666666
+      },
+      "concentration": {
+        "topSymbol": "BNBUSDT",
+        "topSymbolContributionPct": 0,
+        "bySymbol": {
+          "BNBUSDT": -88.63891477126583,
+          "DOGEUSDT": -195.84679337980273,
+          "XRPUSDT": -415.55481462346745,
+          "SUIUSDT": -423.7948113570402,
+          "ETHUSDT": -110.03692507310136,
+          "BTCUSDT": -321.0419541279216,
+          "LINKUSDT": -220.33949153400584,
+          "SOLUSDT": -359.71642909045227,
+          "AVAXUSDT": -512.7457561480259,
+          "ADAUSDT": -307.57002804332024
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.18584342973873114,
+        "upperDailyMeanPct": -0.0702008033116822
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "DRAWDOWN",
+          "FOLD_RATIO"
+        ]
+      },
+      "elapsedMs": 662,
+      "evidenceFile": "artifacts/strategy-runs/16ec2901890b323fd817d51cc269a897e4899aaccb786c64885661c8e746764e/baseline_fixed_8h_v1.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "baseline_fixed_8h_v2",
+      "researchOnly": false,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -52.236285790339096
+        }
+      },
+      "stats": {
+        "trades": 881,
+        "wins": 316,
+        "losses": 565,
+        "grossPnl": -776.9905078699212,
+        "netPnl": -4648.420082482976,
+        "expectancy": -5.276299753102129,
+        "profitFactor": 0.5189849044505952,
+        "maxDrawdown": 46.79400738554867,
+        "longTrades": 881,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 4350.080680269423,
+        "equityTry": 5340.975859669423,
+        "netPnlTry": -4659.024140330577,
+        "maxDrawdownPct": 46.79400738554867,
+        "rejectedCash": 45,
+        "expiredOrders": 247
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -673.8536953349267
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": -270.5829285930067
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -344.32851049681994
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": -371.3526503957637
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": -584.6777915218472
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": -57.5182942063293
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -297.54271755417085
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": -228.1920919045042
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -8.041288696641459
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": -195.98649965650566
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": -34.51806705134368
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -215.46022494403587
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -148.8887212540185
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -17.62931128746277
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": -209.08973632379093
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -341.3331055187318
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": -483.693139230847
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": -176.3353663598309
+          }
+        ],
+        "positiveRatio": 0
+      },
+      "concentration": {
+        "topSymbol": "BNBUSDT",
+        "topSymbolContributionPct": 0,
+        "bySymbol": {
+          "BNBUSDT": -265.41465047236875,
+          "XRPUSDT": -386.8175195165257,
+          "ADAUSDT": -358.48552401344796,
+          "DOGEUSDT": -502.8661402058321,
+          "SUIUSDT": -633.127273739143,
+          "LINKUSDT": -225.1149184013105,
+          "ETHUSDT": -551.8273404994068,
+          "BTCUSDT": -587.7593494683541,
+          "SOLUSDT": -308.4338427324145,
+          "AVAXUSDT": -828.5735234341777
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.3024146960865131,
+        "upperDailyMeanPct": -0.15327967421885932
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "DRAWDOWN",
+          "FOLD_RATIO",
+          "OPEN_POSITIONS_AT_DATA_END"
+        ]
+      },
+      "elapsedMs": 691,
+      "evidenceFile": "artifacts/strategy-runs/16ec2901890b323fd817d51cc269a897e4899aaccb786c64885661c8e746764e/baseline_fixed_8h_v2.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "entry_regime_filter_fixed_8h",
+      "researchOnly": false,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -43.03263804541986
+        }
+      },
+      "stats": {
+        "trades": 759,
+        "wins": 272,
+        "losses": 487,
+        "grossPnl": -282.82433124877394,
+        "netPnl": -3619.2609971836337,
+        "expectancy": -4.768459811836144,
+        "profitFactor": 0.5552381750965768,
+        "maxDrawdown": 36.59818068270901,
+        "longTrades": 759,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 5379.23976556878,
+        "equityTry": 6370.1349449687805,
+        "netPnlTry": -3629.8650550312195,
+        "maxDrawdownPct": 36.59818068270901,
+        "rejectedCash": 21,
+        "expiredOrders": 201
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -663.738797181215
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": -262.83300239076743
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -217.83152444451116
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": -247.7970816156976
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": -463.4500902931077
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 77.83346760963559
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -307.12673736482066
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": 86.8638950027962
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -44.79938200085053
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": -196.82229780115995
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": -4.290838738485945
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -185.00534062270617
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -114.30834575314202
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -13.753480035768007
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": -81.63129126920285
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -318.4255477176566
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": -554.5413823720373
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": -118.20727804252238
+          }
+        ],
+        "positiveRatio": 0.1111111111111111
+      },
+      "concentration": {
+        "topSymbol": "XRPUSDT",
+        "topSymbolContributionPct": 0,
+        "bySymbol": {
+          "XRPUSDT": -277.27296100933853,
+          "ADAUSDT": -290.36323491242246,
+          "DOGEUSDT": -272.76265633691014,
+          "BNBUSDT": -277.55981804682,
+          "LINKUSDT": -220.38862927167523,
+          "ETHUSDT": -374.1743151942069,
+          "SUIUSDT": -224.60665627497812,
+          "BTCUSDT": -587.7593494683541,
+          "SOLUSDT": -281.8680188335869,
+          "AVAXUSDT": -812.5053578353438
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.24263111953302122,
+        "upperDailyMeanPct": -0.08999654938894755
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "DRAWDOWN",
+          "FOLD_RATIO",
+          "OPEN_POSITIONS_AT_DATA_END"
+        ]
+      },
+      "elapsedMs": 936,
+      "evidenceFile": "artifacts/strategy-runs/16ec2901890b323fd817d51cc269a897e4899aaccb786c64885661c8e746764e/entry_regime_filter_fixed_8h.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "baseline_v2_pr04_trail",
+      "researchOnly": false,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -52.84100850784337
+        }
+      },
+      "stats": {
+        "trades": 948,
+        "wins": 557,
+        "losses": 391,
+        "grossPnl": -542.1753850629408,
+        "netPnl": -4708.8793690749335,
+        "expectancy": -4.96717233024782,
+        "profitFactor": 0.526051794283275,
+        "maxDrawdown": 47.87617169483748,
+        "longTrades": 948,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 3288.1213952682483,
+        "equityTry": 5273.3552926882485,
+        "netPnlTry": -4726.6447073117515,
+        "maxDrawdownPct": 47.87617169483748,
+        "rejectedCash": 54,
+        "expiredOrders": 253
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -471.14495372276724
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": -398.5203932161676
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -342.383270322729
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": -328.1381050676282
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": -349.44800380530705
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 41.36139339131478
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -401.8820542422736
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": -367.9387463530993
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -285.5199540004114
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": -380.09733112338654
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": -176.8776645867856
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -403.7387696969254
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -246.65035559287753
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": 78.493489404711
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": -144.96737991873306
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -216.7282770724778
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": -345.5385515916487
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": 13.074220205440724
+          }
+        ],
+        "positiveRatio": 0.16666666666666666
+      },
+      "concentration": {
+        "topSymbol": "BNBUSDT",
+        "topSymbolContributionPct": 0,
+        "bySymbol": {
+          "BNBUSDT": -378.96717377829714,
+          "XRPUSDT": -519.6102557362952,
+          "ADAUSDT": -192.41986900642473,
+          "DOGEUSDT": -476.1690295349217,
+          "SUIUSDT": -341.71109522573977,
+          "LINKUSDT": -140.79064316524645,
+          "ETHUSDT": -440.44678638737213,
+          "BTCUSDT": -772.8617078934851,
+          "SOLUSDT": -696.5802590629653,
+          "AVAXUSDT": -749.3225492841693
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.3128264410351535,
+        "upperDailyMeanPct": -0.15546437126902787
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "DRAWDOWN",
+          "FOLD_RATIO",
+          "OPEN_POSITIONS_AT_DATA_END"
+        ]
+      },
+      "elapsedMs": 1580,
+      "evidenceFile": "artifacts/strategy-runs/16ec2901890b323fd817d51cc269a897e4899aaccb786c64885661c8e746764e/baseline_v2_pr04_trail.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "combined_regime_trail",
+      "researchOnly": false,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -45.97374784791881
+        }
+      },
+      "stats": {
+        "trades": 818,
+        "wins": 488,
+        "losses": 330,
+        "grossPnl": -345.30244020049315,
+        "netPnl": -3940.976913966095,
+        "expectancy": -4.81782018822261,
+        "profitFactor": 0.5344048653092768,
+        "maxDrawdown": 40.50795605637866,
+        "longTrades": 818,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 4056.023850377068,
+        "equityTry": 6041.257747797068,
+        "netPnlTry": -3958.742252202932,
+        "maxDrawdownPct": 40.50795605637866,
+        "rejectedCash": 24,
+        "expiredOrders": 201
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -489.2670475152445
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": -114.19355508946137
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -323.94742890475027
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": -226.47450775340076
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": -262.7624656999342
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 10.27732221056067
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -391.2332458687215
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": -18.101686782511933
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -330.871032696351
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": -263.4098054051274
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": -229.9996460963921
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -416.0768498101179
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -240.11027695466328
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -7.772492374733702
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": -119.99429848108048
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -201.31681156852028
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": -372.76292180812106
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": 39.27449839563906
+          }
+        ],
+        "positiveRatio": 0.1111111111111111
+      },
+      "concentration": {
+        "topSymbol": "XRPUSDT",
+        "topSymbolContributionPct": 0,
+        "bySymbol": {
+          "XRPUSDT": -423.63684879839224,
+          "ADAUSDT": -213.4894680270121,
+          "DOGEUSDT": -255.83895507812935,
+          "BNBUSDT": -340.99872376289625,
+          "LINKUSDT": -89.27526833052468,
+          "ETHUSDT": -324.71032464527315,
+          "SUIUSDT": -320.4793915659333,
+          "BTCUSDT": -772.8617078934851,
+          "SOLUSDT": -549.0963077745628,
+          "AVAXUSDT": -650.5899180898781
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.2557763268935126,
+        "upperDailyMeanPct": -0.11666357113049965
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "DRAWDOWN",
+          "FOLD_RATIO",
+          "OPEN_POSITIONS_AT_DATA_END"
+        ]
+      },
+      "elapsedMs": 1459,
+      "evidenceFile": "artifacts/strategy-runs/16ec2901890b323fd817d51cc269a897e4899aaccb786c64885661c8e746764e/combined_regime_trail.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    }
+  ],
+  "RESEARCH_VALIDATION_STATUS": "NOT_RUN",
+  "elapsedMs": 80961
+}

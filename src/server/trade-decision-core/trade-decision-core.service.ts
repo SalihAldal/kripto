@@ -14,7 +14,13 @@ export function evaluateUnifiedEntryDecision(input: {
   snapshot: MarketSnapshot;
   nowMs: number;
 }): EntrySignalIntent | null {
-  if (input.snapshot.nowMs > input.nowMs) return null;
+  const bar = input.panel.bars[input.barIdx];
+  const s = input.snapshot;
+  if (!bar || !Number.isFinite(bar.closeTime) || !Number.isFinite(bar.close) || bar.close <= 0 || !Number.isFinite(s.nowMs) || !Number.isFinite(input.nowMs) || bar.closeTime > input.nowMs || s.nowMs > input.nowMs) return null;
+  if (!Number.isFinite(s.tryPrice) || s.tryPrice <= 0 || !Number.isFinite(s.tryVolume)) return null;
+  if (s.tryAvailableAtMs != null && (!Number.isFinite(s.tryAvailableAtMs) || s.tryAvailableAtMs > input.nowMs || input.nowMs - s.tryAvailableAtMs > 5 * 60_000)) return null;
+  if (input.nowMs - bar.closeTime > 65 * 60_000) return null;
+  if (s.externalSymbol !== input.panel.symbol || s.executionSymbol !== `${s.baseAsset}TRY` || s.externalSymbol !== `${s.baseAsset}USDT`) return null;
   return evaluateEntrySignal({
     variant: input.variant,
     panel: input.panel,

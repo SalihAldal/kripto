@@ -1,18 +1,19 @@
 import { buildOiFeatures } from "@/src/server/alpha-engine-v2/oi-features.service";
-import type { OiImpulseAlphaId } from "@/src/server/alpha-engine-v2/oi-impulse-alpha-v2.service";
 import type { ExternalSymbolPanel } from "@/src/server/alpha-engine-v2/external-market-data.types";
-import type { EntryCandidateId, EntrySignalIntent, MarketSnapshot, StrategyVariantConfig } from "./types";
+import type { EntrySignalIntent, MarketSnapshot, StrategyVariantConfig, SignalAlphaId } from "./types";
 
 function nearestFunding(panel: ExternalSymbolPanel, time: number) {
-  let best = panel.funding[0];
+  let best: ExternalSymbolPanel["funding"][number] | undefined;
   for (const row of panel.funding) if (row.fundingTime <= time) best = row;
   return best;
 }
 
-function evaluateOiCore(panel: ExternalSymbolPanel, idx: number, alphaId: OiImpulseAlphaId) {
+function evaluateOiCore(panel: ExternalSymbolPanel, idx: number, alphaId: SignalAlphaId) {
   const feat = buildOiFeatures(panel, idx);
   if (!feat) return null;
-  const fund = nearestFunding(panel, panel.bars[idx].closeTime)?.fundingRate ?? 0;
+  const funding = nearestFunding(panel, panel.bars[idx].closeTime);
+  if (!funding && (alphaId === "OI_IMPULSE_LONG" || alphaId === "OI_IMPULSE_LONG_V2_FUNDING")) return null;
+  const fund = funding?.fundingRate ?? 0;
   if (alphaId === "OI_IMPULSE_LONG") {
     if (feat.priceReturn4h > 0.3 && feat.oiDeltaPct > 1.5 && fund <= 0.0003) return { feat, fund };
     return null;
@@ -38,6 +39,7 @@ export function evaluateEntrySignal(input: {
 }): EntrySignalIntent | null {
   const bar = input.panel.bars[input.barIdx];
   if (!bar) return null;
+  if (input.variant.researchOnly) return evaluateResearchEntry(input);
   const core = evaluateOiCore(input.panel, input.barIdx, input.variant.alphaId);
   if (!core) return null;
 
@@ -51,7 +53,8 @@ export function evaluateEntrySignal(input: {
     if (recentVol <= 0) return null;
   }
 
-  const invalidation = bar.low * 0.985;
+  // Preserve the external relative thesis distance, mapped to an as-of TRY mark.
+  const invalidation = input.snapshot.tryPrice * (bar.low * 0.985 / bar.close);
   return {
     signalId: `${input.variant.id}:${input.panel.symbol}:${bar.closeTime}`,
     strategyVersion: input.variant.id,
@@ -61,8 +64,12 @@ export function evaluateEntrySignal(input: {
     signalAtMs: bar.closeTime,
     availableAtMs: bar.closeTime,
     invalidationPrice: invalidation,
+    invalidationCurrency: "TRY",
     reasonCodes: [input.variant.entryCandidate, core.feat.oiDeltaPct > 1.5 ? "OI_IMPULSE" : "OI_V2"],
     metadata: {
+      tryPrice: input.snapshot.tryPrice,
+      externalInvalidationPrice: bar.low * 0.985,
+      invalidationMapping: "RELATIVE_DISTANCE_AT_SIGNAL",
       oiDeltaPct: core.feat.oiDeltaPct,
       priceReturn4h: core.feat.priceReturn4h,
       funding: core.fund,
@@ -118,3 +125,43 @@ export const STRATEGY_VARIANTS: StrategyVariantConfig[] = [
     targetsLossMechanism: "regime_mismatch+giveback",
   },
 ];
+
+
+/** Frozen research hypotheses; never selectable through production getVariantById. */
+export const RESEARCH_VARIANTS: StrategyVariantConfig[] = [
+  { id: "research_trend_cash", entryCandidate: "trend_cash", exitMode: "research_trend", alphaId: "SPOT_TREND", oiFundingRequired: false, researchOnly: true, label: "Daily breakout + cash (research)" },
+  { id: "research_relative_strength", entryCandidate: "relative_strength", exitMode: "research_trend", alphaId: "SPOT_RELATIVE_STRENGTH", oiFundingRequired: false, researchOnly: true, label: "Daily breakout + top-3 strength (research)" },
+  { id: "research_shock_reclaim", entryCandidate: "shock_reclaim", exitMode: "research_trend", alphaId: "SPOT_SHOCK_RECLAIM", oiFundingRequired: false, researchOnly: true, label: "Price shock reclaim (research, not liquidation data)" },
+];
+
+function evaluateResearchEntry(input: {variant: StrategyVariantConfig; panel: ExternalSymbolPanel; barIdx: number; snapshot: MarketSnapshot}): EntrySignalIntent | null {
+  const {panel, barIdx: i, variant, snapshot} = input;
+  if (i < 240 || snapshot.tryVolume <= 0) return null;
+  const b = panel.bars[i];
+  const past = panel.bars.slice(i - 240, i);
+  const mean = past.reduce((sum, x) => sum + x.close, 0) / past.length;
+  const atr = past.slice(-24).reduce((sum, x, k) => {
+    const prev = panel.bars[i - 25 + k].close;
+    return sum + Math.max(x.high - x.low, Math.abs(x.high - prev), Math.abs(x.low - prev));
+  }, 0) / 24;
+  if (!(atr > 0 && b.close > 0)) return null;
+  let eligible: boolean;
+  if (variant.entryCandidate === "shock_reclaim") {
+    const prev = panel.bars[i - 1];
+    const before = panel.bars[i - 2];
+    eligible = prev.close < before.close - 2 * atr && b.close > prev.high && b.close > mean;
+  } else {
+    // Daily decisions only: the 24h breakout excludes the current completed bar.
+    eligible = (i + 1) % 24 === 0 && b.close > mean && b.close > Math.max(...past.slice(-24).map(x => x.high));
+    if (variant.entryCandidate === "relative_strength") eligible &&= (snapshot.relativeStrengthRank ?? Infinity) <= 3;
+  }
+  if (!eligible) return null;
+  const stopDistance = Math.min(0.15, Math.max(0.01, 2 * atr / b.close));
+  return {
+    signalId: `${variant.id}:${panel.symbol}:${b.closeTime}`, strategyVersion: "research-frozen-v1", variantId: variant.id,
+    alphaId: variant.alphaId, side: "LONG", signalAtMs: b.closeTime, availableAtMs: b.closeTime,
+    invalidationPrice: snapshot.tryPrice * (1 - stopDistance), invalidationCurrency: "TRY",
+    reasonCodes: [variant.entryCandidate, "RESEARCH_ONLY"],
+    metadata: {tryPrice: snapshot.tryPrice, stopDistance, relativeStrengthRank: snapshot.relativeStrengthRank},
+  };
+}

@@ -15,6 +15,7 @@ const baseIntent: EntrySignalIntent = {
   signalAtMs: 1_700_000_000_000,
   availableAtMs: 1_700_000_000_000,
   invalidationPrice: 98.5,
+  invalidationCurrency: "TRY",
   reasonCodes: ["baseline_oi_v2", "OI_V2"],
   metadata: { tryPrice: 100 },
 };

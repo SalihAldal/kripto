@@ -1,0 +1,6 @@
+{
+  "abortStatus": "ABORTED",
+  "abortExitCode": 130,
+  "resumeReusedCheckpoint": true,
+  "diagnosticPaperGateBlocked": true
+}

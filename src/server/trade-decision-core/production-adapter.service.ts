@@ -7,7 +7,10 @@ import type { InvalidationContract } from "@/src/server/profitability/pr03-types
 import type { EntrySignalIntent } from "./types";
 
 export function entryIntentToInvalidation(intent: EntrySignalIntent): InvalidationContract {
-  const reference = intent.invalidationPrice ?? Number(intent.metadata.tryPrice ?? 0);
+  if (intent.invalidationCurrency !== "TRY" || !Number.isFinite(intent.invalidationPrice) || !(intent.invalidationPrice! > 0)) {
+    throw new Error("TDC_INVALIDATION_CURRENCY_OR_PRICE_INVALID");
+  }
+  const reference = Number(intent.metadata.tryPrice ?? intent.invalidationPrice);
   return {
     referenceLevel: reference,
     invalidationThreshold: intent.invalidationPrice ?? reference,
