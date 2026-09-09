@@ -23,6 +23,7 @@
     "strategy:validate": "tsx scripts/run-strategy-validation.ts",
     "strategy:audit-try": "tsx scripts/run-oi-try-spot-audited.ts",
     "strategy:paper-smoke": "tsx scripts/run-strategy-paper-smoke.ts",
+    "production:chain-verify": "tsx scripts/run-production-chain-verify.ts",
     "qa:gate": "npm run lint && npm run typecheck && npm run test:run && npm run build",
     "prevalidate:phase07": "tsx scripts/run-phase07-prevalidation.ts",
     "phase07:outcome:forensic": "tsx scripts/phase07-outcome-pending-forensic.ts",

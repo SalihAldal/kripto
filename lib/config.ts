@@ -299,6 +299,16 @@ const envSchema = z.object({
   LIVE_TRADING_EXECUTION_FAILURE_THRESHOLD: z.coerce.number().int().min(1).max(100).default(5),
   LIVE_TRADING_HEALTH_INTERVAL_MS: z.coerce.number().int().min(10_000).default(60_000),
   LIVE_TRADING_RECONCILE_INTERVAL_MS: z.coerce.number().int().min(30_000).default(120_000),
+  TRADE_DECISION_CORE_ENABLED: boolFromEnv(false),
+  TRADE_DECISION_CORE_VARIANT_ID: z
+    .enum([
+      "baseline_fixed_8h_v1",
+      "baseline_fixed_8h_v2",
+      "entry_regime_filter_fixed_8h",
+      "baseline_v2_pr04_trail",
+      "combined_regime_trail",
+    ])
+    .default("baseline_fixed_8h_v2"),
   DISCORD_WEBHOOK_URL: z.string().optional(),
   SLACK_WEBHOOK_URL: z.string().optional(),
   ALERT_WEBHOOK_URL: z.string().optional(),

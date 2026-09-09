@@ -193,6 +193,7 @@ import { recordPaperFillEvent } from "@/src/server/paper-validation/paper-trade-
 import { markPaperPersistenceReconciliation } from "@/src/server/execution/paper-persistence-reconciliation.service";
 import { evaluateCanonicalRegime, routeStrategiesWithDetails, type StrategyId } from "@/src/server/forensics/p4-regime-strategy-shadow";
 import { buildSelectedStrategySignal } from "@/src/server/execution/fix01-selected-signal";
+import { applyTradeDecisionCoreProductionBridge } from "@/src/server/trade-decision-core/production-bridge.service";
 import { buildStrategyEvaluationContexts } from "@/src/server/execution/fix01-strategy-context-builder";
 import { bootstrapPr04ExitStateFromEntry, buildPr04ExitMetadataAtEntry, buildPr04ExitMetadataFromSelectedSignal } from "@/src/server/profitability/pr04-exit-bridge";
 import { bootstrapExitPersistenceAtEntry, restoreExitPolicyStateFromDb } from "@/src/server/execution/fix02-exit-persistence.service";
@@ -1328,6 +1329,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
   let canonicalCandidateId = "";
   let runtimeUserId: string | null = null;
   let claimedExecutionAttemptCandidateId: string | null = null;
+  let signalIdempotencyKey: string | null = null;
   const idempotencyKey = String(
     input.requestedSymbol ?? "auto",
   ) + `:${String(input.requestedQuoteAmountTry ?? input.requestedQuantity ?? "default")}:${mode}`;
@@ -1946,9 +1948,48 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     const p4Regime = evaluateCanonicalRegime(featureContract.regimeInput);
     const strategyRouter = routeStrategiesWithDetails(routerInput, p4Regime);
     const selectedStrategyId = (strategyRouter.preferredStrategy ?? marketRegime.strategy) as StrategyId;
-    const selectedStrategySignal = buildSelectedStrategySignal(selectedStrategyId, strategyRouter);
+    let selectedStrategySignal = buildSelectedStrategySignal(selectedStrategyId, strategyRouter);
+    const tdcBridge = applyTradeDecisionCoreProductionBridge({
+      enabled: env.TRADE_DECISION_CORE_ENABLED,
+      variantId: env.TRADE_DECISION_CORE_VARIANT_ID,
+      candidateMetadata: selected.context.metadata as Record<string, unknown>,
+      symbol: selected.context.symbol,
+      decisionAtMs,
+      p4SelectedSignal: selectedStrategySignal,
+      p4PreferredStrategy: strategyRouter.preferredStrategy,
+      candidateId: featureContract.strategyInput.candidateId,
+      lifecycleId,
+      featureSnapshotId: featureContract.snapshot.snapshotId,
+      mode,
+      fallbackIdempotencyKey: idempotencyKey,
+    });
+    signalIdempotencyKey = tdcBridge.signalIdempotencyKey;
+    if (tdcBridge.selectedSignalOverlay) {
+      selectedStrategySignal = tdcBridge.selectedSignalOverlay;
+    }
+    if (tdcBridge.metadataPatch && Object.keys(tdcBridge.metadataPatch).length > 0) {
+      selected.context.metadata = {
+        ...selected.context.metadata,
+        ...tdcBridge.metadataPatch,
+      };
+    }
     if (selectedStrategySignal) {
       selected.context.metadata.selectedStrategySignal = selectedStrategySignal;
+    }
+    if (tdcBridge.blockEntry) {
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: tdcBridge.blockReason ?? "Trade decision core duplicate runtime block",
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+        details: {
+          tradeDecisionCoreStatus: tdcBridge.status,
+          signalIdempotencyKey,
+        },
+      });
     }
     if (!marketRegime.openAllowed) {
       return finishExecution({
@@ -3589,6 +3630,28 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       }
     }
 
+    if (!input.bypassIdempotency && signalIdempotencyKey && signalIdempotencyKey !== idempotencyKey) {
+      const signalClaim = await claimIdempotentExecutionIntent(user.id, signalIdempotencyKey, executionId);
+      if (!signalClaim.claimed) {
+        const existing = signalClaim.existing ?? (await getIdempotentExecution(user.id, signalIdempotencyKey));
+        const existingExecutionId =
+          typeof existing?.executionId === "string" ? String(existing.executionId) : executionId;
+        return finishExecution({
+          executionId: existingExecutionId,
+          mode,
+          opened: false,
+          rejected: true,
+          rejectReason: "Duplicate signal blocked by persistent idempotency",
+          symbol: executionSymbol,
+          decision: ai.finalDecision,
+          details: {
+            signalIdempotencyKey,
+            existingExecutionState: existing?.executionState ?? null,
+          },
+        });
+      }
+    }
+
     const tradeSignal = await createTradeSignalFromConsensus({
       userId: user.id,
       tradingPairId: pair.id,
@@ -4411,6 +4474,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         runId: decisionFeatureSnapshot.runId ?? undefined,
         sessionId: decisionFeatureSnapshot.sessionId ?? undefined,
         decisionTimestamp: decisionFeatureSnapshot.decisionTimestamp,
+        selectedStrategySignal,
+        tradeDecisionCore: selected.context.metadata.tradeDecisionCore,
+        signalIdempotencyKey,
       },
     });
     await bindDecisionFeatureSnapshotPositionId(position.id);
@@ -4635,7 +4701,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       stage: "completed",
       status: "SUCCESS",
     });
-    await setIdempotentExecution(user.id, idempotencyKey, {
+    const completedIdempotencyPayload = {
       executionId,
       executionState: "COMPLETED",
       opened: true,
@@ -4651,8 +4717,16 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       regimePolicyVersion: REGIME_POLICY_VERSION,
       featureSnapshotId: featureContract.snapshot.snapshotId,
       sourceType: featureContract.snapshot.sourceType,
+      signalId: selectedStrategySignal?.signalId ?? null,
       updatedAt: new Date().toISOString(),
-    });
+    };
+    await setIdempotentExecution(user.id, idempotencyKey, completedIdempotencyPayload);
+    if (signalIdempotencyKey && signalIdempotencyKey !== idempotencyKey) {
+      await setIdempotentExecution(user.id, signalIdempotencyKey, {
+        ...completedIdempotencyPayload,
+        linkedIdempotencyKey: idempotencyKey,
+      });
+    }
     getCanonicalCandidateStore().transitionCandidate(canonicalCandidateId, "PAPER_OPENED", ["PAPER_POSITION_OPENED"]);
 
     observeTradeDecision({
