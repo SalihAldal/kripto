@@ -12,6 +12,7 @@ import { buildMatchedEntryManifest } from "../profitability/pr04-matched-entry-m
 import { buildRiskReference } from "../profitability/pr04-structural-stop";
 import { entryIntentToInvalidation } from "../trade-decision-core/production-adapter.service";
 import type { ExitDecisionKind } from "../profitability/pr04-types";
+import { LOCAL_ENTRY_RISK, isLocalEntry, planLocalEntry } from "../trade-decision-core/local-entry-risk.service";
 export const TRY_REPLAY_VERSION = "causal-portfolio-v2";
 const HOUR = 3600000;
 export type EquityPoint = {
@@ -53,6 +54,7 @@ type Cursor = {
     ti: number;
     ei: number;
     lastTry: number;
+    cooldownUntil: number;
     position: Position | null;
     pending: {
         intent: EntrySignalIntent;
@@ -125,13 +127,24 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
     const cursors: Cursor[] = panels.map(panel => ({ panel,
         ti: Math.max(0, lastBefore(panel.executionBarsTRY, input.periodStart - 1, b => b.closeTime) + 1),
         ei: Math.max(0, lastBefore(panel.bars, input.periodStart - 1, b => b.closeTime) + 1),
-        lastTry: lastBefore(panel.executionBarsTRY, input.periodStart - 1, b => b.closeTime), position: null, pending: null }));
+        lastTry: lastBefore(panel.executionBarsTRY, input.periodStart - 1, b => b.closeTime), cooldownUntil: 0, position: null, pending: null }));
     const trades: TrySpotTradeRecord[] = [], equity: EquityPoint[] = [];
     let cash = initialCash, peak = initialCash, maxDd = 0, lastEquity = initialCash, nextSample = input.periodStart;
     let nextProgress = started, rejectedCash = 0, expiredOrders = 0;
+    let riskRejectedEntries = 0, riskBlockedSignals = 0, day = -1, dayStartEquity = initialCash;
+    const entryDiagnostics: Record<string, number> = {};
     const sessions: string[] = [];
     const markedEquity = () => cash + cursors.reduce((sum, c) => sum + (c.position ? c.position.remaining * c.position.mark : 0), 0);
     const reserved = () => cursors.reduce((sum, c) => sum + (c.pending ? c.pending.notional * (1 + fee) : 0), 0);
+    const modeledOpenRisk = (excludePending?: Cursor) => cursors.reduce((sum, c) => {
+        const p = c.position;
+        const positionRisk = p && isLocalEntry(p.intent) ? p.remaining * Math.max(0, p.entryPrice * (1 + fee) - p.intent.invalidationPrice! * (1 - slip) * (1 - fee)) : 0;
+        return sum + positionRisk + (c !== excludePending && c.pending && isLocalEntry(c.pending.intent) ? Number(c.pending.intent.metadata.riskBudgetTry) : 0);
+    }, 0);
+    const riskEntryAllowed = () => {
+        const account = markedEquity();
+        return (dayStartEquity - account) / dayStartEquity * 100 < LOCAL_ENTRY_RISK.dailyLossLimitPct && (peak - account) / peak * 100 < LOCAL_ENTRY_RISK.maxDrawdownPct;
+    };
     const requestExit = (p: Position, at: number, reason: string, kind: ExitDecisionKind = "TIME_EXIT", quantity = p.remaining, leg: string | null = null) => {
         if (!p.exit)
             p.exit = { atMs: at, reason, kind, quantity: Math.min(quantity, p.remaining), leg };
@@ -143,6 +156,10 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 now = Math.min(now, c.panel.executionBarsTRY[c.ti]?.closeTime ?? Infinity, c.panel.bars[c.ei]?.closeTime ?? Infinity);
             if (now > input.periodEnd || !Number.isFinite(now))
                 break;
+            if (Math.floor(now / 86400000) !== day) {
+                day = Math.floor(now / 86400000);
+                dayStartEquity = lastEquity;
+            }
             // First settle ONLY previously submitted orders. Deterministic symbol priority.
             for (const c of cursors) {
                 const b = c.panel.executionBarsTRY[c.ti];
@@ -193,6 +210,7 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                                 trades.push({ ...base, lossAttribution: attributeEntryLosses(base) });
                                 if (p.session)
                                     releasePr04ReplayState(p.session.positionId);
+                                if (isLocalEntry(p.intent)) c.cooldownUntil = now + LOCAL_ENTRY_RISK.cooldownMs;
                                 c.position = null;
                             }
                             else if (p.exit.quantity <= 0)
@@ -202,9 +220,14 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 }
                 if (!c.position && c.pending && traded && now > c.pending.intent.availableAtMs) {
                     const order = c.pending;
+                    const guarded = isLocalEntry(order.intent);
+                    const plan = guarded && riskEntryAllowed() ? planLocalEntry({ intent: order.intent, mark: b.close, nowMs: now,
+                        maxNotionalTry: order.notional, riskBudgetTry: Math.min(Number(order.intent.metadata.riskBudgetTry), markedEquity() * LOCAL_ENTRY_RISK.riskFraction, markedEquity() * LOCAL_ENTRY_RISK.totalRiskFraction - modeledOpenRisk(c)),
+                        feePerSidePct: fee * 100, slippageBpsPerSide: slip * 10000 }) : null;
+                    if (guarded && !plan) { c.pending = null; riskRejectedEntries++; }
                     // Full-size entry only; insufficient volume leaves the order pending until TTL.
-                    if (b.quoteVolume * participation >= order.notional) {
-                        const entryPrice = b.close * (1 + slip), quantity = Math.floor(order.notional / entryPrice * 1e8) / 1e8;
+                    if (c.pending && b.quoteVolume * participation >= (plan?.notionalTry ?? order.notional)) {
+                        const entryPrice = b.close * (1 + slip), quantity = plan?.quantity ?? Math.floor(order.notional / entryPrice * 1e8) / 1e8;
                         const notional = quantity * entryPrice, entryFee = notional * fee;
                         if (quantity > 0 && cash >= notional + entryFee && order.intent.invalidationPrice! < entryPrice) {
                             cash -= notional + entryFee;
@@ -228,7 +251,7 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 }
                 const pos = c.position;
                 if (pos && now > pos.entryAtMs) {
-                    const maxHold = input.variant.exitMode === "fixed_8h" ? 8 * HOUR : input.variant.researchOnly ? 7 * 24 * HOUR : 48 * HOUR;
+                    const maxHold = isLocalEntry(pos.intent) ? LOCAL_ENTRY_RISK.maxHoldHours * HOUR : input.variant.exitMode === "fixed_8h" ? 8 * HOUR : input.variant.researchOnly ? 7 * 24 * HOUR : 48 * HOUR;
                     if (now >= pos.entryAtMs + maxHold)
                         requestExit(pos, now, "TIME_CAP");
                     if (traded && !pos.exit && pos.session) {
@@ -238,7 +261,7 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                         if (result.decisionKind !== "NONE" && order)
                             requestExit(pos, now, result.decisionKind, result.decisionKind, order.requestedQuantity, order.partialLegId);
                     }
-                    if (traded && input.variant.researchOnly && !pos.exit) {
+                    if (traded && input.variant.researchOnly && !isLocalEntry(pos.intent) && !pos.exit) {
                         const distance = Number(pos.intent.metadata.stopDistance);
                         const stop = Math.max(pos.intent.invalidationPrice!, pos.peak * (1 - distance));
                         if (b.close <= stop)
@@ -254,12 +277,16 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 if (!bar || bar.closeTime !== now)
                     continue;
                 const idx = c.ei++;
-                if (c.position && input.variant.researchOnly && idx >= 240 && (idx + 1) % 24 === 0) {
+                if (c.position && isLocalEntry(c.position.intent) && idx >= 168) {
+                    const mean = c.panel.bars.slice(idx - 168, idx).reduce((sum, b) => sum + b.close, 0) / 168;
+                    if (bar.close < mean) requestExit(c.position, now, "LOCAL_TREND_LOST");
+                }
+                if (c.position && !isLocalEntry(c.position.intent) && input.variant.researchOnly && idx >= 240 && (idx + 1) % 24 === 0) {
                     const avg = c.panel.bars.slice(idx - 240, idx).reduce((sum, b) => sum + b.close, 0) / 240;
                     if (bar.close < avg)
                         requestExit(c.position, now, "TREND_TO_CASH");
                 }
-                if (c.position || c.pending || idx < 48 || (!input.variant.researchOnly && idx % 4 !== 0))
+                if (c.position || c.pending || now < c.cooldownUntil || idx < 48 || (!input.variant.researchOnly && idx % 4 !== 0))
                     continue;
                 const tb = c.panel.executionBarsTRY[c.lastTry];
                 if (!tb || tb.closeTime > now || now - tb.closeTime > 5 * 60000)
@@ -267,13 +294,24 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 const bi = lastBefore(input.btcPanel.bars, now, b => b.closeTime);
                 const snapshot: MarketSnapshot = { nowMs: now, baseAsset: c.panel.baseAsset, externalSymbol: c.panel.symbol, executionSymbol: c.panel.executionSymbol,
                     externalBarIdx: idx, externalClose: bar.close, tryBarIdx: c.lastTry, tryPrice: tb.close, tryVolume: tb.volume, tryAvailableAtMs: tb.closeTime,
+                    executionEstimate: { feePerSidePct: fee * 100, slippageBpsPerSide: slip * 10000 },
+                    entryDiagnostics,
                     btcExternalReturn4hPct: bi >= 4 ? (input.btcPanel.bars[bi].close / input.btcPanel.bars[bi - 4].close - 1) * 100 : null,
                     relativeStrengthRank: rank.findIndex(r => r.symbol === c.panel.symbol) + 1 };
                 const intent = evaluateUnifiedEntryDecision({ variant: input.variant, panel: c.panel, barIdx: idx, snapshot, nowMs: now });
                 if (!intent || intent.side !== "LONG" || intent.invalidationCurrency !== "TRY")
                     continue;
                 let notional = budget;
-                if (input.variant.researchOnly) {
+                if (isLocalEntry(intent)) {
+                    const account = markedEquity();
+                    if (!riskEntryAllowed()) { riskBlockedSignals++; continue; }
+                    const riskBudgetTry = Math.min(account * LOCAL_ENTRY_RISK.riskFraction, account * LOCAL_ENTRY_RISK.totalRiskFraction - modeledOpenRisk());
+                    const plan = planLocalEntry({ intent, mark: snapshot.tryPrice, nowMs: now, maxNotionalTry: budget, riskBudgetTry, feePerSidePct: fee * 100, slippageBpsPerSide: slip * 10000 });
+                    if (!plan) { riskRejectedEntries++; continue; }
+                    notional = plan.notionalTry;
+                    intent.metadata.riskBudgetTry = riskBudgetTry;
+                    intent.metadata.plannedStopRiskTry = plan.modeledStopRiskTry;
+                } else if (input.variant.researchOnly) {
                     const recent = c.panel.executionBarsTRY.slice(Math.max(0, c.lastTry - 59), c.lastTry + 1);
                     if (recent.length < 60 || recent.filter(b => b.volume > 0).length < 54 || recent.reduce((s, b) => s + b.quoteVolume, 0) * participation < budget)
                         continue;
@@ -286,7 +324,7 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                     rejectedCash++;
                     continue;
                 }
-                c.pending = { intent, notional, expires: now + 15 * 60000 };
+                c.pending = { intent, notional, expires: now + (isLocalEntry(intent) ? LOCAL_ENTRY_RISK.entryTtlMs : 15 * 60000) };
             }
             lastEquity = markedEquity();
             peak = Math.max(peak, lastEquity);
@@ -304,9 +342,10 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 mark: c.position.mark, markAtMs: c.position.markAtMs, exitPending: !!c.position.exit,
                 unrealizedPnlTry: c.position.remaining * (c.position.mark - c.position.entryPrice) }] : []);
         equity.push({ atMs: input.periodEnd, cashTry: cash, equityTry: lastEquity, openPositions: openPositions.length });
-        return { trades, stats: tradeStatistics(trades, maxDd), equity, openPositions,
-            portfolio: { initialCashTry: initialCash, cashTry: cash, equityTry: lastEquity, netPnlTry: lastEquity - initialCash, maxDrawdownPct: maxDd, rejectedCash, expiredOrders },
+        return { trades, stats: tradeStatistics(trades, maxDd), equity, openPositions, entryDiagnostics,
+            portfolio: { initialCashTry: initialCash, cashTry: cash, equityTry: lastEquity, netPnlTry: lastEquity - initialCash, maxDrawdownPct: maxDd, rejectedCash, expiredOrders, riskRejectedEntries, riskBlockedSignals },
             config: { version: TRY_REPLAY_VERSION, variant: input.variant, feePerSidePct: fee * 100, slippageBpsPerSide: slip * 10000, participationRate: participation,
+                executionRiskPolicy: input.variant.entryCandidate.startsWith("local_") ? LOCAL_ENTRY_RISK : null,
                 initialCashTry: initialCash, notionalTry: budget, maxPositions, executionModel: "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP", feeSource: "UNVERIFIED_ACCOUNT_ASSUMPTION", equityModel: "LAST_TRADED_CLOSE_MTM" },
             elapsedMs: Date.now() - started };
     }

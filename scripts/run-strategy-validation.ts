@@ -90,7 +90,7 @@ async function main() {
             reasons.push("OPEN_POSITIONS_AT_DATA_END");
         if (diagnostic)
             reasons.push("DIAGNOSTIC_SUBSET");
-        const row = { variantId: variant.id, researchOnly: !!variant.researchOnly, benchmarks: completed.benchmarks, stats: run.stats, portfolio: run.portfolio, walkForward: { method: "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING", folds, positiveRatio: ratio }, concentration: conc, bootstrap: ci, acceptance: { pass: reasons.length === 0, reasons }, elapsedMs: run.elapsedMs, evidenceFile: path.relative(process.cwd(), result), executionModel: run.config.executionModel };
+        const row = { variantId: variant.id, researchOnly: !!variant.researchOnly, benchmarks: completed.benchmarks, stats: run.stats, portfolio: run.portfolio, entryDiagnostics: run.entryDiagnostics, walkForward: { method: "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING", folds, positiveRatio: ratio }, concentration: conc, bootstrap: ci, acceptance: { pass: reasons.length === 0, reasons }, elapsedMs: run.elapsedMs, evidenceFile: path.relative(process.cwd(), result), executionModel: run.config.executionModel };
         results.push(row);
         console.log(JSON.stringify(row));
     }

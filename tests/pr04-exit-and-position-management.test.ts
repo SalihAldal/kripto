@@ -14,7 +14,6 @@ import { buildMatchedEntryManifest, verifyManifestImmutable } from "@/src/server
 import {
   allocateFeeAcrossFills,
   buildExitPnlSnapshot,
-  computeWeightedEntryPrice,
   priceBreakEvenWithFees,
 } from "@/src/server/profitability/pr04-pnl-accounting";
 import { computePartialLegQuantity, applyPartialFill, totalSellWouldExceed } from "@/src/server/profitability/pr04-partial-exit";
@@ -90,6 +89,15 @@ function initState(policyId: keyof typeof EXIT_POLICY_REGISTRY, entry = 100, qty
 }
 
 describe("PR04 exit and position management", () => {
+  it("labels a tightened trailing stop separately from the original structural stop", () => {
+    initState("STRUCTURAL_STOP_TRAIL");
+    const armed = evaluateExitPolicyTick({ positionId: "pos-1", side: "LONG", observation: obs(102, 1) });
+    expect(armed.state.trailingArmed).toBe(true);
+    expect(armed.decision.kind).toBe("NONE");
+    const hit = evaluateExitPolicyTick({ positionId: "pos-1", side: "LONG", observation: obs(101, 2) });
+    expect(hit.decision.kind).toBe("TRAILING_STOP");
+    expect(hit.decision.reasonCode).toBe("TRAILING_STOP_HIT");
+  });
   beforeEach(() => {
     resetExitPolicyStoreForTests();
     resetProfitabilityExperimentRegistryForTests();
@@ -532,7 +540,7 @@ describe("PR04 exit and position management", () => {
   });
 
   it("38 partial realized plus open remainder preserves totals", () => {
-    const state = initState("STRUCTURAL_PARTIAL_TRAIL", 100, 2);
+    initState("STRUCTURAL_PARTIAL_TRAIL", 100, 2);
     applyExitFill({
       positionId: "pos-1",
       fill: { price: 102.5, quantity: 0.5, fee: 0.05, feeAsset: "QUOTE", atMs: baseNow + 1 },

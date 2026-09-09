@@ -196,7 +196,10 @@ export function evaluateExitPolicyTick(input: {
   if (def.structuralStop && state.activeStopPrice != null) {
     const hit = input.side === "LONG" ? mark <= state.activeStopPrice : mark >= state.activeStopPrice;
     if (hit) {
-      candidates.push(makeDecision(state, "STRUCTURAL_STOP", "STRUCTURAL_STOP_HIT", mark, state.remainingQuantity, input.observation));
+      const initialStop = state.riskReference.initialStopPrice;
+      const initialHit = initialStop != null && (input.side === "LONG" ? mark <= initialStop : mark >= initialStop);
+      const trailingHit = def.trailing && state.trailingArmed && initialStop != null && !initialHit;
+      candidates.push(makeDecision(state, trailingHit ? "TRAILING_STOP" : "STRUCTURAL_STOP", trailingHit ? "TRAILING_STOP_HIT" : "STRUCTURAL_STOP_HIT", mark, state.remainingQuantity, input.observation));
     }
   }
 
@@ -241,7 +244,7 @@ export function evaluateExitPolicyTick(input: {
     state.trailingArmed = trailing.armed;
     state.trailingHighWaterMark = trailing.highWaterMark;
     if (trailing.stopPrice != null) state.activeStopPrice = trailing.stopPrice;
-    if (isTrailingStopHit({ side: input.side, markPrice: mark, stopPrice: trailing.stopPrice })) {
+    if (trailing.armed && isTrailingStopHit({ side: input.side, markPrice: mark, stopPrice: trailing.stopPrice })) {
       candidates.push(makeDecision(state, "TRAILING_STOP", "TRAILING_STOP_HIT", mark, state.remainingQuantity, input.observation));
     }
   }

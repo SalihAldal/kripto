@@ -47,6 +47,10 @@ export function buildRiskReference(input: {
     };
   }
   const stop = input.initialStopPrice;
+  if (!Number.isFinite(input.initialQuantity) || input.initialQuantity <= 0 || !Number.isFinite(input.entryFee) || input.entryFee < 0) {
+    return { entryPrice: input.entryPrice, initialStopPrice: stop, initialRiskPerUnit: null, initialRiskNotional: null,
+      includesFeesInBreakEven: input.includesFeesInBreakEven, computedAtMs: input.computedAtMs, quality: "INSUFFICIENT_DATA", reasonCode: "QUANTITY_OR_FEE_INVALID" };
+  }
   if (stop == null || !Number.isFinite(stop)) {
     return {
       entryPrice: input.entryPrice,
@@ -76,7 +80,9 @@ export function buildRiskReference(input: {
     input.includesFeesInBreakEven && input.initialQuantity > 0
       ? input.entryFee / input.initialQuantity
       : 0;
-  const adjustedRiskPerUnit = Math.max(riskPerUnit - feePerUnit, 0);
+  // Entry fees increase the amount lost at the stop. They cannot reduce risk.
+  // Future exit fee/slippage are not supplied by this legacy contract.
+  const adjustedRiskPerUnit = riskPerUnit + feePerUnit;
   const notional = adjustedRiskPerUnit * input.initialQuantity;
   return {
     entryPrice: input.entryPrice,

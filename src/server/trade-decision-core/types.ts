@@ -1,7 +1,7 @@
 import type { ExitPolicyId } from "@/src/server/profitability/pr04-types";
 import type { OiImpulseAlphaId } from "@/src/server/alpha-engine-v2/oi-impulse-alpha-v2.service";
 
-export type SignalAlphaId = OiImpulseAlphaId | "SPOT_TREND" | "SPOT_RELATIVE_STRENGTH" | "SPOT_SHOCK_RECLAIM";
+export type SignalAlphaId = OiImpulseAlphaId | "SPOT_TREND" | "SPOT_RELATIVE_STRENGTH" | "SPOT_SHOCK_RECLAIM" | "LOCAL_BREAKOUT" | "LOCAL_PULLBACK";
 
 export type TradeVenue = "BINANCE_TR_TRY_SPOT";
 export type SignalVenue = "BINANCE_USDT_PERPETUAL";
@@ -31,6 +31,9 @@ export type MarketSnapshot = {
   btcExternalReturn4hPct: number | null;
   tryAvailableAtMs?: number;
   relativeStrengthRank?: number;
+  executionEstimate?: { feePerSidePct: number; slippageBpsPerSide: number };
+  /** Optional replay-only counters; never used to decide an order. */
+  entryDiagnostics?: Record<string, number>;
 };
 
 export type EntryCandidateId =
@@ -39,7 +42,7 @@ export type EntryCandidateId =
   | "baseline_oi_v2_funding"
   | "entry_regime_filter"
   | "entry_liquidity_filter"
-  | "trend_cash" | "relative_strength" | "shock_reclaim";
+  | "trend_cash" | "relative_strength" | "shock_reclaim" | "local_breakout" | "local_pullback";
 
 export type ExitModeId = "fixed_8h" | "pr04_trail" | "pr04_time_decay" | "research_trend";
 
@@ -49,7 +52,7 @@ export type StrategyVariantId =
   | "entry_regime_filter_fixed_8h"
   | "baseline_v2_pr04_trail"
   | "combined_regime_trail"
-  | "research_trend_cash" | "research_relative_strength" | "research_shock_reclaim";
+  | "research_trend_cash" | "research_relative_strength" | "research_shock_reclaim" | "research_local_breakout" | "research_local_pullback";
 
 export type StrategyVariantConfig = {
   id: StrategyVariantId;

@@ -1,0 +1,989 @@
+{
+  "generatedAt": "2026-09-09T16:49:52.582Z",
+  "status": "COMPLETED",
+  "STRATEGY_VALIDATION_STATUS": "FAIL",
+  "paperEligible": null,
+  "LIVE_STATUS": "DISABLED",
+  "liveTradingEnabled": false,
+  "repositoryHead": "455460eb76c1ca2f378f20d3e2284d51237fd97a",
+  "sourceHash": "65319313d5d97e7f3542157d699b0533c06c1da97e082fd40149d6288e9e17d1",
+  "datasetHash": "815e2a29061f628b31c6afb3b760f2653244d41f00d7afbd9103e514a270fa5c",
+  "replayVersion": "causal-portfolio-v2",
+  "diagnostic": false,
+  "researchOnly": true,
+  "acceptanceCriteria": {
+    "minTrades": 40,
+    "minExpectancy": 0,
+    "minProfitFactor": 1.05,
+    "maxDrawdownPct": 20,
+    "minPositiveFoldRatio": 0.55,
+    "maxTopSymbolContributionPct": 45
+  },
+  "period": {
+    "validationStart": 1760572800000,
+    "validationEnd": 1783900799999
+  },
+  "dataSplit": {
+    "development": {
+      "start": 1756684800000,
+      "end": 1760572799999
+    },
+    "validation": {
+      "start": 1760572800000,
+      "end": 1783900799999
+    },
+    "buffer": {
+      "start": 1783900800000,
+      "end": 1784332799999
+    },
+    "freshPartial": {
+      "start": 1784332800000,
+      "end": 1788220799999,
+      "status": "PARTIAL_SEEN_IN_PRIOR_RESEARCH_NOT_USED_FOR_SELECTION"
+    }
+  },
+  "variants": [
+    {
+      "variantId": "research_trend_cash",
+      "researchOnly": true,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -11.450463353522256
+        }
+      },
+      "stats": {
+        "trades": 22,
+        "wins": 7,
+        "losses": 15,
+        "grossPnl": -1.5941220764298905,
+        "netPnl": -98.3215932966296,
+        "expectancy": -4.469163331664982,
+        "profitFactor": 0.6051472851525584,
+        "maxDrawdown": 2.1896061766657584,
+        "longTrades": 22,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 9901.678406703373,
+        "equityTry": 9901.678406703373,
+        "netPnlTry": -98.32159329662682,
+        "maxDrawdownPct": 2.1896061766657584,
+        "rejectedCash": 8,
+        "expiredOrders": 0,
+        "riskRejectedEntries": 0,
+        "riskBlockedSignals": 0
+      },
+      "entryDiagnostics": {},
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -16.013657031240655
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": 64.54849668537281
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": -15.762694290820946
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": -15.824310796806458
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -4.39692215285686
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": 0.009414530426511192
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -39.621189769999546
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -48.663981672969385
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -38.890647887265004
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": 16.293899089532715
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": 0
+          }
+        ],
+        "positiveRatio": 0.16666666666666666
+      },
+      "concentration": {
+        "topSymbol": "XRPUSDT",
+        "topSymbolContributionPct": 61.164435045797106,
+        "bySymbol": {
+          "AVAXUSDT": -69.44407058164742,
+          "XRPUSDT": 50.33254599472674,
+          "BNBUSDT": -32.79966810890068,
+          "BTCUSDT": -28.486806583130402,
+          "ETHUSDT": -4.2095959753924905,
+          "ADAUSDT": -23.210845766748577,
+          "SOLUSDT": 31.957997451051924,
+          "DOGEUSDT": -22.461149726588705
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.012883118385827844,
+        "upperDailyMeanPct": 0.00538471461381677
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "LOW_SAMPLE",
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "FOLD_RATIO",
+          "CONCENTRATION"
+        ]
+      },
+      "elapsedMs": 708,
+      "evidenceFile": "artifacts/strategy-runs/7d7000a192ac6ad4d3633fd840d115a548898f59b6ec2dc585ff22decfa06900/research_trend_cash.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "research_relative_strength",
+      "researchOnly": true,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -11.018883167915572
+        }
+      },
+      "stats": {
+        "trades": 9,
+        "wins": 3,
+        "losses": 6,
+        "grossPnl": -10.520139837223375,
+        "netPnl": -50.06195957721441,
+        "expectancy": -5.562439953023823,
+        "profitFactor": 0.5911846934293754,
+        "maxDrawdown": 1.0529491807639224,
+        "longTrades": 9,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 9949.938040422787,
+        "equityTry": 9949.938040422787,
+        "netPnlTry": -50.0619595772132,
+        "maxDrawdownPct": 1.0529491807639224,
+        "rejectedCash": 0,
+        "expiredOrders": 2,
+        "riskRejectedEntries": 0,
+        "riskBlockedSignals": 0
+      },
+      "entryDiagnostics": {},
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -4.39692215285686
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -8.50499684307033
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -39.71938696282268
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": 2.5593463815366704
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": 0
+          }
+        ],
+        "positiveRatio": 0.05555555555555555
+      },
+      "concentration": {
+        "topSymbol": "SOLUSDT",
+        "topSymbolContributionPct": 100,
+        "bySymbol": {
+          "XRPUSDT": -4.396922152857909,
+          "AVAXUSDT": -42.361411418691105,
+          "ETHUSDT": -20.995372400117404,
+          "ADAUSDT": -23.210845766748577,
+          "SOLUSDT": 40.90259216120057
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.007592601887397052,
+        "upperDailyMeanPct": 0.0039478059993912915
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "LOW_SAMPLE",
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "FOLD_RATIO",
+          "CONCENTRATION"
+        ]
+      },
+      "elapsedMs": 681,
+      "evidenceFile": "artifacts/strategy-runs/7d7000a192ac6ad4d3633fd840d115a548898f59b6ec2dc585ff22decfa06900/research_relative_strength.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "research_shock_reclaim",
+      "researchOnly": true,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -10.43393647005989
+        }
+      },
+      "stats": {
+        "trades": 2,
+        "wins": 2,
+        "losses": 0,
+        "grossPnl": 24.21121961533172,
+        "netPnl": 15.347237428002828,
+        "expectancy": 7.673618714001414,
+        "profitFactor": 999,
+        "maxDrawdown": 0.4458638859918553,
+        "longTrades": 2,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 10015.347237428003,
+        "equityTry": 10015.347237428003,
+        "netPnlTry": 15.3472374280027,
+        "maxDrawdownPct": 0.4458638859918553,
+        "rejectedCash": 0,
+        "expiredOrders": 0,
+        "riskRejectedEntries": 0,
+        "riskBlockedSignals": 0
+      },
+      "entryDiagnostics": {},
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": 15.3472374280027
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": 0
+          }
+        ],
+        "positiveRatio": 0.05555555555555555
+      },
+      "concentration": {
+        "topSymbol": "SUIUSDT",
+        "topSymbolContributionPct": 95.43843750730854,
+        "bySymbol": {
+          "SUIUSDT": 14.647163601822745,
+          "BNBUSDT": 0.7000738261800814
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": 0,
+        "upperDailyMeanPct": 0.0017052486031114236
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "LOW_SAMPLE",
+          "FOLD_RATIO",
+          "CONCENTRATION"
+        ]
+      },
+      "elapsedMs": 610,
+      "evidenceFile": "artifacts/strategy-runs/7d7000a192ac6ad4d3633fd840d115a548898f59b6ec2dc585ff22decfa06900/research_shock_reclaim.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "research_local_breakout",
+      "researchOnly": true,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -16.368078917546004
+        }
+      },
+      "stats": {
+        "trades": 140,
+        "wins": 74,
+        "losses": 66,
+        "grossPnl": -33.24887176029169,
+        "netPnl": -648.2132097503812,
+        "expectancy": -4.630094355359866,
+        "profitFactor": 0.5400997066336616,
+        "maxDrawdown": 7.192809584955404,
+        "longTrades": 140,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 9351.786790249622,
+        "equityTry": 9351.786790249622,
+        "netPnlTry": -648.2132097503782,
+        "maxDrawdownPct": 7.192809584955404,
+        "rejectedCash": 11,
+        "expiredOrders": 34,
+        "riskRejectedEntries": 50,
+        "riskBlockedSignals": 0
+      },
+      "entryDiagnostics": {
+        "EVALUATED": 63907,
+        "EXTERNAL_TREND": 39081,
+        "CONTEXT_OR_BTC_SHOCK": 7021,
+        "VOLUME_OR_COST_ROOM": 14901,
+        "EXTERNAL_SETUP": 2409,
+        "INTENT_ACCEPTED": 235,
+        "LOCAL_LIQUIDITY": 153,
+        "LOCAL_STALE_OR_NO_TRADE": 55,
+        "LOCAL_PRICE_CONFIRMATION": 49,
+        "LOCAL_STOP_DISTANCE": 3
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -68.45739423421946
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": -73.68449250529193
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -32.20242727409823
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": 19.61239355046382
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": -98.4437268907277
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -9.560924122421056
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": 6.914058128499164
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": -3.9844064818880724
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": 37.97390909850765
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": -54.00384237817525
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -210.97857853603637
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -54.90493156019511
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": -29.757201988526504
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -109.35731974747796
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": 74.08123743695978
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": -41.45956224575093
+          }
+        ],
+        "positiveRatio": 0.2222222222222222
+      },
+      "concentration": {
+        "topSymbol": "ETHUSDT",
+        "topSymbolContributionPct": 100,
+        "bySymbol": {
+          "ADAUSDT": -11.655513781029173,
+          "DOGEUSDT": -96.52642323156229,
+          "BTCUSDT": -52.58338432137802,
+          "ETHUSDT": 19.651755168690435,
+          "XRPUSDT": -100.72344105305278,
+          "BNBUSDT": -54.54332148948463,
+          "AVAXUSDT": -228.99019712068338,
+          "SOLUSDT": -21.415048180751242,
+          "SUIUSDT": -101.4276357411299
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.041925419771969015,
+        "upperDailyMeanPct": -0.007949474501713658
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "FOLD_RATIO",
+          "CONCENTRATION"
+        ]
+      },
+      "elapsedMs": 1248,
+      "evidenceFile": "artifacts/strategy-runs/7d7000a192ac6ad4d3633fd840d115a548898f59b6ec2dc585ff22decfa06900/research_local_breakout.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    },
+    {
+      "variantId": "research_local_pullback",
+      "researchOnly": true,
+      "benchmarks": {
+        "btcHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 6388.572406747588,
+          "netPnlTry": -3611.4275932524124,
+          "returnPct": -36.11427593252412,
+          "entries": 1,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "equalWeightHold": {
+          "initialCashTry": 10000,
+          "finalMarkedEquityTry": 4447.437350754406,
+          "netPnlTry": -5552.562649245594,
+          "returnPct": -55.525626492455935,
+          "entries": 10,
+          "exitFeesIncluded": false,
+          "model": "BUY_AND_HOLD_MARKED_NOT_LIQUIDATED_NOT_EXPOSURE_MATCHED"
+        },
+        "tryCash": {
+          "netPnlTry": 0
+        },
+        "currencyAdjusted": {
+          "status": "CONTEXT_TRANSLATION_NOT_FX_EXECUTION",
+          "startUsdtTry": 41.96,
+          "endUsdtTry": 46.92,
+          "returnUsdtPct": -12.496887198684226
+        }
+      },
+      "stats": {
+        "trades": 90,
+        "wins": 53,
+        "losses": 37,
+        "grossPnl": 180.88334828114608,
+        "netPnl": -215.33352564887252,
+        "expectancy": -2.392594729431917,
+        "profitFactor": 0.7272654352806875,
+        "maxDrawdown": 2.4420641676554165,
+        "longTrades": 90,
+        "shortTrades": 0,
+        "cashSkips": 0
+      },
+      "portfolio": {
+        "initialCashTry": 10000,
+        "cashTry": 9784.666474351134,
+        "equityTry": 9784.666474351134,
+        "netPnlTry": -215.33352564886627,
+        "maxDrawdownPct": 2.4420641676554165,
+        "rejectedCash": 7,
+        "expiredOrders": 18,
+        "riskRejectedEntries": 31,
+        "riskBlockedSignals": 0
+      },
+      "entryDiagnostics": {
+        "EVALUATED": 64146,
+        "EXTERNAL_TREND": 39079,
+        "CONTEXT_OR_BTC_SHOCK": 7041,
+        "VOLUME_OR_COST_ROOM": 14988,
+        "LOCAL_LIQUIDITY": 210,
+        "EXTERNAL_SETUP": 2433,
+        "INTENT_ACCEPTED": 146,
+        "LOCAL_PRICE_CONFIRMATION": 166,
+        "LOCAL_STALE_OR_NO_TRADE": 83
+      },
+      "walkForward": {
+        "method": "FROZEN_RULE_TEMPORAL_STABILITY_NOT_MODEL_FITTING",
+        "folds": [
+          {
+            "start": 1760572800000,
+            "end": 1761868799999,
+            "netPnlTry": -86.30003747984847
+          },
+          {
+            "start": 1761868800000,
+            "end": 1763164799999,
+            "netPnlTry": 8.672887808352243
+          },
+          {
+            "start": 1763164800000,
+            "end": 1764460799999,
+            "netPnlTry": -52.22927472372976
+          },
+          {
+            "start": 1764460800000,
+            "end": 1765756799999,
+            "netPnlTry": 5.997870095547114
+          },
+          {
+            "start": 1765756800000,
+            "end": 1767052799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1767052800000,
+            "end": 1768348799999,
+            "netPnlTry": 3.442465224483385
+          },
+          {
+            "start": 1768348800000,
+            "end": 1769644799999,
+            "netPnlTry": -8.432767175387198
+          },
+          {
+            "start": 1769644800000,
+            "end": 1770940799999,
+            "netPnlTry": 0
+          },
+          {
+            "start": 1770940800000,
+            "end": 1772236799999,
+            "netPnlTry": -19.57964205056487
+          },
+          {
+            "start": 1772236800000,
+            "end": 1773532799999,
+            "netPnlTry": 101.05752697973548
+          },
+          {
+            "start": 1773532800000,
+            "end": 1774828799999,
+            "netPnlTry": 36.1114663117296
+          },
+          {
+            "start": 1774828800000,
+            "end": 1776124799999,
+            "netPnlTry": 5.815867984347278
+          },
+          {
+            "start": 1776124800000,
+            "end": 1777420799999,
+            "netPnlTry": -112.91812378227405
+          },
+          {
+            "start": 1777420800000,
+            "end": 1778716799999,
+            "netPnlTry": -2.1199908868948114
+          },
+          {
+            "start": 1778716800000,
+            "end": 1780012799999,
+            "netPnlTry": 7.03960952325906
+          },
+          {
+            "start": 1780012800000,
+            "end": 1781308799999,
+            "netPnlTry": -33.10283341313516
+          },
+          {
+            "start": 1781308800000,
+            "end": 1782604799999,
+            "netPnlTry": 10.08177351847553
+          },
+          {
+            "start": 1782604800000,
+            "end": 1783900799999,
+            "netPnlTry": -78.87032358296165
+          }
+        ],
+        "positiveRatio": 0.4444444444444444
+      },
+      "concentration": {
+        "topSymbol": "ETHUSDT",
+        "topSymbolContributionPct": 76.87211971474306,
+        "bySymbol": {
+          "ADAUSDT": -39.921014760241235,
+          "DOGEUSDT": -11.066750259471569,
+          "BTCUSDT": 9.97161726204638,
+          "ETHUSDT": 38.20049051370484,
+          "XRPUSDT": -60.05608362751482,
+          "AVAXUSDT": 1.5214490761466628,
+          "SOLUSDT": -37.246089114188024,
+          "BNBUSDT": -17.94124011687763,
+          "SUIUSDT": -98.79590462247725
+        }
+      },
+      "bootstrap": {
+        "status": "DESCRIPTIVE_ONLY_NOT_MULTIPLE_TEST_ADJUSTED",
+        "lowerDailyMeanPct": -0.022547741617710868,
+        "upperDailyMeanPct": 0.0072656199067405525
+      },
+      "acceptance": {
+        "pass": false,
+        "reasons": [
+          "EXPECTANCY_OR_PORTFOLIO_PNL",
+          "PROFIT_FACTOR",
+          "FOLD_RATIO",
+          "CONCENTRATION"
+        ]
+      },
+      "elapsedMs": 1221,
+      "evidenceFile": "artifacts/strategy-runs/7d7000a192ac6ad4d3633fd840d115a548898f59b6ec2dc585ff22decfa06900/research_local_pullback.json",
+      "executionModel": "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP"
+    }
+  ],
+  "RESEARCH_VALIDATION_STATUS": "FAIL",
+  "elapsedMs": 62519
+}

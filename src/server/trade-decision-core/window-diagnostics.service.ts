@@ -49,6 +49,7 @@ export function summarizeWindow(run: ReturnType<typeof runTrySpotReplayUniverse>
         sampledInvestedPct: average(run.equity.map(p => p.equityTry > 0 ? (p.equityTry - p.cashTry) / p.equityTry * 100 : 0)),
         exposureMethod: "HOURLY_AND_DAY_BOUNDARY_SAMPLE_NOT_EXACT_TIME_WEIGHTED",
         expiredOrders: run.portfolio.expiredOrders, rejectedCashOrCapacity: run.portfolio.rejectedCash,
+        riskRejectedEntries: run.portfolio.riskRejectedEntries, riskBlockedSignals: run.portfolio.riskBlockedSignals, entryDiagnostics: run.entryDiagnostics,
         byExit, bySymbol: conc.bySymbol, positiveFoldRatio: foldRatio,
         economicScreen: { pass: reasons.length === 0, reasons },
         paperEligible: null, promotionStatus: "BLOCKED_SEEN_DIAGNOSTICS",

@@ -10,7 +10,7 @@ export function atomicJson(file: string, value: unknown) {
     fs.renameSync(tmp, file);
 }
 export function sourceFingerprint() {
-    const files = execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "src/server", "scripts", "package.json", "package-lock.json"], { encoding: "utf8" }).split("\0").filter(Boolean);
+    const files = execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "src/server", "scripts", "package.json", "package-lock.json", "tsconfig.json", "tsconfig.strategy-tools.json"], { encoding: "utf8" }).split("\0").filter(Boolean);
     return sha([...new Set(files)].sort().map(f => `${f}:${fs.existsSync(f) ? sha(fs.readFileSync(f)) : "deleted"}`).join("\n"));
 }
 export function verifyDataset(root: string) {

@@ -1,6 +1,7 @@
 import { buildOiFeatures } from "@/src/server/alpha-engine-v2/oi-features.service";
 import type { ExternalSymbolPanel } from "@/src/server/alpha-engine-v2/external-market-data.types";
 import type { EntrySignalIntent, MarketSnapshot, StrategyVariantConfig, SignalAlphaId } from "./types";
+import { evaluateLocalConfirmedEntry } from "./local-confirmed-entry.service";
 
 function nearestFunding(panel: ExternalSymbolPanel, time: number) {
   let best: ExternalSymbolPanel["funding"][number] | undefined;
@@ -132,9 +133,12 @@ export const RESEARCH_VARIANTS: StrategyVariantConfig[] = [
   { id: "research_trend_cash", entryCandidate: "trend_cash", exitMode: "research_trend", alphaId: "SPOT_TREND", oiFundingRequired: false, researchOnly: true, label: "Daily breakout + cash (research)" },
   { id: "research_relative_strength", entryCandidate: "relative_strength", exitMode: "research_trend", alphaId: "SPOT_RELATIVE_STRENGTH", oiFundingRequired: false, researchOnly: true, label: "Daily breakout + top-3 strength (research)" },
   { id: "research_shock_reclaim", entryCandidate: "shock_reclaim", exitMode: "research_trend", alphaId: "SPOT_SHOCK_RECLAIM", oiFundingRequired: false, researchOnly: true, label: "Price shock reclaim (research, not liquidation data)" },
+  { id: "research_local_breakout", entryCandidate: "local_breakout", exitMode: "pr04_trail", alphaId: "LOCAL_BREAKOUT", oiFundingRequired: false, researchOnly: true, label: "TRY-confirmed hourly breakout + PR04 (frozen research)" },
+  { id: "research_local_pullback", entryCandidate: "local_pullback", exitMode: "pr04_trail", alphaId: "LOCAL_PULLBACK", oiFundingRequired: false, researchOnly: true, label: "TRY-confirmed trend pullback + PR04 (frozen research)" },
 ];
 
 function evaluateResearchEntry(input: {variant: StrategyVariantConfig; panel: ExternalSymbolPanel; barIdx: number; snapshot: MarketSnapshot}): EntrySignalIntent | null {
+  if (input.variant.entryCandidate === "local_breakout" || input.variant.entryCandidate === "local_pullback") return evaluateLocalConfirmedEntry(input);
   const {panel, barIdx: i, variant, snapshot} = input;
   if (i < 240 || snapshot.tryVolume <= 0) return null;
   const b = panel.bars[i];

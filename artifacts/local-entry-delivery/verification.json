@@ -1,0 +1,16 @@
+{
+  "sourceHash": "65319313d5d97e7f3542157d699b0533c06c1da97e082fd40149d6288e9e17d1",
+  "baseCommit": "455460e",
+  "testsPassed": 92,
+  "suitesPassed": 11,
+  "build": {
+    "exitCode": 0,
+    "timedOut": false,
+    "command": "npm run build"
+  },
+  "lint": "PASS",
+  "paperGateRejectionTest": "PASS",
+  "paperCampaignStarted": false,
+  "postgresIntegration": "BLOCKED_POSTGRES_UNAVAILABLE",
+  "liveOrdersSent": false
+}

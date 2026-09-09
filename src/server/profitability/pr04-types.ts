@@ -141,6 +141,9 @@ export type ExitEvaluationResult = {
 export type ExitPnlSnapshot = {
   realizedGrossPnl: number;
   realizedFees: number;
+  /** Entry fill fees are quote amounts, allocated by exited quantity. */
+  realizedEntryFees?: number;
+  remainingEntryFees?: number;
   realizedNetPnl: number | null;
   unrealizedGrossPnl: number | null;
   unrealizedNetPnl: number | null;
