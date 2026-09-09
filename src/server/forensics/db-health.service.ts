@@ -12,7 +12,8 @@ export class PaperDbUnavailableError extends Error {
 export async function validatePaperDbHealth() {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    await prisma.autoRoundJob.count({ take: 1 }).catch(() => 0);
+    // SELECT 1 alone does not prove migrations/application tables are usable.
+    await prisma.autoRoundJob.count({ take: 1 });
     return { ok: true as const };
   } catch (error) {
     throw new PaperDbUnavailableError((error as Error).message || "Database unavailable");

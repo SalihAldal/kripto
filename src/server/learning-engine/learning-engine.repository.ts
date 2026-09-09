@@ -1,4 +1,5 @@
 import { prisma } from "@/src/server/db/prisma";
+import { createHash } from "node:crypto";
 import type { Prisma } from "@prisma/client";
 import type {
   ConfidenceCalibrationPoint,
@@ -48,15 +49,14 @@ export async function persistDecisionMemory(input: DecisionLearningRecord) {
 }
 
 export async function persistTradeLearningMemory(input: TradeLearningRecord & { learningSummary?: string }) {
-  return prisma.learningMemory.create({
-    data: {
+  const data = {
       memoryType: "TRADE",
       refId: input.tradeId,
       symbol: input.symbol.toUpperCase(),
       payload: input as unknown as Prisma.InputJsonValue,
       summary: input.learningSummary,
-    },
-  });
+    } as const;
+  return prisma.learningMemory.upsert({ where: { id: `trade-learning:${input.tradeId}` }, create: { id: `trade-learning:${input.tradeId}`, ...data }, update: data });
 }
 
 export async function upsertPatternLibrary(input: PatternDiscoveryResult & { metadata?: Record<string, unknown> }) {
@@ -119,16 +119,16 @@ export async function persistKnowledgeEntry(input: {
   patternKey?: string;
   metadata?: Record<string, unknown>;
 }) {
-  return prisma.knowledgeBase.create({
-    data: {
+  const id = `knowledge:${createHash("sha256").update(JSON.stringify([input.category,input.title,input.patternKey ?? null])).digest("hex")}`;
+  const data = {
       title: input.title,
       category: input.category,
       content: input.content,
       tags: input.tags ?? [],
       patternKey: input.patternKey,
       metadata: input.metadata as Prisma.InputJsonValue,
-    },
-  });
+    };
+  return prisma.knowledgeBase.upsert({ where: { id }, create: { id, ...data }, update: data });
 }
 
 export async function persistWeightSuggestion(input: WeightSuggestionRow & { expiresAt?: Date }) {

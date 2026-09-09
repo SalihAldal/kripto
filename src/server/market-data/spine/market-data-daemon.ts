@@ -362,9 +362,13 @@ export class MarketDataDaemon {
   }
 
   subscribeDeep(symbol: string, owner: string, kinds: DeepStreamKind[] = DEFAULT_DEEP_KINDS) {
-    const added = this.subscriptions.subscribe(symbol, kinds, owner);
+    const leased = ["scanner-context", "scanner-ai", "ensure-fresh-kline"].includes(owner);
+    const added = leased ? this.subscriptions.ensureLease(symbol, kinds, owner) : this.subscriptions.subscribe(symbol, kinds, owner);
     if (added.length > 0) this.wsLifecycle.subscriptionAdded += added.length;
     if (added.length) this.enqueue("SUBSCRIBE", added);
+    // The existing stream has already requested bootstrap; repeated reads are not
+    // a new acquisition. Recovery remains available through explicit recovery APIs.
+    if (leased && added.length === 0) return added;
     if (kinds.includes("kline_1m")) {
       void this.bootstrapKlines(symbol).catch(() => undefined);
     }
@@ -529,6 +533,11 @@ export class MarketDataDaemon {
   }
 
   private flushSubscribeQueue() {
+    const expired = this.subscriptions.expireLeases();
+    if (expired.length) {
+      this.wsLifecycle.subscriptionRemoved += expired.length;
+      this.enqueue("UNSUBSCRIBE", expired);
+    }
     const next = this.commandQueue.dequeueBatch();
     if (!next) return;
     this.deep?.send({ method: next.method, params: next.params, id: Date.now() });

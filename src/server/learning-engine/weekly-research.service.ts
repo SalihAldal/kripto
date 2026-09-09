@@ -1,4 +1,5 @@
 import { prisma } from "@/src/server/db/prisma";
+import { researchSeedRecords } from "./research-seed";
 import { persistWeeklyResearch } from "@/src/server/learning-engine/learning-engine.repository";
 
 export async function generateWeeklyResearch(weekStartInput = new Date()) {
@@ -14,6 +15,7 @@ export async function generateWeeklyResearch(weekStartInput = new Date()) {
   ]);
 
   const content = {
+    historicalResearchContext: researchSeedRecords(Math.min(Date.now(), weekEnd.getTime())).map(r => ({ title: r.title, content: r.content, metadata: r.metadata })),
     weekStart: weekStart.toISOString(),
     mostProfitableSetups: patterns.filter((row) => (row.expectancy ?? 0) > 0).slice(0, 10),
     worstSetups: patterns.filter((row) => (row.expectancy ?? 0) < 0).slice(0, 10),

@@ -1,3 +1,4 @@
+import { isKnownLeveragedToken } from "../leveraged-token-symbol";
 export type TradeableSymbol = {
   symbol: string;
   baseAsset: string;
@@ -5,11 +6,10 @@ export type TradeableSymbol = {
   status: string;
 };
 
-const LEVERAGED_RE = /(UP|DOWN|BULL|BEAR)$/;
 const STABLE_BASES = new Set(["USDT", "USDC", "BUSD", "FDUSD", "TUSD", "DAI", "USD1"]);
 
 export function isLeveragedToken(symbol: string) {
-  return LEVERAGED_RE.test(symbol.replace(/USDT|TRY|BUSD|USDC$/i, ""));
+  return isKnownLeveragedToken(symbol);
 }
 
 export function filterTradeableUniverse(

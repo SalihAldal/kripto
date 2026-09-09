@@ -2174,6 +2174,16 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
           runId: run.id,
           sessionId: jobId,
         });
+        if (execution?.executionId) {
+          await updateAutoRoundRun({
+            runId: run.id,
+            metadata: {
+              executionAttemptId: execution.executionId,
+              executionAttemptAt: new Date().toISOString(),
+              executionRejectReason: execution.rejected ? execution.rejectReason ?? null : null,
+            },
+          }).catch(() => null);
+        }
         if (execution?.opened && execution.positionId) {
           break;
         }
@@ -2520,12 +2530,16 @@ export async function startAutoRoundJob(input: StartRoundInput) {
       };
     }
   }
-  const safeMode = await getSafeModeState(user.id);
-  if (safeMode.enabled && !paperMode) {
+  const { assessSafeModeExecutionGate, formatSafeModeTerminalReason } = await import(
+    "@/src/server/recovery/paper-safe-mode-policy.service"
+  );
+  const safeModeGate = await assessSafeModeExecutionGate(user.id);
+  if (safeModeGate.blocked) {
     return {
       started: false,
-      reason: safeMode.reason ?? "Safe mode active",
+      reason: formatSafeModeTerminalReason(safeModeGate),
       job: null,
+      code: safeModeGate.failureCode,
     };
   }
   const pause = await resolveTradingPauseState(user.id, paperMode);

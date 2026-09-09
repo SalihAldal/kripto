@@ -1,7 +1,7 @@
 import type { ExitPolicyId } from "@/src/server/profitability/pr04-types";
 import type { OiImpulseAlphaId } from "@/src/server/alpha-engine-v2/oi-impulse-alpha-v2.service";
 
-export type SignalAlphaId = OiImpulseAlphaId | "SPOT_TREND" | "SPOT_RELATIVE_STRENGTH" | "SPOT_SHOCK_RECLAIM" | "LOCAL_BREAKOUT" | "LOCAL_PULLBACK";
+export type SignalAlphaId = OiImpulseAlphaId | "SPOT_TREND" | "SPOT_RELATIVE_STRENGTH" | "SPOT_SHOCK_RECLAIM" | "LOCAL_BREAKOUT" | "LOCAL_PULLBACK" | "MINUTE_EXPANSION";
 
 export type TradeVenue = "BINANCE_TR_TRY_SPOT";
 export type SignalVenue = "BINANCE_USDT_PERPETUAL";
@@ -42,9 +42,9 @@ export type EntryCandidateId =
   | "baseline_oi_v2_funding"
   | "entry_regime_filter"
   | "entry_liquidity_filter"
-  | "trend_cash" | "relative_strength" | "shock_reclaim" | "local_breakout" | "local_pullback";
+  | "trend_cash" | "relative_strength" | "shock_reclaim" | "local_breakout" | "local_pullback" | "minute_expansion";
 
-export type ExitModeId = "fixed_8h" | "pr04_trail" | "pr04_time_decay" | "research_trend";
+export type ExitModeId = "fixed_8h" | "pr04_trail" | "pr04_time_decay" | "research_trend" | "research_risk_trail";
 
 export type StrategyVariantId =
   | "baseline_fixed_8h_v2"
@@ -52,7 +52,7 @@ export type StrategyVariantId =
   | "entry_regime_filter_fixed_8h"
   | "baseline_v2_pr04_trail"
   | "combined_regime_trail"
-  | "research_trend_cash" | "research_relative_strength" | "research_shock_reclaim" | "research_local_breakout" | "research_local_pullback";
+  | "research_trend_cash" | "research_relative_strength" | "research_shock_reclaim" | "research_local_breakout" | "research_local_pullback" | "research_minute_pr04" | "research_minute_risk_trail";
 
 export type StrategyVariantConfig = {
   id: StrategyVariantId;

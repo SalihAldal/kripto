@@ -8,6 +8,7 @@ import { detectRegimeMismatch } from "@/src/server/trading-core/self-learning/re
 import type { PostTradeCritic, StrategyLearningPatch, TpslOptimizationSuggestion, TradeLearningHorizon, TradeLearningInput, TradeLearningReport } from "@/src/server/trading-core/self-learning/self-learning-types";
 import { classifyNetExitOutcome } from "@/src/server/execution/profit-thresholds";
 import { prisma } from "@/src/server/db/prisma";
+import { guardPaperStrategyMutation } from "@/src/server/forensics/paper-strategy-freeze.service";
 
 const LEARNING_MEMORY_KEY = "trading-core.self-learning.memory";
 
@@ -78,7 +79,7 @@ export class SelfLearningEngine {
     const pattern = this.memory.record(weightedInput);
     const indicatorImpact = this.memory.indicatorImpact();
     const strategyPatch = this.strategyPatch(weightedInput.strategy, pattern);
-    if (apply && strategyPatch) {
+    if (apply && strategyPatch && guardPaperStrategyMutation()) {
       tradingConfig.updateStrategy(weightedInput.strategy, { minScore: strategyPatch.nextMinScore });
     }
     const postTradeCritic = this.critic(weightedInput, pattern);

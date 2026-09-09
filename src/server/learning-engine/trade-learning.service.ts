@@ -39,13 +39,13 @@ export async function learnFromRecentTrades(limit = 50) {
   const rows = await prisma.learningTrade.findMany({ orderBy: { closedAt: "desc" }, take: limit, select: { id: true } });
   let learned = 0;
   for (const row of rows) {
-    await learnFromTrade(row.id).catch(() => null);
-    learned += 1;
+    if (await learnFromTrade(row.id)) learned += 1;
   }
   return { learned };
 }
 
 function scoreFromMeta(meta: Record<string, unknown>, key: string) {
-  const value = Number(meta[key] ?? 0);
+  if (meta[key] == null) return undefined;
+  const value = Number(meta[key]);
   return Number.isFinite(value) ? value : undefined;
 }

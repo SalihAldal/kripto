@@ -28,8 +28,33 @@ export class DynamicSubscriptionManager {
   readonly instanceId = `dynamic-sub-manager:${process.pid}:${Math.random().toString(36).slice(2, 8)}`;
   private readonly refs = new Map<string, RefEntry>();
   private readonly desired = new Set<string>();
+  private readonly leases = new Map<string, { symbol: string; kind: DeepStreamKind; owner: string; expires: number }>();
   private duplicateSuppressed = 0;
+  private leaseCapacityRejected = 0;
   private readonly minHoldMs = 1_200;
+
+  /** Scanner polling renews one owner reference; it must not acquire one per read. */
+  ensureLease(symbol: string, kinds: DeepStreamKind[], owner: string, ttlMs = 120000) {
+    if (!Number.isFinite(ttlMs) || ttlMs <= this.minHoldMs) throw new Error("INVALID_SUBSCRIPTION_LEASE_TTL");
+    const additional = [...new Set(kinds)].filter(kind => !this.desired.has(toBinanceStreamName(symbol, kind))).length;
+    if (this.desired.size + additional > BINANCE_MAX_STREAMS_PER_CONNECTION) { this.leaseCapacityRejected++; return []; }
+    const added: string[] = [];
+    for (const kind of new Set(kinds)) {
+      const key = `${owner}:${toBinanceStreamName(symbol, kind)}`;
+      if (!this.leases.has(key)) added.push(...this.subscribe(symbol, [kind], owner));
+      this.leases.set(key, { symbol, kind, owner, expires: Date.now() + ttlMs });
+    }
+    return added;
+  }
+
+  expireLeases(now = Date.now()) {
+    const removed: string[] = [];
+    for (const [key, lease] of this.leases) if (lease.expires <= now) {
+      this.leases.delete(key);
+      removed.push(...this.unsubscribe(lease.symbol, [lease.kind], lease.owner));
+    }
+    return removed;
+  }
 
   subscribe(symbol: string, kinds: DeepStreamKind[], owner: SubscriptionOwner): string[] {
     const added: string[] = [];
@@ -62,6 +87,7 @@ export class DynamicSubscriptionManager {
       if (!entry) continue;
       const ownerCount = entry.owners.get(owner) ?? 0;
       if (ownerCount <= 0) continue;
+      this.leases.delete(`${owner}:${stream}`);
       if (ownerCount === 1) entry.owners.delete(owner);
       else entry.owners.set(owner, ownerCount - 1);
       entry.count = Math.max(0, entry.count - 1);
@@ -140,6 +166,8 @@ export class DynamicSubscriptionManager {
     return {
       desiredStreams: this.desired.size,
       duplicateSubscriptionSuppressed: this.duplicateSuppressed,
+      leaseCapacityRejected: this.leaseCapacityRejected,
+      activeScannerLeases: this.leases.size,
       stateCounts,
     };
   }
@@ -147,6 +175,8 @@ export class DynamicSubscriptionManager {
   reset() {
     this.refs.clear();
     this.desired.clear();
+    this.leases.clear();
     this.duplicateSuppressed = 0;
+    this.leaseCapacityRejected = 0;
   }
 }

@@ -1,4 +1,5 @@
 import { env } from "@/lib/config";
+import { isKnownLeveragedToken } from "../market-data/leveraged-token-symbol";
 import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
 
 export type TopGainerDiscoveryItem = {
@@ -66,7 +67,7 @@ export function getTopGainerCacheMeta() {
 }
 
 function isBadLeveragedSymbol(symbol: string) {
-  return symbol.includes("UP") || symbol.includes("DOWN") || symbol.includes("BULL") || symbol.includes("BEAR");
+  return isKnownLeveragedToken(symbol);
 }
 
 function normalizeScore(input: { change24h: number; volume24h: number }) {

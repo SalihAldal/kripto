@@ -176,6 +176,16 @@ describe("phase 02 realtime market spine", () => {
     expect(daemon.subscriptions.refCount("BTCUSDT", "aggTrade")).toBe(1);
   });
 
+  it("renews scanner leases without leaking owner references and flushes expiry", () => {
+    const daemon = resetMarketDataDaemonForTests(new MarketDataDaemon({ autoConnect: false, kv: new MemoryKv() }));
+    for (let i = 0; i < 50; i++) daemon.subscribeDeep("BTCUSDT", "scanner-context", ["aggTrade"]);
+    expect(daemon.subscriptions.refCount("BTCUSDT", "aggTrade")).toBe(1);
+    const clock = vi.spyOn(Date, "now").mockReturnValue(Date.now() + 120001);
+    daemon.flushCommandQueue();
+    expect(daemon.subscriptions.refCount("BTCUSDT", "aggTrade")).toBe(0);
+    clock.mockRestore();
+  });
+
   it("normalizes aggTrade taker direction", () => {
     const buy = normalizeAggTrade({ e: "aggTrade", s: "BTCUSDT", p: "100", q: "2", m: false, E: 1, T: 1 });
     const sell = normalizeAggTrade({ e: "aggTrade", s: "BTCUSDT", p: "100", q: "2", m: true, E: 1, T: 1 });

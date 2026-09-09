@@ -1,3 +1,4 @@
+import { prisma } from "@/src/server/db/prisma";
 import { createLearningSession, completeLearningSession } from "@/src/server/learning-engine/learning-engine.repository";
 import { learnFromDecision, learnFromRecentDecisions } from "@/src/server/learning-engine/decision-learning.service";
 import { learnFromRecentTrades, learnFromTrade } from "@/src/server/learning-engine/trade-learning.service";
@@ -20,6 +21,7 @@ export async function runLearningEngineJob(payload: LearningEngineJobPayload) {
   const session = await createLearningSession({ sessionType: payload.type, metadata: payload as Record<string, unknown> });
   emitLearningEngineEvent(LEARNING_EVENT.SESSION_STARTED, { sessionId: session.id, type: payload.type });
 
+  try {
   let result: unknown;
   switch (payload.type) {
     case "DECISION_LEARN":
@@ -76,4 +78,8 @@ export async function runLearningEngineJob(payload: LearningEngineJobPayload) {
   await completeLearningSession(session.id, { result });
   emitLearningEngineEvent(LEARNING_EVENT.SESSION_COMPLETED, { sessionId: session.id, type: payload.type });
   return result;
+  } catch (error) {
+    await prisma.learningSession.update({ where: { id: session.id }, data: { status: "FAILED", completedAt: new Date(), metadata: { errorName: error instanceof Error ? error.name : "UnknownError" } } });
+    throw error;
+  }
 }

@@ -10,7 +10,7 @@ const initial = { status: "RUNNING", ENGINEERING_STATUS: "BLOCKED", STRATEGY_STA
 let active: ChildProcess | null = null, aborted = false;
 fs.mkdirSync(root, { recursive: true }); atomicJson(result, initial);
 for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, () => { aborted = true; active?.kill("SIGTERM"); atomicJson(result, { ...initial, status: "ABORTED" }); });
-const suites = ["pr04-fee-risk-accounting", "local-confirmed-entry", "disposable-postgres-target", "try-replay-correctness", "strategy-window-matrix", "strategy-validation-evidence", "trade-decision-core-parity", "trade-decision-core-production-bridge", "oi-try-spot-audited", "oi-impulse-alpha-v2", "pr04-exit-and-position-management"];
+const suites = ["paper-supervision-runner", "paper-db-schema", "forensics/paper-preflight", "learning-research-integrity", "scanner-subscription-lease", "phase02-realtime-market-spine", "leveraged-token-symbol", "minute-expansion", "pump-scan-scheduler", "opportunity-capture", "pr04-fee-risk-accounting", "local-confirmed-entry", "disposable-postgres-target", "try-replay-correctness", "strategy-window-matrix", "strategy-validation-evidence", "trade-decision-core-parity", "trade-decision-core-production-bridge", "oi-try-spot-audited", "oi-impulse-alpha-v2", "pr04-exit-and-position-management"];
 async function step(name: string, args: string[], timeoutMs = 30 * 60000) {
     if (aborted) throw new Error("ABORTED");
     console.log(`START ${name}`);

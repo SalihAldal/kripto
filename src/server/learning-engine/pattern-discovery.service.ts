@@ -1,3 +1,4 @@
+import { patternEconomics } from "./pattern-economics";
 import { prisma } from "@/src/server/db/prisma";
 import { persistPatternPerformance, upsertPatternLibrary } from "@/src/server/learning-engine/learning-engine.repository";
 import type { PatternDiscoveryResult } from "@/src/server/learning-engine/learning-engine.types";
@@ -5,16 +6,19 @@ import type { PatternDiscoveryResult } from "@/src/server/learning-engine/learni
 export async function discoverPatterns(limit = 200) {
   const stats = await prisma.learningPatternStats.findMany({ orderBy: { updatedAt: "desc" }, take: limit });
   const trades = await prisma.learningTrade.findMany({
+    where: { closedAt: { not: null } },
     orderBy: { closedAt: "desc" },
     take: 500,
-    select: { patternKey: true, returnPercent: true, outcome: true, closedAt: true, symbol: true, metadata: true },
+    select: { mode: true, patternKey: true, returnPercent: true, outcome: true, closedAt: true, symbol: true, metadata: true },
   });
 
-  const byPattern = new Map<string, { wins: number; total: number; roeSum: number; hours: number[]; weekdays: number[]; regimes: string[] }>();
+  const byPattern = new Map<string, { wins: number; total: number; roeSum: number; hours: number[]; weekdays: number[]; regimes: string[]; returns: number[]; modes: string[] }>();
   for (const trade of trades) {
+    if (!Number.isFinite(trade.returnPercent)) continue;
     const key = trade.patternKey ?? "unknown";
-    const bucket = byPattern.get(key) ?? { wins: 0, total: 0, roeSum: 0, hours: [], weekdays: [], regimes: [] };
+    const bucket = byPattern.get(key) ?? { wins: 0, total: 0, roeSum: 0, hours: [], weekdays: [], regimes: [], returns: [], modes: [] };
     bucket.total += 1;
+    bucket.returns.push(trade.returnPercent!); bucket.modes.push(trade.mode);
     if (trade.outcome === "WIN") bucket.wins += 1;
     bucket.roeSum += Number(trade.returnPercent ?? 0);
     if (trade.closedAt) {
@@ -29,12 +33,12 @@ export async function discoverPatterns(limit = 200) {
   const discovered: PatternDiscoveryResult[] = [];
   for (const [patternKey, bucket] of byPattern.entries()) {
     if (bucket.total < 3) continue;
-    const winRate = (bucket.wins / bucket.total) * 100;
-    const expectancy = bucket.roeSum / bucket.total;
+    const economics = patternEconomics(bucket.returns, bucket.modes);
+    const { winRate, expectancy } = economics;
     const hourBucket = modeNumber(bucket.hours);
     const weekday = modeNumber(bucket.weekdays);
     const regime = modeString(bucket.regimes);
-    const status = winRate >= 55 && expectancy > 0 ? "WINNING" : winRate <= 40 || expectancy < -1 ? "LOSING" : "NEUTRAL";
+    const status = economics.status;
     const row: PatternDiscoveryResult = {
       patternKey,
       winRate,
@@ -46,23 +50,26 @@ export async function discoverPatterns(limit = 200) {
       status,
     };
     discovered.push(row);
-    await upsertPatternLibrary({ ...row, metadata: { source: "pattern-discovery" } }).catch(() => null);
+    await upsertPatternLibrary({ ...row, metadata: { source: "pattern-discovery", ...economics, modes: [...new Set(bucket.modes)] } });
     await persistPatternPerformance({
       patternKey,
       winRate,
-      profitFactor: Math.max(0, 1 + expectancy / 10),
+      profitFactor: economics.profitFactor,
+      metadata: { ...economics },
       sampleSize: bucket.total,
-    }).catch(() => null);
+    });
   }
 
   for (const stat of stats) {
+    if (byPattern.has(stat.patternKey)) continue;
     await upsertPatternLibrary({
       patternKey: stat.patternKey,
       winRate: Number(stat.winrate ?? 0),
       sampleSize: stat.sampleCount,
       expectancy: Number(stat.expectancyPercent ?? 0),
-      status: stat.status === "LIVE_ACTIVE" ? "WINNING" : "NEUTRAL",
-    }).catch(() => null);
+      status: "NEUTRAL",
+      metadata: { source: "learning-pattern-stats", economicValidation: "UNVERIFIED", lifecycleStatus: stat.status },
+    });
   }
 
   return { discovered: discovered.length, patterns: discovered.slice(0, 50) };

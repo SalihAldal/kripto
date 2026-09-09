@@ -3,6 +3,9 @@ import type { ExternalSymbolPanel } from "@/src/server/alpha-engine-v2/external-
 import type { EntrySignalIntent, MarketSnapshot, StrategyVariantConfig, SignalAlphaId } from "./types";
 import { evaluateLocalConfirmedEntry } from "./local-confirmed-entry.service";
 
+import { evaluateMinuteExpansionEntry } from "./minute-expansion-entry.service";
+import { evaluateEconBreakoutEntry } from "./econ-breakout-entry.service";
+
 function nearestFunding(panel: ExternalSymbolPanel, time: number) {
   let best: ExternalSymbolPanel["funding"][number] | undefined;
   for (const row of panel.funding) if (row.fundingTime <= time) best = row;
@@ -138,6 +141,10 @@ export const RESEARCH_VARIANTS: StrategyVariantConfig[] = [
 ];
 
 function evaluateResearchEntry(input: {variant: StrategyVariantConfig; panel: ExternalSymbolPanel; barIdx: number; snapshot: MarketSnapshot}): EntrySignalIntent | null {
+  if (input.variant.entryCandidate === "minute_expansion") return evaluateMinuteExpansionEntry(input);
+  if (input.variant.entryCandidate === "econ_breakout_rs" || input.variant.entryCandidate === "econ_pullback_reclaim") {
+    return evaluateEconBreakoutEntry(input);
+  }
   if (input.variant.entryCandidate === "local_breakout" || input.variant.entryCandidate === "local_pullback") return evaluateLocalConfirmedEntry(input);
   const {panel, barIdx: i, variant, snapshot} = input;
   if (i < 240 || snapshot.tryVolume <= 0) return null;
@@ -169,3 +176,9 @@ function evaluateResearchEntry(input: {variant: StrategyVariantConfig; panel: Ex
     metadata: {tryPrice: snapshot.tryPrice, stopDistance, relativeStrengthRank: snapshot.relativeStrengthRank},
   };
 }
+
+/** Rejected exploratory candidates: audit runner only, excluded from promotion and regular research. */
+export const OPPORTUNITY_VARIANTS: StrategyVariantConfig[] = [
+  { id: "research_minute_pr04", entryCandidate: "minute_expansion", exitMode: "pr04_trail", alphaId: "MINUTE_EXPANSION", oiFundingRequired: false, researchOnly: true, label: "5m expansion + PR04 (frozen research)" },
+  { id: "research_minute_risk_trail", entryCandidate: "minute_expansion", exitMode: "research_risk_trail", alphaId: "MINUTE_EXPANSION", oiFundingRequired: false, researchOnly: true, label: "5m expansion + 2R/1R trailing (frozen research)" },
+];

@@ -1,11 +1,28 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": { "noEmit": true, "incremental": false },
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": false
+  },
   "include": [
-    "scripts/run-strategy-readiness.ts", "scripts/run-strategy-validation.ts",
-    "scripts/run-strategy-window-matrix.ts", "scripts/run-strategy-paper-smoke.ts",
-    "tests/local-confirmed-entry.test.ts", "tests/disposable-postgres-target.test.ts", "tests/pr04-fee-risk-accounting.test.ts",
-    "tests/try-replay-correctness.test.ts", "tests/strategy-window-matrix.test.ts"
+    "scripts/run-strategy-readiness.ts",
+    "scripts/run-strategy-validation.ts",
+    "scripts/run-strategy-window-matrix.ts",
+    "scripts/run-strategy-paper-smoke.ts",
+    "tests/local-confirmed-entry.test.ts",
+    "tests/disposable-postgres-target.test.ts",
+    "tests/pr04-fee-risk-accounting.test.ts",
+    "tests/try-replay-correctness.test.ts",
+    "tests/strategy-window-matrix.test.ts",
+    "scripts/run-opportunity-capture.ts",
+    "tests/minute-expansion.test.ts",
+    "tests/pump-scan-scheduler.test.ts",
+    "tests/opportunity-capture.test.ts",
+    "scripts/seed-learning-research.ts",
+    "scripts/paper-campaign-runner-core.ts",
+    "tests/learning-research-integrity.test.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

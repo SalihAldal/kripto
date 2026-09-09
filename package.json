@@ -45,7 +45,12 @@
     "strategy:research": "node --import tsx scripts/run-strategy-validation.ts --research",
     "strategy:windows": "node --max-old-space-size=4096 --import tsx scripts/run-strategy-window-matrix.ts",
     "strategy:readiness": "node --import tsx scripts/run-strategy-readiness.ts",
-    "strategy:replay-test": "vitest run tests/try-replay-correctness.test.ts tests/trade-decision-core-parity.test.ts tests/trade-decision-core-production-bridge.test.ts"
+    "strategy:replay-test": "vitest run tests/try-replay-correctness.test.ts tests/trade-decision-core-parity.test.ts tests/trade-decision-core-production-bridge.test.ts",
+    "strategy:opportunities": "node --max-old-space-size=4096 --import tsx scripts/run-opportunity-capture.ts",
+    "learning:seed": "node --import tsx scripts/seed-learning-research.ts",
+    "paper:supervised": "node --import tsx scripts/run-8h-paper-campaign.ts",
+    "econ:build-universe": "node --import tsx scripts/dataset/build-econ-try-universe-dataset.ts",
+    "econ:experiments": "node --import tsx scripts/run-econ-strategy-experiments.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
