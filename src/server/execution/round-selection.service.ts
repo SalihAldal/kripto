@@ -1,3 +1,4 @@
+import { loadPaperExecutionSignalUniverse } from "./paper-execution-symbol.service";
 import { env } from "@/lib/config";
 import { type FastEntryRuntimeHooks } from "@/src/server/scanner";
 import type { ScannerCandidate } from "@/src/types/scanner";
@@ -236,11 +237,12 @@ function resolveEventDrivenConfig(input: { selectionBudgetMs: number; maxDuratio
   };
 }
 
-function selectExecutionReadyRecord(store: ReturnType<typeof getCanonicalCandidateStore>, excluded: Set<string>) {
+function selectExecutionReadyRecord(store: ReturnType<typeof getCanonicalCandidateStore>, excluded: Set<string>, executableSignals: Set<string> | null = null) {
   const staleCutoff = Date.now() - 60_000;
   return store
     .getExecutionReadyCandidates()
     .filter((row) => !excluded.has(row.symbol.toUpperCase()))
+    .filter((row) => executableSignals == null || executableSignals.has(row.symbol.toUpperCase()))
     .filter((row) => row.lastUpdatedAt >= staleCutoff)
     .sort((a, b) => Number(b.finalScore ?? b.microScore ?? 0) - Number(a.finalScore ?? a.microScore ?? 0))[0] as
     | CanonicalCandidateRecord
@@ -348,6 +350,7 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
     const observationMs = eventConfig.selectionDeadlineMs;
     const observationDeadline = Date.now() + observationMs;
     const store = getCanonicalCandidateStore();
+    const executableSignals = input.forcePaperProfile ? await loadPaperExecutionSignalUniverse() : null;
     const tryResolveSelection = async () => {
       await runtime.ensureActive?.();
       await runtime.onHeartbeat?.();
@@ -368,12 +371,13 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
         candidatesProcessed: Number(telemetry.byState.MICRO_ANALYZED ?? 0),
         candidatesRemaining: Number(telemetry.byState.MICRO_CONFIRMED ?? 0),
         scannerSymbolsProcessed: Number(opportunity.evaluated ?? 0),
+        unsupportedExecutionCandidates: executableSignals == null ? 0 : store.getExecutionReadyCandidates().filter(row => !executableSignals.has(row.symbol.toUpperCase())).length,
         lastScannerProgressAt: new Date().toISOString(),
       });
       await controller.heartbeat(
         `Observe candidate store: discovered=${telemetry.byState.DISCOVERED ?? 0} hot=${telemetry.byState.HOT ?? 0} microConfirmed=${telemetry.byState.MICRO_CONFIRMED ?? 0} ready=${telemetry.executionReady}`,
       );
-      const selectedRecord = selectExecutionReadyRecord(store, excludedSymbols);
+      const selectedRecord = selectExecutionReadyRecord(store, excludedSymbols, executableSignals);
       if (!selectedRecord) return null;
       const scannerCandidates = getMicrostructureEngine().toScannerCandidates();
       const selected = scannerCandidates.find(

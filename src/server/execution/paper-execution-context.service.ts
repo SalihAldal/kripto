@@ -1,3 +1,4 @@
+import { env } from "@/lib/config";
 import { executionSignalMetadata } from "./execution-signal-metadata.service";
 import type { ScannerCandidate } from "@/src/types/scanner";
 import { resolvePaperExecutionSymbol } from "./paper-execution-symbol.service";
@@ -33,6 +34,14 @@ export async function preparePaperExecutionContext(candidate: ScannerCandidate, 
       forceLive: true, priority: "high", executionBundle: snapshot.bundle, allowBackgroundIntelCapture: false,
     });
     controller.signal.throwIfAborted();
+    const flowAge = context.metadata.lastTradeAgeSec;
+    const staleFlowLimit = Math.max(90, env.SCANNER_SHORT_HORIZON_SEC * 1.5);
+    if (typeof flowAge === "number" && flowAge > staleFlowLimit) {
+      return { ok: false as const, reason: "STRATEGY:EXECUTION_TRADE_FLOW_STALE", details: {
+        executionSymbol: resolution.executionSymbol, lastTradeAgeSec: flowAge, maxTradeAgeSec: staleFlowLimit,
+        dataQualityIssues: context.metadata.dataQualityIssues, rejectReasons: context.rejectReasons,
+      } };
+    }
     if (context.symbol !== resolution.executionSymbol || !Number.isFinite(context.lastPrice) || context.lastPrice <= 0 ||
         context.metadata.liveDataHealthy !== true || context.metadata.dataQualityOk === false) {
       return { ok: false as const, reason: "MARKET_DATA:EXECUTION_CONTEXT_UNAVAILABLE", details: {

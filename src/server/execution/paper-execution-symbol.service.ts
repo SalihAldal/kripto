@@ -86,3 +86,12 @@ export async function resolvePaperExecutionSymbol(signalSymbol: string): Promise
     reasonDetail: `No active trading pair for ${signal}`,
   };
 }
+
+/** One snapshot per selection round; discovery can remain global but execution must be supported. */
+export async function loadPaperExecutionSignalUniverse(): Promise<Set<string> | null> {
+  if (env.BINANCE_PLATFORM !== "tr") return null;
+  const rows = await prisma.tradingPair.findMany({
+    where: { status: "ACTIVE", quoteAsset: "TRY" }, select: { symbol: true, baseAsset: true },
+  });
+  return new Set(rows.flatMap(row => [row.symbol.toUpperCase(), `${row.baseAsset.toUpperCase()}USDT`]));
+}

@@ -12,12 +12,13 @@ vi.mock("@/lib/config", () => ({
 vi.mock("@/src/server/db/prisma", () => ({
   prisma: {
     tradingPair: {
+      findMany: vi.fn(async () => [...mocks.pairs.values()].filter(row => row.quoteAsset === "TRY")),
       findFirst: vi.fn(async ({ where }: { where: { symbol: string } }) => mocks.pairs.get(where.symbol) ?? null),
     },
   },
 }));
 
-import { resolvePaperExecutionSymbol } from "@/src/server/execution/paper-execution-symbol.service";
+import { loadPaperExecutionSignalUniverse, resolvePaperExecutionSymbol } from "@/src/server/execution/paper-execution-symbol.service";
 
 beforeEach(() => {
   mocks.platform = "tr";
@@ -49,4 +50,8 @@ describe("resolvePaperExecutionSymbol", () => {
     expect(result.executionSymbol).toBe("WLFITRY");
     expect(result.reasonCode).toBeNull();
   });
+});
+
+it("selection universe includes only supported TRY executions and their signal aliases", async () => {
+  expect(await loadPaperExecutionSignalUniverse()).toEqual(new Set(["EGLDTRY", "EGLDUSDT", "WLFITRY", "WLFIUSDT"]));
 });

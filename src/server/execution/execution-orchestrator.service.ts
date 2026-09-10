@@ -1597,8 +1597,11 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         rejectReason: `LEARNING_LANE_HARD_REJECT: ${sourceHardRejects.join(" | ")}`, symbol: selected.context.symbol });
       const { preparePaperExecutionContext } = await import("./paper-execution-context.service");
       const prepared = await preparePaperExecutionContext(selected, input.requestedQuoteAmountTry);
-      if (!prepared.ok) return finishExecution({ executionId, mode, opened: false, rejected: true,
-        rejectReason: prepared.reason, symbol: selected.context.symbol, details: prepared.details });
+      if (!prepared.ok) {
+        logger.info({ executionId, symbol: selected.context.symbol, reason: prepared.reason, details: prepared.details }, "Paper execution preparation rejected");
+        return finishExecution({ executionId, mode, opened: false, rejected: true,
+          rejectReason: prepared.reason, symbol: selected.context.symbol, details: prepared.details });
+      }
       selected = prepared.candidate;
     }
     if (!selected.ai) {

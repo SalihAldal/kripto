@@ -1,3 +1,4 @@
+vi.mock("@/src/server/execution/paper-execution-symbol.service", () => ({ loadPaperExecutionSignalUniverse: vi.fn(async () => new Set(["BTCTRY", "BTCUSDT"])) }));
 vi.mock("@/lib/logger", () => ({ logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock("@/src/server/ai/analysis-orchestrator", () => ({ runAIConsensusFromInput: vi.fn(() => { throw new Error("AI must be deferred until execution venue is ready"); }) }));
 vi.mock("@/src/server/scanner/ai-request-formatter", () => ({ formatAIRequest: vi.fn(() => { throw new Error("Selection must not hydrate source-market AI"); }) }));

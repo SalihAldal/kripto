@@ -2181,6 +2181,7 @@ async function runRoundJob(jobId: string, ctx: SchedulerLoopContext) {
               executionAttemptId: execution.executionId,
               executionAttemptAt: new Date().toISOString(),
               executionRejectReason: execution.rejected ? execution.rejectReason ?? null : null,
+              executionRejectDetails: execution.rejected ? execution.details ?? null : null,
             },
           }).catch(() => null);
         }

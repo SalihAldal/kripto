@@ -71,3 +71,9 @@ it("bounds pending preparation and never invokes AI after cancellation", async (
   resolve(executionMarketFixture("EGLDTRY")); await Promise.resolve(); await Promise.resolve();
   expect(m.ai).not.toHaveBeenCalled();
 });
+
+it("distinguishes inactive execution trades from a broken market data provider", async () => {
+  m.build.mockResolvedValue({ symbol: "EGLDTRY", lastPrice: 900, metadata: { liveDataHealthy: true, dataQualityOk: false, lastTradeAgeSec: 900, dataQualityIssues: ["PRICE_STALE"] } });
+  expect(await preparePaperExecutionContext(source())).toMatchObject({ ok: false, reason: "STRATEGY:EXECUTION_TRADE_FLOW_STALE", details: { lastTradeAgeSec: 900 } });
+  expect(m.ai).not.toHaveBeenCalled();
+});

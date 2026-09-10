@@ -94,6 +94,7 @@ export type RoundRuntimeSnapshot = {
   lastTDIProgressAt?: string;
   lastPersistAt?: string;
   scannerSymbolsProcessed?: number;
+  unsupportedExecutionCandidates?: number;
   pumpSymbolsProcessed?: number;
   marketDataRequests?: number;
   marketDataFailures?: number;
