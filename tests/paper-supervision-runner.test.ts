@@ -1,4 +1,4 @@
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -14,6 +14,7 @@ vi.mock("@/src/server/db/prisma", () => ({ prisma: {
   autoRoundRun: { findMany: async () => [] }, position: { count: async () => 0, findMany: async () => [] }, paperTrade: { findMany: async () => [] },
 } }));
 import { runPaperCampaign } from "../scripts/paper-campaign-runner-core";
+beforeEach(() => { m.status = "RUNNING"; vi.clearAllMocks(); });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllEnvs(); });
 it("stops a stalled production runner early and writes a zero-trade terminal result", async () => {
   vi.stubEnv("EXECUTION_MODE", "paper"); vi.stubEnv("LIVE_TRADING_ENABLED", "false");
@@ -28,5 +29,19 @@ it("stops a stalled production runner early and writes a zero-trade terminal res
     expect(m.stop).toHaveBeenCalledOnce(); expect(m.merge).toHaveBeenCalledOnce();
     expect(fs.existsSync(path.join(root, "result.json"))).toBe(true);
     expect(process.listenerCount("SIGTERM")).toBe(listeners);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
+it("uses the requested wall-clock duration and releases fatal handlers on completion", async () => {
+  vi.stubEnv("EXECUTION_MODE", "paper"); vi.stubEnv("LIVE_TRADING_ENABLED", "false");
+  vi.useFakeTimers(); vi.setSystemTime(new Date("2026-09-10"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "kripto-paper-duration-"));
+  const listeners = process.listenerCount("unhandledRejection");
+  try {
+    const promise = runPaperCampaign({ campaignId: "duration", artifactRoot: root, resultFile: path.join(root, "result.json"),
+      durationMs: 60000, heartbeatMs: 15000, pollMs: 5000, terminalWaitMs: 120000, budgetPerTrade: 1000, maxWaitSec: 600 });
+    await vi.advanceTimersByTimeAsync(61000);
+    expect(await promise).toMatchObject({ stopReason: "deadline", observationDurationMs: 60000, completedFullDuration: true });
+    expect(process.listenerCount("unhandledRejection")).toBe(listeners);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

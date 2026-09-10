@@ -140,6 +140,8 @@ export type TdiShadow = {
 };
 
 export type FinalRankedCandidate = {
+  quoteVolume24h?: number;
+  change24h?: number;
   candidateId: string;
   symbol: string;
   lane: OpportunityLane;

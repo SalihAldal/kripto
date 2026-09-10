@@ -234,12 +234,15 @@ describe("P0 execution failure and breaker contract", () => {
   });
 
   it.each([
-    "Binance API failure breaker",
     "Unknown execution failure",
     "Execution failed",
     "Pre-check failed",
-  ])("generic terminal reason maps to stale safe-mode code: %s", (rejectReason) => {
-    expect(normalizeExecutionTerminalReason({ rejectReason })).toBe("SAFE_MODE:SAFE_MODE_STALE_REASON");
+  ])("generic errors do not invent a safe-mode cause: %s", (rejectReason) => {
+    expect(normalizeExecutionTerminalReason({ rejectReason })).toBe("UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING");
+  });
+
+  it.each(["AI_NO_TRADE: Hacim dusuk", "LEARNING_LANE_HARD_REJECT: AI-3 risk veto", "LOW_CONFIDENCE: 20 < 55"])("preserves strategy reason %s", rejectReason => {
+    expect(normalizeExecutionTerminalReason({ rejectReason })).toBe(`STRATEGY:${rejectReason}`);
   });
 
   it("non-canonical fallback is prefixed with a canonical terminal code", () => {

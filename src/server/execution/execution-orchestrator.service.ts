@@ -1585,6 +1585,22 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     }
 
     const canonicalHandoff = parseCanonicalHandoff(selected);
+    if (mode === "paper") {
+      // Validate the source identity before rebuilding a different execution market.
+      if (canonicalHandoff) {
+        const validation = validateCanonicalHandoffRecord(canonicalHandoff, selected.context.symbol);
+        if (!validation.ok) return finishExecution({ executionId, mode, opened: false, rejected: true,
+          rejectReason: `${validation.reasonCode}:${validation.reasonDetail}`, symbol: selected.context.symbol });
+      }
+      const sourceHardRejects = resolveLearningLaneHardRejects({ candidate: selected, liveDataHealthy: true, paperMode: true });
+      if (sourceHardRejects.length > 0) return finishExecution({ executionId, mode, opened: false, rejected: true,
+        rejectReason: `LEARNING_LANE_HARD_REJECT: ${sourceHardRejects.join(" | ")}`, symbol: selected.context.symbol });
+      const { preparePaperExecutionContext } = await import("./paper-execution-context.service");
+      const prepared = await preparePaperExecutionContext(selected);
+      if (!prepared.ok) return finishExecution({ executionId, mode, opened: false, rejected: true,
+        rejectReason: prepared.reason, symbol: selected.context.symbol });
+      selected = prepared.candidate;
+    }
     if (!selected.ai) {
       if (canonicalHandoff) {
         const validation = validateCanonicalHandoffRecord(canonicalHandoff, selected.context.symbol);
@@ -2304,20 +2320,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           },
         });
       }
-      if (paperSymbol.executionSymbol !== symbol) {
-        publishExecutionEvent({
-          executionId,
-          symbol,
-          stage: "selection",
-          status: "RUNNING",
-          message: paperSymbol.reasonDetail ?? `Paper TR: ${symbol} -> ${paperSymbol.executionSymbol}`,
-          level: "INFO",
-          context: {
-            signalSymbol: paperSymbol.signalSymbol,
-            executionSymbol: paperSymbol.executionSymbol,
-            quoteAsset: paperSymbol.quoteAsset,
-          },
-        });
+      if (paperSymbol.executionSymbol !== selected.context.symbol) {
+        return finishExecution({ executionId, mode, opened: false, rejected: true,
+          rejectReason: "SYMBOL_FILTER:EXECUTION_CONTEXT_SYMBOL_MISMATCH", symbol: selected.context.symbol });
       }
       symbol = paperSymbol.executionSymbol;
     } else if (mode === "live" && env.BINANCE_PLATFORM === "tr" && symbol.endsWith("USDT")) {
@@ -4887,7 +4892,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     );
     try {
       const { user } = await getRuntimeExecutionContext(input.userId);
-      if (failure.breakerEligible) {
+      if (failure.breakerEligible && failure.failureDomain !== "SAFE_MODE") {
         const failureState = await registerDomainApiFailure({
           userId: user.id,
           domain: failure.failureDomain,

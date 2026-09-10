@@ -11,6 +11,7 @@ import { parseAiAdvisory, compactAiContext } from "@/src/server/microstructure/a
 import { combineFinalScore, tdiShadow } from "@/src/server/microstructure/final-ranker";
 import {
   MicrostructureEngine,
+  toMarketContext,
   resetMicrostructureEngineForTests,
 } from "@/src/server/microstructure/microstructure-engine";
 import { resetMarketDataDaemonForTests } from "@/src/server/market-data/spine/market-data-daemon";
@@ -505,6 +506,23 @@ describe("phase 04 microstructure engine", () => {
     expect(sell.flowImbalance5s).toBeLessThan(0);
     expect(sell.netTakerFlow5s).toBeLessThan(0);
     expect(scoreMicro("EARLY", buildMicroBreakdown(sell), sell)).toBeLessThanOrEqual(0);
+  });
+
+  it("carries ticker 24h volume and change into AI context without substituting 60s flow", () => {
+    const engine = resetMicrostructureEngineForTests(new MicrostructureEngine({ warmupMs: 0, warmupTrades: 2 }));
+    const opportunity = opp();
+    const row = engine.evaluatePrepared([{
+      opportunity, trades: burst("BUY", 14, 700), book: book(4),
+      depth: null, bookHistory: [], intendedNotional: 50,
+    }]).ranked[0];
+    const context = toMarketContext(row);
+    expect(context.volume24h).toBe(opportunity.features.quoteVolume24h);
+    expect(context.change24h).toBe(1.2);
+    expect(context.metadata.quoteVolume60s).not.toBe(context.volume24h);
+    expect(context.metadata.volume24hAvailable).toBe(true);
+    const missing = toMarketContext({ ...row, quoteVolume24h: undefined });
+    expect(missing.volume24h).toBe(0);
+    expect(missing.metadata.volume24hAvailable).toBe(false);
   });
 
   it("deep analysis does not poll REST", () => {

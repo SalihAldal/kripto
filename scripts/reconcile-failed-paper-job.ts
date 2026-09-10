@@ -43,6 +43,12 @@ async function main() {
   const openOrders = await prisma.tradeOrder.count({
     where: { userId: job.userId, status: { in: ["NEW", "PARTIALLY_FILLED"] } },
   });
+  if (job.userId !== user.id || openPositions > 0 || openOrders > 0) {
+    throw new Error("RECONCILIATION_BLOCKED: wrong runtime user or unsettled exposure; recover monitors first");
+  }
+  if (job.status === "RUNNING" && Date.now() - job.updatedAt.getTime() < 120_000) {
+    throw new Error("RECONCILIATION_BLOCKED: job recently updated; verify runner ownership before stopping");
+  }
   const openRounds = job.rounds.filter((r) => !r.endedAt);
 
   const snapshot = {

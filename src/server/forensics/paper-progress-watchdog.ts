@@ -49,12 +49,16 @@ export class PaperProgressWatchdog {
     }
 
     const recent = input.rounds.filter((r) => r.endedAt).slice(0, 3);
-    const technical =
-      /^(?:SAFE_MODE|EXECUTION|MARKET_DATA_NOT_READY|MARKET_DATA_STALE|PAPER_DB_UNAVAILABLE|AI_INPUT_KLINES_MISSING|HANDOFF_INVALID|PROVIDER_UNAVAILABLE|DATABASE_UNAVAILABLE)(?:$|[:_\s])/;
+    const technical = (reason: string) => {
+      // DB prepends stages (execution:, ai_evaluation:); these are not failure domains.
+      const canonical = reason.replace(/^(?:(?:execution|ai_evaluation|selection|preflight):)+/, "");
+      return /^(?:SAFE_MODE(?=:)|MARKET_DATA(?=[:_])|PAPER_DB_UNAVAILABLE|AI_INPUT_KLINES_MISSING|HANDOFF_(?:INVALID|CANDIDATE_NOT_FOUND|IDENTITY_MISSING|SYMBOL_MISMATCH)|PROVIDER_UNAVAILABLE|DATABASE(?:_UNAVAILABLE|:)|REDIS:|EXECUTION:API_FAILURE_BREAKER_OPEN)(?:.*)$/.test(canonical);
+    };
 
     const budgetMs = input.runtime?.selectionBudgetMs;
     const selectionStartedAtMs = input.runtime?.selectionStartedAtMs;
     if (
+      input.rounds.some((round) => !round.endedAt) &&
       budgetMs &&
       selectionStartedAtMs != null &&
       Number.isFinite(selectionStartedAtMs) &&
@@ -72,7 +76,7 @@ export class PaperProgressWatchdog {
     const reason =
       input.openPositions > 0
         ? null
-        : recent.length === 3 && recent.every((r) => technical.test(r.failReason ?? ""))
+        : recent.length === 3 && recent.every((r) => technical(r.failReason ?? ""))
           ? "REPEATED_TECHNICAL_FAILURE"
           : input.nowMs - this.progressedAt >= this.stallMs
             ? "NO_ROUND_PROGRESS"

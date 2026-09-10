@@ -166,12 +166,14 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
   };
   process.on("SIGINT", onSignal);
   process.on("SIGTERM", onSignal);
-  process.on("uncaughtException", (error) => {
-    void onFatal("uncaughtException", error).finally(() => process.exit(1));
-  });
-  process.on("unhandledRejection", (error) => {
-    void onFatal("unhandledRejection", error).finally(() => process.exit(1));
-  });
+  const onUncaught = (error: unknown) => { void onFatal("uncaughtException", error).finally(() => process.exit(1)); };
+  const onUnhandled = (error: unknown) => { void onFatal("unhandledRejection", error).finally(() => process.exit(1)); };
+  process.on("uncaughtException", onUncaught);
+  process.on("unhandledRejection", onUnhandled);
+  const cleanupHandlers = () => {
+    process.off("SIGINT", onSignal); process.off("SIGTERM", onSignal);
+    process.off("uncaughtException", onUncaught); process.off("unhandledRejection", onUnhandled);
+  };
 
   const started = await startAutoRoundJob({
     userId: user.id,
@@ -189,7 +191,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
   activeJobId = jobId;
   activeUserId = user.id;
   if (!started.started || !jobId) {
-    process.off("SIGINT", onSignal); process.off("SIGTERM", onSignal);
+    cleanupHandlers();
     const fail = { campaignId: config.campaignId, phase: "START_FAILED", started };
     writeJson(path.resolve(config.resultFile), fail);
     await prisma.$disconnect();
@@ -201,7 +203,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     // Atomic merge: do not erase scheduler/runtime metadata written while starting.
     await prisma.$executeRaw`UPDATE "AutoRoundJob" SET "metadata" = COALESCE("metadata", '{}'::jsonb) || ${metadata}::jsonb WHERE "id" = ${jobId}`;
   } catch (error) {
-    process.off("SIGINT", onSignal); process.off("SIGTERM", onSignal);
+    cleanupHandlers();
     await stopAutoRoundJob(user.id);
     await prisma.$disconnect();
     throw error;
@@ -231,7 +233,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
         take: 5,
         select: { id: true, state: true, endedAt: true, failReason: true, startedAt: true, metadata: true },
       });
-      const activeRound = recentRounds.find((round) => !round.endedAt) ?? recentRounds[0];
+      const activeRound = recentRounds.find((round) => !round.endedAt);
       const runtimeMeta = ((activeRound?.metadata ?? {}) as Record<string, unknown>).runtime as Record<string, unknown> | undefined;
       const runtime: PaperProgressRuntimeEvidence | null = activeRound
         ? {
@@ -269,6 +271,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
       await reconcileOrphanPaperJob(activeUserId, activeJobId, config.artifactRoot, progressFailure);
     }
   }
+  const observationEndedAtMs = Date.now();
   process.off("SIGINT", onSignal);
   process.off("SIGTERM", onSignal);
 
@@ -328,7 +331,8 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     preflightDurationMs: preflightMs,
     plannedDurationMs: config.durationMs,
     actualJobDurationMs: endedAtMs - jobStartedAtMs,
-    completedFullDuration: endedAtMs - jobStartedAtMs >= config.durationMs - config.pollMs,
+    observationDurationMs: observationEndedAtMs - jobStartedAtMs,
+    completedFullDuration: stopReason === "deadline" && observationEndedAtMs - jobStartedAtMs >= config.durationMs,
     gracefulStopRequested,
     stopReason,
     stopError,
@@ -386,6 +390,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     });
   }
 
+  cleanupHandlers();
   await prisma.$disconnect();
   return result;
 }

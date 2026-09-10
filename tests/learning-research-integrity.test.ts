@@ -91,6 +91,19 @@ describe("paper progress watchdog", () => {
     expect(w.observe({ nowMs: 2_700_001, openPositions: 0, rounds: stalledRound, runtime }).reason).toBe("SELECTION_BUDGET_EXCEEDED");
   });
 
+  it.each(["execution:SAFE_MODE:SAFE_MODE_ACTIVE", "ai_evaluation:DATABASE:P2024", "execution:MARKET_DATA:EXECUTION_CONTEXT_UNAVAILABLE"])("recognizes persisted technical stage prefixes: %s", failReason => {
+    const rounds = [3, 2, 1].map(id => ({ id: String(id), state: "done", endedAt: new Date(id), failReason }));
+    expect(new PaperProgressWatchdog(0).observe({ nowMs: 100, openPositions: 0, rounds }).reason).toBe("REPEATED_TECHNICAL_FAILURE");
+  });
+  it("does not mislabel strategy rejection as infrastructure failure", () => {
+    const rounds = [3, 2, 1].map(id => ({ id: String(id), state: "done", endedAt: new Date(id), failReason: "execution:STRATEGY:AI_NO_TRADE: low volume" }));
+    expect(new PaperProgressWatchdog(0).observe({ nowMs: 100, openPositions: 0, rounds }).shouldStop).toBe(false);
+  });
+  it("does not apply completed round selection budgets to an idle job", () => {
+    const rounds = [{ id: "1", state: "done", endedAt: new Date(1), failReason: "NO_VALID_SETUP" }];
+    expect(new PaperProgressWatchdog(0).observe({ nowMs: 3_000_000, openPositions: 0, rounds, runtime: runtimeBase }).shouldStop).toBe(false);
+  });
+
   it("allows healthy no-trades while detecting repeated infrastructure failures", () => {
     const w = new PaperProgressWatchdog(0);
     const rounds = [3, 2, 1].map((id) => ({ id: String(id), state: "tur_tamamlandi", endedAt: new Date(id), failReason: "NO_VALID_SETUP" }));

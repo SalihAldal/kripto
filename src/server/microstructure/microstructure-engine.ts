@@ -307,7 +307,7 @@ function resolveHardReject(
   return null;
 }
 
-function toMarketContext(row: FinalRankedCandidate): MarketContext {
+export function toMarketContext(row: FinalRankedCandidate): MarketContext {
   const opportunityFeatures = row.opportunityBreakdown;
   const spreadPercent = row.features.spreadBps / 100;
   const marketEventAt = row.features.lastAggTradeAt > 0 ? new Date(row.features.lastAggTradeAt).toISOString() : null;
@@ -323,8 +323,8 @@ function toMarketContext(row: FinalRankedCandidate): MarketContext {
   return {
     symbol: row.symbol,
     lastPrice: row.currentPrice,
-    change24h: 0,
-    volume24h: row.features.takerBuyVolume60s + row.features.takerSellVolume60s,
+    change24h: Number.isFinite(row.change24h) ? row.change24h! : 0,
+    volume24h: Number.isFinite(row.quoteVolume24h) ? Math.max(0, row.quoteVolume24h!) : 0,
     volumeSpikePercent: Math.max(0, row.features.tradeRateAcceleration * 10),
     spreadPercent,
     volatilityPercent: Math.max(0.1, row.features.microExhaustion * 4),
@@ -338,6 +338,8 @@ function toMarketContext(row: FinalRankedCandidate): MarketContext {
     tradable: row.state === "EXECUTION_READY" || row.state === "MICRO_CONFIRMED",
     rejectReasons: row.hardReject ? [row.hardReject] : [],
     metadata: {
+      quoteVolume60s: row.features.takerBuyVolume60s + row.features.takerSellVolume60s,
+      volume24hAvailable: Number.isFinite(row.quoteVolume24h),
       opportunityCandidateId: row.candidateId,
       sourceType: inferredSourceType,
       marketDataTimestamp: marketEventAt,

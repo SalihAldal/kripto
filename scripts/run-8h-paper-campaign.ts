@@ -18,7 +18,8 @@ const cli = Object.fromEntries(
 );
 
 const DURATION_HOURS = Number(cli.durationHours ?? cli.hours ?? 8);
-const CAMPAIGN_ID = String(cli.campaignId ?? `paper-8h-${new Date().toISOString().replace(/[:.]/g, "-")}`);
+if (!Number.isFinite(DURATION_HOURS) || DURATION_HOURS <= 0) throw new Error("durationHours must be positive and finite");
+const CAMPAIGN_ID = String(cli.campaignId ?? `paper-${DURATION_HOURS}h-${new Date().toISOString().replace(/[:.]/g, "-")}`);
 
 runPaperCampaign({
   durationMs: DURATION_HOURS * 60 * 60 * 1000,
@@ -36,6 +37,7 @@ runPaperCampaign({
     if ((result as { phase?: string }).phase === "PREFLIGHT_BLOCKED") process.exit(2);
     if ((result as { phase?: string }).phase === "START_FAILED") process.exit(3);
     if ((result as { reachedTerminal?: boolean }).reachedTerminal === false) process.exit(4);
+    if ((result as { progressFailure?: string }).progressFailure || (result as { stopError?: string }).stopError) process.exit(5);
   })
   .catch((error) => {
     console.error(error instanceof Error ? error.message : String(error));

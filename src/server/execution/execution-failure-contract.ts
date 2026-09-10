@@ -236,13 +236,14 @@ export function normalizeExecutionTerminalReason(input: {
   const lower = base.toLowerCase();
   if (lower.includes("safe mode")) return "SAFE_MODE:SAFE_MODE_ACTIVE";
   const generic = new Set([
-    "binance api failure breaker",
     "unknown execution failure",
     "execution failed",
     "pre-check failed",
   ]);
-  if (generic.has(lower)) {
-    return "SAFE_MODE:SAFE_MODE_STALE_REASON";
+  if (lower === "binance api failure breaker") return "SAFE_MODE:SAFE_MODE_STALE_REASON";
+  if (generic.has(lower)) return "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING";
+  if (/^(AI_NO_TRADE|LEARNING_LANE_HARD_REJECT|LOW_CONFIDENCE):/.test(base)) {
+    return `STRATEGY:${redactExecutionError(base)}`;
   }
   if (/^[A-Z][A-Z0-9_]*:[A-Z0-9_]+/.test(base)) return base;
   if (!base) return "UNKNOWN:EXECUTION_REJECTED";

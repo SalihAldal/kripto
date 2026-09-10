@@ -522,14 +522,9 @@ export async function buildMarketContext(
   const approxVolume24h = klineNotionalSum > 0
     ? Number(((klineNotionalSum * (1440 / Math.max(klines.length, 1)))).toFixed(2))
     : 0;
-  const effectiveLiquidity24h =
-    ticker.volume24h >= env.SCANNER_MIN_VOLUME_24H
-      ? safeTickerVolume
-      : approxVolume24h >= env.SCANNER_MIN_VOLUME_24H
-        ? approxVolume24h
-        : hasReliableSnapshotLiquidity
-          ? Number(snapshotNotional.toFixed(2))
-          : safeTickerVolume;
+  // Short-window flow and resting depth are not observed 24h turnover.
+  // Retain their diagnostics below, but never substitute them into a 24h gate.
+  const effectiveLiquidity24h = safeTickerVolume;
 
   const shortCandleSignal = klines.slice(-4).reduce((acc, row) => {
     const body = row.close - row.open;
@@ -741,6 +736,8 @@ export async function buildMarketContext(
       pumpRiskSemantics: "computed_formula_v1",
       snapshotTradeNotional: Number(snapshotTradeNotional.toFixed(2)),
       snapshotBookNotional: Number(snapshotBookNotional.toFixed(2)),
+      estimatedVolume24h: approxVolume24h,
+      volume24hSource: "TICKER",
       effectiveLiquidity24h,
       liveDataHealthy,
       coreMarketDataHealthy,

@@ -166,6 +166,8 @@ export function buildFinalCandidate(input: {
   return {
     candidateId: input.opportunity.candidateId,
     symbol: input.opportunity.symbol,
+    quoteVolume24h: input.opportunity.features.quoteVolume24h,
+    change24h: input.opportunity.features.change24h,
     lane: input.opportunity.primaryLane,
     opportunityScore: input.opportunity.score,
     opportunityBreakdown: input.opportunity.breakdown,
