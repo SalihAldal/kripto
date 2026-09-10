@@ -4,6 +4,7 @@ import type { FeedbackCloseTradeInput, FeedbackLoopReport, FeedbackOpenTradeInpu
 import { tradingLogger } from "@/src/server/trading-core/observability/central-logger";
 import { selfLearningEngine } from "@/src/server/trading-core/self-learning";
 import { buildDynamicLearningWeight } from "@/src/server/trading-core/self-learning/dynamic-learning-weight";
+import { guardPaperStrategyMutation, resolveApplyLearningForPaper } from "@/src/server/forensics/paper-strategy-freeze.service";
 
 export class FeedbackLoopEngine {
   private readonly store = new FeedbackStore();
@@ -61,10 +62,10 @@ export class FeedbackLoopEngine {
         openedAt: trade.openedAt,
         closedAt: trade.closedAt,
       },
-      Boolean(input.applyLearning),
+      resolveApplyLearningForPaper(Boolean(input.applyLearning)),
     );
     const setupStats = this.store.setupStats().find((item) => item.setupKey === this.setupKeyFromLearning(learningReport.pattern.patternKey, trade.botId)) ?? this.bestStatsForTrade(trade.strategy);
-    if (input.applyLearning && setupStats) this.applyAdaptiveConfig(setupStats);
+    if (input.applyLearning && setupStats && guardPaperStrategyMutation()) this.applyAdaptiveConfig(setupStats);
     const report: FeedbackLoopReport = {
       trade,
       learningReport,

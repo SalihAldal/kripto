@@ -1,4 +1,5 @@
 import { prisma } from "@/src/server/db/prisma";
+import { researchSeedRecords } from "./research-seed";
 import { persistDailyAIReport } from "@/src/server/learning-engine/learning-engine.repository";
 
 export async function generateDailyAIReport(date = new Date()) {
@@ -28,6 +29,7 @@ export async function generateDailyAIReport(date = new Date()) {
   const avgRoe = trades.length > 0 ? trades.reduce((sum, row) => sum + Number(row.returnPercent ?? 0), 0) / trades.length : 0;
 
   const content = {
+    historicalResearchContext: researchSeedRecords(Math.min(Date.now(), dayEnd.getTime())).map(r => ({ title: r.title, content: r.content, metadata: r.metadata })),
     reportDate: dayStart.toISOString(),
     whatDidWell: [
       winRate >= 50 ? `Win rate ${winRate.toFixed(1)}% on ${trades.length} trades` : null,

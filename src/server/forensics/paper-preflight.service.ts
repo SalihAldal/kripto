@@ -36,6 +36,10 @@ import {
 import { getEmergencyStopState } from "@/src/server/repositories/execution.repository";
 import { getTicker } from "@/services/binance.service";
 import { evaluateClockSync, persistClockSyncForensics } from "@/src/server/execution-safety/clock-sync.service";
+import {
+  assessSafeModeExecutionGate,
+  describeSafeModeAckRequirement,
+} from "@/src/server/recovery/paper-safe-mode-policy.service";
 
 const IN_PROGRESS_ROUND_STATES: AutoRoundState[] = ["tariyor", "coin_secildi", "alim_yapildi", "satis_bekleniyor"];
 
@@ -416,6 +420,22 @@ export async function runPaperSessionPreflight(input: {
           remoteRequired,
         });
 
+  const safeModeGate = await assessSafeModeExecutionGate(input.userId);
+  const safeModeAck = describeSafeModeAckRequirement(safeModeGate);
+  const safeMode = safeModeGate.blocked
+    ? checkResult(
+        "FAIL",
+        safeModeGate.failureCode,
+        safeModeGate.reasonDetail,
+        {
+          failureDomain: safeModeGate.failureDomain,
+          requireManualAck: safeModeGate.requireManualAck,
+          breakerOpen: safeModeGate.breakerOpen,
+          ack: safeModeAck,
+        },
+      )
+    : checkResult("PASS", "SAFE_MODE_CLEAR", "Safe mode and execution breaker allow paper startup");
+
   const emergencyStopActive = await getEmergencyStopState(input.userId);
   const emergencyStop = emergencyStopActive
     ? checkResult(
@@ -544,7 +564,7 @@ export async function runPaperSessionPreflight(input: {
         { checks: engineSanityReport.checks },
       );
 
-  const blockingChecks = [database, binance, clockSync, ai, engineSanity, activeJobs, zombieRounds, duplicatePaperJobs, resolvedConfig].filter(
+  const blockingChecks = [database, binance, clockSync, ai, engineSanity, safeMode, activeJobs, zombieRounds, duplicatePaperJobs, resolvedConfig].filter(
     (row) => row.status === "FAIL",
   );
   const warnChecks = [emergencyStop, workerLocks, zombieRounds, resolvedConfig, activeJobs].filter(

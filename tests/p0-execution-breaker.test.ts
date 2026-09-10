@@ -227,9 +227,9 @@ describe("P0 execution failure and breaker contract", () => {
     expect(failure.failureCode).toBe("PAPER_DATA_STALE");
   });
 
-  it("legacy generic breaker text cannot be a new terminal reason", () => {
+  it("legacy generic breaker text maps to stale safe-mode terminal code", () => {
     expect(normalizeExecutionTerminalReason({ rejectReason: "Binance API failure breaker" })).toBe(
-      "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING",
+      "SAFE_MODE:SAFE_MODE_STALE_REASON",
     );
   });
 
@@ -238,10 +238,8 @@ describe("P0 execution failure and breaker contract", () => {
     "Unknown execution failure",
     "Execution failed",
     "Pre-check failed",
-  ])("generic terminal reason is rejected: %s", (rejectReason) => {
-    expect(normalizeExecutionTerminalReason({ rejectReason })).toBe(
-      "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING",
-    );
+  ])("generic terminal reason maps to stale safe-mode code: %s", (rejectReason) => {
+    expect(normalizeExecutionTerminalReason({ rejectReason })).toBe("SAFE_MODE:SAFE_MODE_STALE_REASON");
   });
 
   it("non-canonical fallback is prefixed with a canonical terminal code", () => {

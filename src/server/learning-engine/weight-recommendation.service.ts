@@ -3,7 +3,7 @@ import { persistWeightSuggestion } from "@/src/server/learning-engine/learning-e
 import { prisma } from "@/src/server/db/prisma";
 
 export async function generateLearningWeightSuggestions() {
-  await generateWeightRecommendations().catch(() => 0);
+  await generateWeightRecommendations();
   const replayRows = await prisma.weightRecommendation.findMany({ orderBy: { computedAt: "desc" }, take: 50 });
   let stored = 0;
   for (const row of replayRows) {
@@ -11,12 +11,13 @@ export async function generateLearningWeightSuggestions() {
       feature: row.filterName,
       currentWeight: Number(row.currentWeight ?? 0.5),
       suggestedWeight: Number(row.suggestedWeight ?? row.currentWeight ?? 0.5),
-      expectedWinRateDelta: Number(row.expectedTradeIncreasePct ?? 0),
+      // More proposed trades is not a measured improvement in winning probability.
+      expectedWinRateDelta: undefined,
       expectedProfitFactorDelta: Number(row.expectedProfitFactorDelta ?? 0),
       confidence: Number(row.confidence ?? 0.5) * 100,
       rationale: row.rationale ?? undefined,
       expiresAt: row.expiresAt ?? undefined,
-    }).catch(() => null);
+    });
     stored += 1;
   }
 
@@ -30,7 +31,7 @@ export async function generateLearningWeightSuggestions() {
       expectedProfitFactorDelta: 0,
       confidence: Number(row.confidence ?? 0) * 100,
       rationale: row.rationale ?? undefined,
-    }).catch(() => null);
+    });
     stored += 1;
   }
 

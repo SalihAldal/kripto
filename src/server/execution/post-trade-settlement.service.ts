@@ -189,7 +189,7 @@ async function recordFeedbackLearning(input: {
       returnPercent: input.returnPercent,
       closedAt: new Date().toISOString(),
       exitReason: input.closeReason,
-      applyLearning: true,
+      applyLearning: (await import("@/src/server/forensics/paper-strategy-freeze.service")).resolveApplyLearningForPaper(true),
     });
     const closedAt = new Date();
     const holdSec = Math.max(0, Math.round((closedAt.getTime() - input.position.openedAt.getTime()) / 1000));

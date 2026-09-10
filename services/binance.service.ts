@@ -1,3 +1,4 @@
+import { isKnownLeveragedToken as isLeveragedTokenSymbol } from "@/src/server/market-data/leveraged-token-symbol";
 import type { MarketTicker } from "@/lib/types";
 import { env } from "@/lib/config";
 import { getExchangeAdapter, getExchangeProvider } from "@/src/server/exchange";
@@ -450,9 +451,6 @@ export async function getExchangeInfo() {
   }
 }
 
-function isLeveragedTokenSymbol(symbol: string) {
-  return symbol.includes("UPUSDT") || symbol.includes("DOWNUSDT") || symbol.includes("BULLUSDT") || symbol.includes("BEARUSDT");
-}
 
 export async function listTradableSymbols(maxSymbols = 1200, quoteAsset?: string) {
   const info = await getExchangeInfo();

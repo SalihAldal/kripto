@@ -765,8 +765,16 @@ function resolveLearningLaneHardRejects(input: {
   );
 
   if (paperMode) {
-    // Learning lane cannot own hard execution authority; keep as advisory only.
-    return [];
+    const roleRisk = candidate.ai?.roleScores?.find((x) => x.role === "AI-3_RISK");
+    const blockedBy = candidate.ai?.decisionPayload?.consensusEngine?.vetoStatus?.blockedBy ?? [];
+    const riskExposure = Number(candidate.ai?.finalRiskScore ?? roleRisk?.score ?? 0);
+    if ((roleRisk?.veto || (Array.isArray(blockedBy) && blockedBy.includes("AI-3_RISK"))) && riskExposure >= 70) {
+      reasons.push("AI-3 risk veto");
+    }
+    if (candidate.context.fakeSpikeScore >= 3.2 || fakeBreakoutRisk >= 92) {
+      reasons.push("fake breakout/manipulation risk critical");
+    }
+    return Array.from(new Set(reasons));
   }
   if (candidate.context.spreadPercent > 0.24) {
     reasons.push(`spread too wide (${candidate.context.spreadPercent.toFixed(4)}%)`);
@@ -1371,8 +1379,14 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
     }
     const { user, connection } = await getRuntimeExecutionContext(input.userId);
     runtimeUserId = user.id;
-    const safeMode = await getSafeModeState(user.id);
-    if (safeMode.enabled) {
+    const {
+      assessSafeModeExecutionGate,
+      formatSafeModeTerminalReason,
+      describeSafeModeAckRequirement,
+    } = await import("@/src/server/recovery/paper-safe-mode-policy.service");
+    const safeModeGate = await assessSafeModeExecutionGate(user.id);
+    if (safeModeGate.blocked) {
+      const terminalReason = formatSafeModeTerminalReason(safeModeGate);
       publishExecutionEvent({
         executionId,
         stage: "safe-mode",
@@ -1380,8 +1394,11 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         message: "Safe mode aktif, yeni islem acilamaz",
         level: "ERROR",
         context: {
-          reason: safeMode.reason,
-          requireManualAck: safeMode.requireManualAck,
+          reason: safeModeGate.reasonDetail,
+          requireManualAck: safeModeGate.requireManualAck,
+          failureDomain: safeModeGate.failureDomain,
+          failureCode: safeModeGate.failureCode,
+          ack: describeSafeModeAckRequirement(safeModeGate),
         },
       });
       return finishExecution({
@@ -1389,7 +1406,13 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         mode,
         opened: false,
         rejected: true,
-        rejectReason: safeMode.reason ?? "Safe mode active",
+        rejectReason: terminalReason,
+        details: {
+          failureDomain: safeModeGate.failureDomain,
+          failureCode: safeModeGate.failureCode,
+          reasonDetail: safeModeGate.reasonDetail,
+          requireManualAck: safeModeGate.requireManualAck,
+        },
       });
     }
     await persistAnalysisState({
@@ -1815,7 +1838,7 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
         executionId,
         symbol: selected.context.symbol,
         stage: "learning-lane-gate",
-        status: "SKIPPED",
+        status: "FAILED",
         message: "Learning lane sert risk filtresine takildi",
         level: "WARN",
         context: {
@@ -1824,7 +1847,16 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
           decision: ai.finalDecision,
         },
       });
-      // Learning lane is advisory-only by design; never hard-veto execution authority.
+      return finishExecution({
+        executionId,
+        mode,
+        opened: false,
+        rejected: true,
+        rejectReason: `LEARNING_LANE_HARD_REJECT: ${learningHardRejects.join(" | ")}`,
+        symbol: selected.context.symbol,
+        decision: ai.finalDecision,
+        details: { learningHardRejects },
+      });
     }
     if (noTradeReasons.length > 0) {
       const orchestration = await evaluateOrchestration({
@@ -2253,7 +2285,42 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       });
     }
     let symbol = await resolveExchangeSymbol(selected.context.symbol);
-    if (mode === "live" && env.BINANCE_PLATFORM === "tr" && symbol.endsWith("USDT")) {
+    if (mode === "paper") {
+      const { resolvePaperExecutionSymbol } = await import("@/src/server/execution/paper-execution-symbol.service");
+      const paperSymbol = await resolvePaperExecutionSymbol(symbol);
+      if (!paperSymbol.resolved) {
+        return finishExecution({
+          executionId,
+          mode,
+          opened: false,
+          rejected: true,
+          rejectReason: `${paperSymbol.reasonCode}: ${paperSymbol.reasonDetail}`,
+          symbol: selected.context.symbol,
+          decision: ai.finalDecision,
+          details: {
+            signalSymbol: paperSymbol.signalSymbol,
+            executionSymbol: paperSymbol.executionSymbol,
+            quoteAsset: paperSymbol.quoteAsset,
+          },
+        });
+      }
+      if (paperSymbol.executionSymbol !== symbol) {
+        publishExecutionEvent({
+          executionId,
+          symbol,
+          stage: "selection",
+          status: "RUNNING",
+          message: paperSymbol.reasonDetail ?? `Paper TR: ${symbol} -> ${paperSymbol.executionSymbol}`,
+          level: "INFO",
+          context: {
+            signalSymbol: paperSymbol.signalSymbol,
+            executionSymbol: paperSymbol.executionSymbol,
+            quoteAsset: paperSymbol.quoteAsset,
+          },
+        });
+      }
+      symbol = paperSymbol.executionSymbol;
+    } else if (mode === "live" && env.BINANCE_PLATFORM === "tr" && symbol.endsWith("USDT")) {
       const tryCandidate = `${symbol.slice(0, -4)}TRY`;
       const resolvedTry = await resolveExchangeSymbol(tryCandidate).catch(() => tryCandidate);
       if (resolvedTry.endsWith("TRY")) {
@@ -2273,6 +2340,22 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       ? canOpenLearningLaneMicroTrade({ candidate: selected, confidence: scorecardConfidence })
       : false;
     if (learningLane && !microTradeEligible) {
+      const blockingDecision = ai.finalDecision === "NO_TRADE" || ai.finalDecision === "HOLD";
+      if (blockingDecision) {
+        return finishExecution({
+          executionId,
+          mode,
+          opened: false,
+          rejected: true,
+          rejectReason: "LEARNING_LANE_NO_MICRO_EDGE",
+          symbol,
+          decision: ai.finalDecision,
+          details: {
+            confidence: scorecardConfidence,
+            scannerScore: selected.score.score,
+          },
+        });
+      }
       publishExecutionEvent({
         executionId,
         symbol,

@@ -91,7 +91,9 @@ describe("fix2 binance runtime hardening", () => {
     ).rejects.toThrow();
     await new Promise((r) => setTimeout(r, 1_100));
     await expect(withCircuitBreaker(key, async () => "ok", { threshold: 1, cooldownMs: 10 })).resolves.toBe("ok");
-    const snapshot = getCircuitSnapshot().find((row) => row.key === key);
+    // Circuit keys are now isolated by domain/dependency/venue; operation preserves
+    // the caller's identifier. Check the actual circuit instead of a missing row.
+    const snapshot = getCircuitSnapshot().find((row) => row.operation === key);
     expect(snapshot?.state).toBe("CLOSED");
     expect(snapshot?.halfOpenProbeCount).toBeGreaterThanOrEqual(1);
     expect(snapshot?.halfOpenSuccess).toBeGreaterThanOrEqual(1);

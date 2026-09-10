@@ -13,6 +13,7 @@ import { buildRiskReference } from "../profitability/pr04-structural-stop";
 import { entryIntentToInvalidation } from "../trade-decision-core/production-adapter.service";
 import type { ExitDecisionKind } from "../profitability/pr04-types";
 import { LOCAL_ENTRY_RISK, isLocalEntry, planLocalEntry } from "../trade-decision-core/local-entry-risk.service";
+import { expansionTrailingStop, MINUTE_EXPANSION_RULES } from "../trade-decision-core/minute-expansion-entry.service";
 export const TRY_REPLAY_VERSION = "causal-portfolio-v2";
 const HOUR = 3600000;
 export type EquityPoint = {
@@ -261,6 +262,10 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                         if (result.decisionKind !== "NONE" && order)
                             requestExit(pos, now, result.decisionKind, result.decisionKind, order.requestedQuantity, order.partialLegId);
                     }
+                    if (traded && input.variant.exitMode === "research_risk_trail" && !pos.exit) {
+                        const stop = expansionTrailingStop(pos.entryPrice, pos.intent.invalidationPrice!, pos.peak);
+                        if (b.close <= stop) requestExit(pos, now, stop > pos.intent.invalidationPrice! ? "RISK_TRAILING_STOP" : "STRUCTURAL_STOP", "STRUCTURAL_STOP");
+                    }
                     if (traded && input.variant.researchOnly && !isLocalEntry(pos.intent) && !pos.exit) {
                         const distance = Number(pos.intent.metadata.stopDistance);
                         const stop = Math.max(pos.intent.invalidationPrice!, pos.peak * (1 - distance));
@@ -274,16 +279,20 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                 .sort((a, b) => b.score - a.score || a.symbol.localeCompare(b.symbol)) : [];
             for (const c of cursors) {
                 const bar = c.panel.bars[c.ei];
-                if (!bar || bar.closeTime !== now)
-                    continue;
-                const idx = c.ei++;
-                if (c.position && isLocalEntry(c.position.intent) && idx >= 168) {
+                const hourlyEvent = !!bar && bar.closeTime === now;
+                const minuteEvent = input.variant.entryCandidate === "minute_expansion" && (now + 1) % MINUTE_EXPANSION_RULES.cadenceMs === 0 && c.panel.executionBarsTRY[c.lastTry]?.closeTime === now;
+                if (hourlyEvent) c.ei++;
+                if (!hourlyEvent && !minuteEvent) continue;
+                const idx = c.ei - 1;
+                const closedBar = c.panel.bars[idx];
+                if (!closedBar) continue;
+                if (hourlyEvent && c.position && isLocalEntry(c.position.intent) && input.variant.entryCandidate !== "minute_expansion" && idx >= 168) {
                     const mean = c.panel.bars.slice(idx - 168, idx).reduce((sum, b) => sum + b.close, 0) / 168;
-                    if (bar.close < mean) requestExit(c.position, now, "LOCAL_TREND_LOST");
+                    if (closedBar.close < mean) requestExit(c.position, now, "LOCAL_TREND_LOST");
                 }
                 if (c.position && !isLocalEntry(c.position.intent) && input.variant.researchOnly && idx >= 240 && (idx + 1) % 24 === 0) {
                     const avg = c.panel.bars.slice(idx - 240, idx).reduce((sum, b) => sum + b.close, 0) / 240;
-                    if (bar.close < avg)
+                    if (closedBar.close < avg)
                         requestExit(c.position, now, "TREND_TO_CASH");
                 }
                 if (c.position || c.pending || now < c.cooldownUntil || idx < 48 || (!input.variant.researchOnly && idx % 4 !== 0))
@@ -293,7 +302,7 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
                     continue;
                 const bi = lastBefore(input.btcPanel.bars, now, b => b.closeTime);
                 const snapshot: MarketSnapshot = { nowMs: now, baseAsset: c.panel.baseAsset, externalSymbol: c.panel.symbol, executionSymbol: c.panel.executionSymbol,
-                    externalBarIdx: idx, externalClose: bar.close, tryBarIdx: c.lastTry, tryPrice: tb.close, tryVolume: tb.volume, tryAvailableAtMs: tb.closeTime,
+                    externalBarIdx: idx, externalClose: closedBar.close, tryBarIdx: c.lastTry, tryPrice: tb.close, tryVolume: tb.volume, tryAvailableAtMs: tb.closeTime,
                     executionEstimate: { feePerSidePct: fee * 100, slippageBpsPerSide: slip * 10000 },
                     entryDiagnostics,
                     btcExternalReturn4hPct: bi >= 4 ? (input.btcPanel.bars[bi].close / input.btcPanel.bars[bi - 4].close - 1) * 100 : null,
@@ -345,7 +354,7 @@ export function runTrySpotReplayUniverse(input: ReplayOptions) {
         return { trades, stats: tradeStatistics(trades, maxDd), equity, openPositions, entryDiagnostics,
             portfolio: { initialCashTry: initialCash, cashTry: cash, equityTry: lastEquity, netPnlTry: lastEquity - initialCash, maxDrawdownPct: maxDd, rejectedCash, expiredOrders, riskRejectedEntries, riskBlockedSignals },
             config: { version: TRY_REPLAY_VERSION, variant: input.variant, feePerSidePct: fee * 100, slippageBpsPerSide: slip * 10000, participationRate: participation,
-                executionRiskPolicy: input.variant.entryCandidate.startsWith("local_") ? LOCAL_ENTRY_RISK : null,
+                executionRiskPolicy: (input.variant.entryCandidate.startsWith("local_") || input.variant.entryCandidate === "minute_expansion") ? LOCAL_ENTRY_RISK : null,
                 initialCashTry: initialCash, notionalTry: budget, maxPositions, executionModel: "NEXT_TRADED_MINUTE_CLOSE_WITH_VOLUME_CAP", feeSource: "UNVERIFIED_ACCOUNT_ASSUMPTION", equityModel: "LAST_TRADED_CLOSE_MTM" },
             elapsedMs: Date.now() - started };
     }

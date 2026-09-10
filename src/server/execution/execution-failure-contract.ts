@@ -11,6 +11,8 @@ export const EXECUTION_FAILURE_DOMAINS = [
   "AI_PROVIDER",
   "PAPER_EXECUTION",
   "LIVE_EXECUTION",
+  "SAFE_MODE",
+  "EXECUTION",
   "UNKNOWN",
 ] as const;
 
@@ -229,14 +231,18 @@ export function normalizeExecutionTerminalReason(input: {
   const failureCode = String(details.failureCode ?? "").trim().toUpperCase();
   if (failureDomain && failureCode) return `${failureDomain}:${failureCode}`;
   const base = String(input.rejectReason ?? input.fallback ?? "UNKNOWN:EXECUTION_REJECTED").trim();
+  if (/^SAFE_MODE:[A-Z0-9_]+$/.test(base)) return base;
+  if (/^EXECUTION:API_FAILURE_BREAKER_OPEN$/.test(base)) return base;
+  const lower = base.toLowerCase();
+  if (lower.includes("safe mode")) return "SAFE_MODE:SAFE_MODE_ACTIVE";
   const generic = new Set([
     "binance api failure breaker",
     "unknown execution failure",
     "execution failed",
     "pre-check failed",
   ]);
-  if (generic.has(base.toLowerCase())) {
-    return "UNKNOWN:GENERIC_TERMINAL_REASON_DETAIL_MISSING";
+  if (generic.has(lower)) {
+    return "SAFE_MODE:SAFE_MODE_STALE_REASON";
   }
   if (/^[A-Z][A-Z0-9_]*:[A-Z0-9_]+/.test(base)) return base;
   if (!base) return "UNKNOWN:EXECUTION_REJECTED";

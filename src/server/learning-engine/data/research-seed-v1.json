@@ -1,0 +1,954 @@
+{
+  "version": "research-evidence-v1",
+  "trainingEligible": false,
+  "autoApply": false,
+  "records": [
+    {
+      "title": "Historical research: baseline_fixed_8h_v1 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "baseline_fixed_8h_v1"
+      ],
+      "fact": {
+        "variant": "baseline_fixed_8h_v1",
+        "days": 270,
+        "window": "validation_270d",
+        "scenario": "base",
+        "trades": 503,
+        "netPnlTry": -2955.2859181484127,
+        "initialCashTry": 10000,
+        "profitFactor": 0.49617779799298695,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/baseline.json",
+      "sourceFileSha256": "5c67621facca630e77eb34f8837cbb493eb52394ff7ce83fc723cf02249745ae",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-26b4909d593ad034263d3ff0717bc339"
+    },
+    {
+      "title": "Historical research: baseline_fixed_8h_v2 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "baseline_fixed_8h_v2"
+      ],
+      "fact": {
+        "variant": "baseline_fixed_8h_v2",
+        "days": 270,
+        "window": "validation_270d",
+        "scenario": "base",
+        "trades": 881,
+        "netPnlTry": -4659.024140330577,
+        "initialCashTry": 10000,
+        "profitFactor": 0.5189849044505952,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/baseline.json",
+      "sourceFileSha256": "5c67621facca630e77eb34f8837cbb493eb52394ff7ce83fc723cf02249745ae",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-6031aaeeffdea7f38919e877efcbdf55"
+    },
+    {
+      "title": "Historical research: entry_regime_filter_fixed_8h 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "entry_regime_filter_fixed_8h"
+      ],
+      "fact": {
+        "variant": "entry_regime_filter_fixed_8h",
+        "days": 270,
+        "window": "validation_270d",
+        "scenario": "base",
+        "trades": 759,
+        "netPnlTry": -3629.8650550312195,
+        "initialCashTry": 10000,
+        "profitFactor": 0.5552381750965768,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/baseline.json",
+      "sourceFileSha256": "5c67621facca630e77eb34f8837cbb493eb52394ff7ce83fc723cf02249745ae",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-5f63ddc908e31ac45a9ee8c5a27020f4"
+    },
+    {
+      "title": "Historical research: baseline_v2_pr04_trail 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "baseline_v2_pr04_trail"
+      ],
+      "fact": {
+        "variant": "baseline_v2_pr04_trail",
+        "days": 270,
+        "window": "validation_270d",
+        "scenario": "base",
+        "trades": 948,
+        "netPnlTry": -4726.6447073117515,
+        "initialCashTry": 10000,
+        "profitFactor": 0.526051794283275,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/baseline.json",
+      "sourceFileSha256": "5c67621facca630e77eb34f8837cbb493eb52394ff7ce83fc723cf02249745ae",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-c1581e3281e346b23ff16479dbfad9e1"
+    },
+    {
+      "title": "Historical research: combined_regime_trail 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "combined_regime_trail"
+      ],
+      "fact": {
+        "variant": "combined_regime_trail",
+        "days": 270,
+        "window": "validation_270d",
+        "scenario": "base",
+        "trades": 818,
+        "netPnlTry": -3958.742252202932,
+        "initialCashTry": 10000,
+        "profitFactor": 0.5344048653092768,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/baseline.json",
+      "sourceFileSha256": "5c67621facca630e77eb34f8837cbb493eb52394ff7ce83fc723cf02249745ae",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-8aa472216da17b0984b535a76f47085e"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 30d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 30,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 145,
+        "netPnlTry": -328.3641595733461,
+        "initialCashTry": 10000,
+        "profitFactor": 0.6985366230236563,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-7dc922fc1ad918acc8efbcb2b5314247"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 30d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 30,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 115,
+        "netPnlTry": -80.06904900233167,
+        "initialCashTry": 10000,
+        "profitFactor": 0.9215700193851614,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-4634fb7556e75cd8495a6e9d701ff4e1"
+    },
+    {
+      "title": "Historical research: research_local_breakout 30d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 30,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 29,
+        "netPnlTry": 44.12602428362152,
+        "initialCashTry": 10000,
+        "profitFactor": 1.2670766563483793,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-1d13a187f891a987ccc98e67c49e872c"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 30d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 30,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 87,
+        "netPnlTry": -434.0165700122998,
+        "initialCashTry": 10000,
+        "profitFactor": 0.4910405036841697,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-72c5e40ad2c98d7fdbaa69bc5bc744f5"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 30d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 30,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 62,
+        "netPnlTry": -100.36135162745995,
+        "initialCashTry": 10000,
+        "profitFactor": 0.8665640756122588,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-8e59f2f0ae6bf3ddda77a9d50774949e"
+    },
+    {
+      "title": "Historical research: research_local_breakout 30d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 30,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 22,
+        "netPnlTry": -7.317887240775235,
+        "initialCashTry": 10000,
+        "profitFactor": 0.9466608893321665,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-75c6b217027d6abe7cd882c07f8b067b"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 60d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 60,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 218,
+        "netPnlTry": -801.2145878814044,
+        "initialCashTry": 10000,
+        "profitFactor": 0.5441394533936288,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-ec3f6894dfd35bc2f1c2d5ea7d3e61b3"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 60d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 60,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 201,
+        "netPnlTry": -588.30990905627,
+        "initialCashTry": 10000,
+        "profitFactor": 0.6855209601467032,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-8b31968495f11504d94d14d0cb6eee7c"
+    },
+    {
+      "title": "Historical research: research_local_breakout 60d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 60,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 43,
+        "netPnlTry": -13.111166082690033,
+        "initialCashTry": 10000,
+        "profitFactor": 0.9524951219239884,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-7bb194745120cd9dab5c9add29335ea4"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 60d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 60,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 123,
+        "netPnlTry": -795.6118775200775,
+        "initialCashTry": 10000,
+        "profitFactor": 0.39495365727364745,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-ee5b3a73abd16e63550ee59d730690c4"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 60d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 60,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 104,
+        "netPnlTry": -451.7489159495326,
+        "initialCashTry": 10000,
+        "profitFactor": 0.6586905642350566,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-6036ed8b605c2991d8decf46069eccca"
+    },
+    {
+      "title": "Historical research: research_local_breakout 60d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 60,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 24,
+        "netPnlTry": -3.903262923062357,
+        "initialCashTry": 10000,
+        "profitFactor": 0.9715496336348601,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-0cfcd6a922256ad404f219dd23eb73ae"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 90d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 90,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 125,
+        "netPnlTry": -844.3778388459941,
+        "initialCashTry": 10000,
+        "profitFactor": 0.32038586895862436,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-1b95ca1f6ae37f0d993b41cd8fc12436"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 90d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 90,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 93,
+        "netPnlTry": -815.8694138282517,
+        "initialCashTry": 10000,
+        "profitFactor": 0.31729588073282466,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-763a979739a29cae0cd4af0d47692e04"
+    },
+    {
+      "title": "Historical research: research_local_breakout 90d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 90,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 66,
+        "netPnlTry": -27.272570149416424,
+        "initialCashTry": 10000,
+        "profitFactor": 0.9411367055664686,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-5d1864e5c4d8c385b1d349ef3a49ffc2"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 90d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 90,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 82,
+        "netPnlTry": -805.1679991639703,
+        "initialCashTry": 10000,
+        "profitFactor": 0.20243325023678907,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-e6ac36afa62522ff3501f530f4b5bea9"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 90d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 90,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 65,
+        "netPnlTry": -839.382979043763,
+        "initialCashTry": 10000,
+        "profitFactor": 0.25163772004691753,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-4b352ea129ab6045c3b2f9f8401f6a86"
+    },
+    {
+      "title": "Historical research: research_local_breakout 90d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 90,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 33,
+        "netPnlTry": -50.896185119623624,
+        "initialCashTry": 10000,
+        "profitFactor": 0.7718998408482055,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-bd2b7f735597ce09443dfe48b0006ab2"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 270,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 167,
+        "netPnlTry": -806.2455038779226,
+        "initialCashTry": 10000,
+        "profitFactor": 0.46982031423078796,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-2c51509e949a88b12c169333cf4f5c58"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 270,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 136,
+        "netPnlTry": -694.3996688555308,
+        "initialCashTry": 10000,
+        "profitFactor": 0.5373609561042311,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-b30bca99ac2a8e9b40a4b944478b54a0"
+    },
+    {
+      "title": "Historical research: research_local_breakout 270d base",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 270,
+        "window": "trailing",
+        "scenario": "base",
+        "trades": 156,
+        "netPnlTry": -448.3634814624347,
+        "initialCashTry": 10000,
+        "profitFactor": 0.6675916831670767,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-9d502934468942afac6271d76348b3fd"
+    },
+    {
+      "title": "Historical research: research_minute_pr04 270d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_pr04"
+      ],
+      "fact": {
+        "variant": "research_minute_pr04",
+        "days": 270,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 93,
+        "netPnlTry": -699.4382180422726,
+        "initialCashTry": 10000,
+        "profitFactor": 0.36780377335372905,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-78c0b6548cf6ffbf0d111dd32b7fbb44"
+    },
+    {
+      "title": "Historical research: research_minute_risk_trail 270d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_minute_risk_trail"
+      ],
+      "fact": {
+        "variant": "research_minute_risk_trail",
+        "days": 270,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 85,
+        "netPnlTry": -645.3107568016821,
+        "initialCashTry": 10000,
+        "profitFactor": 0.48304316347388987,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-f79e6dea91597a900e1281403c795171"
+    },
+    {
+      "title": "Historical research: research_local_breakout 270d stress",
+      "tags": [
+        "research",
+        "historical",
+        "costs",
+        "try",
+        "research_local_breakout"
+      ],
+      "fact": {
+        "variant": "research_local_breakout",
+        "days": 270,
+        "window": "trailing",
+        "scenario": "stress",
+        "trades": 65,
+        "netPnlTry": -206.30196897479982,
+        "initialCashTry": 10000,
+        "profitFactor": 0.6107742944751199,
+        "economicPass": false
+      },
+      "sourceFile": "artifacts/opportunity-delivery/opportunity-results.json",
+      "sourceFileSha256": "2d06a1b056f65a98615dcc2876edec2e480f0899b329c9a26200fb7d4a51e4b4",
+      "sourceHash": "b94673ad86f0be99cee14b05f337e4cb2d8b3b857d63bdbce3d379aca8e593b2",
+      "limitation": "SEEN_DATA; TEN_ASSETS; MODELED_FEES_AND_FILLS; NOT_LIVE_OR_PAPER_TRADES; NOT_FORWARD_EDGE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-9be3f93d7552a99ac5ce4ffea65073a5"
+    },
+    {
+      "title": "Universe coverage: 30d, 308 TRY pairs",
+      "tags": [
+        "research",
+        "historical",
+        "universe",
+        "coverage",
+        "try"
+      ],
+      "fact": {
+        "days": 30,
+        "coinDays": 9210,
+        "thresholds": [
+          {
+            "pct": 5,
+            "closeCount": 1046,
+            "highCount": 2691
+          },
+          {
+            "pct": 10,
+            "closeCount": 293,
+            "highCount": 991
+          },
+          {
+            "pct": 20,
+            "closeCount": 69,
+            "highCount": 287
+          },
+          {
+            "pct": 30,
+            "closeCount": 31,
+            "highCount": 128
+          }
+        ]
+      },
+      "sourceFile": "artifacts/opportunity-delivery/wide-universe.json",
+      "sourceFileSha256": "c8424a4392204751bbb3493a53b1edd586e79d44f15ac6153080689934c7f4f2",
+      "limitation": "CURRENT_LISTINGS_SURVIVORSHIP; DAILY_HIGHS_NOT_EXECUTABLE_PNL; NOT_TRADE_EXPERIENCE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-28284d371a28a98bc594c57cdf8c54cf"
+    },
+    {
+      "title": "Universe coverage: 60d, 308 TRY pairs",
+      "tags": [
+        "research",
+        "historical",
+        "universe",
+        "coverage",
+        "try"
+      ],
+      "fact": {
+        "days": 60,
+        "coinDays": 18406,
+        "thresholds": [
+          {
+            "pct": 5,
+            "closeCount": 1585,
+            "highCount": 4577
+          },
+          {
+            "pct": 10,
+            "closeCount": 449,
+            "highCount": 1628
+          },
+          {
+            "pct": 20,
+            "closeCount": 116,
+            "highCount": 486
+          },
+          {
+            "pct": 30,
+            "closeCount": 58,
+            "highCount": 218
+          }
+        ]
+      },
+      "sourceFile": "artifacts/opportunity-delivery/wide-universe.json",
+      "sourceFileSha256": "c8424a4392204751bbb3493a53b1edd586e79d44f15ac6153080689934c7f4f2",
+      "limitation": "CURRENT_LISTINGS_SURVIVORSHIP; DAILY_HIGHS_NOT_EXECUTABLE_PNL; NOT_TRADE_EXPERIENCE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-b6ea5c37e39d9d05e71d0a3cb7b57ca6"
+    },
+    {
+      "title": "Universe coverage: 90d, 308 TRY pairs",
+      "tags": [
+        "research",
+        "historical",
+        "universe",
+        "coverage",
+        "try"
+      ],
+      "fact": {
+        "days": 90,
+        "coinDays": 27542,
+        "thresholds": [
+          {
+            "pct": 5,
+            "closeCount": 2410,
+            "highCount": 7152
+          },
+          {
+            "pct": 10,
+            "closeCount": 695,
+            "highCount": 2609
+          },
+          {
+            "pct": 20,
+            "closeCount": 180,
+            "highCount": 777
+          },
+          {
+            "pct": 30,
+            "closeCount": 89,
+            "highCount": 355
+          }
+        ]
+      },
+      "sourceFile": "artifacts/opportunity-delivery/wide-universe.json",
+      "sourceFileSha256": "c8424a4392204751bbb3493a53b1edd586e79d44f15ac6153080689934c7f4f2",
+      "limitation": "CURRENT_LISTINGS_SURVIVORSHIP; DAILY_HIGHS_NOT_EXECUTABLE_PNL; NOT_TRADE_EXPERIENCE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-142b2a4a64af0e065fe1982d1ca41456"
+    },
+    {
+      "title": "Universe coverage: 270d, 308 TRY pairs",
+      "tags": [
+        "research",
+        "historical",
+        "universe",
+        "coverage",
+        "try"
+      ],
+      "fact": {
+        "days": 270,
+        "coinDays": 80380,
+        "thresholds": [
+          {
+            "pct": 5,
+            "closeCount": 7148,
+            "highCount": 20355
+          },
+          {
+            "pct": 10,
+            "closeCount": 2178,
+            "highCount": 7549
+          },
+          {
+            "pct": 20,
+            "closeCount": 524,
+            "highCount": 2219
+          },
+          {
+            "pct": 30,
+            "closeCount": 253,
+            "highCount": 1009
+          }
+        ]
+      },
+      "sourceFile": "artifacts/opportunity-delivery/wide-universe.json",
+      "sourceFileSha256": "c8424a4392204751bbb3493a53b1edd586e79d44f15ac6153080689934c7f4f2",
+      "limitation": "CURRENT_LISTINGS_SURVIVORSHIP; DAILY_HIGHS_NOT_EXECUTABLE_PNL; NOT_TRADE_EXPERIENCE",
+      "availableAt": "2026-09-09T17:51:37.808766+00:00",
+      "id": "research-seed-5f85f6460dd0ee83fc117ecb01fc2b84"
+    }
+  ]
+}

@@ -16,6 +16,12 @@ const preflightMocks = vi.hoisted(() => ({
   prismaFindMany: vi.fn(async () => [] as unknown[]),
 }));
 
+// Unit preflight tests must not wait for public exchange time endpoints.
+vi.mock("@/src/server/execution-safety/clock-sync.service", () => ({
+  evaluateClockSync: async () => ({ ok: true, skewMs: 0, forensics: { localTime: "2026-09-09", serverTime: "2026-09-09", clockOffsetMs: 0, clockSkewMs: 0, measuredLatencyMs: 1, skewThresholdMs: 5000, endpoint: "UNIT_FIXTURE", timestampSource: "UNIT_FIXTURE" } }),
+  persistClockSyncForensics: vi.fn(),
+}));
+
 vi.mock("@/src/server/forensics/db-health.service", async () => {
   const actual = await vi.importActual<typeof import("@/src/server/forensics/db-health.service")>(
     "@/src/server/forensics/db-health.service",

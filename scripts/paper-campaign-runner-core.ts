@@ -4,6 +4,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { PaperProgressWatchdog, type PaperProgressRuntimeEvidence } from "../src/server/forensics/paper-progress-watchdog";
+import { capturePaperStrategySnapshot } from "../src/server/forensics/paper-strategy-freeze.service";
 
 export type PaperCampaignRunnerConfig = {
   durationMs: number;
@@ -31,6 +33,7 @@ export function loadEnvFile() {
   process.env.LIVE_TRADING_ACK = "false";
   process.env.LIVE_AUTHORIZATION = "DISABLED";
   process.env.CANONICAL_RUNTIME_ENFORCE_NO_LEGACY_PERSIST = "true";
+  process.env.PAPER_STRATEGY_FREEZE_ENABLED = "true";
 }
 
 export function writeJson(filePath: string, value: unknown) {
@@ -72,7 +75,25 @@ async function waitForJobTerminal(jobId: string, userId: string, timeoutMs: numb
   return { job, reachedTerminal: false };
 }
 
+async function reconcileOrphanPaperJob(userId: string, jobId: string, artifactRoot: string, reason: string) {
+  const { stopAutoRoundJob } = await import("@/src/server/execution/auto-round-engine.service");
+  const { prisma } = await import("@/src/server/db/prisma");
+  appendCheckpoint(artifactRoot, { type: "RUNNER_FATAL_RECONCILE", jobId, reason });
+  try {
+    await stopAutoRoundJob(userId);
+  } catch (error) {
+    appendCheckpoint(artifactRoot, {
+      type: "RUNNER_FATAL_RECONCILE_ERROR",
+      jobId,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+  const job = await prisma.autoRoundJob.findUnique({ where: { id: jobId }, select: { status: true } });
+  appendCheckpoint(artifactRoot, { type: "RUNNER_FATAL_RECONCILE_DONE", jobId, status: job?.status ?? null });
+}
+
 export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
+  if (process.env.EXECUTION_MODE !== "paper" || process.env.LIVE_TRADING_ENABLED !== "false") throw new Error("PAPER_RUNNER_MODE_REQUIRED");
   const wallClockStartMs = Date.now();
   const { getRuntimeExecutionContext } = await import("@/src/server/repositories/execution.repository");
   const { startAutoRoundJob, getAutoRoundStatus, stopAutoRoundJob } = await import(
@@ -109,26 +130,48 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
       preflight,
       endedAt: new Date().toISOString(),
     };
-    writeJson(path.join(process.cwd(), config.resultFile), blocked);
+    writeJson(path.resolve(config.resultFile), blocked);
     await prisma.$disconnect();
     return blocked;
   }
 
   const { ensurePaperAccountInitialized } = await import("@/src/server/simulation/paper-trading.service");
   await ensurePaperAccountInitialized(user.id);
+  const strategySnapshot = capturePaperStrategySnapshot();
+  writeJson(path.join(config.artifactRoot, "frozen-strategy-snapshot.json"), strategySnapshot);
   const paperCashBefore = await readPaperCashSnapshot(user.id);
   const openPositionsBefore = await prisma.position.count({ where: { userId: user.id, status: "OPEN" } });
 
   const jobStartedAtMs = Date.now();
   const deadlineMs = jobStartedAtMs + config.durationMs;
-  let stopReason: "deadline" | "signal" | "job_stopped" = "deadline";
+  let stopReason: "deadline" | "signal" | "job_stopped" | "technical_stall" | "runner_fatal" = "deadline";
   let gracefulStopRequested = false;
+  let activeJobId: string | null = null;
+  let activeUserId: string | null = null;
   const onSignal = () => {
     gracefulStopRequested = true;
     stopReason = "signal";
   };
+  const onFatal = async (label: string, error: unknown) => {
+    appendCheckpoint(config.artifactRoot, {
+      type: "RUNNER_FATAL",
+      label,
+      message: error instanceof Error ? error.message : String(error),
+      jobId: activeJobId,
+    });
+    if (activeJobId && activeUserId) {
+      await reconcileOrphanPaperJob(activeUserId, activeJobId, config.artifactRoot, label);
+    }
+    stopReason = "runner_fatal";
+  };
   process.on("SIGINT", onSignal);
   process.on("SIGTERM", onSignal);
+  process.on("uncaughtException", (error) => {
+    void onFatal("uncaughtException", error).finally(() => process.exit(1));
+  });
+  process.on("unhandledRejection", (error) => {
+    void onFatal("unhandledRejection", error).finally(() => process.exit(1));
+  });
 
   const started = await startAutoRoundJob({
     userId: user.id,
@@ -143,23 +186,26 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     mode: "auto",
   });
   const jobId = "jobId" in started ? started.jobId : null;
+  activeJobId = jobId;
+  activeUserId = user.id;
   if (!started.started || !jobId) {
+    process.off("SIGINT", onSignal); process.off("SIGTERM", onSignal);
     const fail = { campaignId: config.campaignId, phase: "START_FAILED", started };
-    writeJson(path.join(process.cwd(), config.resultFile), fail);
+    writeJson(path.resolve(config.resultFile), fail);
     await prisma.$disconnect();
     return fail;
   }
 
-  await prisma.autoRoundJob.update({
-    where: { id: jobId },
-    data: {
-      metadata: {
-        campaignId: `cmp:${jobId}`,
-        paperCampaignId: config.campaignId,
-        configHash,
-      },
-    },
-  });
+  try {
+    const metadata = JSON.stringify({ campaignId: `cmp:${jobId}`, paperCampaignId: config.campaignId, configHash });
+    // Atomic merge: do not erase scheduler/runtime metadata written while starting.
+    await prisma.$executeRaw`UPDATE "AutoRoundJob" SET "metadata" = COALESCE("metadata", '{}'::jsonb) || ${metadata}::jsonb WHERE "id" = ${jobId}`;
+  } catch (error) {
+    process.off("SIGINT", onSignal); process.off("SIGTERM", onSignal);
+    await stopAutoRoundJob(user.id);
+    await prisma.$disconnect();
+    throw error;
+  }
 
   appendCheckpoint(config.artifactRoot, {
     type: "JOB_START",
@@ -171,11 +217,35 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
   });
 
   let lastHeartbeat = 0;
+  const progressWatchdog = new PaperProgressWatchdog(jobStartedAtMs);
+  let progressFailure: string | null = null;
+  try {
   while (Date.now() < deadlineMs && !gracefulStopRequested) {
     const now = Date.now();
     if (now - lastHeartbeat >= config.heartbeatMs) {
       const status = await getAutoRoundStatus(user.id).catch(() => null);
       const openPositions = await prisma.position.count({ where: { userId: user.id, status: "OPEN" } });
+      const recentRounds = await prisma.autoRoundRun.findMany({
+        where: { jobId },
+        orderBy: { roundNo: "desc" },
+        take: 5,
+        select: { id: true, state: true, endedAt: true, failReason: true, startedAt: true, metadata: true },
+      });
+      const activeRound = recentRounds.find((round) => !round.endedAt) ?? recentRounds[0];
+      const runtimeMeta = ((activeRound?.metadata ?? {}) as Record<string, unknown>).runtime as Record<string, unknown> | undefined;
+      const runtime: PaperProgressRuntimeEvidence | null = activeRound
+        ? {
+            scannerSymbolsProcessed: Number(runtimeMeta?.scannerSymbolsProcessed ?? 0),
+            candidatesProcessed: Number(runtimeMeta?.candidatesProcessed ?? 0),
+            selectionAttempt: Number(runtimeMeta?.selectionAttempt ?? 0),
+            step: typeof runtimeMeta?.step === "string" ? runtimeMeta.step : undefined,
+            selectionBudgetMs: Number(runtimeMeta?.selectionBudgetMs ?? 0) || undefined,
+            selectionStartedAtMs: activeRound.startedAt?.getTime(),
+          }
+        : null;
+      const progress = progressWatchdog.observe({ nowMs: now, openPositions, rounds: recentRounds, runtime });
+      appendCheckpoint(config.artifactRoot, { type: "PROGRESS_CHECK", ...progress });
+      if (progress.shouldStop) { progressFailure = progress.reason; stopReason = "technical_stall"; break; }
       appendCheckpoint(config.artifactRoot, {
         type: "HEARTBEAT",
         elapsedMs: now - jobStartedAtMs,
@@ -192,6 +262,15 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     }
     await sleep(config.pollMs);
   }
+  } catch (error) {
+    stopReason = "technical_stall";
+    progressFailure = error instanceof Error ? error.message : String(error);
+    if (activeJobId && activeUserId) {
+      await reconcileOrphanPaperJob(activeUserId, activeJobId, config.artifactRoot, progressFailure);
+    }
+  }
+  process.off("SIGINT", onSignal);
+  process.off("SIGTERM", onSignal);
 
   appendCheckpoint(config.artifactRoot, {
     type: "STOP_REQUESTED",
@@ -253,11 +332,16 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
     gracefulStopRequested,
     stopReason,
     stopError,
+    progressFailure,
     reachedTerminal: terminal.reachedTerminal,
     configHash,
     frozenConfig: configSnapshot,
     roundsCompleted: finalJob?.rounds?.filter((r) => r.endedAt != null && r.state !== "tariyor").length ?? 0,
     roundsRecorded: finalJob?.rounds?.length ?? 0,
+    roundReasonCounts: (finalJob?.rounds ?? []).reduce<Record<string, number>>((counts, round) => {
+      const reason = round.failReason ?? round.result ?? round.state;
+      counts[reason] = (counts[reason] ?? 0) + 1; return counts;
+    }, {}),
     tradeCount: campaignClosedPaper.length,
     openPositionCount: campaignOpenPositions.length,
     realizedPnl,
@@ -282,7 +366,7 @@ export async function runPaperCampaign(config: PaperCampaignRunnerConfig) {
   });
 
   writeJson(path.join(config.artifactRoot, "final-snapshot.json"), result);
-  writeJson(path.join(process.cwd(), config.resultFile), result);
+  writeJson(path.resolve(config.resultFile), result);
 
   try {
     const { buildPaperCampaignSummary } = await import("@/src/server/forensics/paper-campaign-summary.service");

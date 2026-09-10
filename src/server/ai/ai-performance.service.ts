@@ -147,12 +147,14 @@ export async function recordAiPerformancePrediction(input: {
 }
 
 export async function evaluateAiPerformanceMemory(userId: string) {
+  try {
   const pending = await withTransientReadFallback("listPendingAiPerformance", [] as Awaited<ReturnType<typeof listPendingAiPerformance>>, () =>
     listPendingAiPerformance(userId),
   );
   if (pending.length === 0) return;
   const now = Date.now();
   for (const record of pending) {
+    try {
     const dueAt = record.createdAt.getTime() + record.horizonMinutes * 60 * 1000;
     if (dueAt > now) continue;
     const price = await getSnapshotPrice(record.symbol, new Date(dueAt));
@@ -176,6 +178,16 @@ export async function evaluateAiPerformanceMemory(userId: string) {
       result,
       errorPercent: Number(errorPercent.toFixed(4)),
     });
+    } catch (error) {
+      if (!isTransientPrismaConnectivityError(error)) {
+        logger.warn({ userId, recordId: record.id, error: (error as Error).message }, "AI performance row skipped");
+      }
+    }
+  }
+  } catch (error) {
+    if (!isTransientPrismaConnectivityError(error)) {
+      logger.error({ userId, error: (error as Error).message }, "AI performance evaluator failed");
+    }
   }
 }
 

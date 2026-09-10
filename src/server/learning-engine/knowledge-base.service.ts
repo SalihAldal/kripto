@@ -1,7 +1,9 @@
 import { searchKnowledge, persistKnowledgeEntry } from "@/src/server/learning-engine/learning-engine.repository";
 import { prisma } from "@/src/server/db/prisma";
+import { syncResearchSeedKnowledge } from "./research-seed.service";
 
 export async function buildKnowledgeBase(limit = 100) {
+  const seed = await syncResearchSeedKnowledge();
   const [patterns, memories, replays] = await Promise.all([
     prisma.patternLibrary.findMany({ orderBy: { updatedAt: "desc" }, take: limit }),
     prisma.learningMemory.findMany({ orderBy: { createdAt: "desc" }, take: limit }),
@@ -17,7 +19,7 @@ export async function buildKnowledgeBase(limit = 100) {
       tags: ["pattern", pattern.patternKey, pattern.status],
       patternKey: pattern.patternKey,
       metadata: { regime: pattern.regime, hourBucket: pattern.hourBucket, weekday: pattern.weekday },
-    }).catch(() => null);
+    });
     added += 1;
   }
 
@@ -28,7 +30,7 @@ export async function buildKnowledgeBase(limit = 100) {
       content: memory.summary ?? JSON.stringify(memory.payload),
       tags: [memory.memoryType, memory.symbol ?? "ALL"],
       metadata: { refId: memory.refId },
-    }).catch(() => null);
+    });
     added += 1;
   }
 
@@ -40,11 +42,11 @@ export async function buildKnowledgeBase(limit = 100) {
       tags: ["replay", replay.patternKey],
       patternKey: replay.patternKey,
       metadata: { decisionId: replay.decisionId, tradeId: replay.tradeId },
-    }).catch(() => null);
+    });
     added += 1;
   }
 
-  return { added };
+  return { added, seed };
 }
 
 export async function similaritySearch(query: string, limit = 20) {

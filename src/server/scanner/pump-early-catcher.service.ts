@@ -20,6 +20,8 @@ import {
 import type { MomentumBreakoutAssessment } from "@/src/server/scanner/momentum-breakout.service";
 import type { ScannerCandidate } from "@/src/types/scanner";
 import { recordPumpScanEvent } from "@/src/server/scanner/pump-scan-lifecycle.service";
+import { schedulePumpScan, attemptedPumpCursor } from "./pump-scan-scheduler";
+import { isKnownLeveragedToken } from "../market-data/leveraged-token-symbol";
 
 type PumpEarlyWatcherState = {
   running: boolean;
@@ -128,15 +130,6 @@ function buildPumpCandidate(input: {
     reason: input.reason,
     mode: input.mode,
   } as PumpEarlyCandidate;
-}
-
-function nextBatch(symbols: string[]) {
-  if (symbols.length === 0) return [];
-  const batchSize = Math.max(6, Math.min(env.PUMP_EARLY_CATCHER_BATCH_SIZE, symbols.length));
-  const cursor = Math.max(0, state.cursor % symbols.length);
-  const batch = Array.from({ length: batchSize }).map((_, idx) => symbols[(cursor + idx) % symbols.length]);
-  state.cursor = (cursor + batchSize) % symbols.length;
-  return Array.from(new Set(batch));
 }
 
 async function mapWithConcurrency<T, R>(
@@ -373,7 +366,7 @@ async function discoverIntradaySpikeLeaders(
   const minVolume = Math.max(80_000, env.SCANNER_MIN_VOLUME_24H * 0.25);
   const seeds = rows
     .filter((row) => row.symbol.endsWith(quoteSuffix))
-    .filter((row) => !row.symbol.includes("UP") && !row.symbol.includes("DOWN"))
+    .filter((row) => !isKnownLeveragedToken(row.symbol))
     .filter((row) => row.volume24h >= minVolume && row.change24h >= env.PUMP_INTRADAY_MIN_CHANGE_24H)
     .sort((a, b) => b.change24h - a.change24h)
     .slice(0, Math.max(limit * 2, 72));
@@ -517,7 +510,10 @@ async function scanTopPumpCandidates(options?: {
     typeof options?.maxSymbolsToEvaluate === "number"
       ? Math.max(1, Math.min(96, Math.floor(options.maxSymbolsToEvaluate)))
       : Math.max(effectiveLimit, Math.min(96, Math.max(36, effectiveLimit * 4)));
-  const batch = Array.from(new Set([...hotSymbols, ...leaderExtras, ...nextBatch(symbols)])).slice(0, maxSymbolsToEvaluate);
+  const startingCursor = state.cursor, attempted = new Set<string>();
+  const scheduled = schedulePumpScan({ leaders: [...hotSymbols, ...leaderExtras], watchlist: symbols,
+    cursor: state.cursor, limit: maxSymbolsToEvaluate, discoveryBatchSize: env.PUMP_EARLY_CATCHER_BATCH_SIZE });
+  const batch = scheduled.symbols;
   let earlyHits = 0;
   let continuationHits = 0;
   let intradayHits = 0;
@@ -526,6 +522,8 @@ async function scanTopPumpCandidates(options?: {
     batch,
     Math.max(2, Math.min(8, env.SCANNER_CONTEXT_CONCURRENCY)),
     async (symbol, _index, signal): Promise<PumpEarlyCandidate | null> => {
+      attempted.add(symbol);
+      state.cursor = attemptedPumpCursor(symbols, startingCursor, scheduled.discoverySymbols, attempted);
       const leader = leaderMap.get(symbol);
       const isIntradayLeader = leader?.reason.includes("intraday-spike") ?? false;
       const context = await withBoundedAwait(
@@ -621,13 +619,14 @@ async function scanTopPumpCandidates(options?: {
     },
   );
 
+  if (attempted.size === batch.length) state.cursor = scheduled.nextCursor;
   const ranked = rows
     .filter((row): row is PumpEarlyCandidate => row !== null)
     .sort((a, b) => b.priorityScore - a.priorityScore);
   const best = ranked[0] ?? null;
 
   state.lastScanStats = {
-    scanned: batch.length,
+    scanned: attempted.size,
     topGainerCount: topGainers.length,
     earlyHits,
     continuationHits,
