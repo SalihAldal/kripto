@@ -2,6 +2,7 @@
  * Canonical selection → handoff → AI hydration → orchestrator → risk → paper execution
  * Uses disposable PostgreSQL and production services. AI provider is the only consensus mock boundary.
  */
+import { executionMarketFixture } from "./helpers/execution-market-fixture";
 import crypto from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createFix02DisposablePostgres, type Fix02DisposablePostgres } from "./helpers/fix02-disposable-postgres";
@@ -20,6 +21,18 @@ import {
   seedExecutionReadyCandidate,
 } from "./helpers/canonical-paper-chain-fixtures";
 
+vi.mock("@/src/server/execution/execution-market-snapshot.service", async importOriginal => ({
+  ...await importOriginal<typeof import("@/src/server/execution/execution-market-snapshot.service")>(),
+  loadExecutionMarketSnapshot: vi.fn(async (symbol: string) => {
+    const snapshot = executionMarketFixture(symbol);
+    // BUY fixture includes rising, buyer-initiated trades; a single print has no momentum.
+    snapshot.bundle.recentTrades = Array.from({ length: 20 }, (_, i) => ({
+      id: i + 1, price: 99.8 + i * .2 / 19, qty: 10,
+      time: Date.now() - (20 - i) * 2000, isBuyerMaker: i % 5 === 0,
+    }));
+    return snapshot;
+  }),
+}));
 const getTickerMock = vi.hoisted(() => vi.fn());
 const runAiConsensusMock = vi.hoisted(() => vi.fn());
 
@@ -51,6 +64,14 @@ vi.mock("@/lib/config", () => ({
     EXECUTION_VARIANT_D_ENABLED: false,
     RISK_TOTAL_CAPITAL_TRY: 100000,
     SCANNER_MIN_VOLUME_24H: 1000,
+    SCANNER_MAX_SPREAD_PERCENT: 0.25,
+    MARKET_DATA_STALE_MS: 5000,
+    MARKET_DATA_ALLOW_SYNTHETIC: false,
+    SCANNER_SHORT_HORIZON_SEC: 120,
+    MACRO_NEWS_SENTIMENT: "NEUTRAL",
+    MACRO_HIGH_IMPACT_NEWS: false,
+    MACRO_UNCERTAINTY_LEVEL: 0,
+    MACRO_BTC_DOMINANCE_BIAS: 0,
     AI_QUALITY_PROFILE: "normal",
     BINANCE_API_KEY: "",
     BINANCE_API_SECRET: "",
@@ -389,7 +410,7 @@ describe.sequential("canonical paper full chain (disposable PostgreSQL)", () => 
       sessionId: "sess-case-1",
     });
 
-    expect(runAiConsensusMock).toHaveBeenCalled();
+    expect(runAiConsensusMock, JSON.stringify(result)).toHaveBeenCalledTimes(1);
     expect(result.opened, JSON.stringify(result)).toBe(true);
     expect(result.executionId).toBeTruthy();
     expect(result.positionId).toBeTruthy();

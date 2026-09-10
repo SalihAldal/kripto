@@ -31,6 +31,8 @@ export type MarketDataGateway = {
     signal?: AbortSignal;
     timeoutMs?: number;
     recovery?: boolean;
+    strictExecution?: boolean;
+    allowStaleOnBackoff?: boolean;
   }): Promise<MarketContextBundle>;
   listTickers24h(options?: MarketDataReadOptions): Promise<MarketDataTicker[]>;
 };

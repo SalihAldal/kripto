@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   classifyRoundTerminalOutcome,
+  formatTerminalReason,
   resolveReportFailReason,
 } from "@/src/server/execution/round-terminal-outcome.service";
 
@@ -48,4 +49,12 @@ describe("round terminal outcome", () => {
     });
     expect(outcome.outcome).toBe("round_incomplete");
   });
+});
+
+it.each(["MARKET_DATA:EXECUTION_CONTEXT_UNAVAILABLE", "SAFE_MODE:SAFE_MODE_ACTIVE"])("preserves precise domain without duplicating it: %s", reason => {
+  const outcome = classifyRoundTerminalOutcome({ reason });
+  const formatted = formatTerminalReason(outcome);
+  expect(formatted).toBe(`execution:${reason}`);
+  expect(formatTerminalReason(classifyRoundTerminalOutcome({ reason: formatted }))).toBe(formatted);
+  expect(outcome.reasonCode).toBe(reason.split(":")[1]);
 });

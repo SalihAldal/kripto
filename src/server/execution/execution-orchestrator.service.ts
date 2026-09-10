@@ -1596,9 +1596,9 @@ async function executeAnalyzeAndTradeInternal(input: ExecuteTradeInput): Promise
       if (sourceHardRejects.length > 0) return finishExecution({ executionId, mode, opened: false, rejected: true,
         rejectReason: `LEARNING_LANE_HARD_REJECT: ${sourceHardRejects.join(" | ")}`, symbol: selected.context.symbol });
       const { preparePaperExecutionContext } = await import("./paper-execution-context.service");
-      const prepared = await preparePaperExecutionContext(selected);
+      const prepared = await preparePaperExecutionContext(selected, input.requestedQuoteAmountTry);
       if (!prepared.ok) return finishExecution({ executionId, mode, opened: false, rejected: true,
-        rejectReason: prepared.reason, symbol: selected.context.symbol });
+        rejectReason: prepared.reason, symbol: selected.context.symbol, details: prepared.details });
       selected = prepared.candidate;
     }
     if (!selected.ai) {

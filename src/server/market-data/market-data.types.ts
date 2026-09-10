@@ -18,6 +18,8 @@ export type MarketDataReadOptions = {
   timeoutMs?: number;
   /** Explicit REST bootstrap/recovery only. Hot-path must omit this. */
   recovery?: boolean;
+  /** Execution venue REST only: no untagged snapshot cache or stale/synthetic fallback. */
+  strictExecution?: boolean;
 };
 
 export type MarketDataTicker = {

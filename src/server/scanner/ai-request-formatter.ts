@@ -1,3 +1,5 @@
+import type { ExecutionMarketSnapshot } from "@/src/server/execution/execution-market-snapshot.service";
+import { assessKlineInput } from "@/src/server/market-data/kline-input-contract.service";
 import type { AIAnalysisInput } from "@/src/types/ai";
 import type { MarketContext } from "@/src/types/scanner";
 import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
@@ -22,9 +24,11 @@ export async function formatAIRequest(
   context: MarketContext,
   strategyParams?: Record<string, unknown>,
   riskSettings?: AIAnalysisInput["riskSettings"],
+  executionSnapshot?: ExecutionMarketSnapshot,
 ): Promise<AIAnalysisInput> {
-  getMarketDataDaemon().subscribeDeep(context.symbol, "scanner-ai");
-  const cached = getMarketSnapshot(context.symbol);
+  if (!executionSnapshot) getMarketDataDaemon().subscribeDeep(context.symbol, "scanner-ai");
+  if (executionSnapshot && executionSnapshot.symbol !== context.symbol) throw new Error("EXECUTION_SNAPSHOT_SYMBOL_MISMATCH");
+  const cached = executionSnapshot ? null : getMarketSnapshot(context.symbol);
   const cachedUsable = Boolean(
     cached &&
       (cached.klines.some((row) => Number(row.volume ?? 0) > 0) ||
@@ -33,7 +37,11 @@ export async function formatAIRequest(
         cached.recentTrades.some((row) => row.qty > 0)),
   );
   const allowCached = cachedUsable && !(context.metadata as { liteSnapshot?: boolean } | undefined)?.liteSnapshot;
-  const klineContext = await ensureFreshKlineContext({
+  const klineContext = executionSnapshot ? {
+    ...assessKlineInput({ klines: executionSnapshot.bundle.klines1m, nowMs: Date.now() }),
+    interval: "1m", klines: executionSnapshot.bundle.klines1m, source: "execution_venue_snapshot",
+    refreshed: true, refreshAttempted: true, refreshSucceeded: true,
+  } : await ensureFreshKlineContext({
     symbol: context.symbol,
     interval: "1m",
     limit: 80,
@@ -60,20 +68,20 @@ export async function formatAIRequest(
     },
   });
   const [orderBook, recentTrades, klines5m, klines15m, klines1h, klines4h, klines1d] = await Promise.all([
-    allowCached
+    executionSnapshot ? Promise.resolve(executionSnapshot.bundle.orderBook!) : allowCached
       ? Promise.resolve(cached!.orderBook)
       : fromRamOrEmpty(
           () => marketDataGateway.getOrderBook(context.symbol, 30),
           { lastUpdateId: 0, bids: [], asks: [] },
         ),
-    allowCached
+    executionSnapshot ? Promise.resolve(executionSnapshot.bundle.recentTrades ?? []) : allowCached
       ? Promise.resolve(cached!.recentTrades)
       : fromRamOrEmpty(() => marketDataGateway.getRecentTrades(context.symbol, 150), []),
-    Promise.resolve([]),
-    Promise.resolve([]),
-    Promise.resolve([]),
-    Promise.resolve([]),
-    Promise.resolve([]),
+    Promise.resolve(executionSnapshot?.timeframes["5m"] ?? []),
+    Promise.resolve(executionSnapshot?.timeframes["15m"] ?? []),
+    Promise.resolve(executionSnapshot?.timeframes["1h"] ?? []),
+    Promise.resolve(executionSnapshot?.timeframes["4h"] ?? []),
+    Promise.resolve(executionSnapshot?.timeframes["1d"] ?? []),
   ]);
   const klines = klineContext.klines;
   const mtf = buildMultiTimeframeAnalysis({

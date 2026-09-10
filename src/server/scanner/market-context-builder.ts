@@ -1,3 +1,4 @@
+import type { MarketContextBundle } from "@/src/server/market-data/market-data.types";
 import { env } from "@/lib/config";
 import { marketDataGateway } from "@/src/server/market-data/market-data-gateway";
 import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-daemon";
@@ -226,6 +227,7 @@ function rememberContext(context: MarketContext) {
 export async function buildMarketContext(
   symbol: string,
   options?: {
+    executionBundle?: MarketContextBundle;
     lite?: boolean;
     forceLive?: boolean;
     priority?: MarketDataPriority;
@@ -243,7 +245,7 @@ export async function buildMarketContext(
     volume24h: undefined,
   });
   const recentCached = getCachedHealthyContext(normalized, Math.max(60_000, maxAgeMs));
-  if (recentCached && recentCached.metadata?.dataQualityOk) {
+  if (!options?.executionBundle && recentCached && recentCached.metadata?.dataQualityOk) {
     const cacheAgeMs = Date.now() - (contextCache.get(normalized)?.at ?? 0);
     const freshEnough = !options?.forceLive || cacheAgeMs <= maxAgeMs;
     if (freshEnough) {
@@ -259,7 +261,7 @@ export async function buildMarketContext(
   }
   let bundle;
   try {
-    bundle = await marketDataGateway.fetchContextBundle({
+    bundle = options?.executionBundle ?? await marketDataGateway.fetchContextBundle({
       symbol: normalized,
       lite,
       priority,
@@ -300,7 +302,7 @@ export async function buildMarketContext(
   const safeTickerPrice = Number.isFinite(ticker.price) && ticker.price > 0 ? ticker.price : 1;
   const safeTickerVolume = Number.isFinite(ticker.volume24h) && ticker.volume24h > 0 ? ticker.volume24h : 0;
   const ringWindowMs = 15 * 60_000;
-  const ringWindow = getMarketDataDaemon().getWindow(normalized, ringWindowMs);
+  const ringWindow = options?.executionBundle ? [] : getMarketDataDaemon().getWindow(normalized, ringWindowMs);
   const derivedKlines = deriveKlinesFromWindow(ringWindow, 80);
   const klineSource = bundle.klines1m.length > 0
     ? "WS_KLINE"
@@ -337,7 +339,7 @@ export async function buildMarketContext(
         ? fallbackRecentTrades(safeTickerPrice, 150)
         : [];
 
-  if (!lite && bundle.orderBook && bundle.recentTrades) {
+  if (!options?.executionBundle && !lite && bundle.orderBook && bundle.recentTrades) {
     putMarketSnapshot(resolvedSymbol, { klines, orderBook, recentTrades });
   }
 
@@ -375,7 +377,7 @@ export async function buildMarketContext(
       ? Number((((closes[closes.length - 1] - closes[0]) / closes[0]) * 100).toFixed(4))
       : 0;
   const tickerChange24h = Number.isFinite(ticker.change24h) ? Number(ticker.change24h) : 0;
-  const useDerived24h = !Number.isFinite(ticker.change24h) || tickerChange24h === 0;
+  const useDerived24h = !Number.isFinite(ticker.change24h);
   const change24hCandidate = change24hFrom1h !== 0 ? change24hFrom1h : derivedChange24h;
   const change24h =
     useDerived24h && change24hCandidate !== 0
@@ -586,8 +588,8 @@ export async function buildMarketContext(
   const pumpRisk = pumpRiskComputation.score;
 
   const [socialSnapshot, futuresIntel] = await Promise.all([
-    lite ? Promise.resolve(null) : getSocialSentimentSnapshotSafe(resolvedSymbol),
-    lite
+    (lite || options?.allowBackgroundIntelCapture === false) ? Promise.resolve(null) : getSocialSentimentSnapshotSafe(resolvedSymbol),
+    (lite || options?.allowBackgroundIntelCapture === false)
       ? Promise.resolve(null)
       : collectPreTradeFuturesIntelligence({
           symbol: resolvedSymbol,
@@ -859,7 +861,7 @@ export async function buildMarketContext(
     }
   }
 
-  rememberContext(context);
+  if (!options?.executionBundle) rememberContext(context);
   if (options?.allowBackgroundIntelCapture !== false && !options?.signal?.aborted) {
     void import("@/src/server/market-intelligence/market-intelligence-queue")
       .then(({ enqueueMarketIntelJob }) =>

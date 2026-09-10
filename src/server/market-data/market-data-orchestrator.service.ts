@@ -218,18 +218,6 @@ async function coalesce<T>(key: string, factory: () => Promise<T>): Promise<T> {
   return promise;
 }
 
-function waitForAbort(signal?: AbortSignal): Promise<never> | null {
-  if (!signal) return null;
-  if (signal.aborted) {
-    return Promise.reject(new Error(String(signal.reason ?? "Aborted")));
-  }
-  return new Promise((_, reject) => {
-    signal.addEventListener("abort", () => reject(new Error(String(signal.reason ?? "Aborted"))), {
-      once: true,
-    });
-  });
-}
-
 async function fetchFromExchange<T>(
   kind: MarketDataKind,
   fn: () => Promise<T>,
@@ -250,15 +238,22 @@ async function fetchFromExchange<T>(
       kind,
     });
   }
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  let onAbort: (() => void) | undefined;
   try {
+    options?.signal?.throwIfAborted();
     telemetry.exchangeCalls += 1;
     spendWeight(kind);
     await getSharedRestLimiter().spend(WEIGHT_ESTIMATE[kind] || 1);
-    const abortPromise = waitForAbort(options?.signal);
+    const abortPromise = options?.signal ? new Promise<never>((_, reject) => {
+      onAbort = () => reject(new Error("Market data request aborted"));
+      options.signal!.addEventListener("abort", onAbort, { once: true });
+      if (options.signal!.aborted) onAbort();
+    }) : null;
     const result = await Promise.race([
       fn(),
       new Promise<never>((_, reject) => {
-        setTimeout(
+        timeout = setTimeout(
           () => reject(new Error(`${options?.label ?? kind} timeout after ${timeoutMs}ms`)),
           timeoutMs,
         );
@@ -276,6 +271,9 @@ async function fetchFromExchange<T>(
     if (is429Error(error)) register429(error);
     if (is418Error(error)) register418(error);
     throw error;
+  } finally {
+    if (timeout) clearTimeout(timeout);
+    if (onAbort) options?.signal?.removeEventListener("abort", onAbort);
   }
 }
 
@@ -296,16 +294,16 @@ export class MarketDataOrchestrator {
 
     const cachedVolume = tickerCache.get(normalized)?.volume24h;
     const maxAgeMs = options.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "ticker", volume24h: cachedVolume, priority });
-    const cached = readCache(tickerCache, normalized, maxAgeMs);
+    const cached = options.strictExecution ? null : readCache(tickerCache, normalized, maxAgeMs);
     if (cached) {
       telemetry.cacheHits += 1;
       updateHitRatio();
       return cached;
     }
 
-    if (isBackoffActive() && options.allowStaleOnBackoff !== false) {
+    if (isBackoffActive()) {
       const stale = tickerCache.get(normalized)?.value;
-      if (stale) {
+      if (stale && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -315,7 +313,7 @@ export class MarketDataOrchestrator {
 
     if (!canSpendWeight("ticker", priority)) {
       const stale = tickerCache.get(normalized)?.value;
-      if (stale) {
+      if (stale && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -328,8 +326,8 @@ export class MarketDataOrchestrator {
       });
     }
 
-    return coalesce(`ticker:${normalized}`, async () => {
-      const freshCached = readCache(tickerCache, normalized, maxAgeMs);
+    return coalesce(`${options.strictExecution ? "execution:" : ""}ticker:${normalized}`, async () => {
+      const freshCached = options.strictExecution ? null : readCache(tickerCache, normalized, maxAgeMs);
       if (freshCached) {
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -337,7 +335,7 @@ export class MarketDataOrchestrator {
       }
       try {
         const provider = getExchangeProvider();
-        const row = await fetchFromExchange("ticker", () => provider.getTicker(normalized), {
+        const row = await fetchFromExchange("ticker", () => provider.getTicker(normalized, options.strictExecution ? { strict: true } : undefined), {
           signal: options.signal,
           timeoutMs: options.timeoutMs,
           label: `ticker:${normalized}`,
@@ -354,7 +352,7 @@ export class MarketDataOrchestrator {
         return mapped;
       } catch (error) {
         const stale = tickerCache.get(normalized)?.value;
-        if (is429Error(error) && stale) {
+        if (is429Error(error) && stale && options.allowStaleOnBackoff !== false && !options.strictExecution) {
           telemetry.duplicateAvoided += 1;
           telemetry.cacheHits += 1;
           updateHitRatio();
@@ -380,7 +378,7 @@ export class MarketDataOrchestrator {
     const cachedVolume = tickerCache.get(normalized)?.volume24h;
     const maxAgeMs =
       options.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "klines", volume24h: cachedVolume, priority, interval });
-    const cached = readCache(klinesCache, key, maxAgeMs);
+    const cached = options.strictExecution ? null : readCache(klinesCache, key, maxAgeMs);
     if (cached) {
       telemetry.cacheHits += 1;
       updateHitRatio();
@@ -389,7 +387,7 @@ export class MarketDataOrchestrator {
 
     if (isBackoffActive()) {
       const stale = klinesCache.get(key)?.value;
-      if (stale?.length) {
+      if (stale?.length && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -399,7 +397,7 @@ export class MarketDataOrchestrator {
 
     if (!canSpendWeight("klines", priority)) {
       const stale = klinesCache.get(key)?.value;
-      if (stale?.length) {
+      if (stale?.length && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -412,15 +410,15 @@ export class MarketDataOrchestrator {
       });
     }
 
-    return coalesce(`klines:${key}`, async () => {
-      const freshCached = readCache(klinesCache, key, maxAgeMs);
+    return coalesce(`${options.strictExecution ? "execution:" : ""}klines:${key}`, async () => {
+      const freshCached = options.strictExecution ? null : readCache(klinesCache, key, maxAgeMs);
       if (freshCached) {
         telemetry.cacheHits += 1;
         updateHitRatio();
         return freshCached;
       }
       const provider = getExchangeProvider();
-      const rows = await fetchFromExchange("klines", () => provider.getKlines(normalized, interval, limit), {
+      const rows = await fetchFromExchange("klines", () => provider.getKlines(normalized, interval, limit, options.strictExecution ? { strict: true } : undefined), {
         signal: options.signal,
         timeoutMs: options.timeoutMs,
         label: `klines:${normalized}:${interval}`,
@@ -438,7 +436,7 @@ export class MarketDataOrchestrator {
     telemetry.totalRequests += 1;
     recordKind("orderBook");
 
-    const snapshot = getMarketSnapshot(normalized);
+    const snapshot = options.strictExecution ? null : getMarketSnapshot(normalized);
     if (snapshot && snapshot.orderBook.bids.length > 0) {
       const snapshotAge = Date.now() - snapshot.at;
       const maxAgeMs = options.maxAgeMs ?? resolveAdaptiveTtlMs({
@@ -457,7 +455,7 @@ export class MarketDataOrchestrator {
     const cachedVolume = tickerCache.get(normalized)?.volume24h;
     const maxAgeMs =
       options.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "orderBook", volume24h: cachedVolume, priority });
-    const cached = readCache(orderBookCache, key, maxAgeMs);
+    const cached = options.strictExecution ? null : readCache(orderBookCache, key, maxAgeMs);
     if (cached) {
       telemetry.cacheHits += 1;
       updateHitRatio();
@@ -466,7 +464,7 @@ export class MarketDataOrchestrator {
 
     if (isBackoffActive()) {
       const stale = orderBookCache.get(key)?.value ?? snapshot?.orderBook;
-      if (stale) {
+      if (stale && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -476,7 +474,7 @@ export class MarketDataOrchestrator {
 
     if (!canSpendWeight("orderBook", priority)) {
       const stale = orderBookCache.get(key)?.value ?? snapshot?.orderBook;
-      if (stale) {
+      if (stale && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -489,9 +487,9 @@ export class MarketDataOrchestrator {
       });
     }
 
-    return coalesce(`orderBook:${key}`, async () => {
+    return coalesce(`${options.strictExecution ? "execution:" : ""}orderBook:${key}`, async () => {
       const provider = getExchangeProvider();
-      const book = await fetchFromExchange("orderBook", () => provider.getOrderBook(normalized, limit), {
+      const book = await fetchFromExchange("orderBook", () => provider.getOrderBook(normalized, limit, options.strictExecution ? { strict: true } : undefined), {
         signal: options.signal,
         timeoutMs: options.timeoutMs,
         label: `orderBook:${normalized}`,
@@ -509,7 +507,7 @@ export class MarketDataOrchestrator {
     telemetry.totalRequests += 1;
     recordKind("recentTrades");
 
-    const snapshot = getMarketSnapshot(normalized);
+    const snapshot = options.strictExecution ? null : getMarketSnapshot(normalized);
     if (snapshot?.recentTrades.length) {
       const maxAgeMs = options.maxAgeMs ?? resolveAdaptiveTtlMs({
         kind: "recentTrades",
@@ -527,7 +525,7 @@ export class MarketDataOrchestrator {
     const cachedVolume = tickerCache.get(normalized)?.volume24h;
     const maxAgeMs =
       options.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "recentTrades", volume24h: cachedVolume, priority });
-    const cached = readCache(recentTradesCache, key, maxAgeMs);
+    const cached = options.strictExecution ? null : readCache(recentTradesCache, key, maxAgeMs);
     if (cached) {
       telemetry.cacheHits += 1;
       updateHitRatio();
@@ -536,7 +534,7 @@ export class MarketDataOrchestrator {
 
     if (isBackoffActive()) {
       const stale = recentTradesCache.get(key)?.value ?? snapshot?.recentTrades;
-      if (stale?.length) {
+      if (stale?.length && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -546,7 +544,7 @@ export class MarketDataOrchestrator {
 
     if (!canSpendWeight("recentTrades", priority)) {
       const stale = recentTradesCache.get(key)?.value ?? snapshot?.recentTrades;
-      if (stale?.length) {
+      if (stale?.length && options.allowStaleOnBackoff !== false && !options.strictExecution) {
         telemetry.duplicateAvoided += 1;
         telemetry.cacheHits += 1;
         updateHitRatio();
@@ -559,9 +557,9 @@ export class MarketDataOrchestrator {
       });
     }
 
-    return coalesce(`recentTrades:${key}`, async () => {
+    return coalesce(`${options.strictExecution ? "execution:" : ""}recentTrades:${key}`, async () => {
       const provider = getExchangeProvider();
-      const rows = await fetchFromExchange("recentTrades", () => provider.getRecentTrades(normalized, limit), {
+      const rows = await fetchFromExchange("recentTrades", () => provider.getRecentTrades(normalized, limit, options.strictExecution ? { strict: true } : undefined), {
         signal: options.signal,
         timeoutMs: options.timeoutMs,
         label: `recentTrades:${normalized}`,
@@ -618,6 +616,8 @@ export class MarketDataOrchestrator {
 
   async fetchContextBundle(input: {
     symbol: string;
+    strictExecution?: boolean;
+    allowStaleOnBackoff?: boolean;
     lite?: boolean;
     priority?: MarketDataPriority;
     maxAgeMs?: number;
@@ -630,16 +630,18 @@ export class MarketDataOrchestrator {
     telemetry.totalRequests += 1;
     recordKind("contextBundle");
 
-    return coalesce(`contextBundle:${normalized}:${lite ? "lite" : "full"}:${priority}`, async () => {
+    return coalesce(`${input.strictExecution ? "execution:" : ""}contextBundle:${normalized}:${lite ? "lite" : "full"}:${priority}`, async () => {
       const ticker = await this.getTicker(normalized, {
         priority,
         maxAgeMs: input.maxAgeMs,
         signal: input.signal,
+        strictExecution: input.strictExecution,
+        allowStaleOnBackoff: input.allowStaleOnBackoff,
         timeoutMs: input.timeoutMs,
       });
       const resolvedSymbol = ticker.symbol.toUpperCase();
       const volume = ticker.volume24h;
-      const needs24hKlines = !Number.isFinite(ticker.change24h) || Math.abs(Number(ticker.change24h)) < 0.2;
+      const needs24hKlines = !Number.isFinite(ticker.change24h);
       const klinesMaxAge = input.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "klines", volume24h: volume, priority, interval: "1m" });
       const hourMaxAge = resolveAdaptiveTtlMs({ kind: "klines", volume24h: volume, priority, interval: "1h" });
 
@@ -648,22 +650,28 @@ export class MarketDataOrchestrator {
           priority,
           maxAgeMs: klinesMaxAge,
           signal: input.signal,
+          strictExecution: input.strictExecution,
+          allowStaleOnBackoff: input.allowStaleOnBackoff,
           timeoutMs: input.timeoutMs,
         }),
         lite
           ? Promise.resolve(null)
           : this.getOrderBook(resolvedSymbol, 30, {
               priority,
-              maxAgeMs: resolveAdaptiveTtlMs({ kind: "orderBook", volume24h: volume, priority }),
+              maxAgeMs: input.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "orderBook", volume24h: volume, priority }),
               signal: input.signal,
+              strictExecution: input.strictExecution,
+              allowStaleOnBackoff: input.allowStaleOnBackoff,
               timeoutMs: input.timeoutMs,
             }),
         lite
           ? Promise.resolve(null)
           : this.getRecentTrades(resolvedSymbol, 150, {
               priority,
-              maxAgeMs: resolveAdaptiveTtlMs({ kind: "recentTrades", volume24h: volume, priority }),
+              maxAgeMs: input.maxAgeMs ?? resolveAdaptiveTtlMs({ kind: "recentTrades", volume24h: volume, priority }),
               signal: input.signal,
+              strictExecution: input.strictExecution,
+              allowStaleOnBackoff: input.allowStaleOnBackoff,
               timeoutMs: input.timeoutMs,
             }),
         needs24hKlines
@@ -671,12 +679,14 @@ export class MarketDataOrchestrator {
               priority,
               maxAgeMs: hourMaxAge,
               signal: input.signal,
+              strictExecution: input.strictExecution,
+              allowStaleOnBackoff: input.allowStaleOnBackoff,
               timeoutMs: input.timeoutMs,
             })
           : Promise.resolve([] as KlineItem[]),
       ]);
 
-      if (!lite && orderBook && recentTrades) {
+      if (!input.strictExecution && !lite && orderBook && recentTrades) {
         putMarketSnapshot(resolvedSymbol, { klines: klines1m, orderBook, recentTrades });
       }
 

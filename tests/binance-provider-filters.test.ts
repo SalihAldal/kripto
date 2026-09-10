@@ -66,3 +66,15 @@ describe("binance symbol filters", () => {
     await expect(provider.calculateValidQuantity("BTCTRY", 0.01)).rejects.toThrow("calculateValidQuantity failed");
   });
 });
+
+it("strict execution reads parse numeric depth and never fall back after upstream failure", async () => {
+  const provider = new BinanceExchangeProvider();
+  const boundary = provider as unknown as { fetchPublicJson: (...args: unknown[]) => Promise<unknown> };
+  const fetch = vi.spyOn(boundary, "fetchPublicJson").mockResolvedValue({ lastUpdateId: 1, bids: [["99", "10"]], asks: [["101", "20"]] });
+  expect(await provider.getOrderBook("BTCTRY", 30, { strict: true })).toMatchObject({ bids: [{ price: 99, quantity: 10 }], asks: [{ price: 101, quantity: 20 }] });
+  fetch.mockRejectedValue(new Error("HTTP 429"));
+  await expect(provider.getTicker("BTCTRY", { strict: true })).rejects.toThrow("HTTP 429");
+  await expect(provider.getOrderBook("BTCTRY", 30, { strict: true })).rejects.toThrow("HTTP 429");
+  await expect(provider.getKlines("BTCTRY", "1m", 80, { strict: true })).rejects.toThrow("HTTP 429");
+  await expect(provider.getRecentTrades("BTCTRY", 150, { strict: true })).rejects.toThrow("HTTP 429");
+});

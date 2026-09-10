@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { putMarketSnapshot } from "@/src/server/scanner/market-snapshot-cache";
 import { marketDataOrchestrator, resolveAdaptiveTtlMs } from "@/src/server/market-data/market-data-orchestrator.service";
 
 const providerMocks = vi.hoisted(() => ({
@@ -79,4 +80,18 @@ describe("market data orchestrator", () => {
     expect(stale.price).toBe(100);
     expect(providerMocks.getTicker).toHaveBeenCalledTimes(1);
   });
+  it("strict execution ignores untagged global cache and calls strict provider", async () => {
+    putMarketSnapshot("BTCTRY", { klines: [], orderBook: { lastUpdateId: 2, bids: [{ price: 1, quantity: 9 }], asks: [{ price: 2, quantity: 9 }] }, recentTrades: [] });
+    const book = await marketDataOrchestrator.getOrderBook("BTCTRY", 30, { strictExecution: true });
+    expect(book.bids[0].price).toBe(99.9);
+    expect(providerMocks.getOrderBook).toHaveBeenCalledWith("BTCTRY", 30, { strict: true });
+  });
+  it("strict execution fails closed during rate limiting despite warm cache", async () => {
+    await marketDataOrchestrator.getTicker("BTCTRY");
+    providerMocks.getTicker.mockRejectedValue(new Error("HTTP 429"));
+    await expect(marketDataOrchestrator.getTicker("BTCTRY", { strictExecution: true })).rejects.toThrow("429");
+    await expect(marketDataOrchestrator.getTicker("BTCTRY", { strictExecution: true })).rejects.toThrow("budget");
+    expect(providerMocks.getTicker).toHaveBeenCalledTimes(2);
+  });
+
 });

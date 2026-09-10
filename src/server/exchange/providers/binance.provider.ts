@@ -18,7 +18,7 @@ import type {
   SymbolValidationResult,
 } from "@/src/types/exchange";
 import { SimpleRateLimiter, withRetry } from "@/src/server/exchange/utils";
-import type { ExchangeProvider } from "@/src/server/exchange/providers/base-provider";
+import type { ExchangeProvider, ExchangeMarketReadOptions } from "@/src/server/exchange/providers/base-provider";
 import { resolveBinanceMakerFeeRate, resolveBinanceTakerFeeRate } from "@/src/server/execution/fee-profile";
 import { MarketDataUnavailableError } from "@/src/server/market-data/market-data-unavailable.error";
 import { getSharedRestLimiter } from "@/src/server/market-data/spine/shared-rest-limiter";
@@ -1029,7 +1029,13 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     }
   }
 
-  async getTicker(symbol: string) {
+  async getTicker(symbol: string, options?: ExchangeMarketReadOptions) {
+    if (options?.strict) {
+      const normalized = symbol.toUpperCase();
+      const row = await this.fetchPublicJson<Record<string, string>>("/api/v3/ticker/24hr", { symbol: normalized }, TR_MARKETDATA_TIMEOUT_MS);
+      if (row.symbol !== normalized) throw new Error("EXECUTION_SYMBOL_MISMATCH");
+      return { symbol: row.symbol, price: Number(row.lastPrice), change24h: Number(row.priceChangePercent), volume24h: Number(row.quoteVolume) };
+    }
     const normalized = symbol.toUpperCase();
     if (this.platform === "tr") {
       if (this.isGlobalNetworkCooldownActive()) {
@@ -1200,7 +1206,15 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     }
   }
 
-  async getKlines(symbol: string, interval = "1m", limit = 100): Promise<KlineItem[]> {
+  async getKlines(symbol: string, interval = "1m", limit = 100, options?: ExchangeMarketReadOptions): Promise<KlineItem[]> {
+    if (options?.strict) {
+      const rows = await this.fetchPublicJson<unknown[]>("/api/v3/klines", { symbol: symbol.toUpperCase(), interval, limit }, TR_MARKETDATA_TIMEOUT_MS);
+      if (!Array.isArray(rows)) throw new Error("EXECUTION_KLINES_INVALID");
+      return rows.filter((row): row is unknown[] => Array.isArray(row) && row.length >= 7).map(row => ({
+        openTime: Number(row[0]), closeTime: Number(row[6]), open: Number(row[1]), high: Number(row[2]),
+        low: Number(row[3]), close: Number(row[4]), volume: Number(row[5]),
+      }));
+    }
     const normalized = symbol.toUpperCase();
     if (this.platform === "tr") {
       const cacheKey = `${normalized}|${interval}|${limit}`;
@@ -1349,7 +1363,14 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     }
   }
 
-  async getOrderBook(symbol: string, limit = 50): Promise<OrderBookSnapshot> {
+  async getOrderBook(symbol: string, limit = 50, options?: ExchangeMarketReadOptions): Promise<OrderBookSnapshot> {
+    if (options?.strict) {
+      const row = await this.fetchPublicJson<{ lastUpdateId: number; bids: unknown; asks: unknown }>("/api/v3/depth", { symbol: symbol.toUpperCase(), limit: this.normalizeTrDepthLimit(limit) }, TR_MARKETDATA_TIMEOUT_MS);
+      return { lastUpdateId: Number(row.lastUpdateId),
+        bids: this.normalizeDepthSide(row.bids).slice(0, limit).map(([price, quantity]) => ({ price: Number(price), quantity: Number(quantity) })),
+        asks: this.normalizeDepthSide(row.asks).slice(0, limit).map(([price, quantity]) => ({ price: Number(price), quantity: Number(quantity) })),
+      };
+    }
     const normalized = symbol.toUpperCase();
     if (this.platform === "tr") {
       const cacheKey = `${normalized}|${limit}`;
@@ -1484,7 +1505,12 @@ export class BinanceExchangeProvider implements ExchangeProvider {
     }
   }
 
-  async getRecentTrades(symbol: string, limit = 50): Promise<RecentTrade[]> {
+  async getRecentTrades(symbol: string, limit = 50, options?: ExchangeMarketReadOptions): Promise<RecentTrade[]> {
+    if (options?.strict) {
+      const rows = await this.fetchPublicJson<Array<Record<string, unknown>>>("/api/v3/trades", { symbol: symbol.toUpperCase(), limit: Math.min(limit, 200) }, TR_MARKETDATA_TIMEOUT_MS);
+      if (!Array.isArray(rows)) throw new Error("EXECUTION_TRADES_INVALID");
+      return rows.map(row => ({ id: Number(row.id), price: Number(row.price), qty: Number(row.qty), time: Number(row.time), isBuyerMaker: row.isBuyerMaker === true }));
+    }
     const normalized = symbol.toUpperCase();
     if (this.platform === "tr") {
       const cacheKey = `${normalized}|${limit}`;

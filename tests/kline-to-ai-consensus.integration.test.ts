@@ -1,3 +1,4 @@
+import { executionMarketFixture } from "./helpers/execution-market-fixture";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { runAIConsensusFromInput } from "@/src/server/ai/analysis-orchestrator";
 import { formatAIRequest } from "@/src/server/scanner/ai-request-formatter";
@@ -254,4 +255,17 @@ describe("kline to AI consensus integration", () => {
     const staleEvent = tradeEvents.find((row) => row.eventType === "AI_KLINE_STALE");
     expect(staleEvent?.newValue).toMatchObject({ reasonCode: "KLINE_COUNT_INSUFFICIENT" });
   });
+});
+
+it("dedicated execution input uses actual multi-timeframe history and never substitutes RAM data", async () => {
+  const { marketDataGateway } = await import("@/src/server/market-data/market-data-gateway");
+  const { getMarketSnapshot } = await import("@/src/server/scanner/market-snapshot-cache");
+  vi.mocked(marketDataGateway.getKlines).mockClear(); vi.mocked(getMarketSnapshot).mockClear();
+  const snapshot = executionMarketFixture("BTCTRY");
+  for (const rows of Object.values(snapshot.timeframes)) rows.forEach((row, i) => { row.close = 100 + i * .2; });
+  const context = { symbol: "BTCTRY", lastPrice: 100, change24h: 0, volume24h: 10000000, metadata: { venue: "BINANCE_TR" }, rejectReasons: [] } as unknown as MarketContext;
+  const input = await formatAIRequest(context, undefined, undefined, snapshot);
+  expect(input.klines).toEqual(snapshot.bundle.klines1m);
+  expect(input.multiTimeframe?.dominantTrend).toBe("BULLISH");
+  expect(marketDataGateway.getKlines).not.toHaveBeenCalled(); expect(getMarketSnapshot).not.toHaveBeenCalled();
 });

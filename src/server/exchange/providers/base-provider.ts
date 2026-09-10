@@ -10,16 +10,18 @@ import type {
   SymbolValidationResult,
 } from "@/src/types/exchange";
 
+export type ExchangeMarketReadOptions = { strict?: boolean };
+
 export interface ExchangeProvider {
   readonly name: string;
   readonly environment: ExchangeEnvironment;
   readonly dryRun: boolean;
 
-  getTicker(symbol: string): Promise<{ symbol: string; price: number; change24h: number; volume24h: number }>;
+  getTicker(symbol: string, options?: ExchangeMarketReadOptions): Promise<{ symbol: string; price: number; change24h: number; volume24h: number }>;
   listTickers24h?(): Promise<Array<{ symbol: string; price: number; change24h: number; volume24h: number }>>;
-  getKlines(symbol: string, interval?: string, limit?: number): Promise<KlineItem[]>;
-  getOrderBook(symbol: string, limit?: number): Promise<OrderBookSnapshot>;
-  getRecentTrades(symbol: string, limit?: number): Promise<RecentTrade[]>;
+  getKlines(symbol: string, interval?: string, limit?: number, options?: ExchangeMarketReadOptions): Promise<KlineItem[]>;
+  getOrderBook(symbol: string, limit?: number, options?: ExchangeMarketReadOptions): Promise<OrderBookSnapshot>;
+  getRecentTrades(symbol: string, limit?: number, options?: ExchangeMarketReadOptions): Promise<RecentTrade[]>;
   placeMarketBuy(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string): Promise<PlaceOrderResult>;
   placeMarketBuyByQuote?(symbol: string, quoteOrderQty: number, dryRun?: boolean): Promise<PlaceOrderResult>;
   placeMarketSell(symbol: string, quantity: number, dryRun?: boolean, clientOrderId?: string): Promise<PlaceOrderResult>;

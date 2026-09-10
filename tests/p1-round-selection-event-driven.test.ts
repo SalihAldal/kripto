@@ -1,7 +1,11 @@
+vi.mock("@/lib/logger", () => ({ logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
+vi.mock("@/src/server/ai/analysis-orchestrator", () => ({ runAIConsensusFromInput: vi.fn(() => { throw new Error("AI must be deferred until execution venue is ready"); }) }));
+vi.mock("@/src/server/scanner/ai-request-formatter", () => ({ formatAIRequest: vi.fn(() => { throw new Error("Selection must not hydrate source-market AI"); }) }));
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { getCanonicalCandidateStore, resetCanonicalCandidateStoreForTests } from "@/src/server/candidate/candidate-store.service";
 
 vi.mock("@/lib/config", () => ({
+  isProd: true,
   env: {
     AUTO_ROUND_SELECTION_MIN_EVIDENCE_WINDOW_MS: 100,
     AUTO_ROUND_SELECTION_FALLBACK_POLL_INTERVAL_MS: 100,

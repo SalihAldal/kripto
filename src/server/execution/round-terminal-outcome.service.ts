@@ -195,7 +195,13 @@ export function toRoundRuntimeStep(outcome: RoundTerminalOutcome): RoundRuntimeS
 }
 
 export function formatTerminalReason(outcome: RoundTerminalOutcome): string {
-  return `${outcome.stage}:${outcome.reasonCode}:${outcome.description}`;
+  const description = outcome.description.trim();
+  const prefix = `${outcome.stage}:`;
+  if (description.startsWith(prefix)) return description;
+  if (description === outcome.reasonCode || description.startsWith(`${outcome.reasonCode}:`) || /^[A-Z_]+:[A-Z_]+/.test(description)) {
+    return `${prefix}${description}`;
+  }
+  return `${prefix}${outcome.reasonCode}:${description}`;
 }
 
 export function resolveReportFailReason(input: {
@@ -214,6 +220,7 @@ export function resolveReportFailReason(input: {
 }
 
 function extractReasonCode(reason: string, fallback: string): string {
-  const token = reason.split(":").find((part) => /^[A-Z][A-Z0-9_]+$/.test(part.trim()));
+  const domains = new Set(["STRATEGY", "MARKET_DATA", "DATABASE", "SAFE_MODE", "EXECUTION", "SYMBOL_FILTER", "AI_PROVIDER"]);
+  const token = reason.split(":").find((part) => /^[A-Z][A-Z0-9_]+$/.test(part.trim()) && !domains.has(part.trim()));
   return token?.trim() || fallback;
 }

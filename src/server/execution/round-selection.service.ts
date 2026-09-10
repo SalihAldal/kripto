@@ -31,10 +31,8 @@ import { getMarketDataDaemon } from "@/src/server/market-data/spine/market-data-
 import {
   attachCanonicalHandoff,
   buildCanonicalHandoffMetadata,
-  hydrateCanonicalHandoffCandidate,
   validateCanonicalHandoffRecord,
 } from "@/src/server/execution/canonical-handoff.service";
-import { resolveAiExecutionGatePolicy } from "@/src/server/execution/ai-execution-gate.service";
 import { recordRoundPipelineTelemetry } from "@/src/server/execution/round-pipeline-telemetry.service";
 import { observeCanonicalShadowTick } from "@/src/server/shadow-outcome/shadow-outcome-engine";
 import { persistShadowOutcomes } from "@/src/server/shadow-outcome/persist";
@@ -411,7 +409,7 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
     let settled = false;
     let inFlight = false;
     let pendingRecheck = false;
-    let minimumCheckAt = Date.now() + eventConfig.minimumEvidenceWindowMs;
+    const minimumCheckAt = Date.now() + eventConfig.minimumEvidenceWindowMs;
     const selectionResult = await new Promise<
       | { kind: "selected"; selectedRecord: CanonicalCandidateRecord; selected: ScannerCandidate }
       | { kind: "aborted"; reason: string }
@@ -498,7 +496,7 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
           eventConfig.minimumEvidenceWindowMs - elapsedSinceTransition,
           eventConfig.candidateEventDebounceMs,
         );
-        minimumCheckAt = Math.max(minimumCheckAt, event.at + eventConfig.minimumEvidenceWindowMs);
+        // Keep the original evidence deadline: unrelated ticks must not postpone selection indefinitely.
         scheduleCheck(Math.max(0, remainingDebounce));
       });
       fallbackTimer = setInterval(() => {
@@ -533,13 +531,9 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
           reason: `${validation.reasonCode}:${validation.reasonDetail}`,
         };
       }
-      const aiPolicy = resolveAiExecutionGatePolicy({ mode: "paper", learningLane: true });
-      const hydrated = await hydrateCanonicalHandoffCandidate({
-        candidate: selectionResult.selected,
-        handoff: handoffMeta,
-        allowAdvisoryShell: aiPolicy === "ADVISORY",
-      });
-      const selected = attachCanonicalHandoff(hydrated.candidate, hydrated.handoff);
+      // Select first. The orchestrator validates identity, prepares the execution
+      // venue, then performs consensus once. No slow source-quote AI before handoff.
+      const selected = attachCanonicalHandoff(selectionResult.selected, handoffMeta);
       await controller.transition("SYMBOL_SELECTED", `${selected.context.symbol} canonical opportunity secimi`, {
         currentSymbol: selected.context.symbol.toUpperCase(),
         currentPipeline: "opportunity-engine",
@@ -552,8 +546,8 @@ export async function runCooperativeRoundSelection(input: CooperativeSelectionIn
         payload: {
           candidateId: handoffMeta.candidateId,
           symbol: selected.context.symbol,
-          aiSource: hydrated.aiSource,
-          aiConsensusStatus: hydrated.handoff.aiConsensusStatus,
+          aiSource: "deferred_to_execution",
+          aiConsensusStatus: handoffMeta.aiConsensusStatus,
           storeTelemetry: getCanonicalCandidateStore().getTelemetry(),
         },
       });
